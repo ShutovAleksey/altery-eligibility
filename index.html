@@ -4141,8 +4141,14 @@
     const Icon = ({ name, size = 20, color = "currentColor", stroke = 1.6, style, ...rest }) => {
       const paths = ICONS[name];
       if (!paths) return null;
+      // Coerce size to a finite positive number. Without this, a CSS-var
+      // string or NaN ends up in <svg width="..."/> as an invalid attribute,
+      // and iOS Safari falls back to SVG-2 default (300×150) which blows
+      // up the surrounding flex layout. Chrome/Firefox handle it via auto
+      // flex sizing so the bug is invisible on desktop.
+      const px = Number.isFinite(+size) && +size > 0 ? +size : 20;
       return (
-        <svg {...rest} width={size} height={size} viewBox="0 0 24 24" fill="none"
+        <svg {...rest} width={px} height={px} viewBox="0 0 24 24" fill="none"
              stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round"
              style={{ flex: "0 0 auto", ...style }} aria-hidden="true">
           {paths}
@@ -4294,10 +4300,15 @@
       whiteSpace: "nowrap", userSelect: "none",
     };
     const btnSizes = {
-      sm: { padding: "6px 12px", fontSize: 13, lineHeight: "18px", borderRadius: "var(--r-sm)", height: 32 },
-      md: { padding: "8px 16px", fontSize: "var(--fs-body)", lineHeight: "var(--lh-body)", borderRadius: "var(--r-md)", height: 36 },
-      lg: { padding: "10px 20px", fontSize: 15, lineHeight: "22px", borderRadius: "var(--r-md)", height: 44 },
-      xl: { padding: "12px 24px", fontSize: "var(--fs-h4)", lineHeight: "var(--lh-h4)", borderRadius: 14, height: 52 },
+      // iconSize is explicit per size — previously we used sz.fontSize + 2,
+      // which silently broke when fontSize was a CSS-var string ("var(--fs-h4)"
+      // + 2 = "var(--fs-h4)2"). Chrome/Firefox fall back to flex auto-sizing
+      // for invalid SVG width/height; iOS Safari follows SVG-2 spec strictly
+      // and reverts to 300×150, which explodes the button layout on mobile.
+      sm: { padding: "6px 12px",  fontSize: 13,                lineHeight: "18px",         borderRadius: "var(--r-sm)", height: 32, iconSize: 14 },
+      md: { padding: "8px 16px",  fontSize: "var(--fs-body)",  lineHeight: "var(--lh-body)", borderRadius: "var(--r-md)", height: 36, iconSize: 16 },
+      lg: { padding: "10px 20px", fontSize: 15,                lineHeight: "22px",         borderRadius: "var(--r-md)", height: 44, iconSize: 17 },
+      xl: { padding: "12px 24px", fontSize: "var(--fs-h4)",    lineHeight: "var(--lh-h4)", borderRadius: 14,            height: 52, iconSize: 20 },
     };
     const btnVariants = {
       primary: { bg: "var(--c-primary)", fg: "var(--c-on-primary)", bgH: "var(--c-primary-hover)", bgA: "var(--c-primary-active)" },
@@ -4328,9 +4339,9 @@
           onMouseUp={() => setA(false)}
           onClick={onClick} {...rest}
         >
-          {iconLeft && <Icon name={iconLeft} size={sz.fontSize + 2} />}
+          {iconLeft && <Icon name={iconLeft} size={sz.iconSize} />}
           {children && <span>{children}</span>}
-          {iconRight && <Icon name={iconRight} size={sz.fontSize + 2} />}
+          {iconRight && <Icon name={iconRight} size={sz.iconSize} />}
         </button>
       );
     };
