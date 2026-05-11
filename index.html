@@ -997,7 +997,7 @@
     }
     .ec-fees__table {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: minmax(0, 1fr) max-content;
       gap: 0;
       border: 1px solid var(--c-border);
       border-radius: 10px;
@@ -1055,9 +1055,21 @@
       border-bottom-color: currentColor;
       outline: none;
     }
-    @media (max-width: 600px) {
-      .ec-fees__value { white-space: normal; max-width: 50%; }
+    /* Mobile fees modal — desktop has generous padding (32px) and assumes
+       wide viewport. On phones (≤640px) we tighten everything so the
+       table cells have enough room for nowrap values like "$10 / €8.80
+       / £8" or "Up to 0.8%" without the desktop rule artificially
+       wrapping them into "Up\nto\n0.8%" mess. Keep white-space: nowrap
+       (inherited from desktop) — the cells expand to fit. The grid
+       template `minmax(0, 1fr) max-content` guarantees the value column
+       gets max-content width regardless of label length. */
+    @media (max-width: 640px) {
+      .ec-modal { padding: 28px 16px 22px; border-radius: 18px; }
+      .ec-modal__title { font-size: 20px; line-height: 26px; margin: 4px 32px 16px; }
+      .ec-fees__subtitle { margin: -12px 16px 18px; font-size: 12px; line-height: 17px; }
       .ec-fees__row > * { padding: 10px 12px; font-size: 13px; }
+      .ec-fees__section { margin-bottom: 16px; }
+      .ec-fees__sectionHead { font-size: 10px; }
     }
 
     .ec-plan-compare__grid {
@@ -1929,12 +1941,11 @@
       overflow: hidden;
       background: var(--c-ink-2, #1a1d2e);
       cursor: default;
-      transition: transform .3s ease, box-shadow .3s ease;
+      transition: transform .3s ease;
       isolation: isolate;
     }
     .ec-perks__card:hover {
       transform: translateY(-3px);
-      box-shadow: 0 18px 44px rgba(0, 23, 73, 0.22);
     }
     .ec-perks__card__media {
       position: absolute;
@@ -2035,9 +2046,18 @@
       .ec-header__right { gap: 8px; min-width: 0; }
       .lang-pill { flex-shrink: 0; height: 32px; padding: 0 10px 0 6px; }
 
-      /* ── Page chrome ── */
-      .ec-main { padding: 0 16px 96px; }
-      .ec-content { padding: 16px 0 120px; gap: 18px; }
+      /* ── Page chrome ──
+         Three sources of empty bottom space on phones, all addressed
+         here: (1) .ec-app min-height: 100vh forces app to fill viewport
+         even when content is short; (2) .ec-main flex: 1 then stretches
+         to fill remaining space, putting void below content; (3) the
+         desktop bottom paddings (96+120 = 216px) compound the void.
+         Mobile drops (1) by setting min-height: auto, overrides (2) by
+         removing flex (main takes natural height), and tightens (3) to
+         tasteful 24/32px. Now the page ends where the content ends. */
+      .ec-app { min-height: auto; }
+      .ec-main { flex: 0 0 auto; padding: 0 16px 24px; }
+      .ec-content { min-height: auto; padding: 16px 0 32px; gap: 18px; }
 
       /* ── Plan card head ──
          German `ec.plan.ultra.fit` ("Über 1 Mio. €/Monat, komplexe Strukturen")
@@ -7667,8 +7687,14 @@
       // perks text (FX cap, SWIFT cap if present). Keeps the modal in
       // sync with whatever copy the plan card shows.
       const planPrice = plan.price; // e.g. "£100"
-      const cycleSuffix = t(plan.cycleKey); // "/month" etc.
-      const monthlyFee = `${planPrice}${cycleSuffix}`;
+      const cycleSuffix = t(plan.cycleKey); // "/ month" etc.
+      // Concatenate with non-breaking spaces — the cycle suffix usually
+      // contains a regular space (e.g. "/ month") which the browser will
+      // happily wrap at on narrow mobile cells. Replacing all ASCII
+      // spaces with \u00A0 keeps the price-and-cycle unit on one line
+      // regardless of CSS white-space behaviour. Belt-and-braces with
+      // the .ec-fees__value { white-space: nowrap } rule.
+      const monthlyFee = `${planPrice}${cycleSuffix}`.replace(/ /g, '\u00A0');
       // FX cap and SWIFT cap detection — read from plan perkKeys text.
       // The modal sources its plan-specific values from the same i18n
       // strings the perks list uses, so changing one updates both.
@@ -7722,7 +7748,7 @@
         },
       ];
 
-      return (
+      return ReactDOM.createPortal((
         <div className="ec-modal__backdrop" role="dialog" aria-modal="true" onClick={onClose}>
           <div className="ec-modal" onClick={(e) => e.stopPropagation()}>
             <button
@@ -7778,7 +7804,7 @@
             </div>
           </div>
         </div>
-      );
+      ), document.body);
     }
 
 
