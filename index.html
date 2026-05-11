@@ -985,6 +985,39 @@
       pointer-events: none;
     }
 
+    /* Express Checkout Element wrap — same Stripe-empty-mount rule.
+       Stripe renders the wallet buttons inline; height collapses to 0
+       when no wallets are available (no domain verification, wrong
+       browser, etc.) so the slot disappears cleanly. */
+    .ec-payment__expressWrap {
+      margin: 18px 0 0;
+    }
+    .ec-payment__expressMount {
+      /* Stripe owns the DOM here. Don't add children. */
+    }
+
+    /* "Or pay with card" divider — only between Express Checkout
+       buttons and Payment Element form. Hidden when no wallets render
+       (handled in JSX with expressAvailable). */
+    .ec-payment__orDivider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 14px 0 10px;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--c-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .ec-payment__orDivider::before,
+    .ec-payment__orDivider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--c-border-soft);
+    }
+
     .ec-payment__alert {
       padding: 10px 14px;
       border-radius: 10px;
@@ -1995,6 +2028,7 @@
         "ec.r.payment.pay":     "Subscribe — {price}/mo",
         "ec.r.payment.processing": "Processing…",
         "ec.r.payment.loading": "Loading payment options…",
+        "ec.r.payment.orPayWith": "or pay with card",
         "ec.r.payment.demoMessage": "Demo mode — payment requires backend confirmation (PaymentIntent creation). Form validated successfully.",
         "ec.r.payment.success":     "Payment succeeded! 🎉 Test mode — no real charge made. Check Stripe Dashboard → Payments to see the PaymentIntent.",
         "ec.r.payment.backendError": "Couldn't reach backend: {error}. Make sure /api/create-payment-intent is deployed.",
@@ -5935,13 +5969,24 @@
     function EcPaymentModal({ activePlan, onClose }) {
       const t = useT();
       const mountRef = useRef(null);
+      const expressMountRef = useRef(null);
       const stripeRef = useRef(null);
       const elementsRef = useRef(null);
+      // Holds the latest confirm-flow function. Shared between the bottom
+      // Subscribe button and the Express Checkout 'confirm' event handler
+      // so both paths run identical validation+backend+confirm logic.
+      const runPaymentFlowRef = useRef(null);
       const [status, setStatus] = useState({ loading: false, message: null, kind: null });
       const [elementReady, setElementReady] = useState(false);
       // True when Stripe couldn't load in this environment. Activates the
       // fallback UI which lists payment methods that would normally appear.
       const [stripeBlocked, setStripeBlocked] = useState(false);
+      // True when Express Checkout Element has at least one wallet button
+      // to show (Apple Pay in Safari with verified domain, Google Pay in
+      // Chrome with account activation, Link, etc.). Controls visibility
+      // of the "or pay with card" divider — hidden when no wallets exist
+      // so we don't render an awkward divider with nothing above it.
+      const [expressAvailable, setExpressAvailable] = useState(false);
 
       // ESC closes + lock body scroll while modal is open
       useEffect(() => {
@@ -5961,6 +6006,7 @@
       useEffect(() => {
         let cancelled = false;
         let paymentElement = null;
+        let expressElement = null;
 
         const init = async () => {
           // Step 1 — get the publishable key. Prefer backend /api/config
@@ -6008,6 +6054,11 @@
           const amount = STRIPE_DEMO_AMOUNTS[activePlan.id] || STRIPE_DEMO_AMOUNTS.pro;
           const stripe = StripeCtor(publishableKey);
           stripeRef.current = stripe;
+          // Diagnostic: confirm which Stripe key actually got used. The
+          // suffix should match the key in your Vercel env vars + Stripe
+          // Dashboard. If it doesn't, /api/config isn't returning the
+          // right key (env var missing / wrong project / cached deploy).
+          console.log("[Altery] Stripe initialised. Key prefix:", publishableKey.slice(0, 14), "suffix:", publishableKey.slice(-8));
 
           const elements = stripe.elements({
             mode: "payment",
@@ -6050,6 +6101,135 @@
             if (!cancelled) setElementReady(true);
           });
           paymentElement.mount(mountRef.current);
+
+          // ─── Express Checkout Element ──────────────────────────
+          // Renders prominent wallet buttons (Apple Pay, Google Pay,
+          // Link, PayPal) ABOVE the Payment Element. Only shows wallets
+          // the user's browser actually supports + account has enabled:
+          //   • Apple Pay → Safari on Apple device + verified domain +
+          //                 card in Wallet
+          //   • Google Pay → Chrome/Edge + Stripe account activation +
+          //                  card in Google Pay
+          //   • Link → opt-in, requires activation
+          // If nothing's available, the element renders nothing (height
+          // 0) and the divider stays hidden via expressAvailable state.
+          if (expressMountRef.current) {
+            expressElement = elements.create("expressCheckout", {
+              buttonHeight: 48,
+              buttonTheme: {
+                applePay: "black",
+                googlePay: "black",
+                paypal: "gold",
+              },
+              paymentMethods: {
+                applePay: "auto",
+                googlePay: "auto",
+                link: "auto",
+                paypal: "auto",
+              },
+            });
+
+            expressElement.on("ready", (event) => {
+              if (cancelled) return;
+              const methods = event && event.availablePaymentMethods;
+              const hasAny = methods && Object.values(methods).some(Boolean);
+              // Diagnostic: shows EXACTLY which wallets Stripe will render
+              // for this browser + Stripe account combo. If methods is
+              // null/undefined/empty — no wallets will appear, and you
+              // need to fix the account (activate in Dashboard) and/or
+              // browser (Chrome with Google Pay setup, Safari with Apple
+              // Pay + verified domain).
+              console.log("[Altery] ExpressCheckout ready. Available wallets:", methods, "→ hasAny:", hasAny);
+              if (!hasAny) {
+                console.warn(
+                  "[Altery] No wallets available. Common causes:\n" +
+                  "  • Apple Pay: domain not verified in Stripe Dashboard → Settings → Payment method domains\n" +
+                  "  • Google Pay: testing in Safari/Firefox (Chrome/Edge only) OR account not activated\n" +
+                  "  • Link/PayPal: not activated in Stripe Dashboard → Settings → Payment methods"
+                );
+              }
+              setExpressAvailable(!!hasAny);
+            });
+
+            // Confirm handler — fired when user taps an Apple Pay /
+            // Google Pay / Link / PayPal button and authorises in the
+            // native sheet. Same backend+confirm flow as the Subscribe
+            // button (handlePay); minor differences: no return early on
+            // missing refs (the click guarantees they're set), and we
+            // don't redirect since wallets confirm inline.
+            expressElement.on("confirm", async () => {
+              setStatus({ loading: true, message: null, kind: null });
+
+              const { error: submitError } = await elementsRef.current.submit();
+              if (submitError) {
+                setStatus({
+                  loading: false,
+                  message: submitError.message || "Validation failed",
+                  kind: "error",
+                });
+                return;
+              }
+
+              let clientSecret;
+              try {
+                const response = await fetch("/api/create-payment-intent", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    planId: activePlan.id,
+                    amount: STRIPE_DEMO_AMOUNTS[activePlan.id] || STRIPE_DEMO_AMOUNTS.pro,
+                    currency: "eur",
+                  }),
+                });
+                if (!response.ok) {
+                  const body = await response.text();
+                  throw new Error("HTTP " + response.status + ": " + body.slice(0, 200));
+                }
+                const data = await response.json();
+                clientSecret = data.clientSecret;
+                if (!clientSecret) throw new Error("Backend returned no clientSecret");
+              } catch (err) {
+                console.error("[ExpressCheckout] Backend error:", err);
+                setStatus({
+                  loading: false,
+                  message: t("ec.r.payment.backendError", { error: err.message || "unknown" }),
+                  kind: "error",
+                });
+                return;
+              }
+
+              const { error: confirmError, paymentIntent } =
+                await stripeRef.current.confirmPayment({
+                  elements: elementsRef.current,
+                  clientSecret,
+                  confirmParams: {
+                    return_url:
+                      window.location.origin +
+                      window.location.pathname +
+                      "?paid=1",
+                  },
+                  redirect: "if_required",
+                });
+
+              if (confirmError) {
+                setStatus({
+                  loading: false,
+                  message: confirmError.message || "Payment failed",
+                  kind: "error",
+                });
+                return;
+              }
+              if (paymentIntent && paymentIntent.status === "succeeded") {
+                setStatus({
+                  loading: false,
+                  message: t("ec.r.payment.success"),
+                  kind: "success",
+                });
+              }
+            });
+
+            expressElement.mount(expressMountRef.current);
+          }
         };
 
         init();
@@ -6057,6 +6237,7 @@
         return () => {
           cancelled = true;
           try { if (paymentElement) paymentElement.destroy(); } catch (e) { /* noop */ }
+          try { if (expressElement) expressElement.destroy(); } catch (e) { /* noop */ }
         };
       }, [activePlan.id, t]);
 
@@ -6194,6 +6375,27 @@
               </div>
               <p className="ec-payment__lead">{t("ec.r.payment.lead")}</p>
             </div>
+
+            {/* Express Checkout Element — renders prominent wallet
+                buttons (Apple Pay / Google Pay / Link / PayPal) when
+                available. Mount node is empty for React (same reason as
+                Payment Element — Stripe owns DOM here). When no wallets
+                are available the element has height 0 and the divider
+                stays hidden via expressAvailable. */}
+            {!stripeBlocked && (
+              <div className="ec-payment__expressWrap">
+                <div ref={expressMountRef} className="ec-payment__expressMount" />
+              </div>
+            )}
+
+            {/* "Or pay another way" divider — only between Express
+                Checkout and Payment Element, only when Express actually
+                renders wallets. */}
+            {!stripeBlocked && expressAvailable && (
+              <div className="ec-payment__orDivider" aria-hidden="true">
+                <span>{t("ec.r.payment.orPayWith")}</span>
+              </div>
+            )}
 
             {/* Stripe Payment Element mount.
                 CRITICAL: mountRef div MUST be empty for React. Stripe
