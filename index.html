@@ -683,13 +683,99 @@
 
     /* Hero — solid navy, no decorative gradient or radial halo. The information
        (entity name + plan + status) is the focus; chrome was decoration. */
+    /* Hero block — the dark navy header that anchors the result page.
+       Carries the entity recommendation, plan, status pills, IBAN
+       preview chip. Premium depth treatment via four signals:
+         1. Top-down vertical gradient: lighter blue tint at the top
+            (~22% lighter navy) fades through the base in the middle,
+            then deepens to ~25% black vignette at the bottom. Simulates
+            light hitting the surface from above — gives the block a
+            three-dimensional read instead of "flat colour fill".
+         2. Beige radial wash in the upper-right corner (12% alpha of
+            Altery's accent #F0EBE3). Subtle warm contrast against the
+            cool navy, ties the hero to the brand palette.
+         3. Inset 1px top highlight (14% white). The bright "edge catches
+            light" line common in premium fintech UI (Stripe, Vercel) —
+            makes the block feel lifted and crafted, not just coloured.
+         4. Two-stage outer shadow with brand-navy tint instead of
+            neutral grey: tight ambient + soft 48px lift at 22%. Gives
+            the hero a noticeable but tasteful elevation off the page.
+       Slow gradient drift: two pseudo-element layers (::before and
+       ::after) each carry a static gradient state, and crossfade with
+       each other via opacity animation. Both layers use the exact same
+       Altery palette; only the linear-gradient angle and the beige
+       radial position differ between them. Result reads as one navy
+       surface catching light from a slowly rotating angle.
+       Chosen over @property-based angle animation because crossfade
+       works in every modern browser without typed-CSS-variable support,
+       and opacity transitions are GPU-accelerated. Disabled under
+       prefers-reduced-motion for accessibility. */
     .ec-result__hero {
       position: relative;
       border-radius: 20px;
       background: #001749;
       color: #fff;
       padding: 32px;
-      box-shadow: var(--sh-2);
+      overflow: hidden;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        0 2px 6px rgba(0, 5, 55, 0.12),
+        0 16px 48px rgba(0, 39, 128, 0.22);
+    }
+    /* Two gradient layers crossfading. State A: light from upper-RIGHT
+       (165° angle, beige glow at 100%,0%). State B: light from
+       upper-LEFT (215° angle, beige glow at 0%,0%) — mirrored. The
+       crossfade simulates the light source sweeping across the full
+       width of the hero. 12s cycle gives a clearly perceptible drift. */
+    .ec-result__hero::before,
+    .ec-result__hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+    .ec-result__hero::before {
+      background:
+        radial-gradient(ellipse 60% 75% at 100% 0%, rgba(240, 235, 227, 0.12) 0%, transparent 55%),
+        linear-gradient(
+          165deg,
+          rgba(60, 110, 220, 0.22) 0%,
+          rgba(0, 23, 73, 0) 35%,
+          rgba(0, 0, 0, 0.25) 100%
+        );
+      animation: hero-fade-a 12s ease-in-out infinite;
+    }
+    .ec-result__hero::after {
+      background:
+        radial-gradient(ellipse 60% 75% at 0% 0%, rgba(240, 235, 227, 0.12) 0%, transparent 55%),
+        linear-gradient(
+          215deg,
+          rgba(60, 110, 220, 0.22) 0%,
+          rgba(0, 23, 73, 0) 35%,
+          rgba(0, 0, 0, 0.25) 100%
+        );
+      opacity: 0;
+      animation: hero-fade-b 12s ease-in-out infinite;
+    }
+    /* Hero children must stack above the pseudo-element gradient
+       layers — the inset:0 absolutely-positioned ::before/::after
+       would otherwise cover the text content. */
+    .ec-result__hero > * {
+      position: relative;
+      z-index: 1;
+    }
+    @keyframes hero-fade-a {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    @keyframes hero-fade-b {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .ec-result__hero::before { animation: none; opacity: 1; }
+      .ec-result__hero::after { animation: none; opacity: 0; }
     }
     .ec-result__heroEyebrow {
       font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
@@ -888,6 +974,92 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* ── Fees modal ─────────────────────────────────────────────────
+       Opens from the plan card's "View all fees" link. Shows the
+       canonical Altery fee schedule (region-tiered from altery.com/
+       fees/business) plus the active plan's specific items (monthly
+       fee, FX cap, SWIFT cap if applicable). Two-column table layout
+       on desktop, stacked on mobile. Always footer-links to the
+       canonical altery.com source so user can verify any number. */
+    .ec-fees__subtitle {
+      font-size: 13px; line-height: 18px; color: var(--c-muted);
+      text-align: center;
+      margin: -16px 32px 24px;
+    }
+    .ec-fees__section { margin-bottom: 20px; }
+    .ec-fees__section:last-of-type { margin-bottom: 0; }
+    .ec-fees__sectionHead {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      color: var(--c-muted);
+      margin-bottom: 8px;
+      padding-left: 2px;
+    }
+    .ec-fees__table {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 0;
+      border: 1px solid var(--c-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .ec-fees__row {
+      display: contents;
+    }
+    .ec-fees__row > * {
+      padding: 11px 14px;
+      background: var(--c-surface);
+      border-bottom: 1px solid var(--c-border-soft);
+      font-size: 13.5px; line-height: 19px;
+      box-sizing: border-box;
+    }
+    .ec-fees__row:last-of-type > * { border-bottom: 0; }
+    .ec-fees__label {
+      color: var(--c-ink-2);
+    }
+    .ec-fees__value {
+      color: var(--c-ink);
+      font-weight: 500;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .ec-fees__value--muted { color: var(--c-muted); font-weight: 400; }
+    .ec-fees__row--highlight > * { background: rgba(0, 39, 128, 0.04); }
+    .ec-fees__row--highlight .ec-fees__value { color: var(--c-primary); font-weight: 600; }
+    .ec-fees__planNote {
+      margin: 12px 2px 0;
+      padding: 10px 12px;
+      background: rgba(0, 39, 128, 0.04);
+      border-radius: 8px;
+      font-size: 12px; line-height: 17px;
+      color: var(--c-ink-2);
+    }
+    .ec-fees__footer {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--c-border-soft);
+      font-size: 12px; line-height: 17px;
+      color: var(--c-muted);
+      text-align: center;
+    }
+    .ec-fees__footer a {
+      color: var(--c-primary);
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid transparent;
+      transition: border-color .12s;
+    }
+    .ec-fees__footer a:hover,
+    .ec-fees__footer a:focus-visible {
+      border-bottom-color: currentColor;
+      outline: none;
+    }
+    @media (max-width: 600px) {
+      .ec-fees__value { white-space: normal; max-width: 50%; }
+      .ec-fees__row > * { padding: 10px 12px; font-size: 13px; }
+    }
+
     .ec-plan-compare__grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -907,9 +1079,13 @@
       color: var(--c-ink);
       letter-spacing: -0.005em;
     }
+    /* Top margin on the price gives the plan name breathing room above
+       — the price is the visual anchor of each comparison column and
+       needs space from the small-text plan name and tagline to read
+       as the headline figure. */
     .ec-plan-compare__price {
       display: flex; align-items: baseline; gap: 6px;
-      margin-top: 2px;
+      margin-top: 12px;
     }
     .ec-plan-compare__priceValue {
       font-size: 28px; font-weight: 700;
@@ -1535,12 +1711,37 @@
     .ec-plan__name { display: flex; align-items: baseline; gap: 8px; }
     .ec-plan__name b { font-size: 16px; font-weight: 600; color: var(--c-ink); letter-spacing: -0.005em; }
     .ec-plan__name span { font-size: 12px; color: var(--c-muted); }
+    /* Price gets prominent treatment — primary commercial anchor on the
+       card. 32px headline with tabular numerals keeps decimal/digit
+       alignment stable across plan tiers (£50/£100/£500 line up). The
+       "/month" suffix stays muted to keep the focus on the figure. */
     .ec-plan__price {
-      font-size: 16px; font-weight: 600; color: var(--c-ink);
+      font-size: 32px; font-weight: 700; color: var(--c-ink);
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.005em;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
     }
-    .ec-plan__price small { font-size: 12px; color: var(--c-muted); font-weight: 400; }
+    .ec-plan__price small {
+      font-size: 13px; color: var(--c-muted); font-weight: 400;
+      letter-spacing: 0; margin-left: 4px;
+    }
+    /* Plan card secondary actions — Compare and View fees links sit on
+       one row above the soft "you can switch plans..." note. Middle-dot
+       separator visually decouples them from neighbouring text. */
+    .ec-plan__links {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 13px; color: var(--c-ink-2);
+    }
+    .ec-plan__links a {
+      color: var(--c-primary);
+      text-decoration: none;
+      cursor: pointer;
+      border-bottom: 1px solid transparent;
+      transition: border-color .12s;
+    }
+    .ec-plan__links a:hover,
+    .ec-plan__links a:focus-visible { border-bottom-color: currentColor; outline: none; }
+    .ec-plan__links__sep { color: var(--c-border); }
     .ec-plan__perks {
       display: flex; flex-direction: column; gap: 8px;
       font-size: 14px; color: var(--c-ink-2); line-height: 20px;
@@ -1754,7 +1955,8 @@
         min-width: 0;
       }
       .ec-plan__name span { font-size: 12px; line-height: 16px; }
-      .ec-plan__price { flex-shrink: 0; font-size: 18px; }
+      .ec-plan__price { flex-shrink: 0; font-size: 26px; }
+      .ec-plan__price small { font-size: 12px; }
 
       /* ── Slider head ──
          "Combined incoming + outgoing volume" runs ~32 chars in German/NL.
@@ -2215,14 +2417,14 @@
 
     // Intro screen
     "ec.intro.eyebrow": "Eligibility check",
-    "ec.intro.title": "See if Altery is a fit — before you fill out anything.",
-    "ec.intro.lead": "{total} short questions. We'll show you which Altery entity will issue your account, which currencies and corridors are supported, and the right plan for your volume. No signup, no soft search.",
-    "ec.intro.value1.title": "We tell you the entity up front",
-    "ec.intro.value1.body": "UK, EEA or DIFC — different licences, different IBANs. We pick before you onboard so you don't restart later.",
-    "ec.intro.value2.title": "Honest about what's supported",
-    "ec.intro.value2.body": "Provider-dependent rails, in-progress entities and review-required industries are flagged here, not after you've uploaded company docs.",
-    "ec.intro.value3.title": "If we can't help, we say so",
-    "ec.intro.value3.body": "We don't take applications from gambling, adult, weapons or unregulated-lending businesses. Better to know now than after KYB.",
+    "ec.intro.title": "Will Altery work for your business?",
+    "ec.intro.lead": "Answer {total} questions about your business. We'll show you the entity that would issue your account (UK, EU or MENA), the currencies and payment rails we support for you, and the plan that fits your volume — all in 90 seconds. No application, no signup, no credit check.",
+    "ec.intro.value1.title": "No \"wrong entity\" restart",
+    "ec.intro.value1.body": "Altery operates three regulated entities — UK, EU, and MENA — each with different IBANs and supported currencies. We match yours before you start onboarding, not after you've uploaded company docs.",
+    "ec.intro.value2.title": "Caveats now, not after KYB",
+    "ec.intro.value2.body": "Some payment rails depend on our partner network. Some entities are still in early access. Some industries trigger manual review. Whatever applies to your business shows up on the result page — before you commit to KYB.",
+    "ec.intro.value3.title": "Fast no's, not slow no's",
+    "ec.intro.value3.body": "Altery can't onboard businesses in gambling, adult content, weapons, or unregulated lending. If yours is one, you'll know in 60 seconds — not after a week of document uploads.",
     "ec.intro.cta": "Start the check",
 
     // Question header
@@ -2258,20 +2460,22 @@
     "ec.q2.alert.crypto.body": "We onboard {category} regularly. Your application routes through our crypto-specialist lane — fluent compliance team, fiat rails via SEPA / Faster Payments / SWIFT, and Synterra Connect for partner-exchange flows.",
 
     // Industries
-    "ec.ind.ai": "AI / Software",
-    "ec.ind.saas": "SaaS / Tech services",
-    "ec.ind.ecom": "E-commerce / Retail",
+    
+    "ec.ind.saas": "SaaS / AI / Software",
+    "ec.ind.ecom": "E-commerce / Retail / Marketplaces",
     "ec.ind.prof": "Professional services",
-    "ec.ind.media": "Media / Marketing",
+    "ec.ind.media": "Marketing / Ad networks / Affiliate",
     "ec.ind.trade": "Import / Export / Trading",
     "ec.ind.logi": "Logistics / Shipping",
+    "ec.ind.gaming": "Gaming / Game dev / Esports",
     "ec.ind.crypto.exchange": "Crypto: exchange / OTC desk",
     "ec.ind.crypto.custody": "Crypto: wallet / custody",
     "ec.ind.crypto.payment": "Crypto: payments / on-off ramp",
     "ec.ind.crypto.defi": "Crypto: DeFi / on-chain protocol",
     "ec.ind.crypto.nft": "Crypto: NFT / digital collectibles",
     "ec.ind.crypto.tools": "Crypto: SaaS / analytics / tools",
-    "ec.ind.gambling": "Gambling / Betting",
+    "ec.ind.crypto.mining": "Crypto: mining / staking",
+    "ec.ind.gambling": "Gambling / Betting / iGaming",
     "ec.ind.adult": "Adult content",
     "ec.ind.weapons": "Weapons manufacture",
     "ec.ind.lending": "Unregulated lending",
@@ -2485,14 +2689,14 @@
     "common.contactTeam": "Team kontaktieren",
 
     "ec.intro.eyebrow": "Eignungsprüfung",
-    "ec.intro.title": "Sehen Sie, ob Altery passt — bevor Sie etwas ausfüllen.",
-    "ec.intro.lead": "{total} kurze Fragen. Wir zeigen Ihnen, welches Altery-Unternehmen Ihr Konto eröffnen wird, welche Währungen und Korridore unterstützt sind, und den passenden Tarif für Ihr Volumen. Keine Registrierung, keine Bonitätsabfrage.",
-    "ec.intro.value1.title": "Sie kennen die Gesellschaft im Voraus",
-    "ec.intro.value1.body": "UK, EWR oder DIFC — verschiedene Lizenzen, verschiedene IBANs. Wir wählen vor dem Onboarding, damit Sie nicht neu beginnen müssen.",
-    "ec.intro.value2.title": "Ehrlich zum Leistungsumfang",
-    "ec.intro.value2.body": "Anbieterabhängige Zahlungswege, im Aufbau befindliche Gesellschaften und prüfungspflichtige Branchen werden hier markiert — nicht erst nach dem Hochladen Ihrer Firmenunterlagen.",
-    "ec.intro.value3.title": "Wenn wir nicht helfen können, sagen wir es",
-    "ec.intro.value3.body": "Wir nehmen keine Anträge aus den Bereichen Glücksspiel, Erwachseneninhalte, Waffen oder unreguliertes Kreditgeschäft. Besser jetzt klären als nach dem KYB.",
+    "ec.intro.title": "Passt Altery zu Ihrem Unternehmen?",
+    "ec.intro.lead": "Beantworten Sie {total} Fragen zu Ihrem Unternehmen. Wir zeigen Ihnen die Gesellschaft, die Ihr Konto eröffnen würde (UK, EU oder MENA), die unterstützten Währungen und Zahlungswege sowie den passenden Tarif für Ihr Volumen — alles in 90 Sekunden. Kein Antrag, keine Registrierung, keine Bonitätsabfrage.",
+    "ec.intro.value1.title": "Kein Neustart wegen falscher Gesellschaft",
+    "ec.intro.value1.body": "Altery betreibt drei regulierte Gesellschaften — UK, EU und MENA — jede mit eigenen IBANs und unterstützten Währungen. Wir wählen Ihre vor dem Onboarding, nicht nachdem Sie Firmenunterlagen hochgeladen haben.",
+    "ec.intro.value2.title": "Vorbehalte jetzt, nicht nach dem KYB",
+    "ec.intro.value2.body": "Manche Zahlungswege hängen von unserem Partnernetzwerk ab. Manche Gesellschaften sind noch im Early Access. Manche Branchen lösen eine manuelle Prüfung aus. Was auch immer auf Ihr Unternehmen zutrifft, erscheint auf der Ergebnisseite — bevor Sie sich auf das KYB festlegen.",
+    "ec.intro.value3.title": "Schnelle Absagen, keine langsamen",
+    "ec.intro.value3.body": "Altery kann keine Unternehmen aus Glücksspiel, Erwachseneninhalten, Waffen oder unreguliertem Kreditgeschäft aufnehmen. Falls Ihres dazugehört, erfahren Sie es in 60 Sekunden — nicht nach einer Woche Dokumenten-Upload.",
     "ec.intro.cta": "Prüfung starten",
 
     "ec.q.eyebrow": "von {total} Fragen",
@@ -2523,21 +2727,21 @@
     "ec.q2.alert.blocked.body": "Altery unterstützt {industry} in keiner unserer Gesellschaften. Auf der Ergebnisseite erläutern wir es — Sie können auch direkt unser Team kontaktieren.",
     "ec.q2.alert.crypto.title": "Krypto-nativ? Sie sind richtig hier.",
     "ec.q2.alert.crypto.body": "Wir onboarden regelmäßig {category}. Ihre Bewerbung läuft über unsere Krypto-Spezialisten-Spur — kompetentes Compliance-Team, Fiat-Schienen via SEPA / Faster Payments / SWIFT, und Synterra Connect für Partner-Exchange-Flows.",
-
-    "ec.ind.ai": "KI / Software",
-    "ec.ind.saas": "SaaS / Tech-Dienstleistungen",
-    "ec.ind.ecom": "E-Commerce / Einzelhandel",
+    "ec.ind.saas": "SaaS / KI / Software",
+    "ec.ind.ecom": "E-Commerce / Einzelhandel / Marktplätze",
     "ec.ind.prof": "Beratung & Dienstleistungen",
-    "ec.ind.media": "Medien / Marketing",
+    "ec.ind.media": "Marketing / Werbenetzwerke / Affiliate",
     "ec.ind.trade": "Import / Export / Handel",
     "ec.ind.logi": "Logistik / Versand",
+    "ec.ind.gaming": "Gaming / Spieleentwicklung / Esports",
     "ec.ind.crypto.exchange": "Krypto: Börse / OTC-Desk",
     "ec.ind.crypto.custody": "Krypto: Wallet / Custody",
     "ec.ind.crypto.payment": "Krypto: Zahlungen / On-/Off-Ramp",
     "ec.ind.crypto.defi": "Krypto: DeFi / On-Chain-Protokoll",
     "ec.ind.crypto.nft": "Krypto: NFT / digitale Sammlerstücke",
     "ec.ind.crypto.tools": "Krypto: SaaS / Analytik / Tools",
-    "ec.ind.gambling": "Glücksspiel / Wetten",
+    "ec.ind.crypto.mining": "Krypto: Mining / Staking",
+    "ec.ind.gambling": "Glücksspiel / Wetten / iGaming",
     "ec.ind.adult": "Erwachseneninhalte",
     "ec.ind.weapons": "Waffenherstellung",
     "ec.ind.lending": "Unreguliertes Kreditgeschäft",
@@ -2662,14 +2866,14 @@
     "common.contactTeam": "Связаться с командой",
 
     "ec.intro.eyebrow": "Проверка соответствия",
-    "ec.intro.title": "Проверьте, подходит ли Altery, — до того как заполнять анкету.",
-    "ec.intro.lead": "{total} коротких вопросов. Покажем, какое подразделение Altery откроет счёт, какие валюты и коридоры поддерживаются и какой план подойдёт под ваш объём. Без регистрации и проверок кредитной истории.",
-    "ec.intro.value1.title": "Сразу скажем, какое подразделение",
-    "ec.intro.value1.body": "Великобритания, ЕЭП или DIFC — разные лицензии, разные IBAN. Мы определим до онбординга, чтобы вы не начинали заново.",
-    "ec.intro.value2.title": "Честно о том, что поддерживается",
-    "ec.intro.value2.body": "Возможности, зависящие от партнёров, подразделения в процессе запуска и отрасли с обязательной проверкой — отмечаем здесь, а не после загрузки документов.",
-    "ec.intro.value3.title": "Если не сможем помочь — скажем",
-    "ec.intro.value3.body": "Мы не принимаем заявки от азартных игр, контента 18+, оружия и нерегулируемого кредитования. Лучше узнать сейчас, чем после KYB.",
+    "ec.intro.title": "Подходит ли Altery вашему бизнесу?",
+    "ec.intro.lead": "Ответьте на {total} вопросов о вашем бизнесе. Покажем подразделение, которое откроет счёт (UK, EU или MENA), поддерживаемые валюты и платёжные рельсы, и тариф под ваш объём — за 90 секунд. Без заявки, без регистрации, без проверки кредитной истории.",
+    "ec.intro.value1.title": "Без рестартов из-за неправильного подразделения",
+    "ec.intro.value1.body": "У Altery три регулируемых подразделения — UK, EU и MENA — у каждого свои IBAN и поддерживаемые валюты. Подберём ваше до старта онбординга, а не после загрузки документов компании.",
+    "ec.intro.value2.title": "Оговорки до KYB, а не после",
+    "ec.intro.value2.body": "Некоторые рельсы зависят от партнёров. Некоторые подразделения ещё в раннем доступе. Некоторые отрасли требуют ручной проверки. Всё, что относится к вашему бизнесу, появится на странице результата — до того как вы возьмётесь за KYB.",
+    "ec.intro.value3.title": "Быстрое «нет», а не медленное",
+    "ec.intro.value3.body": "Altery не открывает счета бизнесам в азартных играх, контенте 18+, оружии и нерегулируемом кредитовании. Если ваш — один из них, узнаете за 60 секунд, а не через неделю загрузок документов.",
     "ec.intro.cta": "Начать проверку",
 
     "ec.q.eyebrow": "из {total} вопросов",
@@ -2701,20 +2905,22 @@
     "ec.q2.alert.crypto.title": "Крипто-нативный? Вы у своих.",
     "ec.q2.alert.crypto.body": "Регулярно работаем с {category}. Ваша заявка идёт через крипто-специализированную линию — компетентный комплаенс, фиат через SEPA / Faster Payments / SWIFT, и Synterra Connect для интеграции с партнёрскими биржами.",
 
-    "ec.ind.ai": "ИИ / Софт",
-    "ec.ind.saas": "SaaS / Технические услуги",
-    "ec.ind.ecom": "E-commerce / Розница",
+    
+    "ec.ind.saas": "SaaS / AI / Software",
+    "ec.ind.ecom": "E-commerce / Ретейл / Маркетплейсы",
     "ec.ind.prof": "Профессиональные услуги",
-    "ec.ind.media": "Медиа / Маркетинг",
+    "ec.ind.media": "Маркетинг / Рекламные сети / Партнёрки",
     "ec.ind.trade": "Импорт / Экспорт / Торговля",
     "ec.ind.logi": "Логистика / Перевозки",
+    "ec.ind.gaming": "Gaming / Game dev / Esports",
     "ec.ind.crypto.exchange": "Крипта: биржа / OTC-деск",
     "ec.ind.crypto.custody": "Крипта: кошелёк / кастоди",
     "ec.ind.crypto.payment": "Крипта: эквайринг / on-off ramp",
     "ec.ind.crypto.defi": "Крипта: DeFi / on-chain протокол",
     "ec.ind.crypto.nft": "Крипта: NFT / цифровые коллекции",
     "ec.ind.crypto.tools": "Крипта: SaaS / аналитика / инструменты",
-    "ec.ind.gambling": "Азартные игры / Беттинг",
+    "ec.ind.crypto.mining": "Крипто: майнинг / стейкинг",
+    "ec.ind.gambling": "Ставки / iGaming",
     "ec.ind.adult": "Контент 18+",
     "ec.ind.weapons": "Производство оружия",
     "ec.ind.lending": "Нерегулируемое кредитование",
@@ -2847,14 +3053,14 @@
     "common.contactTeam": "Contact opnemen",
 
     "ec.intro.eyebrow": "Geschiktheidscheck",
-    "ec.intro.title": "Kijk of Altery past — voordat je iets invult.",
-    "ec.intro.lead": "{total} korte vragen. We laten zien welk Altery-bedrijf jouw rekening uitgeeft, welke valuta's en corridors worden ondersteund en welk plan past bij jouw volume. Geen registratie, geen kredietcontrole.",
-    "ec.intro.value1.title": "We noemen het bedrijf vooraf",
-    "ec.intro.value1.body": "VK, EER of DIFC — andere licenties, andere IBAN's. We kiezen vóór de onboarding zodat je niet opnieuw hoeft te beginnen.",
-    "ec.intro.value2.title": "Eerlijk over wat ondersteund wordt",
-    "ec.intro.value2.body": "Provider-afhankelijke routes, entiteiten in opbouw en sectoren met verplichte review markeren we hier — niet pas nadat je documenten hebt geüpload.",
-    "ec.intro.value3.title": "Als we niet kunnen helpen, zeggen we dat",
-    "ec.intro.value3.body": "We accepteren geen aanvragen uit gokken, adult, wapens of ongereguleerde leningen. Liever nu duidelijkheid dan na de KYB.",
+    "ec.intro.title": "Werkt Altery voor jouw bedrijf?",
+    "ec.intro.lead": "Beantwoord {total} vragen over jouw bedrijf. We laten zien welk Altery-bedrijf jouw rekening uitgeeft (VK, EU of MENA), welke valuta's en betaalkanalen we voor je ondersteunen en welk plan past bij jouw volume — alles binnen 90 seconden. Geen aanvraag, geen registratie, geen kredietcontrole.",
+    "ec.intro.value1.title": "Geen herstart door verkeerd bedrijf",
+    "ec.intro.value1.body": "Altery heeft drie gereguleerde bedrijven — VK, EU en MENA — elk met andere IBAN's en ondersteunde valuta's. We kiezen de jouwe vóór de onboarding, niet nadat je bedrijfsdocumenten hebt geüpload.",
+    "ec.intro.value2.title": "Voorbehouden nu, niet ná KYB",
+    "ec.intro.value2.body": "Sommige betaalkanalen hangen af van ons partnernetwerk. Sommige bedrijven zijn nog in early access. Sommige sectoren leiden tot handmatige beoordeling. Wat ook van toepassing is, verschijnt op de resultatenpagina — voordat je je vastlegt op KYB.",
+    "ec.intro.value3.title": "Snelle nees, geen trage",
+    "ec.intro.value3.body": "Altery kan geen bedrijven onboarden uit gokken, adult, wapens of ongereguleerde leningen. Hoort jouw bedrijf daarbij, dan weet je het binnen 60 seconden — niet na een week documenten uploaden.",
     "ec.intro.cta": "Check starten",
 
     "ec.q.eyebrow": "van {total} vragen",
@@ -2885,21 +3091,21 @@
     "ec.q2.alert.blocked.body": "Altery ondersteunt {industry} bij geen van onze entiteiten. We leggen het uit op het resultaatscherm — of mail ons team direct.",
     "ec.q2.alert.crypto.title": "Crypto-native? Goede plek.",
     "ec.q2.alert.crypto.body": "We onboarden regelmatig {category}. Uw aanvraag loopt via onze crypto-specialistenstroom — deskundig compliance-team, fiat-rails via SEPA / Faster Payments / SWIFT, en Synterra Connect voor partner-exchange-flows.",
-
-    "ec.ind.ai": "AI / Software",
-    "ec.ind.saas": "SaaS / Tech-diensten",
-    "ec.ind.ecom": "E-commerce / Retail",
+    "ec.ind.saas": "SaaS / AI / Software",
+    "ec.ind.ecom": "E-commerce / Retail / Marktplaatsen",
     "ec.ind.prof": "Professionele diensten",
-    "ec.ind.media": "Media / Marketing",
+    "ec.ind.media": "Marketing / Advertentienetwerken / Affiliate",
     "ec.ind.trade": "Import / Export / Handel",
     "ec.ind.logi": "Logistiek / Verzending",
+    "ec.ind.gaming": "Gaming / Game-ontwikkeling / Esports",
     "ec.ind.crypto.exchange": "Crypto: exchange / OTC-desk",
     "ec.ind.crypto.custody": "Crypto: wallet / custody",
     "ec.ind.crypto.payment": "Crypto: betalingen / on-off ramp",
     "ec.ind.crypto.defi": "Crypto: DeFi / on-chain protocol",
     "ec.ind.crypto.nft": "Crypto: NFT / digitale verzamelobjecten",
     "ec.ind.crypto.tools": "Crypto: SaaS / analytics / tools",
-    "ec.ind.gambling": "Gokken / Wedden",
+    "ec.ind.crypto.mining": "Crypto: mining / staking",
+    "ec.ind.gambling": "Gokken / iGaming",
     "ec.ind.adult": "Adult content",
     "ec.ind.weapons": "Wapenproductie",
     "ec.ind.lending": "Ongereguleerde leningen",
@@ -3024,14 +3230,14 @@
     "common.contactTeam": "Ekiple iletişim",
 
     "ec.intro.eyebrow": "Uygunluk kontrolü",
-    "ec.intro.title": "Hiçbir şey doldurmadan, Altery'nin size uygun olup olmadığını görün.",
-    "ec.intro.lead": "{total} kısa soru. Hesabınızı hangi Altery şirketinin açacağını, hangi para birimlerinin ve koridorların desteklendiğini ve hacminize uygun planı gösteririz. Kayıt yok, ön kredi sorgulaması yok.",
-    "ec.intro.value1.title": "Şirketi baştan söyleriz",
-    "ec.intro.value1.body": "İngiltere, AEA veya DIFC — farklı lisanslar, farklı IBAN'lar. Onboarding'den önce seçeriz, böylece tekrar başlamak zorunda kalmazsınız.",
-    "ec.intro.value2.title": "Desteklenenler konusunda dürüstüz",
-    "ec.intro.value2.body": "Sağlayıcıya bağlı yöntemler, kuruluş aşamasındaki şirketler ve inceleme gerektiren sektörler burada işaretlenir — şirket belgeleri yüklendikten sonra değil.",
-    "ec.intro.value3.title": "Yardım edemiyorsak söyleriz",
-    "ec.intro.value3.body": "Kumar, yetişkin içerik, silah veya düzenlenmemiş kredi alanlarından başvuru almıyoruz. KYB sonrası öğrenmektense şimdi bilmek daha iyi.",
+    "ec.intro.title": "Altery işletmeniz için uygun mu?",
+    "ec.intro.lead": "İşletmeniz hakkında {total} soru yanıtlayın. Hesabınızı açacak şirketi (UK, EU veya MENA), sizin için desteklediğimiz para birimlerini ve ödeme yöntemlerini ve hacminize uygun planı göstereceğiz — hepsi 90 saniyede. Başvuru yok, kayıt yok, kredi sorgusu yok.",
+    "ec.intro.value1.title": "Yanlış şirket yüzünden baştan başlamak yok",
+    "ec.intro.value1.body": "Altery üç düzenlemeli şirket işletir — UK, EU ve MENA — her biri farklı IBAN'lar ve desteklenen para birimleriyle. Sizinkini onboarding'den önce eşleştiririz, şirket belgelerini yükledikten sonra değil.",
+    "ec.intro.value2.title": "Çekinceler şimdi, KYB sonrası değil",
+    "ec.intro.value2.body": "Bazı ödeme yöntemleri partner ağımıza bağlıdır. Bazı şirketler hâlâ erken erişimde. Bazı sektörler manuel inceleme gerektirir. İşletmenize ne uygunsa sonuç sayfasında görünür — KYB'ye başlamadan önce.",
+    "ec.intro.value3.title": "Hızlı «hayır», yavaş değil",
+    "ec.intro.value3.body": "Altery; kumar, yetişkin içerik, silah veya düzenlenmemiş kredi sektörlerindeki işletmeleri onboard edemez. Sizinki bunlardan biriyse, 60 saniyede öğrenirsiniz — bir hafta belge yüklemeden sonra değil.",
     "ec.intro.cta": "Kontrolü başlat",
 
     "ec.q.eyebrow": "/ {total}",
@@ -3063,20 +3269,22 @@
     "ec.q2.alert.crypto.title": "Kripto-yerli mi? Doğru yerdesiniz.",
     "ec.q2.alert.crypto.body": "{category} ile düzenli çalışıyoruz. Başvurunuz kripto-uzman ekip ile ilerler — yetkin uyum ekibi, SEPA / Faster Payments / SWIFT fiat ağları, ve Synterra Connect ile partner borsa entegrasyonları.",
 
-    "ec.ind.ai": "Yapay zekâ / Yazılım",
-    "ec.ind.saas": "SaaS / Teknoloji hizmetleri",
-    "ec.ind.ecom": "E-ticaret / Perakende",
+    
+    "ec.ind.saas": "SaaS / AI / Yazılım",
+    "ec.ind.ecom": "E-ticaret / Perakende / Pazaryerleri",
     "ec.ind.prof": "Profesyonel hizmetler",
-    "ec.ind.media": "Medya / Pazarlama",
+    "ec.ind.media": "Pazarlama / Reklam ağları / Affiliate",
     "ec.ind.trade": "İthalat / İhracat / Ticaret",
     "ec.ind.logi": "Lojistik / Nakliye",
+    "ec.ind.gaming": "Oyun / Oyun geliştirme / Esports",
     "ec.ind.crypto.exchange": "Kripto: borsa / OTC masa",
     "ec.ind.crypto.custody": "Kripto: cüzdan / saklama",
     "ec.ind.crypto.payment": "Kripto: ödeme / on-off ramp",
     "ec.ind.crypto.defi": "Kripto: DeFi / zincir-üstü protokol",
     "ec.ind.crypto.nft": "Kripto: NFT / dijital koleksiyon",
     "ec.ind.crypto.tools": "Kripto: SaaS / analiz / araçlar",
-    "ec.ind.gambling": "Kumar / Bahis",
+    "ec.ind.crypto.mining": "Kripto: madencilik / staking",
+    "ec.ind.gambling": "Bahis / iGaming",
     "ec.ind.adult": "Yetişkin içerik",
     "ec.ind.weapons": "Silah üretimi",
     "ec.ind.lending": "Düzenlenmemiş kredi",
@@ -3209,14 +3417,14 @@
     "common.contactTeam": "Contatta il team",
 
     "ec.intro.eyebrow": "Verifica idoneità",
-    "ec.intro.title": "Vedi se Altery fa per te — prima di compilare nulla.",
-    "ec.intro.lead": "{total} domande brevi. Ti diremo quale entità Altery emetterà il tuo conto, quali valute e corridoi sono supportati e il piano adatto al tuo volume. Senza registrazione, senza interrogazioni del credito.",
-    "ec.intro.value1.title": "Ti diciamo subito l'entità",
-    "ec.intro.value1.body": "UK, SEE o DIFC — licenze diverse, IBAN diversi. La scelta avviene prima dell'onboarding, così non ricominci da capo.",
-    "ec.intro.value2.title": "Onesti su ciò che è supportato",
-    "ec.intro.value2.body": "Canali dipendenti dal partner, entità in lancio e settori soggetti a revisione vengono segnalati qui — non dopo aver caricato i documenti aziendali.",
-    "ec.intro.value3.title": "Se non possiamo aiutare, lo diciamo",
-    "ec.intro.value3.body": "Non accettiamo richieste da gioco d'azzardo, contenuti per adulti, armi o credito non regolamentato. Meglio saperlo ora che dopo il KYB.",
+    "ec.intro.title": "Altery è giusto per la tua azienda?",
+    "ec.intro.lead": "Rispondi a {total} domande sulla tua azienda. Ti mostreremo l'entità che emetterà il tuo conto (UK, EU o MENA), le valute e le vie di pagamento che supportiamo per te e il piano adatto al tuo volume — tutto in 90 secondi. Niente domanda, niente registrazione, niente consultazione del credito.",
+    "ec.intro.value1.title": "Niente ripartenze per l'entità sbagliata",
+    "ec.intro.value1.body": "Altery gestisce tre entità regolamentate — UK, EU e MENA — ognuna con IBAN diversi e valute supportate diverse. Scegliamo la tua prima dell'onboarding, non dopo che hai caricato i documenti aziendali.",
+    "ec.intro.value2.title": "Riserve ora, non dopo il KYB",
+    "ec.intro.value2.body": "Alcune vie di pagamento dipendono dalla nostra rete partner. Alcune entità sono ancora in early access. Alcuni settori richiedono una revisione manuale. Qualunque cosa riguardi la tua azienda appare nella pagina dei risultati — prima di impegnarti con il KYB.",
+    "ec.intro.value3.title": "No veloci, non lenti",
+    "ec.intro.value3.body": "Altery non può accogliere aziende di gioco d'azzardo, contenuti per adulti, armi o credito non regolamentato. Se la tua rientra in una di queste, lo saprai in 60 secondi — non dopo una settimana di caricamento documenti.",
     "ec.intro.cta": "Avvia la verifica",
 
     "ec.q.eyebrow": "di {total} domande",
@@ -3247,21 +3455,21 @@
     "ec.q2.alert.blocked.body": "Altery non supporta {industry} in nessuna delle sue entità. Lo spieghiamo nella schermata di risultato — puoi anche scrivere direttamente al team.",
     "ec.q2.alert.crypto.title": "Crypto-nativi? Posto giusto.",
     "ec.q2.alert.crypto.body": "Onboardiamo regolarmente {category}. La tua domanda passa per la corsia specialistica crypto — team compliance esperto, binari fiat via SEPA / Faster Payments / SWIFT, e Synterra Connect per i flussi exchange partner.",
-
-    "ec.ind.ai": "IA / Software",
-    "ec.ind.saas": "SaaS / Servizi tech",
-    "ec.ind.ecom": "E-commerce / Retail",
+    "ec.ind.saas": "SaaS / IA / Software",
+    "ec.ind.ecom": "E-commerce / Retail / Marketplace",
     "ec.ind.prof": "Servizi professionali",
-    "ec.ind.media": "Media / Marketing",
+    "ec.ind.media": "Marketing / Ad network / Affiliazione",
     "ec.ind.trade": "Import / Export / Trading",
     "ec.ind.logi": "Logistica / Spedizioni",
+    "ec.ind.gaming": "Gaming / Sviluppo giochi / Esports",
     "ec.ind.crypto.exchange": "Crypto: exchange / OTC",
     "ec.ind.crypto.custody": "Crypto: wallet / custodia",
     "ec.ind.crypto.payment": "Crypto: pagamenti / on-off ramp",
     "ec.ind.crypto.defi": "Crypto: DeFi / protocollo on-chain",
     "ec.ind.crypto.nft": "Crypto: NFT / collezionabili digitali",
     "ec.ind.crypto.tools": "Crypto: SaaS / analytics / strumenti",
-    "ec.ind.gambling": "Gioco d'azzardo / Scommesse",
+    "ec.ind.crypto.mining": "Cripto: mining / staking",
+    "ec.ind.gambling": "Scommesse / iGaming",
     "ec.ind.adult": "Contenuti per adulti",
     "ec.ind.weapons": "Produzione di armi",
     "ec.ind.lending": "Credito non regolamentato",
@@ -3386,14 +3594,14 @@
     "common.contactTeam": "Contactar al equipo",
 
     "ec.intro.eyebrow": "Comprobación de idoneidad",
-    "ec.intro.title": "Comprueba si Altery encaja — antes de rellenar nada.",
-    "ec.intro.lead": "{total} preguntas breves. Te diremos qué entidad Altery emitirá tu cuenta, qué divisas y corredores están soportados y el plan adecuado para tu volumen. Sin registro, sin consultas de crédito.",
-    "ec.intro.value1.title": "Te decimos la entidad por adelantado",
-    "ec.intro.value1.body": "Reino Unido, EEE o DIFC — licencias distintas, IBAN distintos. Lo escogemos antes del onboarding para que no tengas que empezar de nuevo.",
-    "ec.intro.value2.title": "Honestos con lo que está soportado",
-    "ec.intro.value2.body": "Vías que dependen del proveedor, entidades en activación y sectores con revisión obligatoria se marcan aquí — no después de subir documentos de la empresa.",
-    "ec.intro.value3.title": "Si no podemos ayudar, lo decimos",
-    "ec.intro.value3.body": "No aceptamos solicitudes de juego, contenido para adultos, armas o préstamos no regulados. Mejor saberlo ahora que tras el KYB.",
+    "ec.intro.title": "¿Altery encaja con tu negocio?",
+    "ec.intro.lead": "Responde a {total} preguntas sobre tu negocio. Te mostraremos la entidad que emitirá tu cuenta (Reino Unido, UE o MENA), las divisas y vías de pago que soportamos para ti y el plan que encaja con tu volumen — todo en 90 segundos. Sin solicitud, sin registro, sin consulta de crédito.",
+    "ec.intro.value1.title": "Sin reinicios por elegir mal la entidad",
+    "ec.intro.value1.body": "Altery opera tres entidades reguladas — Reino Unido, UE y MENA — cada una con IBAN y divisas distintos. Te emparejamos antes de empezar el onboarding, no después de subir documentos de empresa.",
+    "ec.intro.value2.title": "Advertencias ahora, no tras el KYB",
+    "ec.intro.value2.body": "Algunas vías de pago dependen de nuestra red de socios. Algunas entidades aún están en acceso anticipado. Algunos sectores activan revisión manual. Lo que aplique a tu negocio aparece en la página de resultados — antes de comprometerte con el KYB.",
+    "ec.intro.value3.title": "Negativas rápidas, no lentas",
+    "ec.intro.value3.body": "Altery no puede dar de alta a negocios de juego, contenido para adultos, armas o préstamos no regulados. Si el tuyo es uno, lo sabrás en 60 segundos — no tras una semana subiendo documentos.",
     "ec.intro.cta": "Iniciar la comprobación",
 
     "ec.q.eyebrow": "de {total} preguntas",
@@ -3425,20 +3633,22 @@
     "ec.q2.alert.crypto.title": "¿Cripto-nativo? El lugar correcto.",
     "ec.q2.alert.crypto.body": "Hacemos onboarding regular de {category}. Tu solicitud pasa por nuestro carril de especialistas cripto — equipo de cumplimiento competente, rieles fiat vía SEPA / Faster Payments / SWIFT, y Synterra Connect para flujos de exchanges asociados.",
 
-    "ec.ind.ai": "IA / Software",
-    "ec.ind.saas": "SaaS / Servicios tech",
-    "ec.ind.ecom": "E-commerce / Retail",
+    
+    "ec.ind.saas": "SaaS / IA / Software",
+    "ec.ind.ecom": "E-commerce / Retail / Marketplaces",
     "ec.ind.prof": "Servicios profesionales",
-    "ec.ind.media": "Medios / Marketing",
+    "ec.ind.media": "Marketing / Redes publicitarias / Afiliados",
     "ec.ind.trade": "Importación / Exportación / Comercio",
     "ec.ind.logi": "Logística / Envíos",
+    "ec.ind.gaming": "Gaming / Desarrollo de juegos / Esports",
     "ec.ind.crypto.exchange": "Cripto: exchange / mesa OTC",
     "ec.ind.crypto.custody": "Cripto: wallet / custodia",
     "ec.ind.crypto.payment": "Cripto: pagos / on-off ramp",
     "ec.ind.crypto.defi": "Cripto: DeFi / protocolo on-chain",
     "ec.ind.crypto.nft": "Cripto: NFT / coleccionables digitales",
     "ec.ind.crypto.tools": "Cripto: SaaS / analítica / herramientas",
-    "ec.ind.gambling": "Juego / Apuestas",
+    "ec.ind.crypto.mining": "Cripto: minería / staking",
+    "ec.ind.gambling": "Apuestas / iGaming",
     "ec.ind.adult": "Contenido para adultos",
     "ec.ind.weapons": "Fabricación de armas",
     "ec.ind.lending": "Préstamos no regulados",
@@ -3572,14 +3782,14 @@
     "common.contactTeam": "Kontakt z zespołem",
 
     "ec.intro.eyebrow": "Sprawdzenie kwalifikacji",
-    "ec.intro.title": "Sprawdź, czy Altery pasuje — zanim cokolwiek wypełnisz.",
-    "ec.intro.lead": "{total} krótkich pytań. Pokażemy, który podmiot Altery wyda konto, jakie waluty i korytarze są obsługiwane oraz właściwy plan dla Twojego wolumenu. Bez rejestracji i sprawdzania zdolności kredytowej.",
-    "ec.intro.value1.title": "Z góry mówimy, który podmiot",
-    "ec.intro.value1.body": "Wielka Brytania, EOG lub DIFC — różne licencje, różne IBAN-y. Wybór następuje przed onboardingiem, więc nie zaczynasz od nowa.",
-    "ec.intro.value2.title": "Uczciwie o tym, co obsługujemy",
-    "ec.intro.value2.body": "Kanały zależne od dostawcy, podmioty w trakcie uruchamiania i branże wymagające oceny zaznaczamy tutaj — nie po przesłaniu dokumentów spółki.",
-    "ec.intro.value3.title": "Jeśli nie pomożemy, mówimy to",
-    "ec.intro.value3.body": "Nie przyjmujemy wniosków z hazardu, treści dla dorosłych, broni ani nieuregulowanych pożyczek. Lepiej wiedzieć teraz niż po KYB.",
+    "ec.intro.title": "Czy Altery sprawdzi się w Twojej firmie?",
+    "ec.intro.lead": "Odpowiedz na {total} pytań o swoją firmę. Pokażemy podmiot, który wyda konto (UK, UE lub MENA), obsługiwane waluty i kanały płatnicze oraz plan dopasowany do Twojego wolumenu — wszystko w 90 sekund. Bez wniosku, bez rejestracji, bez sprawdzania zdolności kredytowej.",
+    "ec.intro.value1.title": "Bez restartu z powodu złego podmiotu",
+    "ec.intro.value1.body": "Altery prowadzi trzy regulowane podmioty — UK, UE i MENA — każdy z innymi IBAN-ami i obsługiwanymi walutami. Dobieramy Twój przed rozpoczęciem onboardingu, nie po przesłaniu dokumentów spółki.",
+    "ec.intro.value2.title": "Zastrzeżenia teraz, nie po KYB",
+    "ec.intro.value2.body": "Niektóre kanały płatnicze zależą od naszej sieci partnerskiej. Niektóre podmioty są jeszcze w early access. Niektóre branże uruchamiają ręczną weryfikację. Wszystko, co dotyczy Twojej firmy, pojawi się na stronie wyniku — zanim zaangażujesz się w KYB.",
+    "ec.intro.value3.title": "Szybkie «nie», nie powolne",
+    "ec.intro.value3.body": "Altery nie może onboardować firm z hazardu, treści dla dorosłych, broni ani nieuregulowanych pożyczek. Jeśli to Twoja branża, dowiesz się w 60 sekund — nie po tygodniu przesyłania dokumentów.",
     "ec.intro.cta": "Rozpocznij sprawdzenie",
 
     "ec.q.eyebrow": "z {total} pytań",
@@ -3610,21 +3820,21 @@
     "ec.q2.alert.blocked.body": "Altery nie obsługuje {industry} w żadnym ze swoich podmiotów. Wyjaśnimy to na ekranie wyniku — można też napisać bezpośrednio do zespołu.",
     "ec.q2.alert.crypto.title": "Krypto-natywny? Dobre miejsce.",
     "ec.q2.alert.crypto.body": "Regularnie onboardujemy {category}. Twoje zgłoszenie przechodzi przez naszą ścieżkę krypto-specjalistyczną — kompetentny zespół compliance, szyny fiat przez SEPA / Faster Payments / SWIFT, i Synterra Connect dla integracji z partnerskimi giełdami.",
-
-    "ec.ind.ai": "AI / Oprogramowanie",
-    "ec.ind.saas": "SaaS / Usługi tech",
-    "ec.ind.ecom": "E-commerce / Handel detaliczny",
+    "ec.ind.saas": "SaaS / AI / Oprogramowanie",
+    "ec.ind.ecom": "E-commerce / Handel / Marketplaces",
     "ec.ind.prof": "Usługi profesjonalne",
-    "ec.ind.media": "Media / Marketing",
+    "ec.ind.media": "Marketing / Sieci reklamowe / Afiliacja",
     "ec.ind.trade": "Import / Eksport / Handel",
     "ec.ind.logi": "Logistyka / Spedycja",
+    "ec.ind.gaming": "Gaming / Tworzenie gier / Esport",
     "ec.ind.crypto.exchange": "Krypto: giełda / OTC",
     "ec.ind.crypto.custody": "Krypto: portfel / kustodia",
     "ec.ind.crypto.payment": "Krypto: płatności / on-off ramp",
     "ec.ind.crypto.defi": "Krypto: DeFi / protokół on-chain",
     "ec.ind.crypto.nft": "Krypto: NFT / kolekcje cyfrowe",
     "ec.ind.crypto.tools": "Krypto: SaaS / analityka / narzędzia",
-    "ec.ind.gambling": "Hazard / Zakłady",
+    "ec.ind.crypto.mining": "Krypto: kopanie / staking",
+    "ec.ind.gambling": "Hazard / iGaming",
     "ec.ind.adult": "Treści dla dorosłych",
     "ec.ind.weapons": "Produkcja broni",
     "ec.ind.lending": "Nieuregulowane pożyczki",
@@ -3749,14 +3959,14 @@
     "common.contactTeam": "Contactar a equipa",
 
     "ec.intro.eyebrow": "Verificação de elegibilidade",
-    "ec.intro.title": "Veja se a Altery serve — antes de preencher seja o que for.",
-    "ec.intro.lead": "{total} perguntas curtas. Mostramos qual a entidade Altery que emitirá a sua conta, que moedas e corredores são suportados e o plano certo para o seu volume. Sem registo, sem consulta de crédito.",
-    "ec.intro.value1.title": "Dizemos a entidade à partida",
-    "ec.intro.value1.body": "Reino Unido, EEE ou DIFC — licenças e IBANs distintos. Escolhemos antes do onboarding para não recomeçar.",
-    "ec.intro.value2.title": "Honestos sobre o que é suportado",
-    "ec.intro.value2.body": "Vias dependentes do parceiro, entidades em arranque e setores sujeitos a revisão são sinalizados aqui — não depois de carregar documentos da empresa.",
-    "ec.intro.value3.title": "Se não pudermos ajudar, dizemos",
-    "ec.intro.value3.body": "Não aceitamos pedidos de jogo, conteúdo adulto, armas ou crédito não regulado. Melhor saber agora do que após o KYB.",
+    "ec.intro.title": "A Altery serve o seu negócio?",
+    "ec.intro.lead": "Responda a {total} perguntas sobre o seu negócio. Mostramos a entidade que emitirá a sua conta (Reino Unido, UE ou MENA), as moedas e vias de pagamento que suportamos para si e o plano adequado ao seu volume — tudo em 90 segundos. Sem pedido, sem registo, sem consulta de crédito.",
+    "ec.intro.value1.title": "Sem recomeço por entidade errada",
+    "ec.intro.value1.body": "A Altery opera três entidades reguladas — Reino Unido, UE e MENA — cada uma com IBANs e moedas suportadas distintas. Selecionamos a sua antes do onboarding, não depois de carregar documentos da empresa.",
+    "ec.intro.value2.title": "Ressalvas agora, não após o KYB",
+    "ec.intro.value2.body": "Algumas vias de pagamento dependem da nossa rede de parceiros. Algumas entidades estão ainda em early access. Alguns setores acionam revisão manual. O que se aplicar ao seu negócio aparece na página de resultados — antes de avançar para o KYB.",
+    "ec.intro.value3.title": "Recusas rápidas, não lentas",
+    "ec.intro.value3.body": "A Altery não pode integrar negócios em jogo, conteúdo adulto, armas ou crédito não regulado. Se o seu for um deles, sabe em 60 segundos — não depois de uma semana a carregar documentos.",
     "ec.intro.cta": "Iniciar verificação",
 
     "ec.q.eyebrow": "de {total} perguntas",
@@ -3788,20 +3998,22 @@
     "ec.q2.alert.crypto.title": "Crypto-nativo? Bem-vindo.",
     "ec.q2.alert.crypto.body": "Fazemos onboarding regular de {category}. A sua candidatura passa pela linha de especialistas crypto — equipa de compliance competente, vias fiat via SEPA / Faster Payments / SWIFT, e Synterra Connect para fluxos de exchanges parceiros.",
 
-    "ec.ind.ai": "IA / Software",
-    "ec.ind.saas": "SaaS / Serviços tech",
-    "ec.ind.ecom": "E-commerce / Retalho",
+    
+    "ec.ind.saas": "SaaS / IA / Software",
+    "ec.ind.ecom": "E-commerce / Varejo / Marketplaces",
     "ec.ind.prof": "Serviços profissionais",
-    "ec.ind.media": "Média / Marketing",
+    "ec.ind.media": "Marketing / Redes de anúncios / Afiliados",
     "ec.ind.trade": "Importação / Exportação / Comércio",
     "ec.ind.logi": "Logística / Transporte",
+    "ec.ind.gaming": "Gaming / Desenvolvimento de jogos / Esports",
     "ec.ind.crypto.exchange": "Crypto: exchange / OTC",
     "ec.ind.crypto.custody": "Crypto: wallet / custódia",
     "ec.ind.crypto.payment": "Crypto: pagamentos / on-off ramp",
     "ec.ind.crypto.defi": "Crypto: DeFi / protocolo on-chain",
     "ec.ind.crypto.nft": "Crypto: NFT / colecionáveis digitais",
     "ec.ind.crypto.tools": "Crypto: SaaS / análise / ferramentas",
-    "ec.ind.gambling": "Jogo / Apostas",
+    "ec.ind.crypto.mining": "Cripto: mineração / staking",
+    "ec.ind.gambling": "Apostas / iGaming",
     "ec.ind.adult": "Conteúdo adulto",
     "ec.ind.weapons": "Fabrico de armas",
     "ec.ind.lending": "Crédito não regulado",
@@ -3926,14 +4138,14 @@
     "common.contactTeam": "Contacter l'équipe",
 
     "ec.intro.eyebrow": "Test d'éligibilité",
-    "ec.intro.title": "Vérifiez si Altery convient — avant de remplir quoi que ce soit.",
-    "ec.intro.lead": "{total} questions courtes. Nous vous indiquerons quelle entité Altery émettra votre compte, quelles devises et corridors sont pris en charge, et le plan adapté à votre volume. Pas d'inscription, pas de consultation de crédit.",
-    "ec.intro.value1.title": "Nous annonçons l'entité d'emblée",
-    "ec.intro.value1.body": "UK, EEE ou DIFC — licences et IBAN différents. Le choix se fait avant l'onboarding pour ne pas tout reprendre.",
-    "ec.intro.value2.title": "Honnêtes sur ce qui est pris en charge",
-    "ec.intro.value2.body": "Voies dépendantes du partenaire, entités en lancement et secteurs soumis à revue sont signalés ici — pas après le dépôt des documents de l'entreprise.",
-    "ec.intro.value3.title": "Si nous ne pouvons aider, nous le disons",
-    "ec.intro.value3.body": "Nous n'acceptons pas les jeux d'argent, le contenu adulte, les armes ni le crédit non régulé. Mieux vaut le savoir maintenant qu'après le KYB.",
+    "ec.intro.title": "Altery convient-il à votre entreprise ?",
+    "ec.intro.lead": "Répondez à {total} questions sur votre entreprise. Nous vous indiquerons l'entité qui émettra votre compte (Royaume-Uni, UE ou MENA), les devises et les voies de paiement que nous prenons en charge pour vous, et le plan adapté à votre volume — le tout en 90 secondes. Pas de candidature, pas d'inscription, pas de consultation de crédit.",
+    "ec.intro.value1.title": "Pas de redémarrage pour mauvaise entité",
+    "ec.intro.value1.body": "Altery exploite trois entités régulées — Royaume-Uni, UE et MENA — chacune avec ses propres IBAN et devises prises en charge. Nous choisissons la vôtre avant l'onboarding, pas après le dépôt de vos documents d'entreprise.",
+    "ec.intro.value2.title": "Réserves maintenant, pas après le KYB",
+    "ec.intro.value2.body": "Certaines voies de paiement dépendent de notre réseau de partenaires. Certaines entités sont encore en accès anticipé. Certains secteurs déclenchent une revue manuelle. Ce qui s'applique à votre entreprise apparaît sur la page de résultats — avant de vous engager dans le KYB.",
+    "ec.intro.value3.title": "Des refus rapides, pas lents",
+    "ec.intro.value3.body": "Altery ne peut pas intégrer les entreprises de jeux d'argent, contenu adulte, armes ou crédit non régulé. Si la vôtre en fait partie, vous le saurez en 60 secondes — pas après une semaine de téléchargement de documents.",
     "ec.intro.cta": "Lancer le test",
 
     "ec.q.eyebrow": "sur {total} questions",
@@ -3964,21 +4176,21 @@
     "ec.q2.alert.blocked.body": "Altery ne prend pas en charge {industry} dans aucune de ses entités. Nous l'expliquerons sur l'écran de résultat — vous pouvez aussi écrire directement à l'équipe.",
     "ec.q2.alert.crypto.title": "Crypto-natif ? Au bon endroit.",
     "ec.q2.alert.crypto.body": "Nous onboardons régulièrement {category}. Votre candidature passe par notre voie spécialisée crypto — équipe conformité compétente, rails fiat via SEPA / Faster Payments / SWIFT, et Synterra Connect pour les flux d'exchanges partenaires.",
-
-    "ec.ind.ai": "IA / Logiciel",
-    "ec.ind.saas": "SaaS / Services tech",
-    "ec.ind.ecom": "E-commerce / Retail",
+    "ec.ind.saas": "SaaS / IA / Logiciels",
+    "ec.ind.ecom": "E-commerce / Retail / Marketplaces",
     "ec.ind.prof": "Services professionnels",
-    "ec.ind.media": "Médias / Marketing",
+    "ec.ind.media": "Marketing / Réseaux publicitaires / Affiliation",
     "ec.ind.trade": "Import / Export / Trading",
     "ec.ind.logi": "Logistique / Expédition",
+    "ec.ind.gaming": "Gaming / Développement de jeux / Esports",
     "ec.ind.crypto.exchange": "Crypto : exchange / desk OTC",
     "ec.ind.crypto.custody": "Crypto : portefeuille / custody",
     "ec.ind.crypto.payment": "Crypto : paiements / on-off ramp",
     "ec.ind.crypto.defi": "Crypto : DeFi / protocole on-chain",
     "ec.ind.crypto.nft": "Crypto : NFT / objets de collection numériques",
     "ec.ind.crypto.tools": "Crypto : SaaS / analytique / outils",
-    "ec.ind.gambling": "Jeux d'argent / Paris",
+    "ec.ind.crypto.mining": "Crypto : minage / staking",
+    "ec.ind.gambling": "Paris / iGaming",
     "ec.ind.adult": "Contenu adulte",
     "ec.ind.weapons": "Fabrication d'armes",
     "ec.ind.lending": "Crédit non régulé",
@@ -5009,6 +5221,361 @@
     "ec.r.perks.massPayments.title": "Bulkbetalingen",
     "ec.r.perks.massPayments.body": "Verstuur honderden betalingen in een paar klikken, in verschillende valuta's.",
   });
+
+  // ─────────── Entity-specific currency perk ──────────────
+  // Renders as the first item in the plan card perks list.
+  // Replaces the old EcAccountPreview panel — same information
+  // (which currencies via which rails per entity) but in one
+  // line of text instead of ~450px of cards. UK/EU/MENA each
+  // gets jurisdiction-specific copy.
+  Object.assign(D.en, {
+    "ec.entity.uk.currencyPerk":   "Local IBANs in GBP & EUR · USD via SWIFT",
+    "ec.entity.eu.currencyPerk":   "EUR with SEPA Instant · GBP & USD via SWIFT",
+    "ec.entity.mena.currencyPerk": "Local IBANs in USD & AED · 50+ via SWIFT",
+  });
+  Object.assign(D.es, {
+    "ec.entity.uk.currencyPerk":   "IBANs locales en GBP y EUR · USD vía SWIFT",
+    "ec.entity.eu.currencyPerk":   "EUR con SEPA Instant · GBP y USD vía SWIFT",
+    "ec.entity.mena.currencyPerk": "IBANs locales en USD y AED · 50+ vía SWIFT",
+  });
+  Object.assign(D.fr, {
+    "ec.entity.uk.currencyPerk":   "IBANs locaux en GBP et EUR · USD via SWIFT",
+    "ec.entity.eu.currencyPerk":   "EUR avec SEPA Instant · GBP et USD via SWIFT",
+    "ec.entity.mena.currencyPerk": "IBANs locaux en USD et AED · 50+ via SWIFT",
+  });
+  Object.assign(D.pt, {
+    "ec.entity.uk.currencyPerk":   "IBANs locais em GBP e EUR · USD via SWIFT",
+    "ec.entity.eu.currencyPerk":   "EUR com SEPA Instant · GBP e USD via SWIFT",
+    "ec.entity.mena.currencyPerk": "IBANs locais em USD e AED · 50+ via SWIFT",
+  });
+  Object.assign(D.ru, {
+    "ec.entity.uk.currencyPerk":   "Локальные IBAN в GBP и EUR · USD через SWIFT",
+    "ec.entity.eu.currencyPerk":   "EUR через SEPA Instant · GBP и USD через SWIFT",
+    "ec.entity.mena.currencyPerk": "Локальные IBAN в USD и AED · 50+ через SWIFT",
+  });
+  Object.assign(D.de, {
+    "ec.entity.uk.currencyPerk":   "Lokale IBANs in GBP & EUR · USD via SWIFT",
+    "ec.entity.eu.currencyPerk":   "EUR mit SEPA Instant · GBP & USD via SWIFT",
+    "ec.entity.mena.currencyPerk": "Lokale IBANs in USD & AED · 50+ via SWIFT",
+  });
+  Object.assign(D.it, {
+    "ec.entity.uk.currencyPerk":   "IBAN locali in GBP e EUR · USD via SWIFT",
+    "ec.entity.eu.currencyPerk":   "EUR con SEPA Instant · GBP e USD via SWIFT",
+    "ec.entity.mena.currencyPerk": "IBAN locali in USD e AED · 50+ via SWIFT",
+  });
+  Object.assign(D.tr, {
+    "ec.entity.uk.currencyPerk":   "GBP ve EUR'de yerel IBAN · USD SWIFT üzerinden",
+    "ec.entity.eu.currencyPerk":   "SEPA Instant ile EUR · GBP ve USD SWIFT üzerinden",
+    "ec.entity.mena.currencyPerk": "USD ve AED'de yerel IBAN · 50+ SWIFT üzerinden",
+  });
+  Object.assign(D.pl, {
+    "ec.entity.uk.currencyPerk":   "Lokalne IBAN-y w GBP i EUR · USD przez SWIFT",
+    "ec.entity.eu.currencyPerk":   "EUR przez SEPA Instant · GBP i USD przez SWIFT",
+    "ec.entity.mena.currencyPerk": "Lokalne IBAN-y w USD i AED · 50+ przez SWIFT",
+  });
+  Object.assign(D.nl, {
+    "ec.entity.uk.currencyPerk":   "Lokale IBANs in GBP en EUR · USD via SWIFT",
+    "ec.entity.eu.currencyPerk":   "EUR met SEPA Instant · GBP en USD via SWIFT",
+    "ec.entity.mena.currencyPerk": "Lokale IBANs in USD en AED · 50+ via SWIFT",
+  });
+
+  // ─────────── Fees modal translations ─────────────────────────
+  // Strings for the EcFeesModal — section headers, row labels, and
+  // footer text. Bank-product names (SEPA, SWIFT, Fedwire, ACH,
+  // Faster Payments) stay verbatim across languages — they're
+  // global product brands, not translatable. The SWIFT cap note
+  // takes a {cap} param substituted from the active plan's perk
+  // text at render time.
+  Object.assign(D.en, {
+    "ec.r.plan.viewFees": "View all fees",
+    "ec.fees.title": "Full fees",
+    "ec.fees.section.account": "Account",
+    "ec.fees.section.outgoing": "Outgoing transfers",
+    "ec.fees.section.incoming": "Incoming transfers",
+    "ec.fees.section.fx": "FX & conversion",
+    "ec.fees.row.opening": "Account opening",
+    "ec.fees.row.monthly": "Monthly fee",
+    "ec.fees.row.closure": "Account closure",
+    "ec.fees.row.inactivity": "Inactivity (3+ months)",
+    "ec.fees.row.internal": "Internal transfer",
+    "ec.fees.row.internalIn": "Internal transfer",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "SWIFT in GBP",
+    "ec.fees.row.swiftEur": "SWIFT in EUR",
+    "ec.fees.row.swiftUsd": "SWIFT in USD",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "FX markup",
+    "ec.fees.row.exchange": "Currency exchange",
+    "ec.fees.note.swiftCap": "SWIFT fees capped at {cap} per transfer on this plan.",
+    "ec.fees.footer.disclaimer": "Final pricing confirmed during onboarding.",
+    "ec.fees.footer.link": "Full schedule at altery.com/fees/business →",
+  });
+  Object.assign(D.es, {
+    "ec.r.plan.viewFees": "Ver todas las tarifas",
+    "ec.fees.title": "Tarifas completas",
+    "ec.fees.section.account": "Cuenta",
+    "ec.fees.section.outgoing": "Transferencias salientes",
+    "ec.fees.section.incoming": "Transferencias entrantes",
+    "ec.fees.section.fx": "FX y conversión",
+    "ec.fees.row.opening": "Apertura de cuenta",
+    "ec.fees.row.monthly": "Cuota mensual",
+    "ec.fees.row.closure": "Cierre de cuenta",
+    "ec.fees.row.inactivity": "Inactividad (3+ meses)",
+    "ec.fees.row.internal": "Transferencia interna",
+    "ec.fees.row.internalIn": "Transferencia interna",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "SWIFT en GBP",
+    "ec.fees.row.swiftEur": "SWIFT en EUR",
+    "ec.fees.row.swiftUsd": "SWIFT en USD",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "Margen FX",
+    "ec.fees.row.exchange": "Cambio de divisa",
+    "ec.fees.note.swiftCap": "Tarifas SWIFT con tope de {cap} por transferencia en este plan.",
+    "ec.fees.footer.disclaimer": "Tarifas finales confirmadas durante el onboarding.",
+    "ec.fees.footer.link": "Tabla completa en altery.com/fees/business →",
+  });
+  Object.assign(D.fr, {
+    "ec.r.plan.viewFees": "Voir tous les frais",
+    "ec.fees.title": "Frais complets",
+    "ec.fees.section.account": "Compte",
+    "ec.fees.section.outgoing": "Virements sortants",
+    "ec.fees.section.incoming": "Virements entrants",
+    "ec.fees.section.fx": "FX et conversion",
+    "ec.fees.row.opening": "Ouverture de compte",
+    "ec.fees.row.monthly": "Frais mensuels",
+    "ec.fees.row.closure": "Clôture de compte",
+    "ec.fees.row.inactivity": "Inactivité (3+ mois)",
+    "ec.fees.row.internal": "Virement interne",
+    "ec.fees.row.internalIn": "Virement interne",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "SWIFT en GBP",
+    "ec.fees.row.swiftEur": "SWIFT en EUR",
+    "ec.fees.row.swiftUsd": "SWIFT en USD",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "Marge FX",
+    "ec.fees.row.exchange": "Conversion de devise",
+    "ec.fees.note.swiftCap": "Frais SWIFT plafonnés à {cap} par virement sur ce plan.",
+    "ec.fees.footer.disclaimer": "Tarifs finaux confirmés lors de l'onboarding.",
+    "ec.fees.footer.link": "Grille complète sur altery.com/fees/business →",
+  });
+  Object.assign(D.pt, {
+    "ec.r.plan.viewFees": "Ver todas as tarifas",
+    "ec.fees.title": "Tarifas completas",
+    "ec.fees.section.account": "Conta",
+    "ec.fees.section.outgoing": "Transferências enviadas",
+    "ec.fees.section.incoming": "Transferências recebidas",
+    "ec.fees.section.fx": "FX e conversão",
+    "ec.fees.row.opening": "Abertura de conta",
+    "ec.fees.row.monthly": "Tarifa mensal",
+    "ec.fees.row.closure": "Encerramento de conta",
+    "ec.fees.row.inactivity": "Inatividade (3+ meses)",
+    "ec.fees.row.internal": "Transferência interna",
+    "ec.fees.row.internalIn": "Transferência interna",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "SWIFT em GBP",
+    "ec.fees.row.swiftEur": "SWIFT em EUR",
+    "ec.fees.row.swiftUsd": "SWIFT em USD",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "Margem de câmbio",
+    "ec.fees.row.exchange": "Câmbio",
+    "ec.fees.note.swiftCap": "Taxas SWIFT limitadas a {cap} por transferência neste plano.",
+    "ec.fees.footer.disclaimer": "Tarifa final confirmada durante o onboarding.",
+    "ec.fees.footer.link": "Tabela completa em altery.com/fees/business →",
+  });
+  Object.assign(D.ru, {
+    "ec.r.plan.viewFees": "Все тарифы",
+    "ec.fees.title": "Все тарифы",
+    "ec.fees.section.account": "Аккаунт",
+    "ec.fees.section.outgoing": "Исходящие платежи",
+    "ec.fees.section.incoming": "Входящие платежи",
+    "ec.fees.section.fx": "FX и конверсия",
+    "ec.fees.row.opening": "Открытие счёта",
+    "ec.fees.row.monthly": "Месячная плата",
+    "ec.fees.row.closure": "Закрытие счёта",
+    "ec.fees.row.inactivity": "Неактивность (3+ мес)",
+    "ec.fees.row.internal": "Внутренний перевод",
+    "ec.fees.row.internalIn": "Внутренний перевод",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "SWIFT в GBP",
+    "ec.fees.row.swiftEur": "SWIFT в EUR",
+    "ec.fees.row.swiftUsd": "SWIFT в USD",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "FX-маржа",
+    "ec.fees.row.exchange": "Конверсия валют",
+    "ec.fees.note.swiftCap": "Комиссии SWIFT ограничены {cap} за перевод на этом тарифе.",
+    "ec.fees.footer.disclaimer": "Финальные тарифы подтверждаются при онбординге.",
+    "ec.fees.footer.link": "Полная таблица на altery.com/fees/business →",
+  });
+  Object.assign(D.de, {
+    "ec.r.plan.viewFees": "Alle Gebühren ansehen",
+    "ec.fees.title": "Alle Gebühren",
+    "ec.fees.section.account": "Konto",
+    "ec.fees.section.outgoing": "Ausgehende Überweisungen",
+    "ec.fees.section.incoming": "Eingehende Überweisungen",
+    "ec.fees.section.fx": "FX und Wechsel",
+    "ec.fees.row.opening": "Kontoeröffnung",
+    "ec.fees.row.monthly": "Monatliche Gebühr",
+    "ec.fees.row.closure": "Kontoschließung",
+    "ec.fees.row.inactivity": "Inaktivität (3+ Monate)",
+    "ec.fees.row.internal": "Interne Überweisung",
+    "ec.fees.row.internalIn": "Interne Überweisung",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "SWIFT in GBP",
+    "ec.fees.row.swiftEur": "SWIFT in EUR",
+    "ec.fees.row.swiftUsd": "SWIFT in USD",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "FX-Aufschlag",
+    "ec.fees.row.exchange": "Währungstausch",
+    "ec.fees.note.swiftCap": "SWIFT-Gebühren bei diesem Tarif auf {cap} pro Überweisung gedeckelt.",
+    "ec.fees.footer.disclaimer": "Endgültige Preise werden beim Onboarding bestätigt.",
+    "ec.fees.footer.link": "Vollständige Übersicht auf altery.com/fees/business →",
+  });
+  Object.assign(D.it, {
+    "ec.r.plan.viewFees": "Vedi tutte le tariffe",
+    "ec.fees.title": "Tariffe complete",
+    "ec.fees.section.account": "Conto",
+    "ec.fees.section.outgoing": "Trasferimenti in uscita",
+    "ec.fees.section.incoming": "Trasferimenti in entrata",
+    "ec.fees.section.fx": "FX e conversione",
+    "ec.fees.row.opening": "Apertura conto",
+    "ec.fees.row.monthly": "Canone mensile",
+    "ec.fees.row.closure": "Chiusura conto",
+    "ec.fees.row.inactivity": "Inattività (3+ mesi)",
+    "ec.fees.row.internal": "Bonifico interno",
+    "ec.fees.row.internalIn": "Bonifico interno",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "SWIFT in GBP",
+    "ec.fees.row.swiftEur": "SWIFT in EUR",
+    "ec.fees.row.swiftUsd": "SWIFT in USD",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "Markup FX",
+    "ec.fees.row.exchange": "Cambio valuta",
+    "ec.fees.note.swiftCap": "Commissioni SWIFT con tetto di {cap} per bonifico su questo piano.",
+    "ec.fees.footer.disclaimer": "Tariffe finali confermate in fase di onboarding.",
+    "ec.fees.footer.link": "Tabella completa su altery.com/fees/business →",
+  });
+  Object.assign(D.tr, {
+    "ec.r.plan.viewFees": "Tüm ücretleri gör",
+    "ec.fees.title": "Tüm ücretler",
+    "ec.fees.section.account": "Hesap",
+    "ec.fees.section.outgoing": "Giden transferler",
+    "ec.fees.section.incoming": "Gelen transferler",
+    "ec.fees.section.fx": "FX ve dönüşüm",
+    "ec.fees.row.opening": "Hesap açılışı",
+    "ec.fees.row.monthly": "Aylık ücret",
+    "ec.fees.row.closure": "Hesap kapatma",
+    "ec.fees.row.inactivity": "İnaktivite (3+ ay)",
+    "ec.fees.row.internal": "İç transfer",
+    "ec.fees.row.internalIn": "İç transfer",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "GBP cinsi SWIFT",
+    "ec.fees.row.swiftEur": "EUR cinsi SWIFT",
+    "ec.fees.row.swiftUsd": "USD cinsi SWIFT",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "FX markup",
+    "ec.fees.row.exchange": "Döviz dönüşümü",
+    "ec.fees.note.swiftCap": "Bu planda SWIFT ücretleri transfer başına {cap} ile sınırlıdır.",
+    "ec.fees.footer.disclaimer": "Nihai fiyatlar onboarding sırasında onaylanır.",
+    "ec.fees.footer.link": "Tam liste altery.com/fees/business adresinde →",
+  });
+  Object.assign(D.pl, {
+    "ec.r.plan.viewFees": "Zobacz wszystkie opłaty",
+    "ec.fees.title": "Pełne opłaty",
+    "ec.fees.section.account": "Konto",
+    "ec.fees.section.outgoing": "Przelewy wychodzące",
+    "ec.fees.section.incoming": "Przelewy przychodzące",
+    "ec.fees.section.fx": "FX i wymiana",
+    "ec.fees.row.opening": "Otwarcie konta",
+    "ec.fees.row.monthly": "Opłata miesięczna",
+    "ec.fees.row.closure": "Zamknięcie konta",
+    "ec.fees.row.inactivity": "Brak aktywności (3+ miesięcy)",
+    "ec.fees.row.internal": "Przelew wewnętrzny",
+    "ec.fees.row.internalIn": "Przelew wewnętrzny",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "SWIFT w GBP",
+    "ec.fees.row.swiftEur": "SWIFT w EUR",
+    "ec.fees.row.swiftUsd": "SWIFT w USD",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "Marża FX",
+    "ec.fees.row.exchange": "Wymiana walut",
+    "ec.fees.note.swiftCap": "Opłaty SWIFT ograniczone do {cap} za przelew w tym planie.",
+    "ec.fees.footer.disclaimer": "Ostateczne ceny potwierdzane podczas onboardingu.",
+    "ec.fees.footer.link": "Pełna tabela na altery.com/fees/business →",
+  });
+  Object.assign(D.nl, {
+    "ec.r.plan.viewFees": "Bekijk alle tarieven",
+    "ec.fees.title": "Volledige tarieven",
+    "ec.fees.section.account": "Account",
+    "ec.fees.section.outgoing": "Uitgaande overschrijvingen",
+    "ec.fees.section.incoming": "Inkomende overschrijvingen",
+    "ec.fees.section.fx": "FX en wisselen",
+    "ec.fees.row.opening": "Rekeningopening",
+    "ec.fees.row.monthly": "Maandelijkse kosten",
+    "ec.fees.row.closure": "Rekeningsluiting",
+    "ec.fees.row.inactivity": "Inactiviteit (3+ maanden)",
+    "ec.fees.row.internal": "Interne overschrijving",
+    "ec.fees.row.internalIn": "Interne overschrijving",
+    "ec.fees.row.sepa": "SEPA",
+    "ec.fees.row.sepaIn": "SEPA",
+    "ec.fees.row.fp": "Faster Payments",
+    "ec.fees.row.fpIn": "Faster Payments",
+    "ec.fees.row.fedwire": "Fedwire",
+    "ec.fees.row.achUsd": "ACH (USD)",
+    "ec.fees.row.swiftGbp": "SWIFT in GBP",
+    "ec.fees.row.swiftEur": "SWIFT in EUR",
+    "ec.fees.row.swiftUsd": "SWIFT in USD",
+    "ec.fees.row.swiftIn": "SWIFT",
+    "ec.fees.row.fxMarkup": "FX-opslag",
+    "ec.fees.row.exchange": "Valutawissel",
+    "ec.fees.note.swiftCap": "SWIFT-kosten beperkt tot {cap} per overschrijving op dit plan.",
+    "ec.fees.footer.disclaimer": "Definitieve tarieven worden bevestigd tijdens onboarding.",
+    "ec.fees.footer.link": "Volledige tabel op altery.com/fees/business →",
+  });
 })();
   </script>
 
@@ -5703,35 +6270,58 @@
       { code: "ROW", group: "other" },
     ];
 
+    // ── Q2 industries ─────────────────────────────────────────────────
+    // Categories Altery actually serves per altery.com/business — plus
+    // explicit crypto sub-types (we onboard crypto-native businesses,
+    // that's a core value prop). Labels chosen to match how competitors
+    // and Altery itself frame these verticals publicly:
+    //   • "SaaS / AI / Software" — merged from separate ai + saas (most
+    //     AI startups self-describe as SaaS, so two options created
+    //     decision friction without information gain).
+    //   • "Marketing / Ad networks / Affiliate" — broadened from "media"
+    //     to capture affiliate-vertical explicitly (Payset, INXY and
+    //     Altery's own /business page all surface affiliate as a core
+    //     served niche).
+    //   • "Gaming / Game dev / Esports" — INXY top-tier category, also
+    //     on Altery's /business page under "Digital products" and
+    //     "Entertainment". Deliberately separate from gambling so users
+    //     don't conflate the two (a game-dev studio is not iGaming).
+    //   • "Crypto: mining / staking" — Altery's /business "Financial"
+    //     section explicitly lists "Cryptocurrency mining"; previous
+    //     six crypto sub-types missed it.
+    //   • "Gambling / Betting / iGaming" — added "iGaming" to the
+    //     blocked label so the contrast with served "Gaming" is sharp.
     const EC_INDUSTRIES = [
-      { value: "ai", labelKey: "ec.ind.ai", risk: "ok" },
-      { value: "saas", labelKey: "ec.ind.saas", risk: "ok" },
-      { value: "ecom", labelKey: "ec.ind.ecom", risk: "ok" },
-      { value: "prof", labelKey: "ec.ind.prof", risk: "ok" },
+      // ─── General welcoming categories ───────────────────────────
+      { value: "saas",  labelKey: "ec.ind.saas",  risk: "ok" },
+      { value: "ecom",  labelKey: "ec.ind.ecom",  risk: "ok" },
+      { value: "prof",  labelKey: "ec.ind.prof",  risk: "ok" },
       { value: "media", labelKey: "ec.ind.media", risk: "ok" },
+      { value: "gaming",labelKey: "ec.ind.gaming",risk: "ok" },
       { value: "trade", labelKey: "ec.ind.trade", risk: "ok" },
-      { value: "logi", labelKey: "ec.ind.logi", risk: "ok" },
+      { value: "logi",  labelKey: "ec.ind.logi",  risk: "ok" },
       // ─── Crypto-native categories ───────────────────────────────
-      // Six specific sub-types instead of one catch-all "crypto-native"
-      // bucket. Different crypto businesses have very different operational
-      // profiles (a CEX needs partner-exchange flows, a custody provider
-      // needs cold-storage settlement, a payment processor needs on/off-ramp
-      // rails — they shouldn't see the same generic message). All risk:"ok"
-      // — Altery actively onboards crypto-native businesses, that's a core
-      // value prop. The `crypto: true` flag flips the Q2 alert from the
-      // generic "watch" warning to a welcoming category-specific message,
-      // and adds the crypto-specialist caveat on the result page.
+      // Seven specific sub-types. Different crypto businesses have very
+      // different operational profiles (a CEX needs partner-exchange
+      // flows, a custody provider needs cold-storage settlement, a
+      // miner needs energy-cost-driven cashflow — they shouldn't see
+      // the same generic message). All risk:"ok" — Altery actively
+      // onboards crypto-native businesses, that's a core value prop.
+      // The `crypto: true` flag flips the Q2 alert from the generic
+      // "watch" warning to a welcoming category-specific message, and
+      // adds the crypto-specialist caveat on the result page.
       { value: "crypto-exchange", labelKey: "ec.ind.crypto.exchange", risk: "ok", crypto: true },
       { value: "crypto-custody",  labelKey: "ec.ind.crypto.custody",  risk: "ok", crypto: true },
       { value: "crypto-payment",  labelKey: "ec.ind.crypto.payment",  risk: "ok", crypto: true },
       { value: "crypto-defi",     labelKey: "ec.ind.crypto.defi",     risk: "ok", crypto: true },
       { value: "crypto-nft",      labelKey: "ec.ind.crypto.nft",      risk: "ok", crypto: true },
       { value: "crypto-tools",    labelKey: "ec.ind.crypto.tools",    risk: "ok", crypto: true },
+      { value: "crypto-mining",   labelKey: "ec.ind.crypto.mining",   risk: "ok", crypto: true },
       // ─── Blocked categories (regulatory or risk reasons) ────────
       { value: "gambling", labelKey: "ec.ind.gambling", risk: "blocked" },
-      { value: "adult", labelKey: "ec.ind.adult", risk: "blocked" },
-      { value: "weapons", labelKey: "ec.ind.weapons", risk: "blocked" },
-      { value: "lending", labelKey: "ec.ind.lending", risk: "blocked" },
+      { value: "adult",    labelKey: "ec.ind.adult",    risk: "blocked" },
+      { value: "weapons",  labelKey: "ec.ind.weapons",  risk: "blocked" },
+      { value: "lending",  labelKey: "ec.ind.lending",  risk: "blocked" },
     ];
 
     const EC_BUSINESS_TYPES = [
@@ -5778,6 +6368,57 @@
       { idx: 6, value: 3000000 }, { idx: 7, value: 7000000 },
     ];
 
+    // ── Fee schedule (canonical, from altery.com/fees/business) ───────
+    // Real Altery business-account fees. Altery's published schedule is
+    // region-tiered — same fees regardless of plan tier (Starter/Pro/
+    // Ultra), only the monthly subscription and the plan-level perks
+    // (FX cap, SWIFT cap) differ across tiers. Region key:
+    //   • "ukEu" — businesses registered in UK or any EU member state
+    //   • "row"  — Rest of the World (everyone else)
+    // Routing derived from entity.id: uk + eu entities → ukEu, mena → row.
+    // Values are FORMATTED strings matching altery.com display, kept
+    // verbatim so they survive copy review without re-translation. If
+    // Altery updates fees, this constant is the single source-of-truth
+    // to keep in sync (link: https://altery.com/fees/business).
+    const EC_FEE_SCHEDULE = {
+      ukEu: {
+        accountOpening:  "Free",
+        accountClosure:  "Free",
+        inactivity:      "£4.99/mo",
+        internal:        "Free",
+        sepa:            "€/£/$ 0.50",
+        fp:              "£/$/€ 0.50",
+        fedwire:         "$10 / €8.80 / £8",
+        achUsd:          "1%, min $1 (>$100)",
+        swiftGbpOut:     "£20",
+        swiftEurOut:     "€30",
+        swiftUsdOut:     "$30",
+        swiftIn:         "£10 / €15 / $20",
+        exchange:        "On request",
+      },
+      row: {
+        accountOpening:  "£100",
+        accountClosure:  "Free",
+        inactivity:      "£9.99/mo",
+        internal:        "Free",
+        sepa:            "€2 / £2 / $2 + 0.10%, max €30 / £25 / $35",
+        fp:              "£2 / $2.50 / €2.50 + 0.10%, max £25 / €30 / $35",
+        fedwire:         "Currently unavailable",
+        achUsd:          "Currently unavailable",
+        swiftGbpOut:     "£30 + 0.15%, max £150",
+        swiftEurOut:     "€35 + 0.15%, max €180",
+        swiftUsdOut:     "$40 + 0.15%, max $200",
+        swiftIn:         "£10 / €15 / $20",
+        exchange:        "On request",
+      },
+    };
+    // Region derivation: UK + EU entities route to UK-EU schedule;
+    // MENA (and any other non-EU entity) routes to RoW schedule.
+    function ecFeeRegion(entity) {
+      if (!entity) return "ukEu";
+      return entity.id === "mena" ? "row" : "ukEu";
+    }
+
     // Real Altery plan data, from the public pricing page:
     //   • Starter — £50/mo, SMEs under €100K/mo volume
     //   • Pro     — £100/mo, growing businesses under €1M/mo
@@ -5795,7 +6436,12 @@
         price: "£50", cycleKey: "ec.plan.cycleMo",
         taglineKey: "ec.plan.starter.tagline",
         fitKey: "ec.plan.starter.fit",
-        perkKeys: ["ec.plan.starter.p1", "ec.plan.starter.p2", "ec.plan.starter.p3", "ec.plan.starter.p4"],
+        // First perk (currency/IBAN coverage) is now rendered at the
+        // entity level via entity.currencyPerkKey — entity-specific copy
+        // is more accurate than the generic "Local IBANs in all base
+        // currencies" we used to ship here. Remaining perks are the
+        // plan-tier differentiators (SWIFT breadth, FX markup, trial).
+        perkKeys: ["ec.plan.starter.p2", "ec.plan.starter.p3", "ec.plan.starter.p4"],
         fees: {
           fasterPay: "£1",
           sepa:      "€2",
@@ -5907,6 +6553,31 @@
       return null;
     }
 
+    // Mask the trailing portion of an account identifier with vertically-
+    // centred middle dots (·····). Replaces the old "Preview" badge — the
+    // dots themselves communicate "this isn't your real number" while
+    // preserving the IBAN/sort-code format as a trust signal. Splits on
+    // whitespace, replaces the last token: with `n` dots if the token is
+    // short (≤n), or with `last (length-n) chars + n dots` if longer.
+    // Behaviour by entity:
+    //   • UK GBP local "23-14-70 · 1234 5678" → "23-14-70 · 1234 ····"
+    //   • UK EUR IBAN  "GB29 ALTY ... 9268 19" → "GB29 ALTY ... 9268 ····"
+    //   • EU EUR IBAN  "CY17 ... 0052 7600"    → "CY17 ... 0052 ····"
+    function maskTailDots(s, n = 4) {
+      if (!s) return s;
+      const parts = s.split(/(\s+)/);
+      for (let i = parts.length - 1; i >= 0; i--) {
+        if (parts[i] && !/^\s+$/.test(parts[i])) {
+          const t = parts[i];
+          parts[i] = t.length > n
+            ? t.slice(0, -n) + "·".repeat(n)
+            : "·".repeat(n);
+          break;
+        }
+      }
+      return parts.join("");
+    }
+
     // ── Account preview data ──────────────────────────────────────────
     // Per-entity, per-currency account identifiers + rails. Values are
     // example placeholders — real numbers are issued at signup. Format is
@@ -5923,6 +6594,7 @@
         nameKey: "ec.entity.uk.name",
         licenceKey: "ec.entity.uk.licence",
         noteKey: "ec.entity.uk.note",
+        currencyPerkKey: "ec.entity.uk.currencyPerk",
         countries: ["GB", "IE", "NL", "DE"],
         accounts: [
           {
@@ -5958,6 +6630,7 @@
         nameKey: "ec.entity.eu.name",
         licenceKey: "ec.entity.eu.licence",
         noteKey: "ec.entity.eu.note",
+        currencyPerkKey: "ec.entity.eu.currencyPerk",
         countries: ["DE", "FR", "NL", "IT", "ES", "IE"],
         accounts: [
           {
@@ -5989,6 +6662,7 @@
         nameKey: "ec.entity.mena.name",
         licenceKey: "ec.entity.mena.licence",
         noteKey: "ec.entity.mena.note",
+        currencyPerkKey: "ec.entity.mena.currencyPerk",
         countries: ["AE", "SA", "EG", "TR"],
         accounts: [
           {
@@ -6112,6 +6786,29 @@
       globe: (p) => <svg viewBox="0 0 24 24" fill="none" {...p}><circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.6"/><path d="M3 12h18M12 3c2.5 3 4 6 4 9s-1.5 6-4 9c-2.5-3-4-6-4-9s1.5-6 4-9Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/></svg>,
       bolt: (p) => <svg viewBox="0 0 24 24" fill="none" {...p}><path d="M13 3 5 14h6l-1 7 8-11h-6l1-7Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round"/></svg>,
       alert: (p) => <svg viewBox="0 0 16 16" fill="none" {...p}><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4"/><path d="M8 4.5v4M8 10.7v.3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+      // Information icon — same 16x16 grid as alert for visual parity.
+      // Dot sits at the top (y≈5.2), vertical stroke below (y≈7→10.5),
+      // mirroring the conventional "i" glyph. Used in the crypto-reroute
+      // callout to signal "here's an explanation" rather than "warning".
+      info: (p) => <svg viewBox="0 0 16 16" fill="none" {...p}><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4"/><path d="M8 5.2v.3M8 7v3.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
+      // ─── Intro value-card icons ──────────────────────────────
+      // Three Tabler icons (MIT-licensed) used in the intro screen's
+      // value cards. Chosen over generic globe/info/alert to give each
+      // card a content-specific visual hook:
+      //   • route — two waypoints with an S-curve path between them.
+      //     Communicates "we route you to the right entity first time"
+      //     for Card 1's "No 'wrong entity' restart" value-prop.
+      //   • eye — classic eye shape with pupil. Communicates
+      //     transparency / visibility for Card 2's "Caveats now, not
+      //     after KYB" — we *show* you the limitations upfront.
+      //   • ban — universal "prohibited" symbol (circle with diagonal
+      //     slash). Communicates blocked / not-allowed for Card 3's
+      //     "Fast no's, not slow no's" — clearer than a generic alert.
+      // All three use stroke-width 1.6 to match the rest of EcIco's
+      // outline family (chess pieces, search, copy, close, info).
+      route: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 19a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path d="M19 7a2 2 0 1 0 0 -4a2 2 0 0 0 0 4"/><path d="M11 19h5.5a3.5 3.5 0 0 0 0 -7h-8a3.5 3.5 0 0 1 0 -7h4.5"/></svg>,
+      eye: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/></svg>,
+      ban: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M5.7 5.7l12.6 12.6"/></svg>,
       search: (p) => <svg viewBox="0 0 24 24" fill="none" {...p}><circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.6"/><path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
       copy: (p) => <svg viewBox="0 0 16 16" fill="none" {...p}><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.4"/><path d="M3.5 10.5V4.5A1.5 1.5 0 0 1 5 3h6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>,
       close: (p) => <svg viewBox="0 0 16 16" fill="none" {...p}><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
@@ -6157,29 +6854,35 @@
         </svg>
       ),
       // ─── Plan tier icons ─────────────────────────────────────
-      // Custom filled-silhouette chess pieces matching Altery's pricing-page
-      // brand language: Starter = Pawn, Pro = Knight, Ultra = Rook.
-      // The progression of chess pieces by rank maps to plan tiers — the
-      // metaphor is operational (climbing capability), not decorative.
-      // Filled style on 24x24 viewBox, sits in an accent-soft rounded square.
+      // Chess pieces from Tabler Icons (MIT-licensed, tabler.io/icons) —
+      // Starter = Pawn, Pro = Knight, Ultra = Rook. The progression of
+      // chess pieces by rank maps to plan tiers; metaphor is operational
+      // (climbing capability), not decorative.
+      // Outline stroke-based style at 1.6px stroke — matches the rest of
+      // the EcIco family (alert, search, copy, close, arrowLeft, etc.)
+      // for visual consistency. Renders perfectly at any size because
+      // path data was grid-aligned by Tabler's design system. Sits in an
+      // accent-soft rounded square via the .ec-plan__icon container.
       pawn: (p) => (
-        <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-          <circle cx="12" cy="6.5" r="2.8"/>
-          <path d="M9.5 9.5 L14.5 9.5 L14 11.5 L12.8 12.2 L13.8 17 L10.2 17 L11.2 12.2 L10 11.5 Z"/>
-          <rect x="6.5" y="17" width="11" height="2.8" rx="0.8"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M12 3a3 3 0 0 1 3 3c0 1.113 -.6 2.482 -1.5 3l1.5 7h-6l1.5 -7c-.9 -.518 -1.5 -1.887 -1.5 -3a3 3 0 0 1 3 -3"/>
+          <path d="M8 9h8"/>
+          <path d="M6.684 16.772a1 1 0 0 0 -.684 .949v1.279a1 1 0 0 0 1 1h10a1 1 0 0 0 1 -1v-1.28a1 1 0 0 0 -.684 -.948l-2.316 -.772h-6l-2.316 .772"/>
         </svg>
       ),
       knight: (p) => (
-        <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-          <path d="M9 17 L9 13 Q7 12 7 10 Q7 6.5 10 5.5 Q12.5 4.8 14 5.5 L15.2 7.5 L16 10 L15 11.2 L13.8 11.4 L13.8 12.4 L15 13 L15 17 Z"/>
-          <rect x="6.5" y="17" width="11" height="2.8" rx="0.8"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8z"/>
+          <path d="M9 3l1 3l-3.491 2.148a1 1 0 0 0 .524 1.852h2.967l-2.073 6h7.961l.112 -5c0 -3 -1.09 -5.983 -4 -7c-1.94 -.678 -2.94 -1.011 -3 -1z"/>
         </svg>
       ),
       rook: (p) => (
-        <svg viewBox="0 0 24 24" fill="currentColor" {...p}>
-          <path d="M6.8 4.5 L9 4.5 L9 6.2 L10.5 6.2 L10.5 4.5 L13.5 4.5 L13.5 6.2 L15 6.2 L15 4.5 L17.2 4.5 L17.2 8 L6.8 8 Z"/>
-          <rect x="8" y="8" width="8" height="9"/>
-          <rect x="6.5" y="17" width="11" height="2.8" rx="0.8"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}>
+          <path d="M8 16l-1.447 .724a1 1 0 0 0 -.553 .894v2.382h12v-2.382a1 1 0 0 0 -.553 -.894l-1.447 -.724h-8"/>
+          <path d="M8 16l1 -9h6l1 9"/>
+          <path d="M6 4l.5 3h11l.5 -3"/>
+          <path d="M10 4v3"/>
+          <path d="M14 4v3"/>
         </svg>
       ),
     };
@@ -6264,21 +6967,21 @@
 
           <div className="ec-value">
             <div className="ec-value__row">
-              <span className="ec-value__icon"><EcIco.globe style={{ width: 18, height: 18 }} /></span>
+              <span className="ec-value__icon"><EcIco.route style={{ width: 18, height: 18 }} /></span>
               <div>
                 <div className="ec-value__title">{t("ec.intro.value1.title")}</div>
                 <div className="ec-value__body">{t("ec.intro.value1.body")}</div>
               </div>
             </div>
             <div className="ec-value__row">
-              <span className="ec-value__icon" style={{ background: "var(--c-success-soft)", color: "var(--c-success)" }}><EcIco.bolt style={{ width: 18, height: 18 }} /></span>
+              <span className="ec-value__icon" style={{ background: "var(--c-success-soft)", color: "var(--c-success)" }}><EcIco.eye style={{ width: 18, height: 18 }} /></span>
               <div>
                 <div className="ec-value__title">{t("ec.intro.value2.title")}</div>
                 <div className="ec-value__body">{t("ec.intro.value2.body")}</div>
               </div>
             </div>
             <div className="ec-value__row">
-              <span className="ec-value__icon" style={{ background: "var(--c-warning-soft)", color: "var(--c-warning)" }}><EcIco.alert style={{ width: 18, height: 18 }} /></span>
+              <span className="ec-value__icon" style={{ background: "var(--c-warning-soft)", color: "var(--c-warning)" }}><EcIco.ban style={{ width: 18, height: 18 }} /></span>
               <div>
                 <div className="ec-value__title">{t("ec.intro.value3.title")}</div>
                 <div className="ec-value__body">{t("ec.intro.value3.body")}</div>
@@ -6816,11 +7519,139 @@
       );
     }
 
-    // Horizontal scroll-snap slider for the "Built to back your business"
-    // section. No JS deps — native CSS scroll-snap gives touch swipe on
-    // mobile and trackpad horizontal-scroll on desktop. Each card has a
-    // full-width image at the top (pulled directly from Altery's
-    // production marketing CDN) followed by title + body below.
+    // ── EcFeesModal ────────────────────────────────────────────────
+    // Surfaces the canonical Altery fee schedule for the active plan
+    // and the entity the user will be routed to. Opens from the
+    // "View all fees" link on the plan card. Region (UK-EU vs RoW) is
+    // derived from entity.id via ecFeeRegion(). Plan-specific items
+    // — monthly fee, FX cap, SWIFT cap — come from EC_PLANS perk
+    // text, while all other rows are fixed from EC_FEE_SCHEDULE.
+    // Footer links to altery.com/fees/business so any number can be
+    // verified against the canonical source — prototype values stay
+    // honest, not invented.
+    function EcFeesModal({ plan, entity, onClose }) {
+      const t = useT();
+      const region = ecFeeRegion(entity);
+      const fees = EC_FEE_SCHEDULE[region];
+      // Plan-specific values pulled directly from EC_PLANS (price) and
+      // perks text (FX cap, SWIFT cap if present). Keeps the modal in
+      // sync with whatever copy the plan card shows.
+      const planPrice = plan.price; // e.g. "£100"
+      const cycleSuffix = t(plan.cycleKey); // "/month" etc.
+      const monthlyFee = `${planPrice}${cycleSuffix}`;
+      // FX cap and SWIFT cap detection — read from plan perkKeys text.
+      // The modal sources its plan-specific values from the same i18n
+      // strings the perks list uses, so changing one updates both.
+      const allPerkText = plan.perkKeys.map((k) => t(k)).join(" ");
+      const fxMatch = allPerkText.match(/(\d+(?:\.\d+)?)\s*%/);
+      const fxCap = fxMatch ? `Up to ${fxMatch[1]}%` : "On request";
+      const swiftCapMatch = allPerkText.match(/(?:cap|capped).*?([€£$]\d+)/i);
+      const swiftCapLabel = swiftCapMatch ? swiftCapMatch[1] : null;
+
+      // Modal sections — order matches buyer logic: what does the
+      // account cost → what does it cost to send → what does it cost
+      // to receive → FX. Each section is a small table.
+      const sections = [
+        {
+          headKey: "ec.fees.section.account",
+          rows: [
+            { labelKey: "ec.fees.row.opening",     value: fees.accountOpening },
+            { labelKey: "ec.fees.row.monthly",     value: monthlyFee, highlight: true },
+            { labelKey: "ec.fees.row.closure",     value: fees.accountClosure },
+            { labelKey: "ec.fees.row.inactivity",  value: fees.inactivity },
+          ],
+        },
+        {
+          headKey: "ec.fees.section.outgoing",
+          rows: [
+            { labelKey: "ec.fees.row.internal",    value: fees.internal },
+            { labelKey: "ec.fees.row.sepa",        value: fees.sepa },
+            { labelKey: "ec.fees.row.fp",          value: fees.fp },
+            { labelKey: "ec.fees.row.fedwire",     value: fees.fedwire },
+            { labelKey: "ec.fees.row.achUsd",      value: fees.achUsd },
+            { labelKey: "ec.fees.row.swiftGbp",    value: fees.swiftGbpOut },
+            { labelKey: "ec.fees.row.swiftEur",    value: fees.swiftEurOut },
+            { labelKey: "ec.fees.row.swiftUsd",    value: fees.swiftUsdOut },
+          ],
+        },
+        {
+          headKey: "ec.fees.section.incoming",
+          rows: [
+            { labelKey: "ec.fees.row.internalIn",  value: fees.internal },
+            { labelKey: "ec.fees.row.sepaIn",      value: "Free" },
+            { labelKey: "ec.fees.row.fpIn",        value: "Free" },
+            { labelKey: "ec.fees.row.swiftIn",     value: fees.swiftIn },
+          ],
+        },
+        {
+          headKey: "ec.fees.section.fx",
+          rows: [
+            { labelKey: "ec.fees.row.fxMarkup",    value: fxCap, highlight: true },
+            { labelKey: "ec.fees.row.exchange",    value: fees.exchange },
+          ],
+        },
+      ];
+
+      return (
+        <div className="ec-modal__backdrop" role="dialog" aria-modal="true" onClick={onClose}>
+          <div className="ec-modal" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="ec-modal__close"
+              aria-label={t("ec.r.plan.compare.closeAria")}
+              onClick={onClose}
+            >
+              <EcIco.close style={{ width: 18, height: 18 }} />
+            </button>
+            <h2 className="ec-modal__title">{t("ec.fees.title")}</h2>
+            <div className="ec-fees__subtitle">
+              {t(plan.nameKey)} · {monthlyFee} · {t(entity.nameKey)}
+            </div>
+
+            {sections.map((s) => (
+              <div className="ec-fees__section" key={s.headKey}>
+                <div className="ec-fees__sectionHead">{t(s.headKey)}</div>
+                <div className="ec-fees__table">
+                  {s.rows.map((r) => (
+                    <div
+                      key={r.labelKey}
+                      className={"ec-fees__row" + (r.highlight ? " ec-fees__row--highlight" : "")}
+                    >
+                      <div className="ec-fees__label">{t(r.labelKey)}</div>
+                      <div className={"ec-fees__value" + (r.value === "Currently unavailable" ? " ec-fees__value--muted" : "")}>
+                        {r.value}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {/* SWIFT cap note — only render when active plan has the
+                    "SWIFT fee cap at X" perk (currently Ultra). Sits
+                    visually attached to the Outgoing section since SWIFT
+                    rows are in that group. */}
+                {s.headKey === "ec.fees.section.outgoing" && swiftCapLabel && (
+                  <div className="ec-fees__planNote">
+                    {t("ec.fees.note.swiftCap", { cap: swiftCapLabel })}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <div className="ec-fees__footer">
+              {t("ec.fees.footer.disclaimer")}<br/>
+              <a
+                href="https://altery.com/fees/business"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("ec.fees.footer.link")}
+              </a>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+
     //
     // Image loading defenses:
     //   • referrerPolicy="no-referrer" — Framer's CDN sometimes refuses
@@ -7737,6 +8568,7 @@
 
       // Plan comparison modal — local state, opens on "Compare all plans →"
       const [comparisonOpen, setComparisonOpen] = useState(false);
+      const [feesOpen, setFeesOpen] = useState(false);
 
       // Payment modal — opens on "Set up this account" CTA. Hosts the Stripe
       // Payment Element with deferred-flow setup (window.Stripe poll-loaded).
@@ -7811,7 +8643,7 @@
                   an explicit "Preview" badge so users don't mistake it for
                   their real number. Skipped for SWIFT-only primaries. */}
               {heroIban && (
-                <div className="ec-result__primaryIban" aria-label={`${heroIban.currency} ${heroIban.value} (preview)`}>
+                <div className="ec-result__primaryIban" aria-label={`${heroIban.currency} ${heroIban.value}`}>
                   {heroIbanFlag && (
                     <span className="ec-result__primaryIban__flag">
                       <Flag code={heroIbanFlag} size={22} />
@@ -7819,8 +8651,7 @@
                   )}
                   <span className="ec-result__primaryIban__currency">{heroIban.currency}</span>
                   <span className="ec-result__primaryIban__sep" aria-hidden="true" />
-                  <span className="ec-result__primaryIban__value">{heroIban.value}</span>
-                  <span className="ec-result__primaryIban__badge">{t("ec.r.heroIban.preview")}</span>
+                  <span className="ec-result__primaryIban__value">{maskTailDots(heroIban.value)}</span>
                 </div>
               )}
             </div>
@@ -7837,7 +8668,7 @@
             {rec.cryptoReroute && (
               <div className="ec-result__reroute">
                 <span className="ec-result__reroute__icon" aria-hidden="true">
-                  <EcIco.reroute style={{ width: 18, height: 18 }} />
+                  <EcIco.info style={{ width: 18, height: 18 }} />
                 </span>
                 <div className="ec-result__reroute__body">
                   <div className="ec-result__reroute__title">
@@ -7883,6 +8714,20 @@
                 <div className="ec-plan__fits__text">{t(activePlan.fitKey)}</div>
               </div>
               <div className="ec-plan__perks">
+                {/* Entity-specific currency perk — sits at the top of the
+                    perks list using the same visual treatment as plan
+                    perks (check icon + line). Text varies by entity so
+                    user sees the actual currency/rail story for the
+                    jurisdiction they'll be routed to (UK gets GBP+EUR
+                    local, EU gets SEPA Instant, MENA gets USD+AED local).
+                    Replaces the old EcAccountPreview panel, which took
+                    ~450px to convey the same information visually. */}
+                {entity.currencyPerkKey && (
+                  <div className="ec-plan__perk">
+                    <EcIco.check className="ec-plan__perk__tick" style={{ width: 16, height: 16 }} />
+                    <span>{t(entity.currencyPerkKey)}</span>
+                  </div>
+                )}
                 {activePlan.perkKeys.map((k, i) => (
                   <div className="ec-plan__perk" key={i}>
                     <EcIco.check className="ec-plan__perk__tick" style={{ width: 16, height: 16 }} />
@@ -7890,8 +8735,12 @@
                   </div>
                 ))}
               </div>
-              <div className="ec-plan__switch">
-                {t("ec.r.plan.switch")}{" "}
+              {/* Secondary actions — Compare and Fees links side by side
+                  above the soft "you can switch" helper. Compare opens
+                  the plan-comparison modal; Fees opens EcFeesModal which
+                  shows the canonical Altery fee schedule for the active
+                  plan and entity region. */}
+              <div className="ec-plan__links">
                 <a
                   role="button"
                   tabIndex={0}
@@ -7900,17 +8749,22 @@
                 >
                   {t("ec.r.plan.compareAll")}
                 </a>
+                <span className="ec-plan__links__sep" aria-hidden="true">·</span>
+                <a
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setFeesOpen(true)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFeesOpen(true); } }}
+                >
+                  {t("ec.r.plan.viewFees")}
+                </a>
+              </div>
+              <div className="ec-plan__switch">
+                {t("ec.r.plan.switch")}
               </div>
             </div>
 
-            {/* Account preview — what the user's actual identifiers will look
-                like. The single most operationally useful detail on this page:
-                shows that on Altery EU you get a SEPA Instant CY IBAN, on UK
-                you get real Faster Payments details, on MENA you get a DIFC
-                IBAN. Replaces the old "Local IBAN × 3 currencies" repetition. */}
-            <EcAccountPreview entity={entity} />
-
-            {/* Supported countries — kept as compact list under accounts */}
+            {/* Supported countries — kept as compact list under plan */}
             <div className="ec-capabilities">
               <div className="ec-capabilities__section">
                 <div className="ec-capabilities__head">{t("ec.r.cards.countries")}</div>
@@ -8003,6 +8857,17 @@
                 setComparisonOpen(false);
               }}
               onClose={() => setComparisonOpen(false)}
+            />
+          )}
+
+          {/* Fees modal — canonical Altery fee schedule for the active
+              plan and entity region. Opens from the "View all fees" link
+              on the plan card. */}
+          {feesOpen && (
+            <EcFeesModal
+              plan={activePlan}
+              entity={entity}
+              onClose={() => setFeesOpen(false)}
             />
           )}
 
