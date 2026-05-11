@@ -556,7 +556,7 @@
       position: absolute; top: 14px; right: 14px;
       width: 20px; height: 20px;
       border-radius: 50%;
-      background: var(--c-primary);
+      background: var(--c-success);
       color: #fff;
       display: inline-flex; align-items: center; justify-content: center;
       opacity: 0; transform: scale(0.6);
@@ -1752,6 +1752,56 @@
       color: var(--c-success);
       margin-top: 4px;
     }
+    /* Fee preview — sits inside the plan card, between perks and the
+       compare/switch links. Surfaces the 4 most-relevant per-transaction
+       fees inline (subscription, outgoing SEPA, outgoing SWIFT, FX
+       markup) so B2B users can estimate total cost without opening the
+       fees modal. The "See full schedule →" link still routes to the
+       full EcFeesModal for the complete breakdown. Border-top divider
+       separates it visually from the perks list above; same colour
+       treatment as .ec-plan__fits for consistency. */
+    .ec-plan__feePreview {
+      padding-top: 16px;
+      margin-top: 4px;
+      border-top: 1px solid var(--c-border-soft);
+    }
+    .ec-plan__feePreview__head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .ec-plan__feePreview__title {
+      font-size: 11px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      color: var(--c-muted);
+    }
+    .ec-plan__feePreview__link {
+      font-size: 12px;
+      color: var(--c-primary);
+      text-decoration: none;
+      cursor: pointer;
+      border-bottom: 1px solid transparent;
+      transition: border-color .12s;
+    }
+    .ec-plan__feePreview__link:hover,
+    .ec-plan__feePreview__link:focus-visible {
+      border-bottom-color: currentColor;
+      outline: none;
+    }
+    .ec-plan__feePreview__list {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .ec-plan__feePreview__row {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .ec-plan__feePreview__label { color: var(--c-muted); }
+    .ec-plan__feePreview__value {
+      color: var(--c-ink);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+    }
     /* "Suitable for" section — surfaces the plan's fitKey on the main plan
        card so users don't need to open the comparison modal to see whether
        the recommendation actually matches their profile. Same label
@@ -1861,19 +1911,35 @@
       outline-offset: 2px;
       border-radius: 12px;
     }
+    /* Perks slider cards — 3S Money premium magazine style. Full-bleed
+       photographic image as the card surface, three-stop dark gradient
+       (transparent top → faint darken middle → strong darken at bottom)
+       for text legibility on any background, and white text overlay
+       anchored at the bottom. Cards are tall portrait (280×400) to give
+       images presence and feel "editorial" rather than utilitarian.
+       Hover: subtle 4% image zoom (slow 800ms ease) + 2px card lift +
+       navy-tinted shadow. The image-zoom-on-hover is the signature
+       premium-fintech touch — Stripe, Wise, 3S Money all use it. */
     .ec-perks__card {
-      flex: 0 0 260px;
+      position: relative;
+      flex: 0 0 280px;
+      height: 400px;
       scroll-snap-align: start;
-      background: var(--c-surface);
-      border: 1px solid var(--c-border);
-      border-radius: 12px;
+      border-radius: 20px;
       overflow: hidden;
-      display: flex; flex-direction: column;
+      background: var(--c-ink-2, #1a1d2e);
+      cursor: default;
+      transition: transform .3s ease, box-shadow .3s ease;
+      isolation: isolate;
+    }
+    .ec-perks__card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 18px 44px rgba(0, 23, 73, 0.22);
     }
     .ec-perks__card__media {
-      width: 100%;
-      aspect-ratio: 260 / 180;
-      background: var(--c-bg);
+      position: absolute;
+      inset: 0;
+      width: 100%; height: 100%;
       overflow: hidden;
     }
     .ec-perks__card__media img {
@@ -1881,29 +1947,60 @@
       object-fit: cover;
       object-position: center;
       display: block;
+      transition: transform .8s cubic-bezier(.2, .6, .2, 1);
+    }
+    .ec-perks__card:hover .ec-perks__card__media img {
+      transform: scale(1.04);
+    }
+    /* Dark gradient overlay — three-stop fall-off so the top of the
+       image stays clean while the bottom is dark enough for text
+       legibility regardless of underlying image. */
+    .ec-perks__card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) 30%,
+        rgba(0, 0, 0, 0.35) 60%,
+        rgba(0, 0, 0, 0.85) 100%
+      );
+      z-index: 1;
     }
     .ec-perks__card__content {
-      padding: 14px 16px 16px;
-      display: flex; flex-direction: column;
-      gap: 4px;
-      flex: 1;
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      padding: 22px 24px 24px;
+      color: #fff;
+      z-index: 2;
     }
     .ec-perks__card__title {
-      font-size: 14px; font-weight: 600;
-      color: var(--c-ink);
-      letter-spacing: -0.005em;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 24px;
+      letter-spacing: -0.012em;
+      color: #fff;
+      margin-bottom: 6px;
     }
     .ec-perks__card__body {
-      font-size: 12px; line-height: 17px;
-      color: var(--c-muted);
+      font-size: 13.5px;
+      line-height: 19px;
+      color: rgba(255, 255, 255, 0.86);
+      text-wrap: pretty;
     }
     @media (max-width: 640px) {
       .ec-perks__card {
-        flex-basis: 220px;
+        flex-basis: 240px;
+        height: 340px;
+        border-radius: 18px;
       }
       .ec-perks__card__content {
-        padding: 12px 14px 14px;
+        padding: 18px 20px 20px;
       }
+      .ec-perks__card__title { font-size: 18px; line-height: 22px; }
+      .ec-perks__card__body  { font-size: 13px; line-height: 18px; }
     }
 
     /* Blocked variant — calm, not alarmist. A solid muted slate communicates
@@ -5097,12 +5194,12 @@
     "ec.r.perks.multiEntity.body": "Manage one company or ten — everything in one account.",
     "ec.r.perks.multiUser.title": "Multi-user access",
     "ec.r.perks.multiUser.body": "Bring in your team, assign roles, collaborate with full visibility.",
-    "ec.r.perks.api.title": "API for businesses",
-    "ec.r.perks.api.body": "Automate, integrate, move money without manual steps.",
+    "ec.r.perks.currencyExchange.title": "Currency exchange",
+    "ec.r.perks.currencyExchange.body": "Hold and convert 30+ currencies at near-mid-market rates.",
     "ec.r.perks.businessCards.title": "Business cards",
     "ec.r.perks.businessCards.body": "Pay like locals worldwide, with real-time spend control.",
-    "ec.r.perks.massPayments.title": "Mass payments",
-    "ec.r.perks.massPayments.body": "Send hundreds of payments in a few clicks, in different currencies.",
+    "ec.r.perks.permissions.title": "Granular permissions",
+    "ec.r.perks.permissions.body": "Set what each team member can view, send and approve.",
   });
   Object.assign(D.es, {
     "ec.r.perks.head": "Diseñado para impulsar tu negocio",
@@ -5110,12 +5207,12 @@
     "ec.r.perks.multiEntity.body": "Gestiona una empresa o diez — todo en una sola cuenta.",
     "ec.r.perks.multiUser.title": "Acceso multi-usuario",
     "ec.r.perks.multiUser.body": "Incorpora a tu equipo, asigna roles y colabora con visibilidad total.",
-    "ec.r.perks.api.title": "API para empresas",
-    "ec.r.perks.api.body": "Automatiza, integra y mueve dinero sin pasos manuales.",
+    "ec.r.perks.currencyExchange.title": "Cambio de divisas",
+    "ec.r.perks.currencyExchange.body": "Mantén y convierte 30+ divisas a tipos cercanos al mid-market.",
     "ec.r.perks.businessCards.title": "Tarjetas corporativas",
     "ec.r.perks.businessCards.body": "Paga como local en todo el mundo, con control de gasto en tiempo real.",
-    "ec.r.perks.massPayments.title": "Pagos masivos",
-    "ec.r.perks.massPayments.body": "Envía cientos de pagos en pocos clics, en distintas divisas.",
+    "ec.r.perks.permissions.title": "Permisos granulares",
+    "ec.r.perks.permissions.body": "Define qué puede ver, enviar y aprobar cada miembro del equipo.",
   });
   Object.assign(D.fr, {
     "ec.r.perks.head": "Conçu pour soutenir votre activité",
@@ -5123,12 +5220,12 @@
     "ec.r.perks.multiEntity.body": "Gérez une entreprise ou dix — tout dans un seul compte.",
     "ec.r.perks.multiUser.title": "Accès multi-utilisateurs",
     "ec.r.perks.multiUser.body": "Intégrez votre équipe, attribuez des rôles, collaborez en pleine visibilité.",
-    "ec.r.perks.api.title": "API pour entreprises",
-    "ec.r.perks.api.body": "Automatisez, intégrez, déplacez l'argent sans étapes manuelles.",
+    "ec.r.perks.currencyExchange.title": "Conversion de devises",
+    "ec.r.perks.currencyExchange.body": "Détenez et convertissez 30+ devises à des taux proches du mid-market.",
     "ec.r.perks.businessCards.title": "Cartes professionnelles",
     "ec.r.perks.businessCards.body": "Payez comme un local partout, avec contrôle des dépenses en temps réel.",
-    "ec.r.perks.massPayments.title": "Paiements en masse",
-    "ec.r.perks.massPayments.body": "Envoyez des centaines de paiements en quelques clics, en différentes devises.",
+    "ec.r.perks.permissions.title": "Permissions granulaires",
+    "ec.r.perks.permissions.body": "Définissez ce que chaque membre de l'équipe peut voir, envoyer et approuver.",
   });
   Object.assign(D.pt, {
     "ec.r.perks.head": "Feito para apoiar o seu negócio",
@@ -5136,12 +5233,12 @@
     "ec.r.perks.multiEntity.body": "Gerencie uma empresa ou dez — tudo em uma conta.",
     "ec.r.perks.multiUser.title": "Acesso multi-utilizador",
     "ec.r.perks.multiUser.body": "Adicione a sua equipa, atribua funções, colabore com visibilidade total.",
-    "ec.r.perks.api.title": "API para empresas",
-    "ec.r.perks.api.body": "Automatize, integre, mova dinheiro sem passos manuais.",
+    "ec.r.perks.currencyExchange.title": "Câmbio de moedas",
+    "ec.r.perks.currencyExchange.body": "Mantenha e converta 30+ moedas a taxas próximas do mid-market.",
     "ec.r.perks.businessCards.title": "Cartões empresariais",
     "ec.r.perks.businessCards.body": "Pague como um local em todo o mundo, com controlo em tempo real.",
-    "ec.r.perks.massPayments.title": "Pagamentos em massa",
-    "ec.r.perks.massPayments.body": "Envie centenas de pagamentos em poucos cliques, em diferentes moedas.",
+    "ec.r.perks.permissions.title": "Permissões granulares",
+    "ec.r.perks.permissions.body": "Defina o que cada membro da equipa pode ver, enviar e aprovar.",
   });
   Object.assign(D.ru, {
     "ec.r.perks.head": "Создано для поддержки вашего бизнеса",
@@ -5149,12 +5246,12 @@
     "ec.r.perks.multiEntity.body": "Управляйте одной компанией или десятью — всё в одном аккаунте.",
     "ec.r.perks.multiUser.title": "Многопользовательский доступ",
     "ec.r.perks.multiUser.body": "Подключите команду, назначьте роли, работайте с полной видимостью.",
-    "ec.r.perks.api.title": "API для бизнеса",
-    "ec.r.perks.api.body": "Автоматизация, интеграция и переводы без ручных шагов.",
+    "ec.r.perks.currencyExchange.title": "Обмен валют",
+    "ec.r.perks.currencyExchange.body": "Храните и конвертируйте 30+ валют по курсам близким к mid-market.",
     "ec.r.perks.businessCards.title": "Корпоративные карты",
     "ec.r.perks.businessCards.body": "Платите как местный по всему миру, с контролем расходов в реальном времени.",
-    "ec.r.perks.massPayments.title": "Массовые платежи",
-    "ec.r.perks.massPayments.body": "Отправляйте сотни платежей в несколько кликов, в разных валютах.",
+    "ec.r.perks.permissions.title": "Гранулярные права",
+    "ec.r.perks.permissions.body": "Задайте, что каждый член команды может видеть, отправлять и подтверждать.",
   });
   Object.assign(D.de, {
     "ec.r.perks.head": "Wir stehen hinter Ihrem Geschäft",
@@ -5162,12 +5259,12 @@
     "ec.r.perks.multiEntity.body": "Ein Unternehmen oder zehn verwalten — alles in einem Konto.",
     "ec.r.perks.multiUser.title": "Multi-User-Zugang",
     "ec.r.perks.multiUser.body": "Holen Sie Ihr Team an Bord, vergeben Sie Rollen, kollaborieren Sie transparent.",
-    "ec.r.perks.api.title": "API für Unternehmen",
-    "ec.r.perks.api.body": "Automatisieren, integrieren, Zahlungen ohne manuelle Schritte.",
+    "ec.r.perks.currencyExchange.title": "Währungstausch",
+    "ec.r.perks.currencyExchange.body": "30+ Währungen halten und nahe am Mittelkurs umtauschen.",
     "ec.r.perks.businessCards.title": "Firmenkarten",
     "ec.r.perks.businessCards.body": "Zahlen wie ein Einheimischer weltweit, mit Echtzeit-Ausgabenkontrolle.",
-    "ec.r.perks.massPayments.title": "Sammelzahlungen",
-    "ec.r.perks.massPayments.body": "Hunderte Zahlungen in wenigen Klicks, in verschiedenen Währungen.",
+    "ec.r.perks.permissions.title": "Granulare Berechtigungen",
+    "ec.r.perks.permissions.body": "Legen Sie fest, was jedes Teammitglied sehen, senden und freigeben darf.",
   });
   Object.assign(D.it, {
     "ec.r.perks.head": "Pensato per sostenere il tuo business",
@@ -5175,12 +5272,12 @@
     "ec.r.perks.multiEntity.body": "Gestisci un'azienda o dieci — tutto in un solo account.",
     "ec.r.perks.multiUser.title": "Accesso multi-utente",
     "ec.r.perks.multiUser.body": "Coinvolgi il team, assegna ruoli, collabora con piena visibilità.",
-    "ec.r.perks.api.title": "API per aziende",
-    "ec.r.perks.api.body": "Automatizza, integra, sposta denaro senza passi manuali.",
+    "ec.r.perks.currencyExchange.title": "Cambio valuta",
+    "ec.r.perks.currencyExchange.body": "Tieni e converti 30+ valute a tassi vicini al mid-market.",
     "ec.r.perks.businessCards.title": "Carte aziendali",
     "ec.r.perks.businessCards.body": "Paga come un locale ovunque, con controllo spese in tempo reale.",
-    "ec.r.perks.massPayments.title": "Pagamenti di massa",
-    "ec.r.perks.massPayments.body": "Invia centinaia di pagamenti in pochi clic, in valute diverse.",
+    "ec.r.perks.permissions.title": "Permessi granulari",
+    "ec.r.perks.permissions.body": "Imposta cosa ogni membro del team può vedere, inviare e approvare.",
   });
   Object.assign(D.tr, {
     "ec.r.perks.head": "İşinizin arkasında olmak için tasarlandı",
@@ -5188,12 +5285,12 @@
     "ec.r.perks.multiEntity.body": "Bir şirket veya on — hepsi tek bir hesapta.",
     "ec.r.perks.multiUser.title": "Çoklu kullanıcı erişimi",
     "ec.r.perks.multiUser.body": "Ekibinizi dahil edin, roller atayın, tam görünürlükle çalışın.",
-    "ec.r.perks.api.title": "İşletmeler için API",
-    "ec.r.perks.api.body": "Otomatikleştirin, entegre edin, manuel adımsız ödeme yapın.",
+    "ec.r.perks.currencyExchange.title": "Döviz dönüşümü",
+    "ec.r.perks.currencyExchange.body": "30+ para birimini orta piyasaya yakın kurlarla tutun ve dönüştürün.",
     "ec.r.perks.businessCards.title": "Kurumsal kartlar",
     "ec.r.perks.businessCards.body": "Dünya çapında yerel gibi ödeyin, gerçek zamanlı harcama kontrolüyle.",
-    "ec.r.perks.massPayments.title": "Toplu ödemeler",
-    "ec.r.perks.massPayments.body": "Birkaç tıklamayla yüzlerce ödeme gönderin, farklı para birimlerinde.",
+    "ec.r.perks.permissions.title": "Hassas yetkilendirme",
+    "ec.r.perks.permissions.body": "Her ekip üyesinin neyi görebileceğini, gönderebileceğini ve onaylayabileceğini belirleyin.",
   });
   Object.assign(D.pl, {
     "ec.r.perks.head": "Stworzone, aby wspierać Twój biznes",
@@ -5201,12 +5298,12 @@
     "ec.r.perks.multiEntity.body": "Zarządzaj jedną firmą lub dziesięcioma — wszystko w jednym koncie.",
     "ec.r.perks.multiUser.title": "Dostęp wielu użytkowników",
     "ec.r.perks.multiUser.body": "Włącz zespół, przypisz role, pracujcie razem z pełną widocznością.",
-    "ec.r.perks.api.title": "API dla firm",
-    "ec.r.perks.api.body": "Automatyzuj, integruj, przesyłaj pieniądze bez ręcznych kroków.",
+    "ec.r.perks.currencyExchange.title": "Wymiana walut",
+    "ec.r.perks.currencyExchange.body": "Trzymaj i wymieniaj 30+ walut po kursach zbliżonych do mid-market.",
     "ec.r.perks.businessCards.title": "Karty firmowe",
     "ec.r.perks.businessCards.body": "Płać jak miejscowy na całym świecie, z kontrolą wydatków w czasie rzeczywistym.",
-    "ec.r.perks.massPayments.title": "Płatności masowe",
-    "ec.r.perks.massPayments.body": "Wyślij setki płatności w kilku kliknięciach, w różnych walutach.",
+    "ec.r.perks.permissions.title": "Granularne uprawnienia",
+    "ec.r.perks.permissions.body": "Ustal, co każdy członek zespołu może zobaczyć, wysłać i zatwierdzić.",
   });
   Object.assign(D.nl, {
     "ec.r.perks.head": "Gemaakt om uw bedrijf te ondersteunen",
@@ -5214,12 +5311,12 @@
     "ec.r.perks.multiEntity.body": "Beheer één bedrijf of tien — alles in één account.",
     "ec.r.perks.multiUser.title": "Multi-user toegang",
     "ec.r.perks.multiUser.body": "Voeg uw team toe, wijs rollen toe, werk samen met volledige zichtbaarheid.",
-    "ec.r.perks.api.title": "API voor bedrijven",
-    "ec.r.perks.api.body": "Automatiseer, integreer, verplaats geld zonder handmatige stappen.",
+    "ec.r.perks.currencyExchange.title": "Valutawissel",
+    "ec.r.perks.currencyExchange.body": "Houd en wissel 30+ valuta's tegen koersen dichtbij de midmarktprijs.",
     "ec.r.perks.businessCards.title": "Zakelijke kaarten",
     "ec.r.perks.businessCards.body": "Betaal als een local wereldwijd, met realtime uitgavencontrole.",
-    "ec.r.perks.massPayments.title": "Bulkbetalingen",
-    "ec.r.perks.massPayments.body": "Verstuur honderden betalingen in een paar klikken, in verschillende valuta's.",
+    "ec.r.perks.permissions.title": "Gedetailleerde rechten",
+    "ec.r.perks.permissions.body": "Bepaal wat elk teamlid kan bekijken, versturen en goedkeuren.",
   });
 
   // ─────────── Entity-specific currency perk ──────────────
@@ -5288,6 +5385,9 @@
   // text at render time.
   Object.assign(D.en, {
     "ec.r.plan.viewFees": "View all fees",
+    "ec.r.fees.head": "What you'll pay",
+    "ec.r.fees.subscription": "Subscription",
+    "ec.r.fees.seeAll": "See full schedule →",
     "ec.fees.title": "Full fees",
     "ec.fees.section.account": "Account",
     "ec.fees.section.outgoing": "Outgoing transfers",
@@ -5317,6 +5417,9 @@
   });
   Object.assign(D.es, {
     "ec.r.plan.viewFees": "Ver todas las tarifas",
+    "ec.r.fees.head": "Cuánto pagarás",
+    "ec.r.fees.subscription": "Suscripción",
+    "ec.r.fees.seeAll": "Tarifa completa →",
     "ec.fees.title": "Tarifas completas",
     "ec.fees.section.account": "Cuenta",
     "ec.fees.section.outgoing": "Transferencias salientes",
@@ -5346,6 +5449,9 @@
   });
   Object.assign(D.fr, {
     "ec.r.plan.viewFees": "Voir tous les frais",
+    "ec.r.fees.head": "Ce que vous paierez",
+    "ec.r.fees.subscription": "Abonnement",
+    "ec.r.fees.seeAll": "Tarification complète →",
     "ec.fees.title": "Frais complets",
     "ec.fees.section.account": "Compte",
     "ec.fees.section.outgoing": "Virements sortants",
@@ -5375,6 +5481,9 @@
   });
   Object.assign(D.pt, {
     "ec.r.plan.viewFees": "Ver todas as tarifas",
+    "ec.r.fees.head": "Quanto irá pagar",
+    "ec.r.fees.subscription": "Subscrição",
+    "ec.r.fees.seeAll": "Tarifário completo →",
     "ec.fees.title": "Tarifas completas",
     "ec.fees.section.account": "Conta",
     "ec.fees.section.outgoing": "Transferências enviadas",
@@ -5404,6 +5513,9 @@
   });
   Object.assign(D.ru, {
     "ec.r.plan.viewFees": "Все тарифы",
+    "ec.r.fees.head": "Сколько будет стоить",
+    "ec.r.fees.subscription": "Подписка",
+    "ec.r.fees.seeAll": "Полный прайс-лист →",
     "ec.fees.title": "Все тарифы",
     "ec.fees.section.account": "Аккаунт",
     "ec.fees.section.outgoing": "Исходящие платежи",
@@ -5433,6 +5545,9 @@
   });
   Object.assign(D.de, {
     "ec.r.plan.viewFees": "Alle Gebühren ansehen",
+    "ec.r.fees.head": "Was Sie zahlen werden",
+    "ec.r.fees.subscription": "Abonnement",
+    "ec.r.fees.seeAll": "Vollständige Übersicht →",
     "ec.fees.title": "Alle Gebühren",
     "ec.fees.section.account": "Konto",
     "ec.fees.section.outgoing": "Ausgehende Überweisungen",
@@ -5462,6 +5577,9 @@
   });
   Object.assign(D.it, {
     "ec.r.plan.viewFees": "Vedi tutte le tariffe",
+    "ec.r.fees.head": "Quanto pagherai",
+    "ec.r.fees.subscription": "Abbonamento",
+    "ec.r.fees.seeAll": "Listino completo →",
     "ec.fees.title": "Tariffe complete",
     "ec.fees.section.account": "Conto",
     "ec.fees.section.outgoing": "Trasferimenti in uscita",
@@ -5491,6 +5609,9 @@
   });
   Object.assign(D.tr, {
     "ec.r.plan.viewFees": "Tüm ücretleri gör",
+    "ec.r.fees.head": "Ne ödeyeceksiniz",
+    "ec.r.fees.subscription": "Abonelik",
+    "ec.r.fees.seeAll": "Tüm ücretler →",
     "ec.fees.title": "Tüm ücretler",
     "ec.fees.section.account": "Hesap",
     "ec.fees.section.outgoing": "Giden transferler",
@@ -5520,6 +5641,9 @@
   });
   Object.assign(D.pl, {
     "ec.r.plan.viewFees": "Zobacz wszystkie opłaty",
+    "ec.r.fees.head": "Ile zapłacisz",
+    "ec.r.fees.subscription": "Subskrypcja",
+    "ec.r.fees.seeAll": "Pełny cennik →",
     "ec.fees.title": "Pełne opłaty",
     "ec.fees.section.account": "Konto",
     "ec.fees.section.outgoing": "Przelewy wychodzące",
@@ -5549,6 +5673,9 @@
   });
   Object.assign(D.nl, {
     "ec.r.plan.viewFees": "Bekijk alle tarieven",
+    "ec.r.fees.head": "Wat je betaalt",
+    "ec.r.fees.subscription": "Abonnement",
+    "ec.r.fees.seeAll": "Volledig schema →",
     "ec.fees.title": "Volledige tarieven",
     "ec.fees.section.account": "Account",
     "ec.fees.section.outgoing": "Uitgaande overschrijvingen",
@@ -6481,54 +6608,57 @@
     };
 
     // ── "Built to back your business" perks carousel ──────────────────
-    // Five real Altery Business solutions surfaced on the result page as
-    // a horizontal scroll-snap slider. Source: altery.com/business — both
-    // copy and visual assets are pulled directly from the production
-    // marketing site, so this section reads as a continuation of Altery's
-    // brand rather than something invented for the checker.
+    // Five Altery Business solutions surfaced on the result page as a
+    // 3S-Money-style horizontal scroll-snap slider. Each card is a tall
+    // portrait (280×400) with a full-bleed photographic image, a
+    // three-stop dark gradient overlay for text legibility, and a white
+    // title+body anchored to the bottom. Hover triggers a subtle 4%
+    // image zoom (800ms ease) and 3px card lift — the signature
+    // premium-fintech touch.
     //
-    // URL strategy: we use the EXACT URLs (including original width/height
-    // params) that altery.com itself serves, so we're requesting the same
-    // CDN variant browsers visiting altery.com already cache. If Framer's
-    // CDN refuses these from non-altery.com Referer (hotlink protection),
-    // EcPerks adds referrerPolicy="no-referrer" and an onError fallback
-    // that collapses the card to title+body — no broken-image icon.
+    // Images live in /images/ alongside index.html. Stored as AVIF
+    // (where the source asset is AVIF) or WebP, both modern formats
+    // with universal support in Claude's target browsers (Chrome 85+,
+    // Safari 16.4+, Firefox 113+). The onError handler in EcPerks
+    // collapses a card to title+body if an image fails to load —
+    // no broken-image icon ever shows.
     //
-    // If hotlinking proves unreliable in production, download the 5 PNGs
-    // and serve them locally from a /perks/ folder in the repo:
-    //   /perks/multiEntity.png, /perks/multiUser.png, etc.
-    // Then change imageUrl below from the framerusercontent.com URL to
-    // the local path. Bulletproof and faster (no extra DNS lookup).
+    // Perk-to-image mapping:
+    //   multiEntity      → perk-global-accounts (Earth + flags)
+    //   multiUser        → perk-team-access (people + plus icon)
+    //   currencyExchange → perk-fx (FX widget on building backdrop)
+    //   businessCards    → perk-cards (Altery Visa + UnionPay cards)
+    //   permissions      → perk-permissions (role-based access UI)
     const EC_PERKS = [
       {
         key: "multiEntity",
-        imageUrl: "https://framerusercontent.com/images/2WsolDeK0TRmCvKsoPq7S8IWaXs.png?width=3224&height=3192",
+        imageUrl: "./images/perk-global-accounts.avif",
         titleKey: "ec.r.perks.multiEntity.title",
         bodyKey:  "ec.r.perks.multiEntity.body",
       },
       {
         key: "multiUser",
-        imageUrl: "https://framerusercontent.com/images/OuknbkhhMvE1lrwJ9fAuMbIw.png?width=724&height=772",
+        imageUrl: "./images/perk-team-access.avif",
         titleKey: "ec.r.perks.multiUser.title",
         bodyKey:  "ec.r.perks.multiUser.body",
       },
       {
-        key: "api",
-        imageUrl: "https://framerusercontent.com/images/NeTpDV2m4zLWsAfzD7UglOdGPiU.png?width=1710&height=1642",
-        titleKey: "ec.r.perks.api.title",
-        bodyKey:  "ec.r.perks.api.body",
+        key: "currencyExchange",
+        imageUrl: "./images/perk-fx.avif",
+        titleKey: "ec.r.perks.currencyExchange.title",
+        bodyKey:  "ec.r.perks.currencyExchange.body",
       },
       {
         key: "businessCards",
-        imageUrl: "https://framerusercontent.com/images/NduAy4uH66dTxKJTZW5HbQTQRQ8.png?width=1302&height=2273",
+        imageUrl: "./images/perk-cards.webp",
         titleKey: "ec.r.perks.businessCards.title",
         bodyKey:  "ec.r.perks.businessCards.body",
       },
       {
-        key: "massPayments",
-        imageUrl: "https://framerusercontent.com/images/yDzXomJviiQRe1BxTi0ZC4uJFZU.png?width=790&height=1228",
-        titleKey: "ec.r.perks.massPayments.title",
-        bodyKey:  "ec.r.perks.massPayments.body",
+        key: "permissions",
+        imageUrl: "./images/perk-permissions.webp",
+        titleKey: "ec.r.perks.permissions.title",
+        bodyKey:  "ec.r.perks.permissions.body",
       },
     ];
 
@@ -8735,11 +8865,60 @@
                   </div>
                 ))}
               </div>
-              {/* Secondary actions — Compare and Fees links side by side
-                  above the soft "you can switch" helper. Compare opens
-                  the plan-comparison modal; Fees opens EcFeesModal which
-                  shows the canonical Altery fee schedule for the active
-                  plan and entity region. */}
+              {/* Fee preview — top 4 per-transaction fees inline so B2B
+                  users can estimate operational cost without opening the
+                  full fees modal. Values pulled from EC_FEE_SCHEDULE for
+                  the active entity's region (UK/EU vs RoW). FX markup is
+                  plan-tier-specific (Starter 0.8% / Pro 0.7% / Ultra 0.5%
+                  — canonical Altery data). "See full schedule →" link
+                  routes to the same EcFeesModal as the (now-removed)
+                  duplicate "View all fees" link previously did. */}
+              {(() => {
+                const region = ecFeeRegion(entity);
+                const schedule = EC_FEE_SCHEDULE[region];
+                const fxByPlan = { starter: "0.8%", pro: "0.7%", ultra: "0.5%" };
+                const subscriptionPrice = activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price;
+                const subscriptionCycle = t(activePlan.cycleKey);
+                return (
+                  <div className="ec-plan__feePreview">
+                    <div className="ec-plan__feePreview__head">
+                      <span className="ec-plan__feePreview__title">{t("ec.r.fees.head")}</span>
+                      <a
+                        role="button"
+                        tabIndex={0}
+                        className="ec-plan__feePreview__link"
+                        onClick={() => setFeesOpen(true)}
+                        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFeesOpen(true); } }}
+                      >
+                        {t("ec.r.fees.seeAll")}
+                      </a>
+                    </div>
+                    <div className="ec-plan__feePreview__list">
+                      <div className="ec-plan__feePreview__row">
+                        <span className="ec-plan__feePreview__label">{t("ec.r.fees.subscription")}</span>
+                        <span className="ec-plan__feePreview__value">{subscriptionPrice} {subscriptionCycle}</span>
+                      </div>
+                      <div className="ec-plan__feePreview__row">
+                        <span className="ec-plan__feePreview__label">{t("ec.r.plan.compare.fee.sepa")}</span>
+                        <span className="ec-plan__feePreview__value">{schedule.sepa}</span>
+                      </div>
+                      <div className="ec-plan__feePreview__row">
+                        <span className="ec-plan__feePreview__label">{t("ec.r.plan.compare.fee.swift")}</span>
+                        <span className="ec-plan__feePreview__value">{schedule.swiftEurOut}</span>
+                      </div>
+                      <div className="ec-plan__feePreview__row">
+                        <span className="ec-plan__feePreview__label">{t("ec.r.plan.compare.fee.fxMarkup")}</span>
+                        <span className="ec-plan__feePreview__value">{fxByPlan[activePlan.id]}</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+              {/* Secondary actions — Compare opens the plan-comparison
+                  modal. The old "View all fees" link was removed when
+                  the fee preview gained its own "See full schedule →"
+                  link inside the preview block — consolidating two
+                  fees-related actions into one. */}
               <div className="ec-plan__links">
                 <a
                   role="button"
@@ -8748,15 +8927,6 @@
                   onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setComparisonOpen(true); } }}
                 >
                   {t("ec.r.plan.compareAll")}
-                </a>
-                <span className="ec-plan__links__sep" aria-hidden="true">·</span>
-                <a
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => setFeesOpen(true)}
-                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFeesOpen(true); } }}
-                >
-                  {t("ec.r.plan.viewFees")}
                 </a>
               </div>
               <div className="ec-plan__switch">
