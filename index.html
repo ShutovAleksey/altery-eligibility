@@ -963,12 +963,18 @@
       margin: 0;
     }
 
-    /* Mount node for Stripe Payment Element. Min-height prevents the
-       modal from collapsing while Stripe.js hydrates the iframe. */
-    .ec-payment__stripeMount {
+    /* Stripe Payment Element mount.
+       The wrap is React's positioning context. The .ec-payment__stripeMount
+       div must stay empty from React's POV — Stripe owns its DOM and any
+       child React adds there causes "Failed to execute removeChild" on
+       unmount. Loading indicator is positioned absolutely as a sibling. */
+    .ec-payment__stripeMountWrap {
+      position: relative;
       min-height: 220px;
       margin: 18px 0 12px;
-      position: relative;
+    }
+    .ec-payment__stripeMount {
+      /* deliberately empty — Stripe injects its iframe here */
     }
     .ec-payment__stripeLoading {
       position: absolute;
@@ -976,6 +982,7 @@
       transform: translate(-50%, -50%);
       color: var(--c-muted);
       font-size: 13px;
+      pointer-events: none;
     }
 
     .ec-payment__alert {
@@ -6177,13 +6184,23 @@
               <p className="ec-payment__lead">{t("ec.r.payment.lead")}</p>
             </div>
 
-            <div ref={mountRef} className="ec-payment__stripeMount" style={{ display: stripeBlocked ? "none" : undefined }}>
-              {!elementReady && !status.message && (
-                <div className="ec-payment__stripeLoading">
-                  {t("ec.r.payment.loading")}
-                </div>
-              )}
-            </div>
+            {/* Stripe Payment Element mount.
+                CRITICAL: mountRef div MUST be empty for React. Stripe
+                replaces the node's children with its own iframe, and if
+                React thinks there are other children inside, the
+                reconciler crashes on unmount with NotFoundError. The
+                loading indicator therefore lives as an absolutely-
+                positioned sibling, not as a child of the mount node. */}
+            {!stripeBlocked && (
+              <div className="ec-payment__stripeMountWrap">
+                <div ref={mountRef} className="ec-payment__stripeMount" />
+                {!elementReady && !status.message && (
+                  <div className="ec-payment__stripeLoading">
+                    {t("ec.r.payment.loading")}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Fallback UI — appears when Stripe.js couldn't load in the
                 preview environment. Honest demo state, not a fake Stripe
