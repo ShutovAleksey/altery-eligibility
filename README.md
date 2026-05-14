@@ -14,6 +14,7 @@ altery-deploy/
 ├── index.html                          ← Frontend (prototype)
 ├── api/
 │   ├── create-payment-intent.js        ← Создаёт Stripe PaymentIntent
+│   ├── send-analysis.js                ← Отправляет PDF-анализ через Resend
 │   └── config.js                       ← Отдаёт publishable key из env
 ├── package.json                        ← Зависимость: stripe SDK
 ├── vercel.json                         ← Конфиг рантайма
@@ -98,16 +99,42 @@ CLI задаст несколько вопросов — отвечай так:
 1. https://vercel.com/dashboard
 2. Кликни на свой проект `altery-eligibility`
 3. **Settings → Environment Variables**
-4. Добавь **две** переменные:
+4. Добавь следующие переменные:
 
 | Name | Value | Environment |
 |---|---|---|
-| `STRIPE_SECRET_KEY` | `sk_test_...` (со Stripe Dashboard) | All (Production, Preview, Development) |
+| `STRIPE_SECRET_KEY` | `sk_test_...` (со Stripe Dashboard) | All |
 | `STRIPE_PUBLISHABLE_KEY` | `pk_test_...` (со Stripe Dashboard) | All |
+| `RESEND_API_KEY` | `re_...` (см. шаг 5.5) | All |
+| `FROM_EMAIL` (опционально) | `Altery <hello@altery.com>` после verify домена | All |
+| `REPLY_TO` (опционально) | `hello@altery.com` | All |
 
 Для каждой:
 - Жми **Save**
 - Галочки на всех трёх Environment (Production / Preview / Development)
+
+---
+
+## Шаг 5.5 — Resend аккаунт (~3 минуты) — для отправки analysis email
+
+Этот checker умеет отправлять PDF-анализ на email пользователя. За доставку отвечает **Resend** (transactional email service, free tier 3,000 emails/month).
+
+1. Регистрация: https://resend.com/signup (login через GitHub быстрее всего)
+2. После входа → **API Keys** в сайдбаре → **Create API Key**
+3. Name: `altery-eligibility-prod`, Permission: `Sending access`, Domain: `All`
+4. Скопируй ключ (начинается с `re_...`) — он показывается только один раз
+5. Добавь его в Vercel как `RESEND_API_KEY` (см. шаг 5 выше)
+
+### Sender domain (для production)
+
+Из коробки Resend разрешает слать с `onboarding@resend.dev` — работает сразу, но в "From" поле получателю придёт generic адрес. Для production setup'а:
+
+1. Resend Dashboard → **Domains** → **Add Domain** → введи `altery.com`
+2. Resend покажет 3 DNS записи (SPF, DKIM, DMARC) — добавь их у своего DNS-провайдера (Cloudflare, Route53, GoDaddy и т.д.)
+3. Жми **Verify Domain** — обычно проходит за 5–30 минут
+4. В Vercel добавь `FROM_EMAIL=Altery <hello@altery.com>` — теперь письма летят с правильного домена и проходят deliverability checks
+
+Пока домен не verified — оставь `FROM_EMAIL` пустым, fallback на sandbox-адрес сработает автоматически.
 
 ---
 
