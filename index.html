@@ -2507,15 +2507,17 @@
        uses ecLoadStripe() to handle this script's lifecycle properly,
        including load/error events and timeouts. -->
   <script src="https://js.stripe.com/v3/" async></script>
-  <!-- html2pdf.js bundle (html2canvas + jsPDF + worker pipeline). Used
-       only by the handoff modal's "Email me the full analysis" path,
-       which builds a styled HTML email template and converts it to PDF
-       client-side. In production, the same HTML template would be sent
-       via SendGrid/Mailgun; the prototype downloads it locally as a
-       tangible artifact to demonstrate the design quality. Async load
-       because it's ~300KB and most users won't trigger the email path.
-       EcHandoffModal.sendEmail awaits window.html2pdf availability. -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" async></script>
+  <!-- PDF generation libs — used by the handoff modal's "Email me the
+       full analysis" path. We load html2canvas and jsPDF as separate
+       UMD scripts (rather than the html2pdf.bundle which wraps both
+       in an IIFE without exposing globals) so we can call them
+       directly. EcHandoffModal.sendEmail polls for both before kicking
+       off the capture. Async load — total ~250KB, and most users skip
+       the email path entirely. Pinned to stable versions because the
+       canvas/PDF rendering surface is finicky enough that breakage
+       on a minor bump is plausible. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" async></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" async></script>
 
   <!-- ============================================================================
        i18n — minimal runtime + EN dictionary. Architecturally extensible to the
@@ -9780,20 +9782,22 @@
     // configurations paginate cleanly thanks to html2pdf's auto page
     // breaks.
 
-    // Wait for the html2pdf bundle to fully populate window globals.
-    // The bundle ships html2pdf + html2canvas + jsPDF; we use the latter
-    // two directly because going through html2pdf's worker chain has
-    // produced blank PDFs in production (its toContainer overrides
-    // element styles in ways that race html2canvas's capture).
-    function ecWaitForHtml2pdf(timeoutMs = 10000) {
+    // Wait for the two PDF libs (html2canvas + jsPDF, loaded async via
+    // separate CDN scripts) to populate their globals before attempting
+    // capture. Polling rather than load events because (a) the scripts
+    // may already be cached and parsed before this code path is reached,
+    // (b) reading window.* is cheap, (c) it's resilient to script-tag
+    // ordering changes. Times out after 10s with a clear error so the
+    // handoff modal surfaces something useful instead of hanging.
+    function ecWaitForPdfLibs(timeoutMs = 10000) {
       return new Promise((resolve, reject) => {
-        const ready = () => !!(window.html2pdf && window.html2canvas && (window.jspdf?.jsPDF || window.jsPDF));
+        const ready = () => !!(window.html2canvas && (window.jspdf?.jsPDF || window.jsPDF));
         if (ready()) return resolve();
         const start = Date.now();
         const tick = () => {
           if (ready()) return resolve();
           if (Date.now() - start > timeoutMs) {
-            return reject(new Error("PDF libs failed to load within " + timeoutMs + "ms"));
+            return reject(new Error("PDF libs (html2canvas / jsPDF) failed to load within " + timeoutMs + "ms"));
           }
           setTimeout(tick, 80);
         };
@@ -10046,7 +10050,7 @@
     // Trade-off: a few extra MB on the user's browser bundle (the
     // html2pdf script, which we load async).
     async function ecSendAnalysisEmail({ rec, email, t }) {
-      await ecWaitForHtml2pdf();
+      await ecWaitForPdfLibs();
 
       const langCode = (window.__I18N && typeof window.__I18N.getLang === "function")
         ? window.__I18N.getLang() : "en";
