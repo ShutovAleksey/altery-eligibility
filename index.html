@@ -9995,14 +9995,14 @@
       });
     }
 
-    // Altery brand mark — the 4-dot favicon, base64-encoded for inline
-    // embedding into the PDF template. 892 chars decoded = 668 bytes (65×65
-    // PNG). Inlining vs URL-fetching avoids CORS / image-decode races in
-    // html2canvas, which is the most common cause of "PDF arrived blank"
-    // bugs. The same asset lives at /favicon.ico for the email body, where
-    // we use the absolute URL instead (smaller email body, browsers can
-    // cache it across messages).
-    const EC_ALTERY_LOGO_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEEAAABBCAMAAAC5KTl3AAAAV1BMVEVMaXEAQtP/dxwAQdQAQdMAQdT/eB7juZr/dxz/dxwAQNO9zdH20K4AQtT/dxz20K+9zdEAQdMAQNLUzcT0z67/eB2+ztL20K+9zdH/dxwAQdO9zdH10K5ICpPuAAAAGXRSTlMARdeH6WclFoJlGZ3RokeAfL8wO1mfzaNblCewqQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAcZJREFUeNrtl9mWgyAQREFA3LcYE9D//87JuBCN0NLkcaae5Z6u6qY5EvIvnOI0eamKA4/LJFKronsccl4dhGZUkfpQlKIAqbIoQQASpb5DVMohlxHZ5Hlz2/UwchGUNU6Zj7NyeeFhjtNGGMZVw4qIFaDqDGhGowHogztMOe60ZBFBBHUiPPeEfGaCgHOWzYlQwYQUJAyXMViCOLu4INyvk8QS9jZyEuKCkPxjomKYYBmprYptJLHdnM88DzcLnKgoeLu4g7SVhDbhu6G8S3gV4UwicpVABStLJqhZUrgtRxnXq3hJwTCtmzYr9UFthtz2lOtPMde2tU0jYdoiZu1IIr0BWpfbw/1+ee3nCdUOCdPX6vX8p87XP+Mugu78Boc5Abr1AmQaEPUhCIjgVUQLEXhmwqwfRd2jTRgbsp5mFRLRykNDi2nTDUtYBrM2gKnABbnN5buEaepDCLcdYHogCbOLfk842eg8koQJhIOE7trFxUQt30xQknA71xUBdhO2sQ21QdiGEupGaT7ll5F4SNzdet+rX0Zd1xK7pCjxVceBO/EFQqD+RM5GOCVIiQODsyzgn06UG6QNOr/kQYUQXfDxP6sfLniyVHyT3q0AAAAASUVORK5CYII=";
+    // Altery wordmark — high-res PNG (284×96) rendered from the same SVG
+    // used in the checker's on-screen header (.ec-header__brand svg).
+    // Inlined as base64 so html2canvas captures it without a network
+    // round-trip, and so the email body can use a stable hosted URL
+    // (the PNG file ships in the deployment at /images/altery-logo.png).
+    // The PNG fill is pure white (#FFFFFF) — designed to sit on the
+    // midnight-navy #000537 header band that mirrors the checker UI.
+    const EC_ALTERY_LOGO_B64 = "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";
 
     // Build the analysis HTML string. Pure function — takes the
     // recommendation, recipient email, and translator; returns markup.
@@ -10064,20 +10064,21 @@
       // Brand palette — duplicated as literals rather than CSS vars so
       // the HTML is fully self-contained for email rendering.
       const C = {
-        primary:      "#002780",  // Altery navy
-        primaryLight: "#B3D1FF",  // Light blue accent (title color highlights)
+        primary:      "#002780",  // Altery navy (body text accent, CTAs)
+        headerBg:     "#000537",  // Midnight navy — same as .ec-header on-screen
+        primaryLight: "#B3D1FF",  // Light blue accent (title highlights)
         ink:          "#14171F",  // Body text
         inkSoft:      "#4B5063",  // Secondary text
         muted:        "#6B6F7B",  // Tertiary / labels
         border:       "#E5E7EE",  // Neutral dividers
         surface:      "#F8F7F4",  // Off-white panel bg
-        beige:        "#F0EBE3",  // Brand beige — header bg
-        beigeBorder:  "#E5E0D5",  // Beige-tone divider
+        beige:        "#F0EBE3",  // Brand beige — body callouts only
+        beigeBorder:  "#E5E0D5",
         success:      "#18A058",  // Active-status dot
         warn:         "#FDF6EC",  // Crypto reroute callout bg
         warnBorder:   "#F4E1B5",
-        savings:      "#C2410C",  // Warm orange — sales highlight (savings number)
-        savingsBg:    "#FFF7ED",  // Faint orange wash — AT A GLANCE savings row
+        savings:      "#C2410C",  // Warm orange — sales highlight
+        savingsBg:    "#FFF7ED",
         white:        "#FFFFFF",
       };
 
@@ -10215,31 +10216,31 @@
       return `
 <div style="font-family:${FF};color:${C.ink};background:${C.white};width:720px;margin:0;padding:0;-webkit-font-smoothing:antialiased;">
 
-  <!-- Header band — beige bg, navy underline. Premium-document feel
-       vs the previous marketing-email full-bleed navy. Reads as a
-       formal commercial proposal, not a system-generated receipt. -->
-  <div style="background:${C.beige};padding:24px 40px 0;border-bottom:3px solid ${C.primary};">
-    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-      <div>
-        <div style="display:flex;align-items:center;gap:12px;">
-          <img src="data:image/png;base64,${EC_ALTERY_LOGO_B64}" alt="" width="44" height="44" style="display:block;border-radius:8px;border:0;"/>
-          <div style="font-size:26px;font-weight:700;letter-spacing:-0.02em;line-height:1;color:${C.primary};">altery</div>
-        </div>
-        <div style="font-size:12px;color:${C.muted};margin-top:8px;">${t("ec.pdf.subtitle")}</div>
+  <!-- Header pill — midnight navy (#000537), rounded 16px. Mirrors
+       the .ec-header element from the on-screen checker exactly:
+       same bg, same wordmark SVG (rasterized to PNG for html2canvas
+       reliability), same proportions. Sits inside a wrapper with
+       padding so the rounded edges show on white doc background. -->
+  <div style="padding:24px 24px 0;">
+    <div style="background:${C.headerBg};border-radius:16px;padding:20px 28px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 12px 32px rgba(0,6,57,.16);">
+      <div style="display:flex;align-items:center;gap:18px;">
+        <img src="data:image/png;base64,${EC_ALTERY_LOGO_B64}" alt="Altery" width="71" height="24" style="display:block;border:0;"/>
+        <div style="width:1px;height:24px;background:rgba(255,255,255,.18);"></div>
+        <div style="font-size:13px;font-weight:500;color:rgba(255,255,255,.82);letter-spacing:-0.005em;">${t("ec.pdf.subtitle")}</div>
       </div>
       <div style="text-align:right;line-height:16px;">
-        <div style="font-size:10px;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;">${t("ec.pdf.proposal")} · ${proposalRef}</div>
-        <div style="font-size:11px;color:${C.ink};margin-top:3px;">${dateStr}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:0.1em;">${t("ec.pdf.proposal")} · ${proposalRef}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.92);margin-top:3px;">${dateStr}</div>
       </div>
     </div>
     ${email ? `
-    <div style="margin-top:14px;padding-top:12px;border-top:1px solid ${C.beigeBorder};padding-bottom:14px;font-size:11px;color:${C.muted};">
+    <div style="margin-top:18px;font-size:11px;color:${C.muted};">
       ${t("ec.pdf.preparedFor")} <span style="color:${C.ink};font-weight:500;">${email}</span>
-    </div>` : `<div style="height:14px;"></div>`}
+    </div>` : ""}
   </div>
 
   <!-- Body -->
-  <div style="padding:32px 40px 28px;">
+  <div style="padding:28px 40px 28px;">
 
     ${personaLine ? `<div style="font-size:13px;font-weight:500;color:${C.primary};margin:0 0 10px;letter-spacing:-0.005em;">${personaLine}</div>` : ""}
 
