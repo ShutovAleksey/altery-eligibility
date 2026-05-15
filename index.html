@@ -672,6 +672,80 @@
        surface + standard border (matches the plan card's elevation), so
        the two read as a tightly coupled pair: rationale → recommendation.
        Bullets use circular primary-navy check marks (matching the Q3
+    .ec-opportunity {
+      background: #FFFFFF;
+      border: 1px solid var(--c-border);
+      border-radius: 16px;
+      padding: 22px 24px;
+      margin: 0 0 20px;
+    }
+    .ec-opportunity__eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--c-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .ec-opportunity__lead {
+      font-size: 14px;
+      line-height: 21px;
+      color: var(--c-ink-soft);
+      margin: 0 0 18px;
+    }
+    .ec-opportunity__band {
+      background: #FFF7ED;
+      border: 1.5px solid #C2410C;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+    }
+    .ec-opportunity__band__label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #C2410C;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 6px;
+    }
+    .ec-opportunity__band__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .ec-opportunity__band__monthly {
+      font-size: 28px;
+      font-weight: 700;
+      color: #C2410C;
+      letter-spacing: -0.01em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .ec-opportunity__band__per {
+      font-size: 14px;
+      font-weight: 500;
+      color: #C2410C;
+      margin-left: 4px;
+    }
+    .ec-opportunity__band__annual {
+      font-size: 13px;
+      color: #C2410C;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+    .ec-opportunity__note {
+      font-size: 12px;
+      line-height: 17px;
+      color: var(--c-muted);
+      font-style: italic;
+    }
+    @media (max-width: 640px) {
+      .ec-opportunity { padding: 18px 18px; }
+      .ec-opportunity__band__monthly { font-size: 24px; }
+    }
+
        services check + Q5 crypto card check) for visual consistency with
        the rest of the questionnaire's selection language. */
     .ec-reasoning {
@@ -1605,6 +1679,176 @@
       outline: 2px solid var(--c-primary);
       outline-offset: 2px;
     }
+
+    /* Value-prop list — three concrete bullets shown on email stage
+       so the user reads what they're getting before they type. Each
+       bullet a single concrete deliverable, with the first one
+       personalized to the user's volume-based savings number. */
+    .ec-handoff__value {
+      list-style: none;
+      margin: 4px 0 18px;
+      padding: 0;
+      display: flex; flex-direction: column;
+      gap: 10px;
+    }
+    .ec-handoff__value__item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      font-size: 13.5px;
+      line-height: 19px;
+      color: var(--c-ink);
+    }
+    .ec-handoff__value__tick {
+      flex-shrink: 0;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--c-primary);
+      color: #fff;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1;
+      margin-top: 1px;
+    }
+
+    /* Sent-stage next-steps — implementation-intention list. Three
+       numbered rows keep momentum past the success state without
+       making it feel like another task. First row is pre-completed
+       (with a checkmark) to anchor a "you're 1/3 done" feeling. */
+    .ec-handoff__nextSteps {
+      margin: 18px 0 6px;
+      padding: 16px 18px;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 12px;
+      text-align: left;
+    }
+    .ec-handoff__nextSteps__head {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--c-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+    .ec-handoff__nextSteps__list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex; flex-direction: column;
+      gap: 12px;
+    }
+    .ec-handoff__nextSteps__item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .ec-handoff__nextSteps__num {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--c-beige, #F0EBE3);
+      border: 1.5px solid var(--c-primary);
+      color: var(--c-primary);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      margin-top: 1px;
+    }
+    .ec-handoff__nextSteps__item.is-done .ec-handoff__nextSteps__num {
+      background: var(--c-primary);
+      color: #fff;
+      border-color: var(--c-primary);
+    }
+    .ec-handoff__nextSteps__title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--c-ink);
+      line-height: 19px;
+    }
+    .ec-handoff__nextSteps__body {
+      font-size: 12.5px;
+      color: var(--c-muted);
+      line-height: 18px;
+      margin-top: 2px;
+    }
+    .ec-handoff__nextSteps__link {
+      color: var(--c-primary);
+      text-decoration: none;
+      border-bottom: 1px solid var(--c-primary);
+      font-weight: 500;
+    }
+    .ec-handoff__nextSteps__link:hover { opacity: 0.75; }
+
+    /* Send-to-colleague row — secondary inline send. Inputs sit
+       side by side for compactness on desktop, stack on mobile. */
+    .ec-handoff__colleague {
+      margin: 14px 0 6px;
+      padding: 14px 16px;
+      background: var(--c-beige, #F0EBE3);
+      border: 1px solid var(--c-beige-border, #E5E0D5);
+      border-radius: 12px;
+      text-align: left;
+    }
+    .ec-handoff__colleague__head {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--c-ink);
+      margin-bottom: 10px;
+    }
+    .ec-handoff__colleague__row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+    .ec-handoff__colleague__input {
+      flex: 1; min-width: 0;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      border: 1px solid var(--c-border);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--c-ink);
+      outline: none;
+      transition: border-color .15s ease;
+    }
+    .ec-handoff__colleague__input:focus {
+      border-color: var(--c-primary);
+    }
+    .ec-handoff__colleague__input.is-error {
+      border-color: var(--c-danger, #C2410C);
+    }
+    .ec-handoff__colleague__btn {
+      flex-shrink: 0;
+      padding: 10px 16px;
+      font-size: 13px;
+      font-family: inherit;
+      font-weight: 500;
+      color: #fff;
+      background: var(--c-primary);
+      border: 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity .15s ease;
+      white-space: nowrap;
+    }
+    .ec-handoff__colleague__btn:hover { opacity: 0.85; }
+    .ec-handoff__colleague__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .ec-handoff__colleague__success {
+      font-size: 13px;
+      color: #18A058;
+      font-weight: 500;
+      padding: 4px 0;
+    }
+    @media (max-width: 640px) {
+      .ec-handoff__colleague__row { flex-direction: column; }
+      .ec-handoff__colleague__btn { width: 100%; }
+    }
+
     @media (max-width: 640px) {
       .ec-modal--handoff { padding: 24px 20px 20px; }
       .ec-modal--handoff .ec-modal__title { font-size: 20px; line-height: 26px; }
@@ -3177,7 +3421,7 @@
     "ec.handoff.lead": "Setup takes about 10 minutes and saves as you go. Pause and pick up where you left off whenever you're ready.",
     "ec.handoff.continue": "Start setup",
     "ec.handoff.continueAnyway": "Start setup now",
-    "ec.handoff.emailOnly": "Email me the full analysis to think it over",
+    "ec.handoff.emailOnly": "Or send me the full proposal",
     "ec.handoff.email.intro": "Where should we send it?",
     "ec.handoff.email.leadHint": "We'll send a full PDF analysis — your recommendation, fees, and setup link. Pick up setup whenever you're ready.",
     "ec.handoff.email.label": "Work email",
@@ -3227,6 +3471,83 @@
     "ec.pdf.steps.4.body": "Cards delivered within 5 business days; API keys available immediately.",
     "ec.pdf.team.head": "Your account team",
     "ec.pdf.team.body": "Reach us at hello@altery.com. Available Mon–Fri, 9:00–18:00 GMT. We respond within 4 working hours.",
+    "ec.r.opportunity.head": "Your savings opportunity",
+    "ec.r.opportunity.lead": "Companies at your ~€{volume}/month volume typically spend {bankCost}/month on traditional bank fees. With Altery, that drops to {alteryCost}/month.",
+    "ec.r.opportunity.leaving": "You're leaving on the table",
+    "ec.r.opportunity.perMonth": "/month",
+    "ec.r.opportunity.annualPrefix": "That's",
+    "ec.r.opportunity.annualSuffix": "per year",
+    "ec.r.opportunity.note": "Full breakdown — FX, SWIFT, local payment math line by line — is in your personal proposal PDF.",
+    "ec.pdf.costMath.head": "Your monthly cost — side by side",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Typical business bank",
+    "ec.pdf.costMath.subscription": "Plan subscription",
+    "ec.pdf.costMath.fx": "FX margins",
+    "ec.pdf.costMath.swift": "Cross-border (SWIFT)",
+    "ec.pdf.costMath.local": "Local payments",
+    "ec.pdf.costMath.total": "Total monthly",
+    "ec.pdf.costMath.savings.label": "Your monthly opportunity",
+    "ec.pdf.costMath.perMonth": "/month",
+    "ec.pdf.costMath.perYear": "per year",
+    "ec.pdf.costMath.assumptions": "Based on your ~€{volume}/month volume, ~{txCount} transactions/month, {fxPct}% FX exposure. Real numbers refined at activation.",
+    "ec.pdf.outcomes.head": "What {amount}/year could fund",
+    "ec.pdf.outcomes.hire": "{value}× a senior hire (UK/EU loaded cost ~€110k)",
+    "ec.pdf.outcomes.hireMid": "A new mid-level hire on your team",
+    "ec.pdf.outcomes.runway": "{value} months of additional runway at typical early-stage burn",
+    "ec.pdf.outcomes.marketing": "About €{value}k of quarterly growth budget",
+    "ec.pdf.comparison.head": "Altery vs typical business bank",
+    "ec.pdf.comparison.bank": "Typical business bank",
+    "ec.pdf.comparison.row.setup.label": "Account setup",
+    "ec.pdf.comparison.row.setup.altery": "10 minutes online",
+    "ec.pdf.comparison.row.setup.bank": "4–8 weeks, branch visits",
+    "ec.pdf.comparison.row.kyb.label": "KYB clearance",
+    "ec.pdf.comparison.row.kyb.altery": "Same-day for most cases",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 weeks",
+    "ec.pdf.comparison.row.fx.label": "FX markup",
+    "ec.pdf.comparison.row.fx.altery": "0.5–0.7%",
+    "ec.pdf.comparison.row.fx.bank": "2–4% typical spread",
+    "ec.pdf.comparison.row.swift.label": "Cross-border (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + 0.25% per tx",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 flat per tx",
+    "ec.pdf.comparison.row.multiCcy.label": "Multi-currency accounts",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ currencies, one dashboard",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 currency or separate accounts",
+    "ec.pdf.comparison.row.crypto.label": "Crypto-native businesses",
+    "ec.pdf.comparison.row.crypto.altery": "Welcomed",
+    "ec.pdf.comparison.row.crypto.bank": "Frequently rejected",
+    "ec.pdf.comparison.row.api.label": "API access",
+    "ec.pdf.comparison.row.api.altery": "Day one",
+    "ec.pdf.comparison.row.api.bank": "Tier-specific, weeks-long approval",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-entity (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "One login, unified team",
+    "ec.pdf.comparison.row.multiEntity.bank": "Three separate banks",
+    "ec.pdf.checklist.head": "Onboarding checklist — 5-min prep",
+    "ec.pdf.checklist.incorporation": "Certificate of incorporation (PDF or scan)",
+    "ec.pdf.checklist.directorIds": "Directors' passport scans",
+    "ec.pdf.checklist.addressProof": "Proof of address — utility bill less than 3 months old",
+    "ec.pdf.checklist.businessActivities": "1–2 sentence description of business activities",
+    "ec.pdf.checklist.volume": "Monthly volume (pre-filled from your answers)",
+    "ec.pdf.checklist.note": "Estimated upload time: 5–10 min. Activation: within 48 working hours of complete KYB.",
+    "ec.pdf.signature.body": "I'll be your point of contact for setup questions — reply directly to this email or book a 15-min call below.",
+    "ec.pdf.validity": "This proposal is valid for 30 days from issue. Pricing and terms confirmed at activation.",
+    "ec.handoff.email.title": "Get your full proposal",
+    "ec.handoff.email.lead": "Detailed PDF you can review with your team. Valid 30 days.",
+    "ec.handoff.email.value.costPersonal": "Personal cost breakdown — see exactly how you save {monthly}/month",
+    "ec.handoff.email.value.costGeneric": "Personal cost breakdown for your monthly volume",
+    "ec.handoff.email.value.comparison": "Altery vs typical bank comparison — for your CFO",
+    "ec.handoff.email.value.checklist": "Onboarding checklist so you can prepare in 5 minutes",
+    "ec.handoff.trust": "No spam. No newsletter. Just your proposal PDF — once.",
+    "ec.handoff.sent.nextHead": "Now do these 3 things",
+    "ec.handoff.sent.step1.title": "Check your inbox",
+    "ec.handoff.sent.step1.body": "Sent to {email}",
+    "ec.handoff.sent.step2.title": "Forward to your CFO or co-founder",
+    "ec.handoff.sent.step2.body": "Many founders share before booking the call — it speeds the decision.",
+    "ec.handoff.sent.step3.title": "Schedule a 15-min intro call",
+    "ec.handoff.sent.step3.link": "Book a call",
+    "ec.handoff.sent.colleague.head": "Send a copy to a colleague",
+    "ec.handoff.sent.colleague.placeholder": "colleague@yourcompany.com",
+    "ec.handoff.sent.colleague.send": "Send copy",
+    "ec.handoff.sent.colleague.success": "Sent to {email}",
     "ec.pdf.team.calendly": "Schedule a 15-min intro call",
     "ec.pdf.volumeHint.starter": "Starting small — Starter rails cover everyday flows; upgrade triggers when monthly volume crosses €100k.",
     "ec.pdf.volumeHint.standard": "At your volume, the standard rails carry the load comfortably. Watch the €100k threshold as growth accelerates — that's the natural Pro upgrade point.",
@@ -3493,7 +3814,7 @@
     "ec.handoff.lead": "Setup dauert etwa 10 Minuten und speichert laufend. Pausieren und später weitermachen — jederzeit.",
     "ec.handoff.continue": "Setup starten",
     "ec.handoff.continueAnyway": "Jetzt mit Setup starten",
-    "ec.handoff.emailOnly": "Vollständige Analyse per E-Mail zum Überlegen",
+    "ec.handoff.emailOnly": "Oder schicken Sie mir das vollständige Angebot",
     "ec.handoff.email.intro": "Wohin sollen wir es senden?",
     "ec.handoff.email.leadHint": "Wir senden eine vollständige PDF-Analyse — Ihre Empfehlung, Gebühren und Setup-Link. Starten Sie das Setup, wenn Sie bereit sind.",
     "ec.handoff.email.label": "Geschäfts-E-Mail",
@@ -3541,6 +3862,83 @@
     "ec.pdf.steps.4.body": "Karten innerhalb von 5 Werktagen geliefert; API-Schlüssel sofort verfügbar.",
     "ec.pdf.team.head": "Ihr Account-Team",
     "ec.pdf.team.body": "Erreichen Sie uns unter hello@altery.com. Verfügbar Mo–Fr, 9:00–18:00 GMT. Antwort innerhalb von 4 Werkstunden.",
+    "ec.r.opportunity.head": "Ihr Einsparpotenzial",
+    "ec.r.opportunity.lead": "Unternehmen mit Ihrem ~€{volume}/Monat-Volumen geben typischerweise {bankCost}/Monat an klassischen Bankgebühren aus. Mit Altery sinkt das auf {alteryCost}/Monat.",
+    "ec.r.opportunity.leaving": "Sie lassen auf dem Tisch liegen",
+    "ec.r.opportunity.perMonth": "/Monat",
+    "ec.r.opportunity.annualPrefix": "Das sind",
+    "ec.r.opportunity.annualSuffix": "pro Jahr",
+    "ec.r.opportunity.note": "Vollständige Aufschlüsselung — FX, SWIFT, lokale Zahlungen Zeile für Zeile — steht im personalisierten Angebots-PDF.",
+    "ec.pdf.costMath.head": "Ihre monatlichen Kosten — Seite an Seite",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Klassische Geschäftsbank",
+    "ec.pdf.costMath.subscription": "Plan-Abonnement",
+    "ec.pdf.costMath.fx": "FX-Margen",
+    "ec.pdf.costMath.swift": "Grenzüberschreitend (SWIFT)",
+    "ec.pdf.costMath.local": "Lokale Zahlungen",
+    "ec.pdf.costMath.total": "Gesamt monatlich",
+    "ec.pdf.costMath.savings.label": "Ihre monatliche Chance",
+    "ec.pdf.costMath.perMonth": "/Monat",
+    "ec.pdf.costMath.perYear": "pro Jahr",
+    "ec.pdf.costMath.assumptions": "Basierend auf Ihrem ~€{volume}/Monat-Volumen, ~{txCount} Transaktionen/Monat, {fxPct}% FX-Exposure. Tatsächliche Zahlen bei Aktivierung präzisiert.",
+    "ec.pdf.outcomes.head": "Was {amount}/Jahr finanzieren könnten",
+    "ec.pdf.outcomes.hire": "{value}× Senior-Einstellung (UK/EU Vollkosten ~€110k)",
+    "ec.pdf.outcomes.hireMid": "Eine neue Mid-Level-Einstellung in Ihrem Team",
+    "ec.pdf.outcomes.runway": "{value} Monate zusätzliche Runway bei typischem Early-Stage-Burn",
+    "ec.pdf.outcomes.marketing": "Etwa €{value}k quartalsweises Wachstumsbudget",
+    "ec.pdf.comparison.head": "Altery vs. klassische Geschäftsbank",
+    "ec.pdf.comparison.bank": "Klassische Geschäftsbank",
+    "ec.pdf.comparison.row.setup.label": "Konto-Eröffnung",
+    "ec.pdf.comparison.row.setup.altery": "10 Minuten online",
+    "ec.pdf.comparison.row.setup.bank": "4–8 Wochen, Filialbesuche",
+    "ec.pdf.comparison.row.kyb.label": "KYB-Freigabe",
+    "ec.pdf.comparison.row.kyb.altery": "Meist taggleich",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 Wochen",
+    "ec.pdf.comparison.row.fx.label": "FX-Aufschlag",
+    "ec.pdf.comparison.row.fx.altery": "0,5–0,7%",
+    "ec.pdf.comparison.row.fx.bank": "2–4% typischer Spread",
+    "ec.pdf.comparison.row.swift.label": "Grenzüberschreitend (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + 0,25% pro Tx",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 pauschal pro Tx",
+    "ec.pdf.comparison.row.multiCcy.label": "Multi-Währungs-Konten",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ Währungen, ein Dashboard",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 Währung oder getrennte Konten",
+    "ec.pdf.comparison.row.crypto.label": "Crypto-native Unternehmen",
+    "ec.pdf.comparison.row.crypto.altery": "Willkommen",
+    "ec.pdf.comparison.row.crypto.bank": "Häufig abgelehnt",
+    "ec.pdf.comparison.row.api.label": "API-Zugang",
+    "ec.pdf.comparison.row.api.altery": "Vom ersten Tag",
+    "ec.pdf.comparison.row.api.bank": "Tier-abhängig, wochenlange Freigabe",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-Entity (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "Ein Login, vereintes Team",
+    "ec.pdf.comparison.row.multiEntity.bank": "Drei separate Banken",
+    "ec.pdf.checklist.head": "Onboarding-Checkliste — 5-Min-Vorbereitung",
+    "ec.pdf.checklist.incorporation": "Handelsregisterauszug (PDF oder Scan)",
+    "ec.pdf.checklist.directorIds": "Pass-Scans der Geschäftsführer",
+    "ec.pdf.checklist.addressProof": "Adressnachweis — Versorgungsrechnung jünger als 3 Monate",
+    "ec.pdf.checklist.businessActivities": "1–2 Sätze Beschreibung der Geschäftstätigkeit",
+    "ec.pdf.checklist.volume": "Monatliches Volumen (bereits aus Ihren Antworten vorausgefüllt)",
+    "ec.pdf.checklist.note": "Geschätzte Upload-Zeit: 5–10 Min. Aktivierung: innerhalb von 48 Werkstunden nach vollständiger KYB.",
+    "ec.pdf.signature.body": "Ich bin Ihr Ansprechpartner für Setup-Fragen — antworten Sie direkt auf diese E-Mail oder buchen Sie unten einen 15-Min-Call.",
+    "ec.pdf.validity": "Dieses Angebot ist 30 Tage ab Ausstellung gültig. Preise und Konditionen werden bei Aktivierung bestätigt.",
+    "ec.handoff.email.title": "Vollständiges Angebot erhalten",
+    "ec.handoff.email.lead": "Detailliertes PDF, das Sie mit Ihrem Team prüfen können. 30 Tage gültig.",
+    "ec.handoff.email.value.costPersonal": "Persönliche Kostenaufschlüsselung — sehen Sie genau, wie Sie {monthly}/Monat sparen",
+    "ec.handoff.email.value.costGeneric": "Persönliche Kostenaufschlüsselung für Ihr Monatsvolumen",
+    "ec.handoff.email.value.comparison": "Altery vs. klassische Bank — für Ihren CFO",
+    "ec.handoff.email.value.checklist": "Onboarding-Checkliste, damit Sie sich in 5 Minuten vorbereiten können",
+    "ec.handoff.trust": "Kein Spam. Kein Newsletter. Nur Ihr Angebots-PDF — einmal.",
+    "ec.handoff.sent.nextHead": "Machen Sie jetzt diese 3 Dinge",
+    "ec.handoff.sent.step1.title": "Posteingang prüfen",
+    "ec.handoff.sent.step1.body": "Gesendet an {email}",
+    "ec.handoff.sent.step2.title": "An Ihren CFO oder Mitgründer weiterleiten",
+    "ec.handoff.sent.step2.body": "Viele Gründer teilen, bevor sie den Call buchen — das beschleunigt die Entscheidung.",
+    "ec.handoff.sent.step3.title": "15-Min-Erstgespräch buchen",
+    "ec.handoff.sent.step3.link": "Termin buchen",
+    "ec.handoff.sent.colleague.head": "Kopie an Kollegen senden",
+    "ec.handoff.sent.colleague.placeholder": "kollege@ihrfirma.com",
+    "ec.handoff.sent.colleague.send": "Kopie senden",
+    "ec.handoff.sent.colleague.success": "Gesendet an {email}",
     "ec.pdf.team.calendly": "15-Min-Erstgespräch buchen",
     "ec.pdf.volumeHint.starter": "Sie starten klein — Starter-Schienen decken den Alltag ab; Upgrade-Auslöser, sobald das Monatsvolumen €100k überschreitet.",
     "ec.pdf.volumeHint.standard": "Bei Ihrem Volumen tragen die Standard-Schienen die Last komfortabel. Behalten Sie die €100k-Schwelle im Auge — das ist der natürliche Pro-Upgrade-Punkt.",
@@ -3795,7 +4193,7 @@
     "ec.handoff.lead": "Настройка займёт около 10 минут и сохраняется по ходу. Прервитесь и продолжите когда удобно.",
     "ec.handoff.continue": "Начать настройку",
     "ec.handoff.continueAnyway": "Начать настройку сейчас",
-    "ec.handoff.emailOnly": "Прислать полный анализ на email, чтобы подумать",
+    "ec.handoff.emailOnly": "Или пришлите мне полное предложение",
     "ec.handoff.email.intro": "Куда отправить?",
     "ec.handoff.email.leadHint": "Пришлём полный PDF-анализ — рекомендацию, тарифы и ссылку на настройку. Начнёте setup когда будете готовы.",
     "ec.handoff.email.label": "Рабочая почта",
@@ -3843,6 +4241,83 @@
     "ec.pdf.steps.4.body": "Карты доставляются в течение 5 рабочих дней; API-ключи доступны сразу.",
     "ec.pdf.team.head": "Ваша команда поддержки",
     "ec.pdf.team.body": "Свяжитесь по hello@altery.com. Доступны Пн–Пт, 9:00–18:00 GMT. Отвечаем в течение 4 рабочих часов.",
+    "ec.r.opportunity.head": "Ваша возможность экономии",
+    "ec.r.opportunity.lead": "Компании с вашим объёмом ~€{volume}/мес обычно платят {bankCost}/мес комиссий традиционным банкам. С Altery — {alteryCost}/мес.",
+    "ec.r.opportunity.leaving": "Вы переплачиваете",
+    "ec.r.opportunity.perMonth": "/мес",
+    "ec.r.opportunity.annualPrefix": "Это",
+    "ec.r.opportunity.annualSuffix": "в год",
+    "ec.r.opportunity.note": "Полная разбивка — FX, SWIFT, локальные платежи построчно — в персональном PDF-предложении.",
+    "ec.pdf.costMath.head": "Ваши месячные расходы — сравнение",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Типичный бизнес-банк",
+    "ec.pdf.costMath.subscription": "Подписка плана",
+    "ec.pdf.costMath.fx": "FX-маржа",
+    "ec.pdf.costMath.swift": "Трансграничные (SWIFT)",
+    "ec.pdf.costMath.local": "Локальные платежи",
+    "ec.pdf.costMath.total": "Итого в месяц",
+    "ec.pdf.costMath.savings.label": "Ваша месячная экономия",
+    "ec.pdf.costMath.perMonth": "/мес",
+    "ec.pdf.costMath.perYear": "в год",
+    "ec.pdf.costMath.assumptions": "По вашему объёму ~€{volume}/мес, ~{txCount} транзакций/мес, {fxPct}% FX-экспозиция. Точные цифры подтверждаются при активации.",
+    "ec.pdf.outcomes.head": "На что хватит {amount}/год",
+    "ec.pdf.outcomes.hire": "{value}× senior-найм (UK/EU полная стоимость ~€110k)",
+    "ec.pdf.outcomes.hireMid": "Один middle-найм в команду",
+    "ec.pdf.outcomes.runway": "{value} месяцев дополнительной runway при типичном early-stage burn",
+    "ec.pdf.outcomes.marketing": "~€{value}k квартального маркетингового бюджета",
+    "ec.pdf.comparison.head": "Altery против типичного бизнес-банка",
+    "ec.pdf.comparison.bank": "Типичный бизнес-банк",
+    "ec.pdf.comparison.row.setup.label": "Открытие счёта",
+    "ec.pdf.comparison.row.setup.altery": "10 минут онлайн",
+    "ec.pdf.comparison.row.setup.bank": "4–8 недель, визиты в офис",
+    "ec.pdf.comparison.row.kyb.label": "Прохождение KYB",
+    "ec.pdf.comparison.row.kyb.altery": "Чаще всего в день обращения",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 недели",
+    "ec.pdf.comparison.row.fx.label": "FX-наценка",
+    "ec.pdf.comparison.row.fx.altery": "0,5–0,7%",
+    "ec.pdf.comparison.row.fx.bank": "2–4% типичный спред",
+    "ec.pdf.comparison.row.swift.label": "Трансграничные (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + 0,25% за транзакцию",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 фикс за транзакцию",
+    "ec.pdf.comparison.row.multiCcy.label": "Мульти-валютные счета",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ валют, один дашборд",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 валюта или отдельные счета",
+    "ec.pdf.comparison.row.crypto.label": "Crypto-native бизнес",
+    "ec.pdf.comparison.row.crypto.altery": "Приветствуется",
+    "ec.pdf.comparison.row.crypto.bank": "Часто отказывают",
+    "ec.pdf.comparison.row.api.label": "API-доступ",
+    "ec.pdf.comparison.row.api.altery": "С первого дня",
+    "ec.pdf.comparison.row.api.bank": "По тарифу, недели на одобрение",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-entity (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "Один логин, единая команда",
+    "ec.pdf.comparison.row.multiEntity.bank": "Три отдельных банка",
+    "ec.pdf.checklist.head": "Чек-лист онбординга — 5-мин подготовка",
+    "ec.pdf.checklist.incorporation": "Свидетельство о регистрации (PDF или скан)",
+    "ec.pdf.checklist.directorIds": "Сканы паспортов директоров",
+    "ec.pdf.checklist.addressProof": "Подтверждение адреса — счёт за коммунальные услуги не старше 3 месяцев",
+    "ec.pdf.checklist.businessActivities": "1–2 предложения о деятельности компании",
+    "ec.pdf.checklist.volume": "Месячный объём (уже заполнено из ваших ответов)",
+    "ec.pdf.checklist.note": "Время загрузки: 5–10 мин. Активация: в течение 48 рабочих часов после полной KYB.",
+    "ec.pdf.signature.body": "Я ваша точка контакта по вопросам настройки — ответьте на это письмо или забронируйте 15-мин звонок ниже.",
+    "ec.pdf.validity": "Это предложение действительно 30 дней с момента выпуска. Тарифы и условия подтверждаются при активации.",
+    "ec.handoff.email.title": "Получить полное предложение",
+    "ec.handoff.email.lead": "Детальный PDF, который можно обсудить с командой. Действителен 30 дней.",
+    "ec.handoff.email.value.costPersonal": "Персональная разбивка затрат — увидите ровно как экономите {monthly}/мес",
+    "ec.handoff.email.value.costGeneric": "Персональная разбивка затрат на ваш объём",
+    "ec.handoff.email.value.comparison": "Altery vs типичный банк — для вашего CFO",
+    "ec.handoff.email.value.checklist": "Чек-лист онбординга — подготовитесь за 5 минут",
+    "ec.handoff.trust": "Никакого спама. Никакой рассылки. Только ваш PDF — один раз.",
+    "ec.handoff.sent.nextHead": "Теперь сделайте 3 вещи",
+    "ec.handoff.sent.step1.title": "Проверьте почту",
+    "ec.handoff.sent.step1.body": "Отправлено на {email}",
+    "ec.handoff.sent.step2.title": "Перешлите CFO или co-founder",
+    "ec.handoff.sent.step2.body": "Многие основатели делятся до звонка — это ускоряет решение.",
+    "ec.handoff.sent.step3.title": "Запишитесь на 15-мин звонок",
+    "ec.handoff.sent.step3.link": "Забронировать звонок",
+    "ec.handoff.sent.colleague.head": "Отправить копию коллеге",
+    "ec.handoff.sent.colleague.placeholder": "коллега@вашакомпания.com",
+    "ec.handoff.sent.colleague.send": "Отправить копию",
+    "ec.handoff.sent.colleague.success": "Отправлено на {email}",
     "ec.pdf.team.calendly": "Записаться на 15-минутный звонок",
     "ec.pdf.volumeHint.starter": "Объём небольшой — Starter покрывает повседневные потоки; апгрейд имеет смысл, когда месячный объём перешагнёт €100k.",
     "ec.pdf.volumeHint.standard": "При вашем объёме стандартные рельсы держат нагрузку с запасом. Следите за порогом €100k — это естественная точка перехода на Pro.",
@@ -4103,7 +4578,7 @@
     "ec.handoff.lead": "Setup duurt ongeveer 10 minuten en slaat onderweg op. Pauzeer en pak op waar u was — wanneer u wilt.",
     "ec.handoff.continue": "Start setup",
     "ec.handoff.continueAnyway": "Nu setup starten",
-    "ec.handoff.emailOnly": "Stuur me de volledige analyse om over na te denken",
+    "ec.handoff.emailOnly": "Of stuur me het volledige voorstel",
     "ec.handoff.email.intro": "Waar mogen we het naartoe sturen?",
     "ec.handoff.email.leadHint": "We sturen een volledige PDF-analyse — uw aanbeveling, kosten en setup-link. Pak setup op wanneer u klaar bent.",
     "ec.handoff.email.label": "Zakelijke e-mail",
@@ -4151,6 +4626,83 @@
     "ec.pdf.steps.4.body": "Kaarten geleverd binnen 5 werkdagen; API-sleutels direct beschikbaar.",
     "ec.pdf.team.head": "Uw account-team",
     "ec.pdf.team.body": "Bereik ons op hello@altery.com. Beschikbaar ma–vr, 9:00–18:00 GMT. We reageren binnen 4 werkuren.",
+    "ec.r.opportunity.head": "Uw besparingskans",
+    "ec.r.opportunity.lead": "Bedrijven met uw ~€{volume}/maand-volume geven typisch {bankCost}/maand uit aan klassieke bankkosten. Met Altery wordt dat {alteryCost}/maand.",
+    "ec.r.opportunity.leaving": "U laat liggen op tafel",
+    "ec.r.opportunity.perMonth": "/maand",
+    "ec.r.opportunity.annualPrefix": "Dat is",
+    "ec.r.opportunity.annualSuffix": "per jaar",
+    "ec.r.opportunity.note": "Volledige uitsplitsing — FX, SWIFT, lokale betalingen regel voor regel — staat in uw persoonlijke voorstel-PDF.",
+    "ec.pdf.costMath.head": "Uw maandelijkse kosten — naast elkaar",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Typische zakelijke bank",
+    "ec.pdf.costMath.subscription": "Plan-abonnement",
+    "ec.pdf.costMath.fx": "FX-marges",
+    "ec.pdf.costMath.swift": "Grensoverschrijdend (SWIFT)",
+    "ec.pdf.costMath.local": "Lokale betalingen",
+    "ec.pdf.costMath.total": "Totaal maandelijks",
+    "ec.pdf.costMath.savings.label": "Uw maandelijkse kans",
+    "ec.pdf.costMath.perMonth": "/maand",
+    "ec.pdf.costMath.perYear": "per jaar",
+    "ec.pdf.costMath.assumptions": "Gebaseerd op uw ~€{volume}/maand-volume, ~{txCount} transacties/maand, {fxPct}% FX-exposure. Definitieve cijfers bij activering.",
+    "ec.pdf.outcomes.head": "Wat {amount}/jaar kan financieren",
+    "ec.pdf.outcomes.hire": "{value}× een senior-aanwerving (UK/EU geladen kosten ~€110k)",
+    "ec.pdf.outcomes.hireMid": "Een nieuwe mid-level aanwerving in uw team",
+    "ec.pdf.outcomes.runway": "{value} maanden extra runway bij typische early-stage burn",
+    "ec.pdf.outcomes.marketing": "Ongeveer €{value}k kwartaal-groeibudget",
+    "ec.pdf.comparison.head": "Altery vs. typische zakelijke bank",
+    "ec.pdf.comparison.bank": "Typische zakelijke bank",
+    "ec.pdf.comparison.row.setup.label": "Account-setup",
+    "ec.pdf.comparison.row.setup.altery": "10 minuten online",
+    "ec.pdf.comparison.row.setup.bank": "4–8 weken, kantoorbezoek",
+    "ec.pdf.comparison.row.kyb.label": "KYB-goedkeuring",
+    "ec.pdf.comparison.row.kyb.altery": "Meestal zelfde dag",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 weken",
+    "ec.pdf.comparison.row.fx.label": "FX-opslag",
+    "ec.pdf.comparison.row.fx.altery": "0,5–0,7%",
+    "ec.pdf.comparison.row.fx.bank": "2–4% typische spread",
+    "ec.pdf.comparison.row.swift.label": "Grensoverschrijdend (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + 0,25% per tx",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 vast per tx",
+    "ec.pdf.comparison.row.multiCcy.label": "Multi-valuta-rekeningen",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ valuta's, één dashboard",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 valuta of aparte rekeningen",
+    "ec.pdf.comparison.row.crypto.label": "Crypto-native bedrijven",
+    "ec.pdf.comparison.row.crypto.altery": "Welkom",
+    "ec.pdf.comparison.row.crypto.bank": "Vaak afgewezen",
+    "ec.pdf.comparison.row.api.label": "API-toegang",
+    "ec.pdf.comparison.row.api.altery": "Vanaf dag één",
+    "ec.pdf.comparison.row.api.bank": "Tier-afhankelijk, weken goedkeuring",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-entity (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "Eén login, één team",
+    "ec.pdf.comparison.row.multiEntity.bank": "Drie aparte banken",
+    "ec.pdf.checklist.head": "Onboarding-checklist — 5-min voorbereiding",
+    "ec.pdf.checklist.incorporation": "Uittreksel KvK / oprichtingsakte (PDF of scan)",
+    "ec.pdf.checklist.directorIds": "Paspoortscans van bestuurders",
+    "ec.pdf.checklist.addressProof": "Adresbewijs — energierekening jonger dan 3 maanden",
+    "ec.pdf.checklist.businessActivities": "1–2 zinnen beschrijving van bedrijfsactiviteiten",
+    "ec.pdf.checklist.volume": "Maandvolume (vooraf ingevuld uit uw antwoorden)",
+    "ec.pdf.checklist.note": "Geschatte upload-tijd: 5–10 min. Activering: binnen 48 werkuren na volledige KYB.",
+    "ec.pdf.signature.body": "Ik ben uw contactpersoon voor setup-vragen — beantwoord deze e-mail of boek hieronder een 15-min call.",
+    "ec.pdf.validity": "Dit voorstel is 30 dagen geldig vanaf uitgifte. Prijzen en voorwaarden bevestigd bij activering.",
+    "ec.handoff.email.title": "Ontvang uw volledige voorstel",
+    "ec.handoff.email.lead": "Gedetailleerde PDF om met uw team te bekijken. 30 dagen geldig.",
+    "ec.handoff.email.value.costPersonal": "Persoonlijke kostenuitsplitsing — zie precies hoe u {monthly}/maand bespaart",
+    "ec.handoff.email.value.costGeneric": "Persoonlijke kostenuitsplitsing voor uw maandvolume",
+    "ec.handoff.email.value.comparison": "Altery vs. typische bank — voor uw CFO",
+    "ec.handoff.email.value.checklist": "Onboarding-checklist zodat u zich in 5 minuten kunt voorbereiden",
+    "ec.handoff.trust": "Geen spam. Geen nieuwsbrief. Alleen uw voorstel-PDF — één keer.",
+    "ec.handoff.sent.nextHead": "Doe nu deze 3 dingen",
+    "ec.handoff.sent.step1.title": "Controleer uw inbox",
+    "ec.handoff.sent.step1.body": "Verzonden naar {email}",
+    "ec.handoff.sent.step2.title": "Doorsturen naar uw CFO of medeoprichter",
+    "ec.handoff.sent.step2.body": "Veel oprichters delen vóór de call — dat versnelt de beslissing.",
+    "ec.handoff.sent.step3.title": "Plan een 15-min intro-call",
+    "ec.handoff.sent.step3.link": "Boek een call",
+    "ec.handoff.sent.colleague.head": "Stuur een kopie naar een collega",
+    "ec.handoff.sent.colleague.placeholder": "collega@uwbedrijf.com",
+    "ec.handoff.sent.colleague.send": "Kopie sturen",
+    "ec.handoff.sent.colleague.success": "Verzonden naar {email}",
     "ec.pdf.team.calendly": "Plan een 15-min intro-gesprek",
     "ec.pdf.volumeHint.starter": "Klein begonnen — Starter-rails dekken dagelijkse stromen; upgrade-trigger zodra het maandvolume €100k passeert.",
     "ec.pdf.volumeHint.standard": "Bij uw volume dragen de standaardrails de belasting comfortabel. Houd de €100k-drempel in de gaten als groei versnelt — dat is het natuurlijke Pro-upgrademoment.",
@@ -4405,7 +4957,7 @@
     "ec.handoff.lead": "Kurulum yaklaşık 10 dakika sürer ve ilerledikçe kaydedilir. Ne zaman isterseniz duraklatın ve devam edin.",
     "ec.handoff.continue": "Kuruluma başla",
     "ec.handoff.continueAnyway": "Şimdi kuruluma başla",
-    "ec.handoff.emailOnly": "Düşünmek için tam analizi bana e-postayla gönder",
+    "ec.handoff.emailOnly": "Veya bana tam teklifi gönderin",
     "ec.handoff.email.intro": "Nereye gönderelim?",
     "ec.handoff.email.leadHint": "Tam PDF analizini göndereceğiz — öneriniz, ücretler ve kurulum linki. Kurulumu hazır olduğunuzda yapabilirsiniz.",
     "ec.handoff.email.label": "İş e-postası",
@@ -4453,6 +5005,83 @@
     "ec.pdf.steps.4.body": "Kartlar 5 iş günü içinde teslim; API anahtarları hemen kullanılabilir.",
     "ec.pdf.team.head": "Hesap ekibiniz",
     "ec.pdf.team.body": "hello@altery.com üzerinden bize ulaşın. Pzt–Cum 9:00–18:00 GMT arası. 4 iş saati içinde yanıtlıyoruz.",
+    "ec.r.opportunity.head": "Tasarruf fırsatınız",
+    "ec.r.opportunity.lead": "Sizin ~€{volume}/ay hacminizdeki şirketler tipik olarak geleneksel banka ücretlerine {bankCost}/ay harcar. Altery ile bu {alteryCost}/ay'a düşer.",
+    "ec.r.opportunity.leaving": "Masada bırakıyorsunuz",
+    "ec.r.opportunity.perMonth": "/ay",
+    "ec.r.opportunity.annualPrefix": "Bu",
+    "ec.r.opportunity.annualSuffix": "yıllık",
+    "ec.r.opportunity.note": "Tam döküm — FX, SWIFT, yerel ödeme matematiği satır satır — kişisel teklif PDF'inizde.",
+    "ec.pdf.costMath.head": "Aylık maliyetiniz — yan yana",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Tipik ticari banka",
+    "ec.pdf.costMath.subscription": "Plan aboneliği",
+    "ec.pdf.costMath.fx": "FX marjları",
+    "ec.pdf.costMath.swift": "Sınır ötesi (SWIFT)",
+    "ec.pdf.costMath.local": "Yerel ödemeler",
+    "ec.pdf.costMath.total": "Aylık toplam",
+    "ec.pdf.costMath.savings.label": "Aylık fırsatınız",
+    "ec.pdf.costMath.perMonth": "/ay",
+    "ec.pdf.costMath.perYear": "yıllık",
+    "ec.pdf.costMath.assumptions": "~€{volume}/ay hacminize, ~{txCount} işlem/ay, %{fxPct} FX maruziyetine göre. Gerçek rakamlar aktivasyonda netleşir.",
+    "ec.pdf.outcomes.head": "{amount}/yıl neyi finanse edebilir",
+    "ec.pdf.outcomes.hire": "{value}× kıdemli işe alım (UK/EU yüklü maliyet ~€110k)",
+    "ec.pdf.outcomes.hireMid": "Ekibinize yeni bir orta seviye işe alım",
+    "ec.pdf.outcomes.runway": "Tipik erken aşama burn'de {value} ay ek runway",
+    "ec.pdf.outcomes.marketing": "Yaklaşık €{value}k çeyreklik büyüme bütçesi",
+    "ec.pdf.comparison.head": "Altery vs. tipik ticari banka",
+    "ec.pdf.comparison.bank": "Tipik ticari banka",
+    "ec.pdf.comparison.row.setup.label": "Hesap açılışı",
+    "ec.pdf.comparison.row.setup.altery": "10 dakika online",
+    "ec.pdf.comparison.row.setup.bank": "4–8 hafta, şube ziyaretleri",
+    "ec.pdf.comparison.row.kyb.label": "KYB onayı",
+    "ec.pdf.comparison.row.kyb.altery": "Çoğu durumda aynı gün",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 hafta",
+    "ec.pdf.comparison.row.fx.label": "FX marjı",
+    "ec.pdf.comparison.row.fx.altery": "%0,5–0,7",
+    "ec.pdf.comparison.row.fx.bank": "%2–4 tipik spread",
+    "ec.pdf.comparison.row.swift.label": "Sınır ötesi (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + %0,25 işlem başı",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 sabit işlem başı",
+    "ec.pdf.comparison.row.multiCcy.label": "Çoklu para birimi hesapları",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ para birimi, tek dashboard",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 para birimi veya ayrı hesaplar",
+    "ec.pdf.comparison.row.crypto.label": "Crypto-native şirketler",
+    "ec.pdf.comparison.row.crypto.altery": "Hoş geldiniz",
+    "ec.pdf.comparison.row.crypto.bank": "Sık reddedilir",
+    "ec.pdf.comparison.row.api.label": "API erişimi",
+    "ec.pdf.comparison.row.api.altery": "İlk günden",
+    "ec.pdf.comparison.row.api.bank": "Seviyeye bağlı, haftalar süren onay",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-entity (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "Tek giriş, birleşik ekip",
+    "ec.pdf.comparison.row.multiEntity.bank": "Üç ayrı banka",
+    "ec.pdf.checklist.head": "Onboarding kontrol listesi — 5-dk hazırlık",
+    "ec.pdf.checklist.incorporation": "Kuruluş belgesi (PDF veya tarama)",
+    "ec.pdf.checklist.directorIds": "Direktörlerin pasaport taramaları",
+    "ec.pdf.checklist.addressProof": "Adres kanıtı — 3 aydan eski olmayan fatura",
+    "ec.pdf.checklist.businessActivities": "Faaliyetlerinizin 1–2 cümle açıklaması",
+    "ec.pdf.checklist.volume": "Aylık hacim (cevaplarınızdan otomatik dolduruldu)",
+    "ec.pdf.checklist.note": "Tahmini yükleme süresi: 5–10 dk. Aktivasyon: tam KYB'den sonra 48 iş saati içinde.",
+    "ec.pdf.signature.body": "Kurulum sorularında temas noktanız ben olacağım — bu e-postaya yanıt verin veya aşağıdan 15 dakikalık görüşme alın.",
+    "ec.pdf.validity": "Bu teklif düzenlemeden itibaren 30 gün geçerlidir. Fiyatlar ve şartlar aktivasyonda onaylanır.",
+    "ec.handoff.email.title": "Tam teklifinizi alın",
+    "ec.handoff.email.lead": "Ekibinizle birlikte inceleyebileceğiniz detaylı PDF. 30 gün geçerli.",
+    "ec.handoff.email.value.costPersonal": "Kişisel maliyet dökümü — {monthly}/ay nasıl tasarruf ettiğinizi tam görün",
+    "ec.handoff.email.value.costGeneric": "Aylık hacminize özel maliyet dökümü",
+    "ec.handoff.email.value.comparison": "Altery vs tipik banka karşılaştırması — CFO'nuz için",
+    "ec.handoff.email.value.checklist": "5 dakikada hazırlanmanız için onboarding kontrol listesi",
+    "ec.handoff.trust": "Spam yok. Bülten yok. Sadece teklifin PDF'i — bir kez.",
+    "ec.handoff.sent.nextHead": "Şimdi şu 3 şeyi yapın",
+    "ec.handoff.sent.step1.title": "Gelen kutunuzu kontrol edin",
+    "ec.handoff.sent.step1.body": "{email} adresine gönderildi",
+    "ec.handoff.sent.step2.title": "CFO veya kurucu ortağınıza iletin",
+    "ec.handoff.sent.step2.body": "Birçok kurucu görüşmeden önce paylaşır — kararı hızlandırır.",
+    "ec.handoff.sent.step3.title": "15-dakikalık tanışma görüşmesi planlayın",
+    "ec.handoff.sent.step3.link": "Görüşme planla",
+    "ec.handoff.sent.colleague.head": "Bir meslektaşa kopya gönder",
+    "ec.handoff.sent.colleague.placeholder": "meslektas@sirketiniz.com",
+    "ec.handoff.sent.colleague.send": "Kopya gönder",
+    "ec.handoff.sent.colleague.success": "{email} adresine gönderildi",
     "ec.pdf.team.calendly": "15 dakikalık tanışma görüşmesi planla",
     "ec.pdf.volumeHint.starter": "Küçük başlıyorsunuz — Starter altyapıları günlük akışları karşılar; aylık hacim €100k'yi geçtiğinde yükseltme zamanı gelir.",
     "ec.pdf.volumeHint.standard": "Sizin hacminizde standart altyapılar yükü rahatça taşır. Büyüme hızlandıkça €100k eşiğine dikkat edin — Pro'ya yükseltmenin doğal noktası burası.",
@@ -4713,7 +5342,7 @@
     "ec.handoff.lead": "La configurazione richiede circa 10 minuti e si salva man mano. Mettila in pausa e riprendi quando vuoi.",
     "ec.handoff.continue": "Inizia configurazione",
     "ec.handoff.continueAnyway": "Inizia configurazione ora",
-    "ec.handoff.emailOnly": "Inviami l'analisi completa per pensarci",
+    "ec.handoff.emailOnly": "O inviami la proposta completa",
     "ec.handoff.email.intro": "Dove la inviamo?",
     "ec.handoff.email.leadHint": "Invieremo un'analisi PDF completa — la tua raccomandazione, tariffe e link di configurazione. Riprendi quando sei pronto.",
     "ec.handoff.email.label": "Email aziendale",
@@ -4761,6 +5390,83 @@
     "ec.pdf.steps.4.body": "Carte consegnate entro 5 giorni lavorativi; chiavi API disponibili subito.",
     "ec.pdf.team.head": "Il tuo team account",
     "ec.pdf.team.body": "Contattaci a hello@altery.com. Disponibili Lun–Ven, 9:00–18:00 GMT. Rispondiamo entro 4 ore lavorative.",
+    "ec.r.opportunity.head": "La tua opportunità di risparmio",
+    "ec.r.opportunity.lead": "Le aziende con il tuo volume di ~€{volume}/mese spendono tipicamente {bankCost}/mese in commissioni bancarie tradizionali. Con Altery scendono a {alteryCost}/mese.",
+    "ec.r.opportunity.leaving": "Stai lasciando sul tavolo",
+    "ec.r.opportunity.perMonth": "/mese",
+    "ec.r.opportunity.annualPrefix": "Cioè",
+    "ec.r.opportunity.annualSuffix": "all'anno",
+    "ec.r.opportunity.note": "Ripartizione completa — FX, SWIFT, pagamenti locali riga per riga — nel tuo PDF di proposta personale.",
+    "ec.pdf.costMath.head": "Il tuo costo mensile — confronto diretto",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Banca aziendale tipica",
+    "ec.pdf.costMath.subscription": "Abbonamento al piano",
+    "ec.pdf.costMath.fx": "Margini FX",
+    "ec.pdf.costMath.swift": "Transfrontalieri (SWIFT)",
+    "ec.pdf.costMath.local": "Pagamenti locali",
+    "ec.pdf.costMath.total": "Totale mensile",
+    "ec.pdf.costMath.savings.label": "La tua opportunità mensile",
+    "ec.pdf.costMath.perMonth": "/mese",
+    "ec.pdf.costMath.perYear": "all'anno",
+    "ec.pdf.costMath.assumptions": "Basato sul tuo volume di ~€{volume}/mese, ~{txCount} transazioni/mese, {fxPct}% esposizione FX. Numeri reali precisati all'attivazione.",
+    "ec.pdf.outcomes.head": "Cosa potrebbero finanziare {amount}/anno",
+    "ec.pdf.outcomes.hire": "{value}× assunzione senior (UK/EU costo caricato ~€110k)",
+    "ec.pdf.outcomes.hireMid": "Una nuova assunzione mid-level nel tuo team",
+    "ec.pdf.outcomes.runway": "{value} mesi di runway aggiuntiva al typical early-stage burn",
+    "ec.pdf.outcomes.marketing": "Circa €{value}k di budget di crescita trimestrale",
+    "ec.pdf.comparison.head": "Altery vs banca aziendale tipica",
+    "ec.pdf.comparison.bank": "Banca aziendale tipica",
+    "ec.pdf.comparison.row.setup.label": "Apertura conto",
+    "ec.pdf.comparison.row.setup.altery": "10 minuti online",
+    "ec.pdf.comparison.row.setup.bank": "4–8 settimane, visite in filiale",
+    "ec.pdf.comparison.row.kyb.label": "Approvazione KYB",
+    "ec.pdf.comparison.row.kyb.altery": "Stesso giorno nella maggior parte dei casi",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 settimane",
+    "ec.pdf.comparison.row.fx.label": "Margine FX",
+    "ec.pdf.comparison.row.fx.altery": "0,5–0,7%",
+    "ec.pdf.comparison.row.fx.bank": "2–4% spread tipico",
+    "ec.pdf.comparison.row.swift.label": "Transfrontalieri (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + 0,25% per transazione",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 fissi per transazione",
+    "ec.pdf.comparison.row.multiCcy.label": "Conti multi-valuta",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ valute, una dashboard",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 valuta o conti separati",
+    "ec.pdf.comparison.row.crypto.label": "Aziende crypto-native",
+    "ec.pdf.comparison.row.crypto.altery": "Benvenute",
+    "ec.pdf.comparison.row.crypto.bank": "Spesso rifiutate",
+    "ec.pdf.comparison.row.api.label": "Accesso API",
+    "ec.pdf.comparison.row.api.altery": "Dal primo giorno",
+    "ec.pdf.comparison.row.api.bank": "Per tier, settimane di approvazione",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-entità (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "Un login, team unificato",
+    "ec.pdf.comparison.row.multiEntity.bank": "Tre banche separate",
+    "ec.pdf.checklist.head": "Checklist onboarding — 5 min di preparazione",
+    "ec.pdf.checklist.incorporation": "Certificato di costituzione (PDF o scansione)",
+    "ec.pdf.checklist.directorIds": "Scansioni passaporto degli amministratori",
+    "ec.pdf.checklist.addressProof": "Prova di residenza — bolletta di meno di 3 mesi",
+    "ec.pdf.checklist.businessActivities": "Descrizione delle attività in 1–2 frasi",
+    "ec.pdf.checklist.volume": "Volume mensile (precompilato dalle tue risposte)",
+    "ec.pdf.checklist.note": "Tempo stimato di upload: 5–10 min. Attivazione: entro 48 ore lavorative dopo KYB completo.",
+    "ec.pdf.signature.body": "Sarò il tuo punto di contatto per le domande sulla configurazione — rispondi direttamente a questa email o prenota una call di 15 min sotto.",
+    "ec.pdf.validity": "Questa proposta è valida 30 giorni dall'emissione. Prezzi e condizioni confermati all'attivazione.",
+    "ec.handoff.email.title": "Ricevi la proposta completa",
+    "ec.handoff.email.lead": "PDF dettagliato da condividere con il team. Valido 30 giorni.",
+    "ec.handoff.email.value.costPersonal": "Ripartizione personale dei costi — vedi esattamente come risparmi {monthly}/mese",
+    "ec.handoff.email.value.costGeneric": "Ripartizione personale dei costi per il tuo volume mensile",
+    "ec.handoff.email.value.comparison": "Confronto Altery vs banca tipica — per il tuo CFO",
+    "ec.handoff.email.value.checklist": "Checklist di onboarding per prepararti in 5 minuti",
+    "ec.handoff.trust": "Niente spam. Niente newsletter. Solo il tuo PDF di proposta — una volta.",
+    "ec.handoff.sent.nextHead": "Ora fai queste 3 cose",
+    "ec.handoff.sent.step1.title": "Controlla la tua casella",
+    "ec.handoff.sent.step1.body": "Inviato a {email}",
+    "ec.handoff.sent.step2.title": "Inoltra al tuo CFO o co-founder",
+    "ec.handoff.sent.step2.body": "Molti fondatori condividono prima della call — accelera la decisione.",
+    "ec.handoff.sent.step3.title": "Prenota una call introduttiva di 15 min",
+    "ec.handoff.sent.step3.link": "Prenota una call",
+    "ec.handoff.sent.colleague.head": "Invia una copia a un collega",
+    "ec.handoff.sent.colleague.placeholder": "collega@tuaazienda.com",
+    "ec.handoff.sent.colleague.send": "Invia copia",
+    "ec.handoff.sent.colleague.success": "Inviato a {email}",
     "ec.pdf.team.calendly": "Prenota una call introduttiva di 15 min",
     "ec.pdf.volumeHint.starter": "Si parte piccoli — i binari Starter coprono i flussi quotidiani; il momento dell'upgrade arriva quando il volume mensile supera €100k.",
     "ec.pdf.volumeHint.standard": "Al tuo volume i binari standard reggono il carico con margine. Tieni d'occhio la soglia €100k quando la crescita accelera — è il punto naturale di passaggio a Pro.",
@@ -5015,7 +5721,7 @@
     "ec.handoff.lead": "La configuración tarda unos 10 minutos y se guarda sobre la marcha. Pausa y retoma cuando quieras.",
     "ec.handoff.continue": "Iniciar configuración",
     "ec.handoff.continueAnyway": "Iniciar configuración ahora",
-    "ec.handoff.emailOnly": "Envíame el análisis completo para pensarlo",
+    "ec.handoff.emailOnly": "O envíame la propuesta completa",
     "ec.handoff.email.intro": "¿Dónde te lo enviamos?",
     "ec.handoff.email.leadHint": "Enviaremos un análisis PDF completo — tu recomendación, tarifas y enlace de configuración. Retoma cuando estés listo.",
     "ec.handoff.email.label": "Email de trabajo",
@@ -5063,6 +5769,83 @@
     "ec.pdf.steps.4.body": "Tarjetas entregadas en 5 días hábiles; claves API disponibles al instante.",
     "ec.pdf.team.head": "Tu equipo de cuenta",
     "ec.pdf.team.body": "Contáctanos en hello@altery.com. Disponibles Lun–Vie, 9:00–18:00 GMT. Respondemos en 4 horas laborables.",
+    "ec.r.opportunity.head": "Tu oportunidad de ahorro",
+    "ec.r.opportunity.lead": "Empresas con tu volumen de ~€{volume}/mes suelen gastar {bankCost}/mes en comisiones bancarias tradicionales. Con Altery baja a {alteryCost}/mes.",
+    "ec.r.opportunity.leaving": "Estás dejando sobre la mesa",
+    "ec.r.opportunity.perMonth": "/mes",
+    "ec.r.opportunity.annualPrefix": "Eso son",
+    "ec.r.opportunity.annualSuffix": "al año",
+    "ec.r.opportunity.note": "Desglose completo — FX, SWIFT, pagos locales línea por línea — en tu PDF de propuesta personal.",
+    "ec.pdf.costMath.head": "Tu coste mensual — lado a lado",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Banco empresarial típico",
+    "ec.pdf.costMath.subscription": "Suscripción del plan",
+    "ec.pdf.costMath.fx": "Márgenes FX",
+    "ec.pdf.costMath.swift": "Transfronterizos (SWIFT)",
+    "ec.pdf.costMath.local": "Pagos locales",
+    "ec.pdf.costMath.total": "Total mensual",
+    "ec.pdf.costMath.savings.label": "Tu oportunidad mensual",
+    "ec.pdf.costMath.perMonth": "/mes",
+    "ec.pdf.costMath.perYear": "al año",
+    "ec.pdf.costMath.assumptions": "Basado en tu volumen de ~€{volume}/mes, ~{txCount} transacciones/mes, {fxPct}% exposición FX. Cifras reales precisadas en la activación.",
+    "ec.pdf.outcomes.head": "Qué podrían financiar {amount}/año",
+    "ec.pdf.outcomes.hire": "{value}× contratación senior (UK/EU coste cargado ~€110k)",
+    "ec.pdf.outcomes.hireMid": "Una nueva contratación mid-level en tu equipo",
+    "ec.pdf.outcomes.runway": "{value} meses de runway adicional al typical early-stage burn",
+    "ec.pdf.outcomes.marketing": "Aproximadamente €{value}k de presupuesto trimestral de crecimiento",
+    "ec.pdf.comparison.head": "Altery vs banco empresarial típico",
+    "ec.pdf.comparison.bank": "Banco empresarial típico",
+    "ec.pdf.comparison.row.setup.label": "Apertura de cuenta",
+    "ec.pdf.comparison.row.setup.altery": "10 minutos online",
+    "ec.pdf.comparison.row.setup.bank": "4–8 semanas, visitas a sucursal",
+    "ec.pdf.comparison.row.kyb.label": "Aprobación KYB",
+    "ec.pdf.comparison.row.kyb.altery": "Mismo día en la mayoría de casos",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 semanas",
+    "ec.pdf.comparison.row.fx.label": "Margen FX",
+    "ec.pdf.comparison.row.fx.altery": "0,5–0,7%",
+    "ec.pdf.comparison.row.fx.bank": "2–4% spread típico",
+    "ec.pdf.comparison.row.swift.label": "Transfronterizos (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + 0,25% por tx",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 fijos por tx",
+    "ec.pdf.comparison.row.multiCcy.label": "Cuentas multidivisa",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ divisas, un dashboard",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 divisa o cuentas separadas",
+    "ec.pdf.comparison.row.crypto.label": "Empresas crypto-native",
+    "ec.pdf.comparison.row.crypto.altery": "Bienvenidas",
+    "ec.pdf.comparison.row.crypto.bank": "Rechazadas con frecuencia",
+    "ec.pdf.comparison.row.api.label": "Acceso API",
+    "ec.pdf.comparison.row.api.altery": "Desde el primer día",
+    "ec.pdf.comparison.row.api.bank": "Por tier, semanas de aprobación",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-entidad (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "Un login, equipo unificado",
+    "ec.pdf.comparison.row.multiEntity.bank": "Tres bancos separados",
+    "ec.pdf.checklist.head": "Lista de onboarding — 5 min de preparación",
+    "ec.pdf.checklist.incorporation": "Certificado de constitución (PDF o escaneo)",
+    "ec.pdf.checklist.directorIds": "Escaneos de pasaporte de los administradores",
+    "ec.pdf.checklist.addressProof": "Prueba de domicilio — factura de menos de 3 meses",
+    "ec.pdf.checklist.businessActivities": "Descripción de actividades en 1–2 frases",
+    "ec.pdf.checklist.volume": "Volumen mensual (precargado desde tus respuestas)",
+    "ec.pdf.checklist.note": "Tiempo estimado de subida: 5–10 min. Activación: dentro de 48 horas laborables tras KYB completo.",
+    "ec.pdf.signature.body": "Seré tu punto de contacto para preguntas de configuración — responde directamente a este email o reserva una llamada de 15 min abajo.",
+    "ec.pdf.validity": "Esta propuesta es válida 30 días desde su emisión. Precios y términos confirmados en la activación.",
+    "ec.handoff.email.title": "Recibe tu propuesta completa",
+    "ec.handoff.email.lead": "PDF detallado para revisar con tu equipo. Válido 30 días.",
+    "ec.handoff.email.value.costPersonal": "Desglose personal de costes — ve exactamente cómo ahorras {monthly}/mes",
+    "ec.handoff.email.value.costGeneric": "Desglose personal de costes para tu volumen mensual",
+    "ec.handoff.email.value.comparison": "Comparación Altery vs banco típico — para tu CFO",
+    "ec.handoff.email.value.checklist": "Lista de onboarding para que te prepares en 5 minutos",
+    "ec.handoff.trust": "Sin spam. Sin newsletter. Solo tu PDF de propuesta — una vez.",
+    "ec.handoff.sent.nextHead": "Ahora haz estas 3 cosas",
+    "ec.handoff.sent.step1.title": "Revisa tu bandeja de entrada",
+    "ec.handoff.sent.step1.body": "Enviado a {email}",
+    "ec.handoff.sent.step2.title": "Reenvía a tu CFO o cofundador",
+    "ec.handoff.sent.step2.body": "Muchos fundadores comparten antes de la llamada — acelera la decisión.",
+    "ec.handoff.sent.step3.title": "Agenda una llamada introductoria de 15 min",
+    "ec.handoff.sent.step3.link": "Reservar llamada",
+    "ec.handoff.sent.colleague.head": "Envía una copia a un colega",
+    "ec.handoff.sent.colleague.placeholder": "colega@tuempresa.com",
+    "ec.handoff.sent.colleague.send": "Enviar copia",
+    "ec.handoff.sent.colleague.success": "Enviado a {email}",
     "ec.pdf.team.calendly": "Agenda una llamada introductoria de 15 min",
     "ec.pdf.volumeHint.starter": "Empezando pequeño — los rieles Starter cubren los flujos cotidianos; el momento de actualizar llega cuando el volumen mensual supera los €100k.",
     "ec.pdf.volumeHint.standard": "Con tu volumen los rieles estándar soportan la carga con margen. Vigila el umbral de €100k cuando el crecimiento se acelere — es el punto natural de paso a Pro.",
@@ -5324,7 +6107,7 @@
     "ec.handoff.lead": "Konfiguracja zajmuje około 10 minut i zapisuje się na bieżąco. Wstrzymaj i wróć, kiedy chcesz.",
     "ec.handoff.continue": "Rozpocznij konfigurację",
     "ec.handoff.continueAnyway": "Rozpocznij konfigurację teraz",
-    "ec.handoff.emailOnly": "Wyślij mi pełną analizę do przemyślenia",
+    "ec.handoff.emailOnly": "Lub wyślij mi pełną ofertę",
     "ec.handoff.email.intro": "Gdzie ją wysłać?",
     "ec.handoff.email.leadHint": "Wyślemy pełną analizę PDF — Twoją rekomendację, opłaty i link do konfiguracji. Wróć, kiedy będziesz gotów.",
     "ec.handoff.email.label": "Email firmowy",
@@ -5372,6 +6155,83 @@
     "ec.pdf.steps.4.body": "Karty dostarczane w 5 dni roboczych; klucze API dostępne natychmiast.",
     "ec.pdf.team.head": "Twój zespół konta",
     "ec.pdf.team.body": "Skontaktuj się pod hello@altery.com. Dostępni Pn–Pt, 9:00–18:00 GMT. Odpowiadamy w ciągu 4 godzin roboczych.",
+    "ec.r.opportunity.head": "Twoja szansa na oszczędności",
+    "ec.r.opportunity.lead": "Firmy z Twoim wolumenem ~€{volume}/mies typowo wydają {bankCost}/mies na tradycyjne opłaty bankowe. Z Altery to spada do {alteryCost}/mies.",
+    "ec.r.opportunity.leaving": "Zostawiasz na stole",
+    "ec.r.opportunity.perMonth": "/mies",
+    "ec.r.opportunity.annualPrefix": "To",
+    "ec.r.opportunity.annualSuffix": "rocznie",
+    "ec.r.opportunity.note": "Pełne wyliczenie — FX, SWIFT, płatności lokalne linia po linii — w Twoim spersonalizowanym PDF z ofertą.",
+    "ec.pdf.costMath.head": "Twój miesięczny koszt — porównanie",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Typowy bank biznesowy",
+    "ec.pdf.costMath.subscription": "Subskrypcja planu",
+    "ec.pdf.costMath.fx": "Marże FX",
+    "ec.pdf.costMath.swift": "Międzynarodowe (SWIFT)",
+    "ec.pdf.costMath.local": "Płatności lokalne",
+    "ec.pdf.costMath.total": "Razem miesięcznie",
+    "ec.pdf.costMath.savings.label": "Twoja miesięczna szansa",
+    "ec.pdf.costMath.perMonth": "/mies",
+    "ec.pdf.costMath.perYear": "rocznie",
+    "ec.pdf.costMath.assumptions": "Na podstawie Twojego wolumenu ~€{volume}/mies, ~{txCount} transakcji/mies, {fxPct}% ekspozycji FX. Dokładne liczby uściślane przy aktywacji.",
+    "ec.pdf.outcomes.head": "Co może sfinansować {amount}/rok",
+    "ec.pdf.outcomes.hire": "{value}× rekrutacja senior (UK/EU koszt całkowity ~€110k)",
+    "ec.pdf.outcomes.hireMid": "Nowa rekrutacja mid-level w Twoim zespole",
+    "ec.pdf.outcomes.runway": "{value} miesięcy dodatkowego runway przy typowym early-stage burn",
+    "ec.pdf.outcomes.marketing": "Około €{value}k kwartalnego budżetu wzrostu",
+    "ec.pdf.comparison.head": "Altery vs typowy bank biznesowy",
+    "ec.pdf.comparison.bank": "Typowy bank biznesowy",
+    "ec.pdf.comparison.row.setup.label": "Otwarcie konta",
+    "ec.pdf.comparison.row.setup.altery": "10 minut online",
+    "ec.pdf.comparison.row.setup.bank": "4–8 tygodni, wizyty w oddziale",
+    "ec.pdf.comparison.row.kyb.label": "Weryfikacja KYB",
+    "ec.pdf.comparison.row.kyb.altery": "Tego samego dnia w większości przypadków",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 tygodnie",
+    "ec.pdf.comparison.row.fx.label": "Marża FX",
+    "ec.pdf.comparison.row.fx.altery": "0,5–0,7%",
+    "ec.pdf.comparison.row.fx.bank": "2–4% typowy spread",
+    "ec.pdf.comparison.row.swift.label": "Międzynarodowe (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + 0,25% za transakcję",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 stałe za transakcję",
+    "ec.pdf.comparison.row.multiCcy.label": "Konta wielowalutowe",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ walut, jeden dashboard",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 waluta lub osobne konta",
+    "ec.pdf.comparison.row.crypto.label": "Firmy crypto-native",
+    "ec.pdf.comparison.row.crypto.altery": "Mile widziane",
+    "ec.pdf.comparison.row.crypto.bank": "Często odrzucane",
+    "ec.pdf.comparison.row.api.label": "Dostęp do API",
+    "ec.pdf.comparison.row.api.altery": "Od pierwszego dnia",
+    "ec.pdf.comparison.row.api.bank": "Zależnie od tieru, tygodnie zatwierdzania",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-entity (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "Jeden login, zjednoczony zespół",
+    "ec.pdf.comparison.row.multiEntity.bank": "Trzy osobne banki",
+    "ec.pdf.checklist.head": "Lista onboardingowa — 5 min przygotowań",
+    "ec.pdf.checklist.incorporation": "Wpis do KRS / certyfikat rejestracji (PDF lub skan)",
+    "ec.pdf.checklist.directorIds": "Skany paszportów członków zarządu",
+    "ec.pdf.checklist.addressProof": "Potwierdzenie adresu — rachunek za media nie starszy niż 3 miesiące",
+    "ec.pdf.checklist.businessActivities": "Opis działalności w 1–2 zdaniach",
+    "ec.pdf.checklist.volume": "Miesięczny wolumen (wstępnie wypełniony z Twoich odpowiedzi)",
+    "ec.pdf.checklist.note": "Szacowany czas uploadu: 5–10 min. Aktywacja: w ciągu 48 godzin roboczych po pełnym KYB.",
+    "ec.pdf.signature.body": "Będę Twoim punktem kontaktowym w sprawach setupu — odpowiedz bezpośrednio na ten email lub umów 15-min rozmowę poniżej.",
+    "ec.pdf.validity": "Ta oferta jest ważna 30 dni od daty wystawienia. Ceny i warunki potwierdzane przy aktywacji.",
+    "ec.handoff.email.title": "Odbierz pełną ofertę",
+    "ec.handoff.email.lead": "Szczegółowy PDF do przejrzenia z zespołem. Ważny 30 dni.",
+    "ec.handoff.email.value.costPersonal": "Osobiste wyliczenie kosztów — zobacz dokładnie jak oszczędzasz {monthly}/mies",
+    "ec.handoff.email.value.costGeneric": "Osobiste wyliczenie kosztów dla Twojego miesięcznego wolumenu",
+    "ec.handoff.email.value.comparison": "Porównanie Altery vs typowy bank — dla Twojego CFO",
+    "ec.handoff.email.value.checklist": "Lista onboardingowa, żebyś przygotował się w 5 minut",
+    "ec.handoff.trust": "Bez spamu. Bez newslettera. Tylko Twój PDF z ofertą — raz.",
+    "ec.handoff.sent.nextHead": "Teraz zrób te 3 rzeczy",
+    "ec.handoff.sent.step1.title": "Sprawdź skrzynkę",
+    "ec.handoff.sent.step1.body": "Wysłano na {email}",
+    "ec.handoff.sent.step2.title": "Przekaż swojemu CFO lub współzałożycielowi",
+    "ec.handoff.sent.step2.body": "Wielu founderów dzieli się przed rozmową — to przyspiesza decyzję.",
+    "ec.handoff.sent.step3.title": "Umów 15-min rozmowę wprowadzającą",
+    "ec.handoff.sent.step3.link": "Zarezerwuj rozmowę",
+    "ec.handoff.sent.colleague.head": "Wyślij kopię koledze",
+    "ec.handoff.sent.colleague.placeholder": "kolega@twojafirma.com",
+    "ec.handoff.sent.colleague.send": "Wyślij kopię",
+    "ec.handoff.sent.colleague.success": "Wysłano na {email}",
     "ec.pdf.team.calendly": "Umów 15-min rozmowę wprowadzającą",
     "ec.pdf.volumeHint.starter": "Zaczynacie od mniejszych kwot — Starter pokrywa codzienne przepływy; moment na upgrade przychodzi, gdy miesięczny wolumen przekroczy €100k.",
     "ec.pdf.volumeHint.standard": "Przy Waszym wolumenie standardowe szyny komfortowo udźwigną obciążenie. Obserwujcie próg €100k, gdy wzrost przyspieszy — to naturalny moment przejścia na Pro.",
@@ -5626,7 +6486,7 @@
     "ec.handoff.lead": "A configuração demora cerca de 10 minutos e guarda à medida que avança. Pause e retome quando quiser.",
     "ec.handoff.continue": "Iniciar configuração",
     "ec.handoff.continueAnyway": "Iniciar configuração agora",
-    "ec.handoff.emailOnly": "Envie-me a análise completa para pensar",
+    "ec.handoff.emailOnly": "Ou envia-me a proposta completa",
     "ec.handoff.email.intro": "Para onde enviamos?",
     "ec.handoff.email.leadHint": "Enviaremos uma análise PDF completa — a sua recomendação, taxas e link de configuração. Retome quando estiver pronto.",
     "ec.handoff.email.label": "Email profissional",
@@ -5674,6 +6534,83 @@
     "ec.pdf.steps.4.body": "Cartões entregues em 5 dias úteis; chaves API disponíveis imediatamente.",
     "ec.pdf.team.head": "A sua equipa de conta",
     "ec.pdf.team.body": "Contacte-nos em hello@altery.com. Disponíveis Seg–Sex, 9:00–18:00 GMT. Respondemos em 4 horas úteis.",
+    "ec.r.opportunity.head": "A tua oportunidade de poupança",
+    "ec.r.opportunity.lead": "Empresas com o teu volume de ~€{volume}/mês gastam tipicamente {bankCost}/mês em comissões bancárias tradicionais. Com a Altery desce para {alteryCost}/mês.",
+    "ec.r.opportunity.leaving": "Estás a deixar em cima da mesa",
+    "ec.r.opportunity.perMonth": "/mês",
+    "ec.r.opportunity.annualPrefix": "Isso são",
+    "ec.r.opportunity.annualSuffix": "por ano",
+    "ec.r.opportunity.note": "Desdobramento completo — FX, SWIFT, pagamentos locais linha a linha — no teu PDF de proposta pessoal.",
+    "ec.pdf.costMath.head": "O teu custo mensal — lado a lado",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Banco empresarial típico",
+    "ec.pdf.costMath.subscription": "Subscrição do plano",
+    "ec.pdf.costMath.fx": "Margens FX",
+    "ec.pdf.costMath.swift": "Transfronteiriços (SWIFT)",
+    "ec.pdf.costMath.local": "Pagamentos locais",
+    "ec.pdf.costMath.total": "Total mensal",
+    "ec.pdf.costMath.savings.label": "A tua oportunidade mensal",
+    "ec.pdf.costMath.perMonth": "/mês",
+    "ec.pdf.costMath.perYear": "por ano",
+    "ec.pdf.costMath.assumptions": "Baseado no teu volume de ~€{volume}/mês, ~{txCount} transações/mês, {fxPct}% exposição FX. Números reais refinados na ativação.",
+    "ec.pdf.outcomes.head": "O que {amount}/ano poderia financiar",
+    "ec.pdf.outcomes.hire": "{value}× contratação senior (UK/EU custo carregado ~€110k)",
+    "ec.pdf.outcomes.hireMid": "Uma nova contratação mid-level na tua equipa",
+    "ec.pdf.outcomes.runway": "{value} meses de runway adicional ao typical early-stage burn",
+    "ec.pdf.outcomes.marketing": "Cerca de €{value}k de orçamento trimestral de crescimento",
+    "ec.pdf.comparison.head": "Altery vs banco empresarial típico",
+    "ec.pdf.comparison.bank": "Banco empresarial típico",
+    "ec.pdf.comparison.row.setup.label": "Abertura de conta",
+    "ec.pdf.comparison.row.setup.altery": "10 minutos online",
+    "ec.pdf.comparison.row.setup.bank": "4–8 semanas, visitas à agência",
+    "ec.pdf.comparison.row.kyb.label": "Aprovação KYB",
+    "ec.pdf.comparison.row.kyb.altery": "No mesmo dia na maioria dos casos",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 semanas",
+    "ec.pdf.comparison.row.fx.label": "Margem FX",
+    "ec.pdf.comparison.row.fx.altery": "0,5–0,7%",
+    "ec.pdf.comparison.row.fx.bank": "2–4% spread típico",
+    "ec.pdf.comparison.row.swift.label": "Transfronteiriços (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + 0,25% por tx",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 fixos por tx",
+    "ec.pdf.comparison.row.multiCcy.label": "Contas multi-moeda",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ moedas, um dashboard",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 moeda ou contas separadas",
+    "ec.pdf.comparison.row.crypto.label": "Empresas crypto-native",
+    "ec.pdf.comparison.row.crypto.altery": "Bem-vindas",
+    "ec.pdf.comparison.row.crypto.bank": "Frequentemente recusadas",
+    "ec.pdf.comparison.row.api.label": "Acesso à API",
+    "ec.pdf.comparison.row.api.altery": "Desde o primeiro dia",
+    "ec.pdf.comparison.row.api.bank": "Por tier, semanas de aprovação",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-entidade (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "Um login, equipa unificada",
+    "ec.pdf.comparison.row.multiEntity.bank": "Três bancos separados",
+    "ec.pdf.checklist.head": "Checklist de onboarding — 5 min de preparação",
+    "ec.pdf.checklist.incorporation": "Certidão de constituição (PDF ou digitalização)",
+    "ec.pdf.checklist.directorIds": "Digitalizações dos passaportes dos administradores",
+    "ec.pdf.checklist.addressProof": "Comprovativo de morada — fatura com menos de 3 meses",
+    "ec.pdf.checklist.businessActivities": "Descrição das atividades em 1–2 frases",
+    "ec.pdf.checklist.volume": "Volume mensal (pré-preenchido das tuas respostas)",
+    "ec.pdf.checklist.note": "Tempo estimado de upload: 5–10 min. Ativação: dentro de 48 horas úteis após KYB completo.",
+    "ec.pdf.signature.body": "Serei o teu ponto de contacto para questões de configuração — responde diretamente a este email ou agenda uma call de 15 min abaixo.",
+    "ec.pdf.validity": "Esta proposta é válida 30 dias a partir da emissão. Preços e condições confirmados na ativação.",
+    "ec.handoff.email.title": "Recebe a tua proposta completa",
+    "ec.handoff.email.lead": "PDF detalhado para reveres com a tua equipa. Válido 30 dias.",
+    "ec.handoff.email.value.costPersonal": "Desdobramento pessoal de custos — vê exatamente como poupas {monthly}/mês",
+    "ec.handoff.email.value.costGeneric": "Desdobramento pessoal de custos para o teu volume mensal",
+    "ec.handoff.email.value.comparison": "Comparação Altery vs banco típico — para o teu CFO",
+    "ec.handoff.email.value.checklist": "Checklist de onboarding para te preparares em 5 minutos",
+    "ec.handoff.trust": "Sem spam. Sem newsletter. Apenas o teu PDF de proposta — uma vez.",
+    "ec.handoff.sent.nextHead": "Agora faz estas 3 coisas",
+    "ec.handoff.sent.step1.title": "Verifica a tua caixa de entrada",
+    "ec.handoff.sent.step1.body": "Enviado para {email}",
+    "ec.handoff.sent.step2.title": "Encaminha para o teu CFO ou cofundador",
+    "ec.handoff.sent.step2.body": "Muitos founders partilham antes da call — acelera a decisão.",
+    "ec.handoff.sent.step3.title": "Marca uma call introdutória de 15 min",
+    "ec.handoff.sent.step3.link": "Marcar call",
+    "ec.handoff.sent.colleague.head": "Envia uma cópia a um colega",
+    "ec.handoff.sent.colleague.placeholder": "colega@tuaempresa.com",
+    "ec.handoff.sent.colleague.send": "Enviar cópia",
+    "ec.handoff.sent.colleague.success": "Enviado para {email}",
     "ec.pdf.team.calendly": "Marcar uma call introdutória de 15 min",
     "ec.pdf.volumeHint.starter": "A começar pequeno — os trilhos Starter cobrem fluxos diários; o gatilho de upgrade chega quando o volume mensal ultrapassa €100k.",
     "ec.pdf.volumeHint.standard": "Com o seu volume, os trilhos padrão suportam a carga com folga. Fique atento ao limiar de €100k quando o crescimento acelerar — é o ponto natural de passagem para Pro.",
@@ -5926,7 +6863,7 @@
     "ec.handoff.lead": "La configuration prend environ 10 minutes et s'enregistre au fur et à mesure. Mettez en pause et reprenez quand vous voulez.",
     "ec.handoff.continue": "Démarrer la configuration",
     "ec.handoff.continueAnyway": "Démarrer la configuration maintenant",
-    "ec.handoff.emailOnly": "Envoyez-moi l'analyse complète pour y réfléchir",
+    "ec.handoff.emailOnly": "Ou envoyez-moi la proposition complète",
     "ec.handoff.email.intro": "Où l'envoyer ?",
     "ec.handoff.email.leadHint": "Nous enverrons une analyse PDF complète — votre recommandation, frais et lien de configuration. Reprenez quand vous serez prêt.",
     "ec.handoff.email.label": "Email professionnel",
@@ -5974,6 +6911,83 @@
     "ec.pdf.steps.4.body": "Cartes livrées sous 5 jours ouvrés ; clés API disponibles immédiatement.",
     "ec.pdf.team.head": "Votre équipe de compte",
     "ec.pdf.team.body": "Contactez-nous à hello@altery.com. Disponibles Lun–Ven, 9:00–18:00 GMT. Nous répondons sous 4 heures ouvrées.",
+    "ec.r.opportunity.head": "Votre opportunité d'économies",
+    "ec.r.opportunity.lead": "Les entreprises avec votre volume de ~€{volume}/mois dépensent typiquement {bankCost}/mois en frais bancaires traditionnels. Avec Altery, cela descend à {alteryCost}/mois.",
+    "ec.r.opportunity.leaving": "Vous laissez sur la table",
+    "ec.r.opportunity.perMonth": "/mois",
+    "ec.r.opportunity.annualPrefix": "Soit",
+    "ec.r.opportunity.annualSuffix": "par an",
+    "ec.r.opportunity.note": "Ventilation complète — FX, SWIFT, paiements locaux ligne par ligne — dans votre PDF de proposition personnelle.",
+    "ec.pdf.costMath.head": "Votre coût mensuel — côte à côte",
+    "ec.pdf.costMath.altery": "Altery",
+    "ec.pdf.costMath.bank": "Banque d'affaires typique",
+    "ec.pdf.costMath.subscription": "Abonnement au plan",
+    "ec.pdf.costMath.fx": "Marges FX",
+    "ec.pdf.costMath.swift": "Transfrontaliers (SWIFT)",
+    "ec.pdf.costMath.local": "Paiements locaux",
+    "ec.pdf.costMath.total": "Total mensuel",
+    "ec.pdf.costMath.savings.label": "Votre opportunité mensuelle",
+    "ec.pdf.costMath.perMonth": "/mois",
+    "ec.pdf.costMath.perYear": "par an",
+    "ec.pdf.costMath.assumptions": "Basé sur votre volume de ~€{volume}/mois, ~{txCount} transactions/mois, {fxPct}% d'exposition FX. Chiffres réels précisés à l'activation.",
+    "ec.pdf.outcomes.head": "Ce que {amount}/an pourrait financer",
+    "ec.pdf.outcomes.hire": "{value}× un recrutement senior (UK/EU coût chargé ~€110k)",
+    "ec.pdf.outcomes.hireMid": "Un nouveau recrutement mid-level dans votre équipe",
+    "ec.pdf.outcomes.runway": "{value} mois de runway supplémentaire au typical early-stage burn",
+    "ec.pdf.outcomes.marketing": "Environ €{value}k de budget trimestriel de croissance",
+    "ec.pdf.comparison.head": "Altery vs banque d'affaires typique",
+    "ec.pdf.comparison.bank": "Banque d'affaires typique",
+    "ec.pdf.comparison.row.setup.label": "Ouverture de compte",
+    "ec.pdf.comparison.row.setup.altery": "10 minutes en ligne",
+    "ec.pdf.comparison.row.setup.bank": "4–8 semaines, visites en agence",
+    "ec.pdf.comparison.row.kyb.label": "Validation KYB",
+    "ec.pdf.comparison.row.kyb.altery": "Le jour même dans la plupart des cas",
+    "ec.pdf.comparison.row.kyb.bank": "2–4 semaines",
+    "ec.pdf.comparison.row.fx.label": "Marge FX",
+    "ec.pdf.comparison.row.fx.altery": "0,5–0,7%",
+    "ec.pdf.comparison.row.fx.bank": "2–4% spread typique",
+    "ec.pdf.comparison.row.swift.label": "Transfrontaliers (SWIFT)",
+    "ec.pdf.comparison.row.swift.altery": "€10 + 0,25% par tx",
+    "ec.pdf.comparison.row.swift.bank": "€30–60 forfaitaires par tx",
+    "ec.pdf.comparison.row.multiCcy.label": "Comptes multi-devises",
+    "ec.pdf.comparison.row.multiCcy.altery": "30+ devises, un tableau de bord",
+    "ec.pdf.comparison.row.multiCcy.bank": "1 devise ou comptes séparés",
+    "ec.pdf.comparison.row.crypto.label": "Entreprises crypto-native",
+    "ec.pdf.comparison.row.crypto.altery": "Bienvenues",
+    "ec.pdf.comparison.row.crypto.bank": "Souvent refusées",
+    "ec.pdf.comparison.row.api.label": "Accès API",
+    "ec.pdf.comparison.row.api.altery": "Dès le premier jour",
+    "ec.pdf.comparison.row.api.bank": "Selon le tier, semaines d'approbation",
+    "ec.pdf.comparison.row.multiEntity.label": "Multi-entités (UK + EU + MENA)",
+    "ec.pdf.comparison.row.multiEntity.altery": "Un login, équipe unifiée",
+    "ec.pdf.comparison.row.multiEntity.bank": "Trois banques séparées",
+    "ec.pdf.checklist.head": "Checklist d'onboarding — 5 min de préparation",
+    "ec.pdf.checklist.incorporation": "Certificat d'immatriculation (PDF ou scan)",
+    "ec.pdf.checklist.directorIds": "Scans de passeport des dirigeants",
+    "ec.pdf.checklist.addressProof": "Justificatif de domicile — facture de moins de 3 mois",
+    "ec.pdf.checklist.businessActivities": "Description de l'activité en 1–2 phrases",
+    "ec.pdf.checklist.volume": "Volume mensuel (pré-rempli depuis vos réponses)",
+    "ec.pdf.checklist.note": "Temps d'upload estimé : 5–10 min. Activation : sous 48 heures ouvrées après KYB complet.",
+    "ec.pdf.signature.body": "Je serai votre point de contact pour les questions de configuration — répondez directement à cet email ou réservez un appel de 15 min ci-dessous.",
+    "ec.pdf.validity": "Cette proposition est valable 30 jours à compter de l'émission. Tarifs et conditions confirmés à l'activation.",
+    "ec.handoff.email.title": "Recevez votre proposition complète",
+    "ec.handoff.email.lead": "PDF détaillé à examiner avec votre équipe. Valable 30 jours.",
+    "ec.handoff.email.value.costPersonal": "Ventilation personnelle des coûts — voyez exactement comment vous économisez {monthly}/mois",
+    "ec.handoff.email.value.costGeneric": "Ventilation personnelle des coûts pour votre volume mensuel",
+    "ec.handoff.email.value.comparison": "Comparaison Altery vs banque typique — pour votre CFO",
+    "ec.handoff.email.value.checklist": "Checklist d'onboarding pour vous préparer en 5 minutes",
+    "ec.handoff.trust": "Pas de spam. Pas de newsletter. Juste votre PDF de proposition — une fois.",
+    "ec.handoff.sent.nextHead": "Faites maintenant ces 3 choses",
+    "ec.handoff.sent.step1.title": "Vérifiez votre boîte de réception",
+    "ec.handoff.sent.step1.body": "Envoyé à {email}",
+    "ec.handoff.sent.step2.title": "Transférez à votre CFO ou cofondateur",
+    "ec.handoff.sent.step2.body": "Beaucoup de fondateurs partagent avant l'appel — cela accélère la décision.",
+    "ec.handoff.sent.step3.title": "Planifiez un appel d'intro de 15 min",
+    "ec.handoff.sent.step3.link": "Réserver un appel",
+    "ec.handoff.sent.colleague.head": "Envoyer une copie à un collègue",
+    "ec.handoff.sent.colleague.placeholder": "collegue@votreentreprise.com",
+    "ec.handoff.sent.colleague.send": "Envoyer une copie",
+    "ec.handoff.sent.colleague.success": "Envoyé à {email}",
     "ec.pdf.team.calendly": "Planifier un appel d'intro de 15 min",
     "ec.pdf.volumeHint.starter": "Vous démarrez petit — les rails Starter couvrent les flux quotidiens ; le déclencheur d'upgrade arrive quand le volume mensuel franchit €100k.",
     "ec.pdf.volumeHint.standard": "À votre volume, les rails standards portent la charge confortablement. Surveillez le seuil €100k quand la croissance s'accélère — c'est le point naturel de passage à Pro.",
@@ -10146,6 +11160,131 @@
 
     // Build the analysis HTML string. Pure function — takes the
     // recommendation, recipient email, and translator; returns markup.
+    // Derive a transaction-count assumption from the monthly volume
+    // band. Real txCount sits in EcApp state but we don't thread it
+    // through ecRecommend → rec, so we infer from volume. These are
+    // averages — the PDF labels them "estimated", and customers who
+    // care about precision will adjust during onboarding.
+    function ecEstimateTxCount(monthlyVolume) {
+      if (!monthlyVolume) return 20;
+      if (monthlyVolume < 10000)    return 5;
+      if (monthlyVolume < 100000)   return 20;
+      if (monthlyVolume < 500000)   return 40;
+      if (monthlyVolume < 1000000)  return 80;
+      return 150;
+    }
+
+    // The full Altery-vs-typical-bank cost projection. This is the
+    // single most important calculation in the whole experience —
+    // it's the number that goes to the customer's CFO, the number
+    // they remember six weeks later, the anchor that justifies the
+    // switching cost. Coefficients are deliberately conservative so
+    // we under-promise: real savings for most digital businesses
+    // are larger, but the math we show has to survive scrutiny.
+    //
+    // Assumptions documented inline so future-us can audit them:
+    function ecComputeCostBreakdown(rec) {
+      const vol = rec?.monthlyVolume || 0;
+      if (vol < 1000) return null;  // not enough to project credibly
+
+      // 60% of monthly volume assumed to be FX-touching (cross-border
+      // or non-base-currency). Conservative — many digital businesses
+      // run higher. Subscription-revenue SaaS in EUR may run lower
+      // (~20-40%), high-growth marketplaces often run >80%.
+      const fxVolume = vol * 0.60;
+
+      // Altery rails (from public fees page, business plan tier):
+      const ALTERY_FX_MARKUP  = 0.0065;  // 0.65% — mid of 0.5–0.7% Pro range
+      const ALTERY_SWIFT_FLAT = 10;       // €10 per outgoing
+      const ALTERY_SWIFT_PCT  = 0.0025;   // + 0.25% of tx value
+      const ALTERY_LOCAL      = 1;        // €1 per SEPA/FPS
+
+      // Industry-average traditional business bank (HSBC/Barclays/
+      // Deutsche/Santander SMB tier — public retail business pricing,
+      // averaged):
+      const BANK_FX_MARKUP   = 0.025;     // 2.5% — typical mid of 2–4% spread
+      const BANK_SWIFT_FLAT  = 40;        // €40 per outgoing — typical
+      const BANK_LOCAL       = 0.5;       // €0.50 — bank local cheaper but
+                                          // requires sep. account per currency
+
+      const txCount  = ecEstimateTxCount(vol);
+      const avgTxVal = vol / Math.max(txCount, 1);
+
+      // Local payments — assume 60% of tx are local SEPA/FPS, 40%
+      // cross-border SWIFT. Tunes the math toward digital businesses
+      // doing mostly EU↔EU and UK↔UK with cross-border on top.
+      const localTxCount = Math.round(txCount * 0.6);
+      const swiftTxCount = txCount - localTxCount;
+
+      // Plan subscription — taken straight from rec.plan.price. We
+      // strip currency symbol and parse, defaulting to 0 if it's a
+      // free tier or starter.
+      const planNumeric = (() => {
+        const raw = String(rec.plan?.price || "").replace(/[^\d.]/g, "");
+        return parseFloat(raw) || 0;
+      })();
+
+      const altery = {
+        subscription: planNumeric,
+        fx:           Math.round(fxVolume * ALTERY_FX_MARKUP),
+        swift:        Math.round(swiftTxCount * ALTERY_SWIFT_FLAT + swiftTxCount * avgTxVal * ALTERY_SWIFT_PCT),
+        local:        Math.round(localTxCount * ALTERY_LOCAL),
+      };
+      altery.total = altery.subscription + altery.fx + altery.swift + altery.local;
+
+      const bank = {
+        fx:    Math.round(fxVolume * BANK_FX_MARKUP),
+        swift: Math.round(swiftTxCount * BANK_SWIFT_FLAT),
+        local: Math.round(localTxCount * BANK_LOCAL),
+      };
+      bank.total = bank.fx + bank.swift + bank.local;
+
+      // Round savings to the nearest €100 for clean presentation.
+      // Numbers like "€9,547/month" look fake-precise; "€9,500/month"
+      // reads as the considered estimate it actually is.
+      const rawMonthly = Math.max(bank.total - altery.total, 0);
+      const monthly    = Math.round(rawMonthly / 100) * 100;
+      const annual     = monthly * 12;
+
+      return {
+        altery, bank,
+        savings: { monthly, annual },
+        meta: { txCount, fxVolumePct: 60, fxVolume: Math.round(fxVolume) },
+      };
+    }
+
+    // Translate an annual-savings number into 1-3 tangible business
+    // outcomes the customer can visualize. Engages future-self
+    // simulation — the savings number stops being abstract and
+    // becomes "a senior hire" or "9 months of runway". Buckets
+    // chosen for digital-business ICP (founders, ops leads, CFOs).
+    function ecOutcomesForSavings(annual) {
+      if (!annual || annual < 12000) return [];
+
+      const outcomes = [];
+
+      // Hire — UK/EU senior loaded cost ~€100-130k. We say "around"
+      // because rounding precisely would over-claim.
+      if (annual >= 80000) {
+        outcomes.push({ key: "ec.pdf.outcomes.hire", value: Math.round(annual / 110000 * 10) / 10 });
+      } else if (annual >= 40000) {
+        outcomes.push({ key: "ec.pdf.outcomes.hireMid", value: null });
+      }
+
+      // Runway — assume ~€10k/mo burn for early-stage, scales with
+      // savings amount (bigger savings → likely bigger company).
+      const runwayMonths = annual >= 200000 ? 4
+                         : annual >= 100000 ? 6
+                         : annual >= 50000  ? 9
+                         : 12;
+      outcomes.push({ key: "ec.pdf.outcomes.runway", value: runwayMonths });
+
+      // Marketing — one quarter of growth budget.
+      outcomes.push({ key: "ec.pdf.outcomes.marketing", value: Math.round(annual / 4 / 1000) });
+
+      return outcomes;
+    }
+
     // Calendly booking URL — used in both the PDF account-team block
     // and the email body's CTA stack. Swap this single constant when
     // the real booking page goes live; ideally Altery operations sets
@@ -10329,34 +11468,126 @@
           <div style="font-size:12.5px;line-height:19px;color:${C.inkSoft};">${t("ec.pdf.cryptoReroute.body")}</div>
         </div>` : "";
 
-      // AT A GLANCE — the sales hook. Four rows: volume, plan, savings,
-      // setup time. The savings row gets a warm orange treatment (text
-      // and a faint wash) so it pulls the eye instantly when the PDF
-      // opens. Savings only shown if the volume is large enough for
-      // meaningful numbers (ecEstimateSavings returns null otherwise).
-      const savingsRowHTML = savings ? `
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:10px 14px;background:${C.savingsBg};border-radius:8px;margin:6px 0;">
-          <span style="color:${C.inkSoft};">${t("ec.pdf.atGlance.savings")}</span>
-          <span style="color:${C.savings};font-weight:700;font-variant-numeric:tabular-nums;">€${savings.low.toLocaleString("en-US")}–€${savings.high.toLocaleString("en-US")}</span>
+      // Cost breakdown — Altery vs typical business bank. This is
+      // the document's anchor calculation: the number the customer
+      // remembers, forwards, and quotes to their CFO.
+      const cost = ecComputeCostBreakdown(rec);
+      const outcomes = cost ? ecOutcomesForSavings(cost.savings.annual) : [];
+
+      const fmtEUR = (n) => "€" + (n || 0).toLocaleString("en-US");
+
+      const costMathHTML = cost ? `
+        <div style="margin:0 0 18px;">
+          <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin:0 0 14px;">${t("ec.pdf.costMath.head")}</div>
+          <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
+            <tr>
+              <td style="width:50%;padding:14px 16px;background:${C.surface};border:1px solid ${C.border};border-radius:12px 0 0 12px;vertical-align:top;">
+                <div style="font-size:11px;color:${C.primary};font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">${t("ec.pdf.costMath.altery")}</div>
+                ${cost.altery.subscription > 0 ? `
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
+                  <span>${t("ec.pdf.costMath.subscription")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.subscription)}</span>
+                </div>` : ""}
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
+                  <span>${t("ec.pdf.costMath.fx")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.fx)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
+                  <span>${t("ec.pdf.costMath.swift")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.swift)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
+                  <span>${t("ec.pdf.costMath.local")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.local)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13.5px;color:${C.ink};padding:10px 0 0;margin-top:6px;border-top:1px solid ${C.border};">
+                  <span style="font-weight:600;">${t("ec.pdf.costMath.total")}</span><span style="font-weight:700;font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.total)}</span>
+                </div>
+              </td>
+              <td style="width:50%;padding:14px 16px;background:${C.white};border:1px solid ${C.border};border-left:0;border-radius:0 12px 12px 0;vertical-align:top;">
+                <div style="font-size:11px;color:${C.muted};font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">${t("ec.pdf.costMath.bank")}</div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
+                  <span>${t("ec.pdf.costMath.fx")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.bank.fx)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
+                  <span>${t("ec.pdf.costMath.swift")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.bank.swift)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
+                  <span>${t("ec.pdf.costMath.local")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.bank.local)}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;font-size:13.5px;color:${C.ink};padding:10px 0 0;margin-top:31px;border-top:1px solid ${C.border};">
+                  <span style="font-weight:600;">${t("ec.pdf.costMath.total")}</span><span style="font-weight:700;font-variant-numeric:tabular-nums;">${fmtEUR(cost.bank.total)}</span>
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Savings band — loss-framed: "you're leaving on the table" -->
+          <div style="background:${C.savingsBg};border:1.5px solid ${C.savings};border-radius:12px;padding:18px 22px;margin-top:14px;">
+            <div style="font-size:11px;color:${C.savings};font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">${t("ec.pdf.costMath.savings.label")}</div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;">
+              <div style="font-size:24px;font-weight:700;color:${C.savings};font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${fmtEUR(cost.savings.monthly)}<span style="font-size:14px;color:${C.savings};font-weight:500;"> ${t("ec.pdf.costMath.perMonth")}</span></div>
+              <div style="font-size:14px;color:${C.savings};font-weight:600;font-variant-numeric:tabular-nums;">${fmtEUR(cost.savings.annual)} ${t("ec.pdf.costMath.perYear")}</div>
+            </div>
+          </div>
+
+          <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:10px;">${t("ec.pdf.costMath.assumptions", { volume: ecFormatVolume(rec.monthlyVolume), txCount: cost.meta.txCount, fxPct: cost.meta.fxVolumePct })}</div>
         </div>` : "";
 
-      const atGlanceHTML = `
-        <div style="background:${C.surface};border:1px solid ${C.border};border-radius:14px;padding:18px 20px;margin:0 0 22px;">
-          <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin:0 0 14px;">${t("ec.pdf.atGlance.head")}</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:4px 0;">
-            <span style="color:${C.inkSoft};">${t("ec.pdf.atGlance.volume")}</span>
-            <span style="color:${C.ink};font-weight:600;font-variant-numeric:tabular-nums;">~€${ecFormatVolume(monthlyVolume)}</span>
+      // "What €X annual buys you" — future-self visualization. Turns
+      // an abstract money number into 2-3 concrete business outcomes
+      // (hire, runway, marketing) the founder can already picture.
+      const outcomesHTML = outcomes.length ? `
+        <div style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;padding:16px 20px;margin:0 0 30px;">
+          <div style="font-size:11px;color:${C.muted};font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 10px;">${t("ec.pdf.outcomes.head", { amount: fmtEUR(cost.savings.annual) })}</div>
+          ${outcomes.map((o) => `
+            <div style="display:flex;align-items:flex-start;gap:10px;padding:4px 0;">
+              <div style="flex-shrink:0;width:6px;height:6px;border-radius:50%;background:${C.primary};margin-top:8px;"></div>
+              <div style="font-size:13px;color:${C.ink};line-height:19px;">${t(o.key, { value: o.value })}</div>
+            </div>`).join("")}
+        </div>` : "";
+
+      // Altery vs typical business bank — comparison table. By the
+      // end of these 8 rows the customer has made the case for
+      // switching to themselves. Each row a single fact that
+      // accumulates into a clear winner.
+      const comparisonRows = [
+        "setup", "kyb", "fx", "swift", "multiCcy", "crypto", "api", "multiEntity"
+      ];
+      const comparisonHTML = `
+        <div style="margin:0 0 30px;">
+          <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 14px;">${t("ec.pdf.comparison.head")}</div>
+          <table style="width:100%;border-collapse:collapse;background:${C.surface};border:1px solid ${C.border};border-radius:12px;overflow:hidden;">
+            <thead>
+              <tr style="background:${C.white};">
+                <th style="text-align:left;font-size:11px;font-weight:600;color:${C.muted};padding:10px 14px;border-bottom:1px solid ${C.border};text-transform:uppercase;letter-spacing:0.06em;width:38%;"></th>
+                <th style="text-align:left;font-size:11px;font-weight:600;color:${C.primary};padding:10px 14px;border-bottom:1px solid ${C.border};text-transform:uppercase;letter-spacing:0.06em;">Altery</th>
+                <th style="text-align:left;font-size:11px;font-weight:600;color:${C.muted};padding:10px 14px;border-bottom:1px solid ${C.border};text-transform:uppercase;letter-spacing:0.06em;">${t("ec.pdf.comparison.bank")}</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${comparisonRows.map((row, i) => `
+                <tr ${i > 0 ? `style="border-top:1px solid ${C.border};"` : ""}>
+                  <td style="padding:10px 14px;font-size:12px;color:${C.muted};font-weight:500;">${t(`ec.pdf.comparison.row.${row}.label`)}</td>
+                  <td style="padding:10px 14px;font-size:12px;color:${C.ink};font-weight:500;">${t(`ec.pdf.comparison.row.${row}.altery`)}</td>
+                  <td style="padding:10px 14px;font-size:12px;color:${C.muted};">${t(`ec.pdf.comparison.row.${row}.bank`)}</td>
+                </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>`;
+
+      // Onboarding checklist — neutralizes the #1 friction: "what do
+      // I need to prepare?" By spelling it out before they ask, we
+      // remove the procrastination excuse and reward their earlier
+      // engagement (we already have their volume answer pre-filled).
+      const checklistItems = ["incorporation", "directorIds", "addressProof", "businessActivities", "volume"];
+      const checklistHTML = `
+        <div style="margin:0 0 30px;">
+          <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 14px;">${t("ec.pdf.checklist.head")}</div>
+          <div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:14px 18px;">
+            ${checklistItems.map((id) => `
+              <div style="display:flex;gap:12px;align-items:flex-start;padding:6px 0;">
+                <div style="flex-shrink:0;width:16px;height:16px;border-radius:4px;border:1.5px solid ${C.primary};display:inline-flex;align-items:center;justify-content:center;color:${C.primary};font-size:10px;font-weight:700;margin-top:2px;">✓</div>
+                <div style="font-size:12.5px;color:${C.ink};line-height:18px;">${t(`ec.pdf.checklist.${id}`)}</div>
+              </div>`).join("")}
+            <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:10px;padding-top:10px;border-top:1px solid ${C.border};">${t("ec.pdf.checklist.note")}</div>
           </div>
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:4px 0;">
-            <span style="color:${C.inkSoft};">${t("ec.pdf.atGlance.plan")}</span>
-            <span style="color:${C.ink};font-weight:600;">${planName} · ${planPrice}</span>
-          </div>
-          ${savingsRowHTML}
-          <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:4px 0;">
-            <span style="color:${C.inkSoft};">${t("ec.pdf.atGlance.setupTime")}</span>
-            <span style="color:${C.ink};font-weight:600;">${t("ec.pdf.atGlance.setupTimeValue")}</span>
-          </div>
-          ${savings ? `<div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:12px;padding-top:10px;border-top:1px dashed ${C.border};">${t("ec.pdf.atGlance.savingsNote")}</div>` : ""}
         </div>`;
 
       // Volume-specific advisor note — sales voice. Rendered as a
@@ -10429,7 +11660,9 @@
 
     ${cryptoRerouteHTML}
 
-    ${atGlanceHTML}
+    ${costMathHTML}
+
+    ${outcomesHTML}
 
     ${volumeHintHTML}
 
@@ -10438,6 +11671,8 @@
       ${t("ec.r.reasoning.head", { plan: planName })}
     </div>
     <div style="margin-bottom:32px;">${reasoningHTML}</div>
+
+    ${comparisonHTML}
 
     <!-- Selected services — compact card list -->
     <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
@@ -10453,6 +11688,8 @@
       <table style="width:100%;border-collapse:collapse;">${feeTableHTML}</table>
     </div>
 
+    ${checklistHTML}
+
     <!-- Numbered timeline — sells "how easy it is to start" -->
     <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
       ${t("ec.pdf.nextSteps.head")}
@@ -10465,14 +11702,17 @@
       <div style="font-size:14px;color:${C.white};font-family:${FF_MONO};letter-spacing:-0.005em;">altery.com/setup/${sessionToken}</div>
     </div>
 
-    <!-- Account team — humanises the proposal. Sales touch. Calendly
-         link sits inside the panel as a second CTA, secondary to the
-         setup link above. Bookers vs self-servers route here. -->
-    <div style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;padding:14px 18px;margin-bottom:8px;">
-      <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">${t("ec.pdf.team.head")}</div>
-      <div style="font-size:12.5px;line-height:18px;color:${C.ink};margin-bottom:10px;">${t("ec.pdf.team.body")}</div>
+    <!-- Account team — humanises the proposal. Validity notice gives
+         it the legal-document weight of a real commercial proposal. -->
+    <div style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;padding:16px 20px;margin-bottom:16px;">
+      <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">${t("ec.pdf.team.head")}</div>
+      <div style="font-size:13px;line-height:19px;color:${C.ink};margin-bottom:10px;">${t("ec.pdf.signature.body")}</div>
+      <div style="font-size:12.5px;line-height:18px;color:${C.inkSoft};margin-bottom:12px;">${t("ec.pdf.team.body")}</div>
       <a href="${EC_CALENDLY_URL}" style="display:inline-block;font-size:12.5px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.team.calendly")} →</a>
     </div>
+
+    <!-- Validity notice — soft urgency, commercial-proposal convention -->
+    <div style="font-size:11px;color:${C.muted};line-height:16px;margin-bottom:8px;text-align:center;font-style:italic;">${t("ec.pdf.validity")}</div>
 
   </div>
 
@@ -10758,6 +11998,17 @@
       const [submitting, setSubmitting] = useState(false);
       const [submitError, setSubmitError] = useState(null);
 
+      // "Send a copy to a colleague" flow — secondary send action on
+      // the sent stage. Kept in its own state slice so primary email
+      // flow doesn't get tangled with it; both reuse ecSendAnalysisEmail
+      // under the hood (each invocation regenerates the PDF — cheap
+      // enough that caching adds more code than it saves).
+      const [colleagueEmail, setColleagueEmail] = useState("");
+      const [colleagueTouched, setColleagueTouched] = useState(false);
+      const [colleagueSubmitting, setColleagueSubmitting] = useState(false);
+      const [colleagueSent, setColleagueSent] = useState(false);
+      const [colleagueError, setColleagueError] = useState(null);
+
       // ESC close + body scroll lock
       useEffect(() => {
         const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -10792,6 +12043,28 @@
           setSubmitError(t("ec.handoff.error"));
         } finally {
           setSubmitting(false);
+        }
+      };
+
+      const isColleagueValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(colleagueEmail.trim());
+      const showColleagueError = colleagueTouched && colleagueEmail.length > 0 && !isColleagueValid;
+
+      const sendColleagueCopy = async () => {
+        setColleagueTouched(true);
+        if (!isColleagueValid) return;
+        setColleagueSubmitting(true);
+        setColleagueError(null);
+        try {
+          // Reuses the same end-to-end pipeline as the primary send.
+          // Cheaper to regenerate the PDF than to thread cached bytes
+          // through state — 2s of compute against vastly simpler code.
+          await ecSendAnalysisEmail({ rec, email: colleagueEmail.trim(), t });
+          setColleagueSent(true);
+        } catch (err) {
+          console.error("[EcHandoffModal] colleague copy failed:", err);
+          setColleagueError(t("ec.handoff.error"));
+        } finally {
+          setColleagueSubmitting(false);
         }
       };
 
@@ -10843,12 +12116,40 @@
               </>
             )}
 
-            {stage === "email" && (
+            {stage === "email" && (() => {
+              // Compute personalised cost projection so the value-prop
+              // bullets can quote the user's specific monthly savings
+              // figure. Falls back to a generic bullet when the volume
+              // is too small for credible projection.
+              const cost = ecComputeCostBreakdown(rec);
+              const fmt = (n) => "€" + (n || 0).toLocaleString("en-US");
+              return (
               <>
                 <h2 id="ec-handoff-title" className="ec-modal__title">
-                  {t("ec.handoff.email.intro")}
+                  {t("ec.handoff.email.title")}
                 </h2>
-                <p className="ec-handoff__lead">{t("ec.handoff.email.leadHint")}</p>
+                <p className="ec-handoff__lead">{t("ec.handoff.email.lead")}</p>
+
+                {/* Value-prop list — the conversion driver. Three
+                    concrete bullets, the first personalized with
+                    the user's savings number. Reads as upgrade, not
+                    chore. */}
+                <ul className="ec-handoff__value">
+                  <li className="ec-handoff__value__item">
+                    <span className="ec-handoff__value__tick" aria-hidden="true">✓</span>
+                    <span>{cost && cost.savings.monthly >= 100
+                      ? t("ec.handoff.email.value.costPersonal", { monthly: fmt(cost.savings.monthly) })
+                      : t("ec.handoff.email.value.costGeneric")}</span>
+                  </li>
+                  <li className="ec-handoff__value__item">
+                    <span className="ec-handoff__value__tick" aria-hidden="true">✓</span>
+                    <span>{t("ec.handoff.email.value.comparison")}</span>
+                  </li>
+                  <li className="ec-handoff__value__item">
+                    <span className="ec-handoff__value__tick" aria-hidden="true">✓</span>
+                    <span>{t("ec.handoff.email.value.checklist")}</span>
+                  </li>
+                </ul>
 
                 <div className="ec-handoff__field">
                   <label className="ec-handoff__label" htmlFor="ec-handoff-email">
@@ -10897,9 +12198,10 @@
                 >
                   {t("ec.handoff.email.back")}
                 </button>
-                <p className="ec-handoff__privacy">{t("ec.handoff.privacy")}</p>
+                <p className="ec-handoff__privacy">{t("ec.handoff.trust")}</p>
               </>
-            )}
+              );
+            })()}
 
             {stage === "sent" && (
               <>
@@ -10912,6 +12214,88 @@
                 <h2 id="ec-handoff-title" className="ec-modal__title">{t("ec.handoff.sent.title")}</h2>
                 <p className="ec-handoff__lead">{t("ec.handoff.sent.lead", { email })}</p>
 
+                {/* "Now do these 3 things" — implementation intention
+                    list. Keeps momentum past the success state, plants
+                    the idea of forwarding (the second checkbox), and
+                    offers the booking path explicitly. */}
+                <div className="ec-handoff__nextSteps">
+                  <div className="ec-handoff__nextSteps__head">{t("ec.handoff.sent.nextHead")}</div>
+                  <ol className="ec-handoff__nextSteps__list">
+                    <li className="ec-handoff__nextSteps__item is-done">
+                      <span className="ec-handoff__nextSteps__num" aria-hidden="true">✓</span>
+                      <div>
+                        <div className="ec-handoff__nextSteps__title">{t("ec.handoff.sent.step1.title")}</div>
+                        <div className="ec-handoff__nextSteps__body">{t("ec.handoff.sent.step1.body", { email })}</div>
+                      </div>
+                    </li>
+                    <li className="ec-handoff__nextSteps__item">
+                      <span className="ec-handoff__nextSteps__num" aria-hidden="true">2</span>
+                      <div>
+                        <div className="ec-handoff__nextSteps__title">{t("ec.handoff.sent.step2.title")}</div>
+                        <div className="ec-handoff__nextSteps__body">{t("ec.handoff.sent.step2.body")}</div>
+                      </div>
+                    </li>
+                    <li className="ec-handoff__nextSteps__item">
+                      <span className="ec-handoff__nextSteps__num" aria-hidden="true">3</span>
+                      <div>
+                        <div className="ec-handoff__nextSteps__title">{t("ec.handoff.sent.step3.title")}</div>
+                        <div className="ec-handoff__nextSteps__body">
+                          <a href={EC_CALENDLY_URL} target="_blank" rel="noopener noreferrer" className="ec-handoff__nextSteps__link">
+                            {t("ec.handoff.sent.step3.link")} →
+                          </a>
+                        </div>
+                      </div>
+                    </li>
+                  </ol>
+                </div>
+
+                {/* Send-to-colleague — inline second-email capture.
+                    Converts a single lead into two aligned stakeholders
+                    when the founder forwards to their CFO/co-founder.
+                    Showing a small success state inline (not modal
+                    transition) keeps the original sent context intact. */}
+                <div className="ec-handoff__colleague">
+                  {!colleagueSent ? (
+                    <>
+                      <div className="ec-handoff__colleague__head">{t("ec.handoff.sent.colleague.head")}</div>
+                      <div className="ec-handoff__colleague__row">
+                        <input
+                          type="email"
+                          inputMode="email"
+                          autoComplete="off"
+                          className={"ec-handoff__colleague__input" + (showColleagueError ? " is-error" : "")}
+                          placeholder={t("ec.handoff.sent.colleague.placeholder")}
+                          value={colleagueEmail}
+                          onChange={(e) => setColleagueEmail(e.target.value)}
+                          onBlur={() => setColleagueTouched(true)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" && isColleagueValid && !colleagueSubmitting) sendColleagueCopy();
+                          }}
+                          disabled={colleagueSubmitting}
+                        />
+                        <button
+                          type="button"
+                          className="ec-handoff__colleague__btn"
+                          onClick={sendColleagueCopy}
+                          disabled={colleagueSubmitting || !isColleagueValid}
+                        >
+                          {colleagueSubmitting ? t("ec.handoff.submitting") : t("ec.handoff.sent.colleague.send")}
+                        </button>
+                      </div>
+                      {showColleagueError && (
+                        <div className="ec-handoff__error" role="alert">{t("ec.handoff.email.error")}</div>
+                      )}
+                      {colleagueError && (
+                        <div className="ec-handoff__error" role="alert">{colleagueError}</div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="ec-handoff__colleague__success">
+                      ✓ {t("ec.handoff.sent.colleague.success", { email: colleagueEmail })}
+                    </div>
+                  )}
+                </div>
+
                 <div className="ec-handoff__actions">
                   <Button
                     variant="primary"
@@ -10920,9 +12304,6 @@
                     iconRight="arrowRight"
                   >
                     {t("ec.handoff.continueAnyway")}
-                  </Button>
-                  <Button variant="outline" size="xl" onClick={onClose}>
-                    {t("common.close")}
                   </Button>
                 </div>
               </>
@@ -11590,6 +12971,49 @@
                 </div>
               </div>
             )}
+
+            {/* "Your opportunity" hook block — the conversion lever.
+                Computes the Altery-vs-bank monthly cost projection
+                with the same helper that drives the PDF, so what the
+                user sees on screen is exactly what arrives in their
+                inbox. Two psychological levers stacked: (1) specific
+                personalised numbers based on their stated volume,
+                which converts generic marketing into "this is about
+                me", and (2) loss framing ("leaving on the table"
+                rather than "could save") because loss aversion is
+                ~2× stronger than gain motivation. The closing line
+                explicitly creates a curiosity gap that the email PDF
+                resolves — driving capture rates on the handoff CTA. */}
+            {(() => {
+              const cost = ecComputeCostBreakdown(rec);
+              if (!cost || cost.savings.monthly < 100) return null;
+              const fmt = (n) => "€" + (n || 0).toLocaleString("en-US");
+              return (
+                <div className="ec-opportunity">
+                  <div className="ec-opportunity__eyebrow">{t("ec.r.opportunity.head")}</div>
+                  <p className="ec-opportunity__lead">
+                    {t("ec.r.opportunity.lead", {
+                      volume: ecFormatVolume(rec.monthlyVolume),
+                      bankCost: fmt(cost.bank.total),
+                      alteryCost: fmt(cost.altery.total),
+                    })}
+                  </p>
+                  <div className="ec-opportunity__band">
+                    <div className="ec-opportunity__band__label">{t("ec.r.opportunity.leaving")}</div>
+                    <div className="ec-opportunity__band__row">
+                      <div className="ec-opportunity__band__monthly">
+                        {fmt(cost.savings.monthly)}
+                        <span className="ec-opportunity__band__per">{t("ec.r.opportunity.perMonth")}</span>
+                      </div>
+                      <div className="ec-opportunity__band__annual">
+                        {t("ec.r.opportunity.annualPrefix")} <strong>{fmt(cost.savings.annual)}</strong> {t("ec.r.opportunity.annualSuffix")}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ec-opportunity__note">{t("ec.r.opportunity.note")}</div>
+                </div>
+              );
+            })()}
 
             {/* "Why we recommend X" reasoning block — the gold-tier
                 conversion moment. 3 dynamic bullets that cite the user's
