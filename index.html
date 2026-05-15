@@ -9780,17 +9780,20 @@
     // configurations paginate cleanly thanks to html2pdf's auto page
     // breaks.
 
-    // Wait for html2pdf.js to load (it's an async script). The handoff
-    // modal awaits this before attempting PDF generation; failure falls
-    // through to the standard submitError path.
+    // Wait for the html2pdf bundle to fully populate window globals.
+    // The bundle ships html2pdf + html2canvas + jsPDF; we use the latter
+    // two directly because going through html2pdf's worker chain has
+    // produced blank PDFs in production (its toContainer overrides
+    // element styles in ways that race html2canvas's capture).
     function ecWaitForHtml2pdf(timeoutMs = 10000) {
       return new Promise((resolve, reject) => {
-        if (window.html2pdf) return resolve();
+        const ready = () => !!(window.html2pdf && window.html2canvas && (window.jspdf?.jsPDF || window.jsPDF));
+        if (ready()) return resolve();
         const start = Date.now();
         const tick = () => {
-          if (window.html2pdf) return resolve();
+          if (ready()) return resolve();
           if (Date.now() - start > timeoutMs) {
-            return reject(new Error("html2pdf script load timeout"));
+            return reject(new Error("PDF libs failed to load within " + timeoutMs + "ms"));
           }
           setTimeout(tick, 80);
         };
@@ -10050,70 +10053,98 @@
 
       const html = ecBuildAnalysisHTML({ rec, email, t, langCode });
 
-      // Mount the template into the live document so html2canvas can read
-      // real computed styles. Three details matter and are easy to get
-      // wrong (we did, the first time — empty PDF in production):
+      // ── Mount strategy ────────────────────────────────────────────
+      // Past attempts failed because html2pdf's worker chain wraps our
+      // element in its own overlay/container with style overrides that
+      // race html2canvas's capture step — the canvas ended up the right
+      // *height* (so PDF had right number of pages) but blank content.
       //
-      //  1. Don't use `left: -9999px`. html2canvas v1.4 occasionally
-      //     captures off-screen elements as blank, especially when the
-      //     element contains images that haven't decoded yet. Instead we
-      //     keep the element in the visible viewport (top:0, left:0) but
-      //     send it to the back of the stacking context with z-index
-      //     `-9999`. The handoff modal overlay sits above it; user sees
-      //     nothing flash on screen.
-      //  2. Don't use `opacity: 0` or `visibility: hidden`. Both make
-      //     html2canvas render the element as empty (opacity propagates
-      //     through cloning; visibility skips paint).
-      //  3. Don't immediately call html2pdf after appendChild. The browser
-      //     hasn't painted yet, so the inline favicon hasn't decoded and
-      //     fonts haven't laid out. Wait two animation frames + a small
-      //     timeout for image decode, then capture.
-      const container = document.createElement("div");
-      container.style.cssText = "position:fixed;top:0;left:0;width:720px;background:#fff;z-index:-9999;";
-      container.innerHTML = html;
-      document.body.appendChild(container);
+      // We now bypass html2pdf entirely and call html2canvas + jsPDF
+      // directly. Mount uses a 0×0 overflow:hidden wrapper around a
+      // full-size inner element. The wrapper visually clips everything
+      // to zero (user sees nothing flash on screen), but the inner
+      // element's getBoundingClientRect() reports its full intrinsic
+      // size — which is what html2canvas uses to allocate the capture
+      // canvas. No position:fixed shenanigans, no left:-9999px, no
+      // opacity tricks; just normal flow constrained by a clip.
+      const wrapper = document.createElement("div");
+      wrapper.style.cssText = "position:fixed;left:0;top:0;width:0;height:0;overflow:hidden;z-index:-1;pointer-events:none;";
 
-      // Double-RAF guarantees one full layout + paint cycle has happened.
-      // The extra setTimeout gives the inlined base64 logo time to decode
-      // — image decoding is async and can race html2canvas if we capture
-      // immediately after paint.
+      const inner = document.createElement("div");
+      inner.style.cssText = "width:720px;background:#fff;";
+      inner.innerHTML = html;
+      wrapper.appendChild(inner);
+
+      document.body.appendChild(wrapper);
+
+      // Wait for one full paint cycle (double-RAF) plus a generous
+      // image-decode window. The inline base64 logo decodes async
+      // even though no network is involved; 250ms covers slow devices.
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-      await new Promise((r) => setTimeout(r, 80));
+      await new Promise((r) => setTimeout(r, 250));
 
       const planSlug = (rec.plan?.id || "plan").toLowerCase();
       const stamp = new Date().toISOString().slice(0, 10);
       const filename = `Altery-eligibility-${planSlug}-${stamp}.pdf`;
 
       try {
-        const blob = await window.html2pdf().set({
-          margin: [10, 0, 10, 0],
-          filename,
-          image: { type: "jpeg", quality: 0.96 },
-          html2canvas: {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: "#ffffff",
-            // Both width and windowWidth set explicitly — html2canvas's
-            // viewport auto-detection misjudges offscreen / fixed-position
-            // elements and can produce a zero-width canvas.
-            width: 720,
-            windowWidth: 720,
-            // Wait for any nested images (the inlined logo) to actually
-            // finish loading before snapshotting. Default is no wait.
-            imageTimeout: 3000,
-          },
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait", compress: true },
-          pagebreak: { mode: ["css", "legacy"] },
-        }).from(container.firstElementChild).outputPdf("blob");
+        // Step 1 — render the element to a canvas via html2canvas. We
+        // pass the inner element directly (not its parent) so dimensions
+        // are read from the element's own border box, ignoring the 0×0
+        // wrapper clip.
+        const target = inner.firstElementChild;
+        const canvas = await window.html2canvas(target, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,         // lets the inline base64 PNG render even on strict origins
+          logging: false,
+          backgroundColor: "#ffffff",
+          // foreignObjectRendering is false by default and we keep it that
+          // way: the SVG-foreignObject path produces blank canvases for
+          // some templates; walking the DOM by hand is slower but reliable.
+          foreignObjectRendering: false,
+          imageTimeout: 3000,
+        });
 
-        // Sanity check — if the produced PDF is suspiciously tiny we very
-        // likely hit a rendering race despite the waits above. Log it so
-        // we can see it in production console; don't fail the send though,
-        // since a tiny PDF still beats a thrown error.
-        if (blob.size < 4000) {
-          console.warn("[ecSendAnalysisEmail] PDF blob is small (" + blob.size + " bytes) — possible render race");
+        // Sanity check — empty canvas means html2canvas silently failed.
+        // Throwing here is better than shipping a blank PDF.
+        if (!canvas || canvas.width < 50 || canvas.height < 50) {
+          throw new Error("html2canvas produced empty canvas: " + (canvas?.width || 0) + "×" + (canvas?.height || 0));
         }
+
+        const imgData = canvas.toDataURL("image/jpeg", 0.94);
+        if (!imgData || imgData.length < 2000) {
+          throw new Error("Canvas produced empty data URL (length=" + (imgData?.length || 0) + ")");
+        }
+
+        // Step 2 — build the PDF. html2pdf's bundle exposes jsPDF as
+        // window.jspdf.jsPDF; some loaders expose plain window.jsPDF
+        // instead, so we accept both.
+        const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+        const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+        const pageWidth  = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        // Scale the captured image to the page width and paginate by
+        // sliding the image up across pages. Each page renders the same
+        // image at a different Y offset; jsPDF clips automatically to
+        // the page bounds.
+        const imgWidth  = pageWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        let yOffset   = 0;
+        let remaining = imgHeight;
+        pdf.addImage(imgData, "JPEG", 0, yOffset, imgWidth, imgHeight);
+        remaining -= pageHeight;
+        while (remaining > 0) {
+          yOffset  -= pageHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "JPEG", 0, yOffset, imgWidth, imgHeight);
+          remaining -= pageHeight;
+        }
+
+        const blob = pdf.output("blob");
+        console.info("[ecSendAnalysisEmail] PDF blob:", blob.size, "bytes,", "canvas:", canvas.width + "×" + canvas.height);
 
         const pdfBase64 = await ecBlobToBase64(blob);
 
@@ -10159,9 +10190,9 @@
         const okJson = await apiRes.json().catch(() => ({}));
         return { ok: true, id: okJson?.id || null };
       } finally {
-        // Always clean up the hidden div so subsequent runs and the
-        // accessibility tree stay tidy.
-        document.body.removeChild(container);
+        // Always clean up the offscreen wrapper so subsequent runs and
+        // the accessibility tree stay tidy.
+        document.body.removeChild(wrapper);
       }
     }
 
