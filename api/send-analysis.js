@@ -37,28 +37,35 @@ const EMAIL_RE      = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // detail; this is the wrapper that greets the user before they click
 // the attachment. Inline styles only (every email client renders inline
 // CSS reliably; <style> blocks get stripped in Gmail, Outlook, etc.).
+//
+// Visual structure mirrors the on-screen checker's result-page hero:
+// persona eyebrow → entity-and-plan title with light-blue accents →
+// muted lead → beige entity pill with success dot → CTA. Recipients
+// who saw the result page should feel they're reading the same artifact.
 function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoURL }) {
   const C = {
-    primary: "#002780",
+    primary:      "#002780",
     primaryLight: "#B3D1FF",
-    ink: "#14171F",
-    inkSoft: "#4B5063",
-    muted: "#6B6F7B",
-    border: "#E5E7EE",
-    surface: "#F8F7F4",
-    beige: "#F0EBE3",
-    white: "#FFFFFF",
+    ink:          "#14171F",
+    inkSoft:      "#4B5063",
+    muted:        "#6B6F7B",
+    border:       "#E5E7EE",
+    surface:      "#F8F7F4",
+    beige:        "#F0EBE3",
+    beigeBorder:  "#E5E0D5",
+    success:      "#18A058",
+    white:        "#FFFFFF",
   };
   const FF = "'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif";
 
-  // Logo block — image + wordmark. We use the absolute URL so Resend
-  // doesn't need to attach the asset; the user's email client will
-  // fetch it from the deployment. Some email clients block remote
-  // images by default ("show images" prompt) — that's acceptable
-  // because the wordmark text next to the logo still identifies us.
-  const logoBlock = logoURL ? `
-    <img src="${logoURL}" alt="Altery" width="32" height="32" style="display:block;border-radius:6px;border:0;" />
-  ` : "";
+  // Header logo block. URL-fetched (recipient's email client loads it
+  // on display). Some clients block remote images by default — that's
+  // acceptable because the "altery" wordmark next to it still identifies
+  // the sender.
+  const logoCell = logoURL ? `
+    <td style="vertical-align:middle;padding-right:12px;width:34px;">
+      <img src="${logoURL}" alt="" width="34" height="34" style="display:block;border-radius:7px;border:0;" />
+    </td>` : "";
 
   return `<!doctype html>
 <html lang="en">
@@ -67,7 +74,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Your Altery eligibility analysis</title>
 </head>
-<body style="margin:0;padding:0;background:${C.surface};font-family:${FF};">
+<body style="margin:0;padding:0;background:${C.surface};font-family:${FF};-webkit-font-smoothing:antialiased;">
   <!-- Hidden preheader: shows next to subject in inbox lists -->
   <div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:${C.surface};">
     Your ${planName} plan recommendation on ${entityName} — full PDF attached.
@@ -75,63 +82,66 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
 
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${C.surface};">
     <tr><td align="center" style="padding:32px 16px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background:${C.white};border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(0,6,57,0.08);">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background:${C.white};border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(0,6,57,0.08);">
 
-        <!-- Header band -->
-        <tr><td style="background:${C.primary};color:${C.white};padding:28px 36px 26px;">
+        <!-- Header band — solid navy, mirrors the result-page hero bg -->
+        <tr><td style="background:${C.primary};color:${C.white};padding:32px 36px 30px;">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0">
             <tr>
-              <td style="vertical-align:middle;padding-right:12px;">${logoBlock}</td>
+              ${logoCell}
               <td style="vertical-align:middle;">
                 <div style="font-size:22px;font-weight:700;letter-spacing:-0.01em;line-height:1;color:${C.white};">altery</div>
               </td>
             </tr>
           </table>
-          <div style="font-size:13px;color:rgba(255,255,255,.72);margin-top:14px;">Your eligibility analysis</div>
         </td></tr>
 
-        <!-- Body -->
-        <tr><td style="padding:32px 36px 28px;">
+        <!-- Hero — eyebrow + persona + title-with-accents + lead + pill -->
+        <tr><td style="padding:32px 36px 4px;">
 
-          ${personaLine ? `<div style="font-size:13px;font-weight:500;color:${C.primary};margin:0 0 12px;">${personaLine}</div>` : ""}
+          ${personaLine ? `<div style="font-size:13px;font-weight:500;line-height:19px;color:${C.primary};margin:0 0 10px;letter-spacing:-0.005em;">${personaLine}</div>` : ""}
 
-          <h1 style="font-size:22px;font-weight:700;letter-spacing:-0.02em;line-height:28px;color:${C.ink};margin:0 0 14px;">
-            Your analysis is ready.
+          <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 12px;">
+            Recommended for your business
+          </div>
+
+          <h1 style="font-size:24px;font-weight:700;letter-spacing:-0.02em;line-height:30px;color:${C.ink};margin:0 0 14px;">
+            <span style="color:${C.primary};">${entityName}</span> is built for your <span style="color:${C.primary};">${planName}</span> account.
           </h1>
 
-          <p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0 0 22px;">
-            We've recommended the <strong style="color:${C.ink};">${planName}</strong> plan on
-            <strong style="color:${C.ink};">${entityName}</strong>. The full PDF analysis is attached —
-            it covers our reasoning, your selected services, fees, and your personal setup link.
+          <p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0 0 18px;">
+            We've put together a full eligibility analysis covering our reasoning, your selected services, fees, and your personal setup link. It's attached as a PDF — open it whenever you're ready.
           </p>
 
-          <!-- Recommendation card -->
-          <div style="background:${C.beige};border:1px solid #E5E0D5;border-radius:12px;padding:14px 16px;margin:0 0 26px;">
-            <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Recommendation</div>
-            <div style="font-size:15px;color:${C.ink};">
-              <strong>${planName}</strong> · ${entityName}
-            </div>
+          <!-- Entity status pill — beige bg, success dot, matches result page -->
+          <div style="margin:0 0 26px;">
+            <span style="display:inline-block;padding:7px 14px 7px 10px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;font-size:12px;color:${C.ink};line-height:1;">
+              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${C.success};margin-right:8px;vertical-align:middle;"></span>
+              ${entityName} · Active
+            </span>
           </div>
 
-          <!-- Setup CTA -->
-          <div style="margin:0 0 24px;">
-            <a href="${sessionLink}" style="display:inline-block;background:${C.primary};color:${C.white};text-decoration:none;padding:14px 24px;border-radius:10px;font-size:14px;font-weight:500;letter-spacing:0.01em;">
-              Continue setup →
-            </a>
-          </div>
+        </td></tr>
 
-          <p style="font-size:13px;line-height:20px;color:${C.inkSoft};margin:0 0 14px;">
+        <!-- CTA block — pill button with arrow, matches checker primary CTA -->
+        <tr><td style="padding:0 36px 8px;">
+          <a href="${sessionLink}" style="display:inline-block;background:${C.primary};color:${C.white};text-decoration:none;padding:15px 28px;border-radius:12px;font-size:15px;font-weight:500;letter-spacing:0.005em;line-height:1;">
+            Continue to setup &nbsp;→
+          </a>
+        </td></tr>
+
+        <!-- Tail copy -->
+        <tr><td style="padding:24px 36px 32px;">
+          <p style="font-size:13px;line-height:20px;color:${C.inkSoft};margin:0 0 12px;">
             Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off.
           </p>
-
           <p style="font-size:13px;line-height:20px;color:${C.muted};margin:0;">
             Questions? Just reply to this email or write to <a href="mailto:hello@altery.com" style="color:${C.primary};text-decoration:underline;">hello@altery.com</a> — we're here to help.
           </p>
-
         </td></tr>
 
         <!-- Footer -->
-        <tr><td style="background:${C.surface};padding:20px 36px;border-top:1px solid ${C.border};font-size:11px;line-height:16px;color:${C.muted};">
+        <tr><td style="background:${C.surface};padding:22px 36px;border-top:1px solid ${C.border};font-size:11px;line-height:16px;color:${C.muted};">
           <div style="color:${C.ink};font-weight:600;margin-bottom:4px;">Altery</div>
           <div>Business finance for digital companies banks struggle to understand.</div>
           <div style="margin-top:8px;">Altery Ltd (UK · FCA-licensed EMI) · Altery EU (CY · Central Bank of Cyprus EMI) · Altery MENA (DIFC · DFSA)</div>
