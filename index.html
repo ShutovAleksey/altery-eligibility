@@ -9798,6 +9798,15 @@
       });
     }
 
+    // Altery brand mark — the 4-dot favicon, base64-encoded for inline
+    // embedding into the PDF template. 892 chars decoded = 668 bytes (65×65
+    // PNG). Inlining vs URL-fetching avoids CORS / image-decode races in
+    // html2canvas, which is the most common cause of "PDF arrived blank"
+    // bugs. The same asset lives at /favicon.ico for the email body, where
+    // we use the absolute URL instead (smaller email body, browsers can
+    // cache it across messages).
+    const EC_ALTERY_LOGO_B64 = "iVBORw0KGgoAAAANSUhEUgAAAEEAAABBCAMAAAC5KTl3AAAAV1BMVEVMaXEAQtP/dxwAQdQAQdMAQdT/eB7juZr/dxz/dxwAQNO9zdH20K4AQtT/dxz20K+9zdEAQdMAQNLUzcT0z67/eB2+ztL20K+9zdH/dxwAQdO9zdH10K5ICpPuAAAAGXRSTlMARdeH6WclFoJlGZ3RokeAfL8wO1mfzaNblCewqQAAAAlwSFlzAAALEwAACxMBAJqcGAAAAcZJREFUeNrtl9mWgyAQREFA3LcYE9D//87JuBCN0NLkcaae5Z6u6qY5EvIvnOI0eamKA4/LJFKronsccl4dhGZUkfpQlKIAqbIoQQASpb5DVMohlxHZ5Hlz2/UwchGUNU6Zj7NyeeFhjtNGGMZVw4qIFaDqDGhGowHogztMOe60ZBFBBHUiPPeEfGaCgHOWzYlQwYQUJAyXMViCOLu4INyvk8QS9jZyEuKCkPxjomKYYBmprYptJLHdnM88DzcLnKgoeLu4g7SVhDbhu6G8S3gV4UwicpVABStLJqhZUrgtRxnXq3hJwTCtmzYr9UFthtz2lOtPMde2tU0jYdoiZu1IIr0BWpfbw/1+ee3nCdUOCdPX6vX8p87XP+Mugu78Boc5Abr1AmQaEPUhCIjgVUQLEXhmwqwfRd2jTRgbsp5mFRLRykNDi2nTDUtYBrM2gKnABbnN5buEaepDCLcdYHogCbOLfk842eg8koQJhIOE7trFxUQt30xQknA71xUBdhO2sQ21QdiGEupGaT7ll5F4SNzdet+rX0Zd1xK7pCjxVceBO/EFQqD+RM5GOCVIiQODsyzgn06UG6QNOr/kQYUQXfDxP6sfLniyVHyT3q0AAAAASUVORK5CYII=";
+
     // Build the analysis HTML string. Pure function — takes the
     // recommendation, recipient email, and translator; returns markup.
     function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
@@ -9926,8 +9935,11 @@
   <div style="background:${C.primary};color:${C.white};padding:36px 48px 30px;">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;">
       <div>
-        <div style="font-size:24px;font-weight:700;letter-spacing:0.04em;line-height:1;">ALTERY</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.72);margin-top:8px;letter-spacing:0.01em;">${t("ec.pdf.subtitle")}</div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <img src="data:image/png;base64,${EC_ALTERY_LOGO_B64}" alt="" width="34" height="34" style="display:block;border-radius:7px;"/>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-0.01em;line-height:1;color:${C.white};">altery</div>
+        </div>
+        <div style="font-size:13px;color:rgba(255,255,255,.72);margin-top:14px;letter-spacing:0.01em;">${t("ec.pdf.subtitle")}</div>
       </div>
       <div style="font-size:10.5px;color:rgba(255,255,255,.6);text-align:right;line-height:16px;">
         <div style="text-transform:uppercase;letter-spacing:0.06em;">${t("ec.pdf.generated")}</div>
@@ -10038,23 +10050,41 @@
 
       const html = ecBuildAnalysisHTML({ rec, email, t, langCode });
 
-      // Mount the email HTML into a hidden offscreen div so html2canvas
-      // can compute a real layout. Detached nodes don't compute styles,
-      // hence the temporary DOM insertion.
+      // Mount the template into the live document so html2canvas can read
+      // real computed styles. Three details matter and are easy to get
+      // wrong (we did, the first time — empty PDF in production):
+      //
+      //  1. Don't use `left: -9999px`. html2canvas v1.4 occasionally
+      //     captures off-screen elements as blank, especially when the
+      //     element contains images that haven't decoded yet. Instead we
+      //     keep the element in the visible viewport (top:0, left:0) but
+      //     send it to the back of the stacking context with z-index
+      //     `-9999`. The handoff modal overlay sits above it; user sees
+      //     nothing flash on screen.
+      //  2. Don't use `opacity: 0` or `visibility: hidden`. Both make
+      //     html2canvas render the element as empty (opacity propagates
+      //     through cloning; visibility skips paint).
+      //  3. Don't immediately call html2pdf after appendChild. The browser
+      //     hasn't painted yet, so the inline favicon hasn't decoded and
+      //     fonts haven't laid out. Wait two animation frames + a small
+      //     timeout for image decode, then capture.
       const container = document.createElement("div");
-      container.style.cssText = "position:absolute;left:-9999px;top:0;width:720px;background:#fff;z-index:-1;";
+      container.style.cssText = "position:fixed;top:0;left:0;width:720px;background:#fff;z-index:-9999;";
       container.innerHTML = html;
       document.body.appendChild(container);
+
+      // Double-RAF guarantees one full layout + paint cycle has happened.
+      // The extra setTimeout gives the inlined base64 logo time to decode
+      // — image decoding is async and can race html2canvas if we capture
+      // immediately after paint.
+      await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+      await new Promise((r) => setTimeout(r, 80));
 
       const planSlug = (rec.plan?.id || "plan").toLowerCase();
       const stamp = new Date().toISOString().slice(0, 10);
       const filename = `Altery-eligibility-${planSlug}-${stamp}.pdf`;
 
       try {
-        // Convert to PDF as a Blob — exactly the same rendering pipeline
-        // as the prior download path, just outputting bytes instead of
-        // triggering a save dialog. .outputPdf("blob") returns the PDF
-        // bytes ready for transport.
         const blob = await window.html2pdf().set({
           margin: [10, 0, 10, 0],
           filename,
@@ -10064,18 +10094,30 @@
             useCORS: true,
             logging: false,
             backgroundColor: "#ffffff",
+            // Both width and windowWidth set explicitly — html2canvas's
+            // viewport auto-detection misjudges offscreen / fixed-position
+            // elements and can produce a zero-width canvas.
+            width: 720,
             windowWidth: 720,
+            // Wait for any nested images (the inlined logo) to actually
+            // finish loading before snapshotting. Default is no wait.
+            imageTimeout: 3000,
           },
           jsPDF: { unit: "mm", format: "a4", orientation: "portrait", compress: true },
           pagebreak: { mode: ["css", "legacy"] },
         }).from(container.firstElementChild).outputPdf("blob");
 
+        // Sanity check — if the produced PDF is suspiciously tiny we very
+        // likely hit a rendering race despite the waits above. Log it so
+        // we can see it in production console; don't fail the send though,
+        // since a tiny PDF still beats a thrown error.
+        if (blob.size < 4000) {
+          console.warn("[ecSendAnalysisEmail] PDF blob is small (" + blob.size + " bytes) — possible render race");
+        }
+
         const pdfBase64 = await ecBlobToBase64(blob);
 
-        // Pull a few display fields server-side needs for the email body:
-        // recommended plan, entity, persona line, setup link. The HTML
-        // template lives on the server too (api/send-analysis.js) and
-        // assembles its short email body from these.
+        // Display fields the server template needs for the email body.
         const planName = t(rec.plan.nameKey);
         const entityName = t(rec.entity.nameKey);
         const personaIndustries = ["saas", "apps", "games", "edtech", "affiliate", "creator", "crypto"];
