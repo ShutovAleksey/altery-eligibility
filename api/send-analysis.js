@@ -37,7 +37,7 @@ const EMAIL_RE      = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // detail; this is the wrapper that greets the user before they click
 // the attachment. Inline styles only (every email client renders inline
 // CSS reliably; <style> blocks get stripped in Gmail, Outlook, etc.).
-function buildEmailHTML({ planName, entityName, sessionLink, personaLine }) {
+function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoURL }) {
   const C = {
     primary: "#002780",
     primaryLight: "#B3D1FF",
@@ -50,6 +50,15 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine }) {
     white: "#FFFFFF",
   };
   const FF = "'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif";
+
+  // Logo block — image + wordmark. We use the absolute URL so Resend
+  // doesn't need to attach the asset; the user's email client will
+  // fetch it from the deployment. Some email clients block remote
+  // images by default ("show images" prompt) — that's acceptable
+  // because the wordmark text next to the logo still identifies us.
+  const logoBlock = logoURL ? `
+    <img src="${logoURL}" alt="Altery" width="32" height="32" style="display:block;border-radius:6px;border:0;" />
+  ` : "";
 
   return `<!doctype html>
 <html lang="en">
@@ -69,9 +78,16 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine }) {
       <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background:${C.white};border-radius:14px;overflow:hidden;box-shadow:0 8px 24px rgba(0,6,57,0.08);">
 
         <!-- Header band -->
-        <tr><td style="background:${C.primary};color:${C.white};padding:30px 36px 26px;">
-          <div style="font-size:22px;font-weight:700;letter-spacing:0.04em;line-height:1;">ALTERY</div>
-          <div style="font-size:13px;color:rgba(255,255,255,.72);margin-top:7px;">Your eligibility analysis</div>
+        <tr><td style="background:${C.primary};color:${C.white};padding:28px 36px 26px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="vertical-align:middle;padding-right:12px;">${logoBlock}</td>
+              <td style="vertical-align:middle;">
+                <div style="font-size:22px;font-weight:700;letter-spacing:-0.01em;line-height:1;color:${C.white};">altery</div>
+              </td>
+            </tr>
+          </table>
+          <div style="font-size:13px;color:rgba(255,255,255,.72);margin-top:14px;">Your eligibility analysis</div>
         </td></tr>
 
         <!-- Body -->
@@ -182,11 +198,21 @@ export default async function handler(req, res) {
     // Build email body. Subject is concise + persona-aware where
     // possible; mailbox previews tend to truncate at ~40 chars.
     const subject = `Your ${safePlan} account on Altery — analysis attached`;
+
+    // Absolute URL to the brand mark, computed from the inbound request
+    // so it adapts automatically when the user points a custom domain
+    // (altery.com etc.) at this Vercel deployment. We fall back to a
+    // bare host header if x-forwarded-proto isn't present (local dev).
+    const proto = (req.headers["x-forwarded-proto"] || "https").split(",")[0].trim();
+    const host  = (req.headers["x-forwarded-host"] || req.headers.host || "").split(",")[0].trim();
+    const logoURL = host ? `${proto}://${host}/favicon.ico` : "";
+
     const html = buildEmailHTML({
       planName:    safePlan,
       entityName:  safeEntity,
       sessionLink: safeLink,
       personaLine: safePersona,
+      logoURL,
     });
 
     const safeFilename = (typeof filename === "string" && /^[A-Za-z0-9_\-.]+\.pdf$/.test(filename))
