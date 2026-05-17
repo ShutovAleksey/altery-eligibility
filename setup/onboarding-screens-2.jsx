@@ -114,8 +114,120 @@ function formatUboRoleLabel(t, ubo) {
   return Number.isFinite(pct) && pct > 0 ? `${base} (${pct}%)` : base;
 }
 
-function ScreenUboList({ next, back, ubos, onAddPerson, onEditPerson }) {
+// Country options for the sole-shortcut residence picker. Matches the set
+// used in ScreenUboForm so we don't introduce a new vocabulary for the same
+// concept; broader list comes when the backend exposes a country master.
+const UBO_COUNTRY_OPTIONS = [
+  { value: "GB", flag: "GB", label: "United Kingdom" },
+  { value: "IT", flag: "IT", label: "Italy" },
+  { value: "DE", flag: "DE", label: "Germany" },
+  { value: "FR", flag: "FR", label: "France" },
+  { value: "NL", flag: "NL", label: "Netherlands" },
+  { value: "ES", flag: "ES", label: "Spain" },
+  { value: "IE", flag: "IE", label: "Ireland" },
+  { value: "PL", flag: "PL", label: "Poland" },
+];
+
+function ScreenUboList({ next, back, ubos, auth, onAddPerson, onEditPerson, onConfirmSole }) {
   const t = useT();
+  // Three view modes:
+  //   "question" — fresh visit, no UBOs yet → ask the sole-vs-multi question
+  //   "sole"     — user picked "yes, just me" → inline DOB + country mini-form
+  //   "list"     — user picked "no, multiple people" OR already has saved UBOs
+  // If saved UBOs already exist on mount, the question was answered earlier.
+  const [mode, setMode] = useState(() => (ubos.length > 0 ? "list" : "question"));
+  const [dob, setDob] = useState(null);
+  const [country, setCountry] = useState("");
+
+  const fullName = `${auth?.firstName || ""} ${auth?.lastName || ""}`.trim();
+
+  if (mode === "question") {
+    return (
+      <div className="ob-content fade-in">
+        <TopRow onBack={back} />
+        <Title title={t("ob.ubo.title")} lead={t("ob.ubo.lead")} />
+
+        <div style={{
+          padding: 20,
+          background: "var(--c-surface)",
+          border: "1px solid var(--c-border)", borderRadius: 12,
+          display: "flex", flexDirection: "column", gap: 14,
+        }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--c-ink)" }}>
+            Are you the sole director and 100% owner?
+          </div>
+          <div style={{ fontSize: 13, color: "var(--c-muted)" }}>
+            Most single-founder companies pick the fast path — we'll fill in your details from what you already entered.
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Button variant="primary" size="lg" onClick={() => setMode("sole")} iconRight="arrowRight">
+              Yes, that's just me
+            </Button>
+            <Button variant="outline" size="lg" onClick={() => setMode("list")}>
+              No, there's a team
+            </Button>
+          </div>
+        </div>
+
+        <WhyWeAsk>{t("ob.ubo.why")}</WhyWeAsk>
+
+        <div className="ob-actions">
+          <Button variant="outline" size="lg" onClick={back} iconLeft="arrowLeft">{t("ob.common.back")}</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "sole") {
+    const canConfirm = dob && country;
+    const dobToISO = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return (
+      <div className="ob-content fade-in">
+        <TopRow onBack={() => setMode("question")} />
+        <Title title={t("ob.ubo.title")} lead="A couple more details and we're done." />
+
+        <div style={{
+          padding: 16,
+          background: "var(--c-surface)",
+          border: "1px solid var(--c-border)", borderRadius: 12,
+          fontSize: 14, color: "var(--c-muted)",
+        }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--c-ink)", marginBottom: 4 }}>
+            {fullName || "You"}
+          </div>
+          <div>{auth?.email || ""} · Director and beneficial owner · 100%</div>
+        </div>
+
+        <div className="ob-fields">
+          <div className="ob-fields row">
+            <DatePicker label={t("ob.uboForm.dob")}
+              value={dob} onChange={setDob}
+              maxDate={new Date()} />
+            <Select label={t("ob.uboForm.country")}
+              value={country} onChange={setCountry}
+              placeholder={t("ob.uboForm.countryPh")}
+              options={UBO_COUNTRY_OPTIONS} />
+          </div>
+        </div>
+
+        <Alert tone="info">
+          We need this to verify your identity. The company's legal address came from the previous step — this one is about you personally.
+        </Alert>
+
+        <div className="ob-actions between">
+          <Button variant="outline" size="lg" onClick={() => setMode("question")}>{t("ob.common.back")}</Button>
+          <Button variant="primary" size="lg"
+            disabled={!canConfirm}
+            iconRight="arrowRight"
+            onClick={() => onConfirmSole({ dateOfBirth: dobToISO(dob), country })}>
+            Confirm and continue
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // mode === "list"
   return (
     <div className="ob-content fade-in">
       <TopRow onBack={back} />
@@ -143,7 +255,7 @@ function ScreenUboList({ next, back, ubos, onAddPerson, onEditPerson }) {
           background: "var(--c-surface)",
           color: "var(--c-muted)", fontSize: 14, textAlign: "center",
         }}>
-          {t("ob.ubo.lead")}
+          Add yourself first, then any other director or beneficial owner.
         </div>
       )}
 
@@ -158,7 +270,7 @@ function ScreenUboList({ next, back, ubos, onAddPerson, onEditPerson }) {
           cursor: "pointer",
         }}
       >
-        <Icon name="plus" size={16}/> {t("ob.ubo.add")}
+        <Icon name="plus" size={16}/> {ubos.length === 0 ? "Add yourself" : t("ob.ubo.add")}
       </button>
 
       <WhyWeAsk>{t("ob.ubo.why")}</WhyWeAsk>

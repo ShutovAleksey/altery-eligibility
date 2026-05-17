@@ -328,10 +328,53 @@ function App() {
                                       onChangeOutbound={setOutboundChannels}/>;
       case "documents":     return <ScreenDocuments next={next} back={back}
                                       docs={docs} setDoc={setDoc}/>;
-      case "ubo-list":      return <ScreenUboList next={next} back={back}
+      case "ubo-list":      return <ScreenUboList
+                                      // Continue on the list skips the form (the form is reached
+                                      // only via Add/Edit) and goes straight to review.
+                                      next={() => setStep("review")}
+                                      back={back}
                                       ubos={formState.ubos}
-                                      onAddPerson={() => { clearUboDraft(); setStep("ubo-form"); }}
-                                      onEditPerson={(id) => { loadUboIntoDraft(id); setStep("ubo-form"); }}/>;
+                                      auth={formState.auth}
+                                      onAddPerson={() => {
+                                        // Pre-fill the very first UBO from the auth section — the
+                                        // lead applicant is almost always the first person added.
+                                        // Subsequent adds open a blank form.
+                                        if (formState.ubos.length === 0) {
+                                          setFormState((s) => ({
+                                            ...s,
+                                            uboDraft: {
+                                              ...INITIAL_UBO_DRAFT,
+                                              firstName: s.auth.firstName || "",
+                                              lastName: s.auth.lastName || "",
+                                              email: s.auth.email || "",
+                                            },
+                                          }));
+                                        } else {
+                                          clearUboDraft();
+                                        }
+                                        setStep("ubo-form");
+                                      }}
+                                      onEditPerson={(id) => { loadUboIntoDraft(id); setStep("ubo-form"); }}
+                                      onConfirmSole={({ dateOfBirth, country }) => {
+                                        // Sole-director shortcut: build the UBO record entirely
+                                        // from auth + the two extra fields, replace any existing
+                                        // ubos array (sole means sole), and jump to review.
+                                        setFormState((s) => ({
+                                          ...s,
+                                          ubos: [{
+                                            id: makeUboId(),
+                                            firstName: s.auth.firstName || "",
+                                            lastName: s.auth.lastName || "",
+                                            email: s.auth.email || "",
+                                            dateOfBirth,
+                                            country,
+                                            role: "both",
+                                            stakePercent: "100",
+                                          }],
+                                          uboDraft: INITIAL_UBO_DRAFT,
+                                        }));
+                                        setStep("review");
+                                      }}/>;
       case "ubo-form":      return <ScreenUboForm
                                       onSave={() => { saveUboDraft(); setStep("ubo-list"); }}
                                       onCancel={() => { clearUboDraft(); setStep("ubo-list"); }}
