@@ -395,7 +395,8 @@ function App() {
       </main>
       {showSaveModal && (
         <ResumeModal
-          email="anna@orbit.io"
+          email={formState.auth.email || ""}
+          lastSavedAt={formState.meta.lastSavedAt}
           onClose={() => setShowSaveModal(false)}
         />
       )}
@@ -404,9 +405,17 @@ function App() {
 }
 
 // ──────────────────── ResumeModal — "Save and continue later" ────────────────────
-function ResumeModal({ email, onClose }) {
+function ResumeModal({ email, lastSavedAt, onClose }) {
   const [emailVal, setEmailVal] = useState(email || "");
   const [sent, setSent] = useState(false);
+  // Show the wall-clock time the last persist actually happened (from the
+  // useFormState effect that writes to localStorage) — falling back to "just
+  // now" if the modal opened before any save has been logged. Previously
+  // this called `new Date()` and so always read as the moment the modal
+  // opened, which made the "Saved automatically" line meaningless.
+  const savedLabel = lastSavedAt
+    ? new Date(lastSavedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    : "just now";
   return (
     <div className="ob-modal-overlay" onClick={onClose}>
       <div className="ob-modal" onClick={(e) => e.stopPropagation()} style={{ position: "relative" }}>
@@ -430,7 +439,7 @@ function ResumeModal({ email, onClose }) {
             </div>
             <div style={{ marginTop: 16, fontSize: 12, color: "var(--c-muted)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
               <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--c-success)", boxShadow: "0 0 0 4px rgba(10,159,82,.12)" }}/>
-              Saved automatically · {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              Saved automatically · {savedLabel}
             </div>
           </React.Fragment>
         ) : (

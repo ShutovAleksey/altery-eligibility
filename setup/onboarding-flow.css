@@ -34,12 +34,16 @@ html { overflow-y: scroll; }
 .ob-header__bg svg path { fill: #000756; }
 .ob-header__logo { height: 32px; width: auto; flex: 0 0 auto; position: relative; z-index: 2; }
 .ob-header__steps {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  /* Steps cluster fills the middle of the header via flex, instead of
+     being absolutely centered. Absolute centering used to cause the
+     last pill to overlap the right-side "Save & continue later" button
+     at narrower desktop widths — the cluster grew symmetrically from
+     the centre and crashed into the absolutely-positioned actions. */
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 24px;
   z-index: 2;
 }
