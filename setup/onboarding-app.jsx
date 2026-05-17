@@ -165,6 +165,7 @@ function useTweaks(defaults) {
 }
 
 function App() {
+  const t = useT();
   const [step, setStep] = useState("prep");
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULS);
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -288,7 +289,10 @@ function App() {
       const prevIdx = SECTIONS.findIndex((s) => s.id === prev.id);
       const newIdx = SECTIONS.findIndex((s) => s.id === sec.id);
       if (newIdx > prevIdx) {
-        setCelebration({ message: `${prev.label} — done` });
+        // SECTIONS entries carry `labelKey` (an i18n key), not a literal
+        // `label`. Resolve it via t() so the toast shows the actual section
+        // name instead of the string "undefined".
+        setCelebration({ message: t(prev.labelKey) + " — done" });
       }
     }
     if (sec) prevSectionRef.current = sec;
