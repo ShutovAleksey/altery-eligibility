@@ -163,71 +163,7 @@ function App() {
           onClose={() => setShowSaveModal(false)}
         />
       )}
-      <Tweaks step={step} tweaks={tweaks} setTweak={setTweak}/>
     </div>
-  );
-}
-
-function Tweaks({ step, tweaks, setTweak }) {
-  // Determine which state options are relevant for this step
-  const stateOptions = (() => {
-    if (step === "welcome" || step === "phone" || step === "ubo-form" || step === "country" || step === "business-info" || step === "activity")
-      return ["default", "empty"];
-    if (step === "password") return ["default", "empty", "error"];
-    if (step === "verify") return ["default", "filled", "error"];
-    if (step === "documents") return ["complete", "partial", "error", "empty"];
-    return null;
-  })();
-  const showPlanTweaks = false;
-  return (
-    <aside className="ob-tweaks">
-      <h3>Tweaks</h3>
-      {stateOptions && (
-        <div className="row">
-          <label>Field state</label>
-          <select value={tweaks.stateVariant} onChange={(e) => setTweak("stateVariant", e.target.value)}>
-            {stateOptions.map((o) => <option key={o} value={o}>{o}</option>)}
-          </select>
-        </div>
-      )}
-      {showPlanTweaks && (
-        <>
-          <div className="row">
-            <label>Currency</label>
-            <select value={tweaks.currency} onChange={(e) => setTweak("currency", e.target.value)}>
-              <option value="GBP">GBP £</option>
-              <option value="EUR">EUR €</option>
-            </select>
-          </div>
-          <div className="row">
-            <label>Selected plan</label>
-            <select value={tweaks.selectedPlan} onChange={(e) => setTweak("selectedPlan", e.target.value)}>
-              <option value="starter">Starter — £500/yr</option>
-              <option value="pro">Pro — £1,000/yr</option>
-              <option value="ultra">Ultra — £3,000/yr</option>
-            </select>
-          </div>
-        </>
-      )}
-      {step === "submit" && (
-        <div className="row">
-          <label>Application state</label>
-          <select value={tweaks.submitState} onChange={(e) => setTweak("submitState", e.target.value)}>
-            <option value="pending">In review</option>
-            <option value="rejected">Rejected</option>
-            <option value="applications">Applications list</option>
-          </select>
-        </div>
-      )}
-      <div className="row" style={{marginBottom:0}}>
-        <label>Quick jump</label>
-        <select value={step} onChange={(e) => {
-          window.dispatchEvent(new CustomEvent("ob-jump", { detail: e.target.value }));
-        }}>
-          {ALL_STEPS.map((s) => <option key={s} value={s}>{(ALL_STEPS.indexOf(s)+1)}. {STEP_LABELS[s] || s}</option>)}
-        </select>
-      </div>
-    </aside>
   );
 }
 
