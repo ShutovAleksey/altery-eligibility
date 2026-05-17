@@ -13286,7 +13286,23 @@
               onClose={() => setHandoffOpen(false)}
               onContinueToSetup={() => {
                 setHandoffOpen(false);
-                setPaymentOpen(true);
+                // Hand off to the onboarding flow (separate page at
+                // /setup/). The user has already chosen the plan and
+                // entity in the checker — pass both via URL params so
+                // the onboarding can pre-fill the payment screen and
+                // skip the generic prep checklist. Currency follows
+                // the entity: GBP for UK, EUR for EU/MENA. Volume is
+                // a hint, not yet used downstream. Payment happens at
+                // the end of onboarding, before submit — replaces the
+                // pre-onboarding Stripe modal.
+                const params = new URLSearchParams({
+                  token:    ecGenProposalRef(),
+                  plan:     activePlan.id,
+                  entity:   rec.entity.id,
+                  currency: rec.entity.id === "uk" ? "GBP" : "EUR",
+                  volume:   String(rec.monthlyVolume || ""),
+                });
+                window.location.href = "/setup?" + params.toString();
               }}
             />
           )}
