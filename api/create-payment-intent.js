@@ -17,13 +17,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2024-12-18.acacia",
 });
 
-// Whitelist of plans we accept payments for — prevents arbitrary
-// amount injection from a malicious client. The frontend sends a
-// planId, the backend looks up the canonical amount here.
-const PLAN_AMOUNTS_EUR = {
-  starter: 5500,   // €55
-  pro:     11000,  // €110
-  ultra:   33000,  // €330
+// Plan annual fees, expressed in MAJOR currency units (£ or €) — these
+// mirror the prices the frontend shows on the plan and payment screens
+// (see `PLANS` in setup/onboarding-screens-payment.jsx). The Stripe
+// PaymentIntent wants the smallest unit, so the handler multiplies by
+// 100 below. Whitelist also doubles as currency validation: anything
+// outside {gbp, eur} is rejected before reaching Stripe.
+const PLAN_ANNUAL_MAJOR = {
+  gbp: { starter: 500,  pro: 1000, ultra: 3000 },
+  eur: { starter: 600,  pro: 1200, ultra: 3600 },
 };
 
 export default async function handler(req, res) {
@@ -51,34 +53,52 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { planId, currency = "eur" } = req.body || {};
+    const { planId, currency = "eur", mode = "live" } = req.body || {};
+    const cur = String(currency).toLowerCase();
 
     // Resolve amount server-side from the whitelist — never trust the
-    // amount the client sends. Defaults to Pro if planId is unknown.
-    const amount = PLAN_AMOUNTS_EUR[planId] || PLAN_AMOUNTS_EUR.pro;
+    // amount the client sends. Reject unknown currencies up-front so we
+    // don't accidentally pass an unsupported ISO code to Stripe and get
+    // a confusing 4xx back.
+    const table = PLAN_ANNUAL_MAJOR[cur];
+    if (!table) {
+      return res.status(400).json({
+        error: `Unsupported currency '${currency}'. Use 'gbp' or 'eur'.`,
+      });
+    }
+    const annualMajor = table[planId] || table.pro;
+    const amount = annualMajor * 100; // major → pence / cents
+
+    // Pre-submit mode authorises now and captures later (on KYB approval)
+    // — manual capture matches the on-screen legal copy "we'll capture
+    // the fee only after your application is approved". Live mode (post-
+    // approval activation) charges immediately with automatic capture.
+    const captureMethod = mode === "presubmit" ? "manual" : "automatic";
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
-      currency,
+      currency: cur,
+      capture_method: captureMethod,
       // Let Stripe auto-enable all eligible payment methods based on
       // the account's dashboard configuration + customer location.
-      // This is what gives us the broadest method coverage — card,
-      // Apple/Google Pay, Link, SEPA, iDEAL, Bancontact, EPS, P24,
-      // Giropay, Sofort, Klarna, Afterpay, BLIK, Multibanco, and
-      // bank transfer (depending on account settings).
+      // Card, Apple/Google Pay, Link, SEPA, iDEAL, Bancontact, EPS,
+      // P24, Giropay, Sofort, Klarna, Afterpay, BLIK, Multibanco,
+      // bank transfer — depending on what's enabled in the account.
       automatic_payment_methods: { enabled: true },
       metadata: {
         planId: String(planId || "unknown"),
+        mode: String(mode),
         source: "altery-eligibility-prototype",
       },
-      description: "Altery — " + (planId || "unknown") + " plan (test)",
+      description: "Altery — " + (planId || "unknown") + " plan (" + mode + ")",
     });
 
     return res.status(200).json({
       clientSecret: paymentIntent.client_secret,
       planId,
       amount,
-      currency,
+      currency: cur,
+      captureMethod,
     });
   } catch (err) {
     console.error("[create-payment-intent] Stripe error:", err);

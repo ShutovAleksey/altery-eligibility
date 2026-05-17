@@ -449,7 +449,13 @@ function ScreenActivation({ planId, currency, mode, next, back }) {
         const piRes = await fetch("/api/create-payment-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ planId: plan.id, currency: cur.toLowerCase() }),
+          body: JSON.stringify({
+            planId: plan.id,
+            currency: cur.toLowerCase(),
+            // presubmit → capture_method: "manual" (authorise now, capture
+            // on KYB approval). post-approval activation → automatic capture.
+            mode: isPresubmit ? "presubmit" : "live",
+          }),
         });
         const piData = await piRes.json();
         if (!piRes.ok || !piData.clientSecret) {
