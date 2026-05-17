@@ -24,8 +24,11 @@
 // All dependencies (DS components, data, helpers, the PDF/email functions in
 // /checker-pdf.js, the inline EcIco from /checker-screens.jsx) resolve at
 // render time through the standard scope chain.
-
-const { useState, useEffect, useRef, useMemo, useLayoutEffect } = React;
+//
+// useState/useEffect/etc. are NOT redeclared here — the inline text/babel
+// block in /index.html owns that destructure, and a second top-level
+// `const useState = …` would collide in the per-realm lexical slot
+// (SyntaxError: Identifier 'useState' has already been declared).
 
 function EcFeesModal({ plan, entity, onClose }) {
   const t = useT();

@@ -31,8 +31,14 @@
 // All cross-module dependencies (DS components, data constants, helpers,
 // modals) are resolved at render time through the standard scope chain
 // (i.e. via the window exports those modules set).
-
-const { useState, useEffect, useRef, useMemo, useLayoutEffect } = React;
+//
+// We DO NOT redeclare useState/useEffect/etc. here. The inline text/babel
+// block in /index.html owns the top-level `const { useState, … } = React;`.
+// Each script's top-level `let`/`const` lands in the same per-realm Global
+// Lexical Declarations slot — redeclaring across files throws
+// "Identifier 'useState' has already been declared" at appendChild.
+// Function bodies in this file resolve `useState`, `useEffect`, etc. at
+// render time via free-variable lookup into that single shared slot.
 
 const EcIco = {
   arrowRight: (p) => <svg viewBox="0 0 16 16" fill="none" {...p}><path d="M3.5 8h9m0 0L8.5 4m4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>,
