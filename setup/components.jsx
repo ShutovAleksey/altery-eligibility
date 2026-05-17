@@ -38,11 +38,27 @@ const btnVariants = {
   link: { bg: "transparent", fg: "var(--c-accent)", bgH: "transparent", bgA: "transparent" }
 };
 
-const Button = ({
-  children, size = "md", variant = "primary", iconLeft, iconRight,
-  loading, disabled, full, style, onClick, type = "button",
-  ariaLabel, "aria-label": ariaLabelProp, ...rest
-}) => {
+const Button = (props) => {
+  // The previous version used a single-pattern destructure that mixed an
+  // identifier rename (`ariaLabel`) with a string-keyed rename
+  // (`"aria-label": ariaLabelProp`) and `...rest`. Some Babel-standalone
+  // builds (observed on @babel/standalone 7.29.0 in-browser) silently
+  // leaked the string-keyed and adjacent identifier props into `rest`,
+  // which then got spread onto the inner `<button>` and triggered
+  // "React does not recognize the iconRight prop on a DOM element".
+  // Two-step destructure + an explicit allowlist for the spread fixes it.
+  const {
+    children, size = "md", variant = "primary",
+    iconLeft, iconRight,
+    loading, disabled, full, style, onClick, type = "button",
+    ariaLabel,
+    ...rest
+  } = props;
+  const ariaLabelProp = rest["aria-label"];
+  // Drop anything we already consumed or never want on the DOM <button>.
+  // Object spread + omit so we don't mutate the caller's props object.
+  const { iconLeft: _il, iconRight: _ir, "aria-label": _al, ...domProps } = rest;
+
   const [h, setH] = React.useState(false);
   const [a, setA] = React.useState(false);
   const v = btnVariants[variant];
@@ -73,8 +89,8 @@ const Button = ({
       onMouseDown={() => setA(true)}
       onMouseUp={() => setA(false)}
       onClick={onClick}
-      {...rest}>
-      
+      {...domProps}>
+
       {loading ? <Spinner size={sz.fontSize + 2} /> : iconLeft && <Icon name={iconLeft} size={sz.fontSize + 2} aria-hidden="true" />}
       {children && <span>{children}</span>}
       {iconRight && !loading && <Icon name={iconRight} size={sz.fontSize + 2} aria-hidden="true" />}
