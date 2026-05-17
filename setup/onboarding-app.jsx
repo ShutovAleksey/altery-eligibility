@@ -8,10 +8,16 @@ const FORM_STORAGE_KEY = "altery:ob:formState:v2";
 
 // Whitelist of fields that survive a reload. Sensitive material (password,
 // 2FA code, card data) is deliberately absent — never persist those.
+//
+// When extending this shape, prefer ADDING new keys (or new slices) over
+// renaming/removing — `hydrateFormState` shallow-merges saved data on top of
+// the defaults, so additive changes don't require a `_v` bump. Bump `_v`
+// only on truly breaking changes (rename/remove/restructure).
 const INITIAL_FORM_STATE = {
   _v: 2,
   auth:     { firstName: "", lastName: "", email: "", phone: "", tosAccepted: false, marketingAccepted: false },
   contact:  { country: null },
+  business: { companyName: "", tradingName: "", companyNumber: "", dateOfIncorporation: null, address: "", industry: "", website: "" },
   activity: { inboundChannels: [], outboundChannels: [] },
   uboDraft: { role: "director" },
   plan:     { selectedPlanId: null, billingCurrency: null },
@@ -23,7 +29,13 @@ function hydrateFormState(checkerParams) {
     const raw = window.localStorage.getItem(FORM_STORAGE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
-      if (parsed && parsed._v === INITIAL_FORM_STATE._v) return parsed;
+      if (parsed && parsed._v === INITIAL_FORM_STATE._v) {
+        // Shallow merge over defaults so any newly-added top-level slice is
+        // present even if the saved payload predates that slice. This lets us
+        // ship additive shape changes without forcing a _v bump that wipes
+        // the user's in-progress data.
+        return { ...INITIAL_FORM_STATE, ...parsed };
+      }
     }
   } catch (e) { /* storage unavailable / parse error → fall through to seed */ }
   return {
@@ -151,6 +163,10 @@ function App() {
     (patch) => setFormState((s) => ({ ...s, auth: { ...s.auth, ...patch } })),
     []
   );
+  const updateBusiness = _useCallback(
+    (patch) => setFormState((s) => ({ ...s, business: { ...s.business, ...patch } })),
+    []
+  );
   const setCountry = _useCallback(
     (code) => setFormState((s) => ({ ...s, contact: { ...s.contact, country: code } })),
     []
@@ -218,7 +234,9 @@ function App() {
       case "country":       return <ScreenCountry next={next} back={back} state={s}
                                       country={formState.contact.country}
                                       onSelectCountry={setCountry}/>;
-      case "business-info": return <ScreenBusinessInfo next={next} back={back} state={s}/>;
+      case "business-info": return <ScreenBusinessInfo next={next} back={back} state={s}
+                                      business={formState.business}
+                                      updateBusiness={updateBusiness}/>;
       case "activity":      return <ScreenActivity next={next} back={back} state={s}
                                       inboundChannels={formState.activity.inboundChannels}
                                       outboundChannels={formState.activity.outboundChannels}

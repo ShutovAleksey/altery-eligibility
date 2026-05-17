@@ -234,29 +234,51 @@ function ScreenCountry({ next, back, country, onSelectCountry }) {
 }
 
 // ── Step 6: Business information ──────────────────
-function ScreenBusinessInfo({ next, back, state }) {
+function ScreenBusinessInfo({ next, back, business, updateBusiness }) {
   const t = useT();
-  const filled = state !== "empty";
+  // dateOfIncorporation is stored as a local-time "YYYY-MM-DD" string for
+  // clean JSON serialisation. We deliberately avoid Date.toISOString() and
+  // `new Date(iso)` because both interpret the string as UTC midnight, which
+  // shifts the displayed date by ±1 day for non-UTC users. Manual Y-M-D
+  // packing/unpacking keeps the date stable in the user's local calendar.
+  const dateValue = (() => {
+    if (!business.dateOfIncorporation) return null;
+    const [y, m, d] = business.dateOfIncorporation.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  })();
+  const onDateChange = (d) => {
+    if (!d) return updateBusiness({ dateOfIncorporation: null });
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    updateBusiness({ dateOfIncorporation: iso });
+  };
+  // Required for Continue: companyName, companyNumber, dateOfIncorporation,
+  // address, industry. Trading name and website are optional.
+  const canContinue =
+    business.companyName.trim() &&
+    business.companyNumber.trim() &&
+    business.dateOfIncorporation &&
+    business.address.trim() &&
+    business.industry;
   return (
     <div className="ob-content fade-in">
       <TopRow onBack={back} />
       <Title eyebrow={t("ob.country.eyebrow")} title={t("ob.bi.title")} lead={t("ob.bi.lead")} />
       <div className="ob-fields">
         <Input label={t("ob.bi.companyName")} placeholder={t("ob.bi.companyNamePh")}
-          value={filled ? "Orbit Labs Ltd" : ""} onChange={() => {}} />
+          value={business.companyName} onChange={(e) => updateBusiness({ companyName: e.target.value })} />
         <Input label={t("ob.bi.tradingName")} placeholder={t("ob.bi.tradingNamePh")}
-          value={filled ? "Orbit" : ""} onChange={() => {}} />
+          value={business.tradingName} onChange={(e) => updateBusiness({ tradingName: e.target.value })} />
         <div className="ob-fields row">
           <Input label={t("ob.bi.companyNumber")} placeholder={t("ob.bi.companyNumberPh")}
-            value={filled ? "HE 412 309" : ""} onChange={() => {}} />
+            value={business.companyNumber} onChange={(e) => updateBusiness({ companyNumber: e.target.value })} />
           <DatePicker label={t("ob.bi.dateInc")}
-            value={filled ? new Date(2021, 2, 12) : null} onChange={() => {}}
+            value={dateValue} onChange={onDateChange}
             maxDate={new Date()} />
         </div>
         <Input label={t("ob.bi.address")} placeholder={t("ob.bi.addressPh")}
-          value={filled ? "Stasinou 8, Office 401, Nicosia" : ""} onChange={() => {}} />
+          value={business.address} onChange={(e) => updateBusiness({ address: e.target.value })} />
         <Select label={t("ob.bi.industry")}
-          value={filled ? "tech" : ""} onChange={() => {}}
+          value={business.industry} onChange={(v) => updateBusiness({ industry: v })}
           placeholder={t("ob.bi.industryPh")}
           options={[
             { value: "tech", label: t("ob.bi.ind.tech") },
@@ -267,13 +289,13 @@ function ScreenBusinessInfo({ next, back, state }) {
             { value: "med", label: t("ob.bi.ind.med") }]
           } />
         <Input label={t("ob.bi.website")} placeholder={t("ob.bi.websitePh")}
-          value={filled ? "orbit.io" : ""} onChange={() => {}} />
+          value={business.website} onChange={(e) => updateBusiness({ website: e.target.value })} />
       </div>
       <Alert tone="warning" title={t("ob.bi.alertTitle")}>
         {t("ob.bi.alertBody")}
       </Alert>
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!filled}>{t("ob.common.continue")}</Button>
+        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!canContinue}>{t("ob.common.continue")}</Button>
       </div>
     </div>);
 }
