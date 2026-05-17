@@ -1400,6 +1400,7 @@ function EcResultBlocked({ rec, onBack, onReset }) {
 }
 
 Object.assign(window, {
+  EcApp,
   EcIco,
   EcIntro, EcQuestionHeader,
   EcCountry, EcIndustry, EcServices, EcVolume, EcCorridors, EcCrypto,
