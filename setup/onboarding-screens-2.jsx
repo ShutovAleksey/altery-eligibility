@@ -4,8 +4,24 @@
 // Onboarding screens — Documents, UBOs, Review, Status
 
 // ── Step 8: Company documents ──────────────────
-function ScreenDocuments({ next, back, state }) {
+// Documents live in App-level (NOT formState) — see comment in App.
+// Reload wipes them. Real uploads + server-side storage land in Phase 3.
+const DOC_ACCEPT = ".pdf,application/pdf,image/jpeg,image/png";
+const DOC_MAX_BYTES = 10 * 1024 * 1024; // 10 MB
+
+function formatBytes(n) {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(0)} KB`;
+  return `${(n / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function ScreenDocuments({ next, back, docs, setDoc }) {
   const t = useT();
+  // useState/useRef pulled from the global React (see other screens).
+  const [pendingDocId, setPendingDocId] = useState(null);
+  const [rejection, setRejection] = useState(null); // { docId, reason } or null
+  const inputRef = useRef(null);
+
   const DOC_LIST = [
     { id: "incorp", title: t("ob.doc.incorp"), required: true, hint: t("ob.doc.incorp.h") },
     { id: "memo",   title: t("ob.doc.memo"), required: true, hint: t("ob.doc.memo.h") },
@@ -14,19 +30,55 @@ function ScreenDocuments({ next, back, state }) {
     { id: "address", title: t("ob.doc.address"), required: true, hint: t("ob.doc.address.h") },
     { id: "good-standing", title: t("ob.doc.good"), required: false, hint: t("ob.doc.good.h") },
   ];
-  const allUploaded = state === "complete";
-  const someUploaded = state === "partial" || allUploaded;
+  const allRequiredUploaded = DOC_LIST.filter((d) => d.required).every((d) => docs[d.id]);
+
+  const openPicker = (docId) => {
+    setPendingDocId(docId);
+    setRejection((r) => (r && r.docId === docId ? null : r));
+    // Reset value so picking the same filename twice still fires onChange.
+    if (inputRef.current) inputRef.current.value = "";
+    inputRef.current?.click();
+  };
+
+  const onFileSelected = (e) => {
+    const file = e.target.files?.[0];
+    const id = pendingDocId;
+    e.target.value = "";
+    setPendingDocId(null);
+    if (!file || !id) return;
+    if (file.size > DOC_MAX_BYTES) {
+      setRejection({ docId: id, reason: t("ob.doc.fileError") });
+      return;
+    }
+    const okType = /\.(pdf|jpe?g|png)$/i.test(file.name) ||
+                   file.type === "application/pdf" ||
+                   file.type === "image/jpeg" ||
+                   file.type === "image/png";
+    if (!okType) {
+      setRejection({ docId: id, reason: t("ob.doc.fileError") });
+      return;
+    }
+    setRejection((r) => (r && r.docId === id ? null : r));
+    setDoc(id, file);
+  };
+
   return (
     <div className="ob-content fade-in">
       <TopRow onBack={back} />
       <Title title={t("ob.doc.title")} lead={t("ob.doc.lead")} />
       <Alert tone="info">{t("ob.doc.alert")}</Alert>
+      <input
+        ref={inputRef}
+        type="file"
+        accept={DOC_ACCEPT}
+        style={{ display: "none" }}
+        onChange={onFileSelected}
+      />
       <div style={{display:"flex", flexDirection:"column", gap:10}}>
-        {DOC_LIST.map((d, i) => {
-          const uploaded = allUploaded || (someUploaded && i < 3);
-          const errored = state === "error" && i === 1;
-          const fileState = uploaded ? "uploaded" : errored ? "error" : "idle";
-          // Filename uses doc id so it's stable across languages.
+        {DOC_LIST.map((d) => {
+          const file = docs[d.id];
+          const isErrored = rejection && rejection.docId === d.id;
+          const fileState = file ? "uploaded" : isErrored ? "error" : "idle";
           return (
             <FileUploadRow
               key={d.id}
@@ -34,15 +86,17 @@ function ScreenDocuments({ next, back, state }) {
               optional={!d.required}
               hint={d.hint}
               state={fileState}
-              filename={uploaded ? `${d.id}-2024.pdf` : null}
-              fileSize="1.4 MB"
-              errorMessage={t("ob.doc.fileError")}
+              filename={file ? file.name : null}
+              fileSize={file ? formatBytes(file.size) : undefined}
+              onUpload={() => openPicker(d.id)}
+              onReplace={() => openPicker(d.id)}
+              errorMessage={isErrored ? rejection.reason : undefined}
             />
           );
         })}
       </div>
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!allUploaded}>{t("ob.common.continue")}</Button>
+        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!allRequiredUploaded}>{t("ob.common.continue")}</Button>
       </div>
     </div>
   );

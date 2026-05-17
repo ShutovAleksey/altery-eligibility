@@ -251,6 +251,19 @@ function App() {
     setFormState((s) => ({ ...s, uboDraft: INITIAL_UBO_DRAFT }));
   }, []);
 
+  // Document uploads are deliberately NOT in formState/localStorage. The
+  // raw File blobs can't survive serialisation, and persisting just the
+  // filenames would falsely imply the file is still available after reload.
+  // Until the backend (Phase 3) accepts uploads and returns server file IDs,
+  // documents live in App-level state and reset on refresh — the user
+  // re-picks them once after a reload, which mirrors how real KYB portals
+  // behave before a server save is confirmed.
+  const [docs, setDocs] = useState({});
+  const setDoc = _useCallback(
+    (id, file) => setDocs((d) => ({ ...d, [id]: file })),
+    []
+  );
+
   // If the visitor came from the checker (token present), skip the
   // generic prep screen and go straight to welcome — they've already
   // seen the "what you'll need" story in the checker. Otherwise the
@@ -309,7 +322,8 @@ function App() {
                                       outboundChannels={formState.activity.outboundChannels}
                                       onChangeInbound={setInboundChannels}
                                       onChangeOutbound={setOutboundChannels}/>;
-      case "documents":     return <ScreenDocuments next={next} back={back} state={s === "default" ? "complete" : s}/>;
+      case "documents":     return <ScreenDocuments next={next} back={back}
+                                      docs={docs} setDoc={setDoc}/>;
       case "ubo-list":      return <ScreenUboList next={next} back={back}
                                       ubos={formState.ubos}
                                       onAddPerson={() => { clearUboDraft(); setStep("ubo-form"); }}
