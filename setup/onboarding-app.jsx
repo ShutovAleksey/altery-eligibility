@@ -1,29 +1,139 @@
 // Onboarding flow — main App
 const { useMemo: _useMemo, useCallback: _useCallback } = React;
 
+// ─────────────────────────────────────────────────────────────────
+// Type definitions (JSDoc — picked up by IDEs without a build step)
+// ─────────────────────────────────────────────────────────────────
+
+/**
+ * @typedef {'starter'|'pro'|'ultra'} PlanId
+ * @typedef {'GBP'|'EUR'} CurrencyCode
+ * @typedef {'director'|'both'|'ubo'} UboRole
+ * @typedef {string} IsoDate — local-time YYYY-MM-DD (no timezone shift)
+ * @typedef {string} IsoTimestamp — ISO 8601 string
+ * @typedef {string} Iso3166Alpha2 — country code, e.g. "GB"
+ */
+
+/**
+ * @typedef AuthSlice
+ * @property {string} firstName
+ * @property {string} lastName
+ * @property {string} email
+ * @property {string} phone           - E.164 format from PhoneInput, or "" if blank
+ * @property {boolean} tosAccepted
+ * @property {boolean} marketingAccepted
+ */
+
+/**
+ * @typedef ContactSlice
+ * @property {Iso3166Alpha2|null} country — company's country of incorporation
+ */
+
+/**
+ * @typedef BusinessSlice
+ * @property {string} companyName
+ * @property {string} tradingName
+ * @property {string} companyNumber
+ * @property {IsoDate|null} dateOfIncorporation
+ * @property {string} address
+ * @property {string} industry        - one of: tech | fin | ret | prof | mfg | med
+ * @property {string} website
+ */
+
+/**
+ * @typedef ActivitySlice
+ * @property {string[]} inboundChannels   - subset of: sepa, swift, fps, cards, crypto
+ * @property {string[]} outboundChannels  - same options as inbound
+ */
+
+/**
+ * @typedef UboRecord
+ * @property {string} id              - crypto.randomUUID()
+ * @property {string} firstName
+ * @property {string} lastName
+ * @property {string} email
+ * @property {IsoDate} dateOfBirth
+ * @property {Iso3166Alpha2} country  - country of residence
+ * @property {UboRole} role
+ * @property {string} stakePercent    - empty for "director"; numeric string "1".."100"
+ */
+
+/**
+ * @typedef UboDraft
+ * @property {string|null} editingId  - UUID being edited, or null when adding new
+ * @property {string} firstName
+ * @property {string} lastName
+ * @property {string} email
+ * @property {IsoDate|null} dateOfBirth
+ * @property {string} country
+ * @property {UboRole} role
+ * @property {string} stakePercent
+ */
+
+/**
+ * @typedef PlanSlice
+ * @property {PlanId|null} selectedPlanId
+ * @property {CurrencyCode|null} billingCurrency
+ */
+
+/**
+ * @typedef MetaSlice
+ * @property {string|null} token       - session ID forwarded from the checker
+ * @property {IsoTimestamp|null} startedAt
+ * @property {IsoTimestamp|null} lastSavedAt - written on every persist
+ */
+
+/**
+ * The persistent form-state object. Everything here survives a reload via
+ * localStorage. Sensitive fields (password, 2FA code, card data) are
+ * deliberately absent — those live in the screen-local React state.
+ *
+ * Extending the shape:
+ *  - ADD new keys / slices freely; `hydrateFormState` deep-merges saved
+ *    data over INITIAL_FORM_STATE so older payloads get the new defaults.
+ *  - RENAME / REMOVE keys requires a `_v` bump (and saved data will reset
+ *    for in-flight users).
+ *
+ * @typedef FormState
+ * @property {number} _v
+ * @property {AuthSlice} auth
+ * @property {ContactSlice} contact
+ * @property {BusinessSlice} business
+ * @property {ActivitySlice} activity
+ * @property {UboRecord[]} ubos
+ * @property {UboDraft} uboDraft
+ * @property {PlanSlice} plan
+ * @property {MetaSlice} meta
+ */
+
+/**
+ * @typedef CheckerParams
+ * @property {string} plan       - lower-case PlanId or fallback "pro"
+ * @property {string} entity     - "uk" | "eu" | "mena"
+ * @property {string|null} token
+ * @property {string|null} email
+ * @property {string|null} volume - monthly volume estimate from the checker
+ * @property {string} currency   - upper-case CurrencyCode or "GBP" fallback
+ */
+
 // localStorage key for the persisted onboarding form state. Bump the suffix
 // (`:v2`, `:v3`, …) whenever the shape changes; hydration will refuse to load
 // anything from an older version and the user will start fresh.
 const FORM_STORAGE_KEY = "altery:ob:formState:v2";
 
-// Whitelist of fields that survive a reload. Sensitive material (password,
-// 2FA code, card data) is deliberately absent — never persist those.
-//
-// When extending this shape, prefer ADDING new keys (or new slices) over
-// renaming/removing — `hydrateFormState` shallow-merges saved data on top of
-// the defaults, so additive changes don't require a `_v` bump. Bump `_v`
-// only on truly breaking changes (rename/remove/restructure).
+/** @type {UboDraft} */
 const INITIAL_UBO_DRAFT = {
-  editingId: null,         // null = new, string id = editing existing
+  editingId: null,
   firstName: "",
   lastName: "",
   email: "",
-  dateOfBirth: null,       // YYYY-MM-DD local
+  dateOfBirth: null,
   country: "",
   role: "director",
-  stakePercent: "",        // empty for "director"; numeric string otherwise
+  stakePercent: "",
 };
 
+/** @type {FormState} */
 const INITIAL_FORM_STATE = {
   _v: 2,
   auth:     { firstName: "", lastName: "", email: "", phone: "", tosAccepted: false, marketingAccepted: false },
@@ -55,6 +165,14 @@ function mergeFormState(defaults, saved) {
   return out;
 }
 
+/**
+ * Read the persisted form state from localStorage, or build a fresh one
+ * seeded from the eligibility-checker URL params (plan, currency, email,
+ * token). Returns INITIAL_FORM_STATE + seed when storage is unavailable.
+ *
+ * @param {CheckerParams} checkerParams
+ * @returns {FormState}
+ */
 function hydrateFormState(checkerParams) {
   try {
     const raw = window.localStorage.getItem(FORM_STORAGE_KEY);
@@ -86,6 +204,14 @@ function hydrateFormState(checkerParams) {
   };
 }
 
+/**
+ * React state hook that owns the persistent form-state pair. Writes to
+ * localStorage on every change with a fresh `lastSavedAt` timestamp;
+ * silently skips persistence when storage is full / unavailable.
+ *
+ * @param {CheckerParams} checkerParams
+ * @returns {[FormState, React.Dispatch<React.SetStateAction<FormState>>]}
+ */
 function useFormState(checkerParams) {
   const [formState, setFormState] = useState(() => hydrateFormState(checkerParams));
   useEffect(() => {

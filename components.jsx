@@ -43,9 +43,38 @@ const btnVariants = {
   link: { bg: "transparent", fg: "var(--c-accent)", bgH: "transparent", bgA: "transparent" }
 };
 
+/**
+ * @typedef {'primary'|'accent'|'secondary'|'outline'|'ghost'|'danger'|'dangerSoft'|'link'} ButtonVariant
+ * @typedef {'sm'|'md'|'lg'|'xl'} ButtonSize
+ *
+ * @typedef ButtonProps
+ * @property {React.ReactNode} [children]                  - Label. Sentence case, 1–3 words, action verb.
+ * @property {ButtonSize}      [size='md']                 - Height 32/36/44/52 px.
+ * @property {ButtonVariant}   [variant='primary']         - Visual hierarchy (see AlteryPay DS Do/Don't).
+ * @property {string}          [iconLeft]                  - Icon name (rendered before the label).
+ * @property {string}          [iconRight]                 - Icon name (rendered after the label).
+ * @property {boolean}         [loading]                   - Replaces label with spinner; non-interactive.
+ * @property {boolean}         [disabled]                  - Non-interactive, lower contrast.
+ * @property {boolean}         [full]                      - Stretches to 100% width of container.
+ * @property {React.CSSProperties} [style]                 - Inline-style override (merged last).
+ * @property {(e: React.MouseEvent) => void} [onClick]
+ * @property {'button'|'submit'|'reset'} [type='button']
+ * @property {string}          [ariaLabel]                 - Accessible name; required when there's no text label.
+ *
+ * Primary surface for actions. One primary CTA per screen — see
+ * library-v2-buttons.jsx in the DS handoff:
+ *   - primary  = THE action of the screen (forward progress)
+ *   - outline  = secondary parallel action
+ *   - ghost    = cancel / back (visually demoted, never competing)
+ *   - danger   = irreversible (delete)
+ *   - link     = inline text action
+ *
+ * @param {ButtonProps} props
+ * @returns {React.ReactElement}
+ */
 const Button = (props) => {
   // Read every prop by direct lookup — no destructure, no rest, no spread
-  // onto the DOM <button>. The previous Button used an object destructure
+  // onto the DOM <button>. A previous version used an object destructure
   // that mixed an identifier rename with a string-keyed rename
   // (`"aria-label": ariaLabelProp`) plus `...rest`; on @babel/standalone
   // 7.29.0 (the in-browser Babel) that pattern silently leaked props such
