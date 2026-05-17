@@ -826,36 +826,8 @@ html { overflow-y: scroll; }
 .ob-prep__total strong { color: var(--c-ink); font-weight: 600; }
 
 /* ============================================================
-   UBO list — verification progress strip + per-person actions
+   UBO list — per-person card
    ============================================================ */
-.ob-ubo-progress {
-  padding: 14px 16px;
-  background: #fff;
-  border: 1px solid var(--c-border);
-  border-radius: 14px;
-  display: flex; flex-direction: column; gap: 10px;
-}
-.ob-ubo-progress__head {
-  display: flex; align-items: baseline; justify-content: space-between;
-  gap: 12px; flex-wrap: wrap;
-}
-.ob-ubo-progress__title {
-  font-size: 13px; font-weight: 600; color: var(--c-ink);
-}
-.ob-ubo-progress__meta {
-  font-size: 11px; color: var(--c-muted);
-}
-.ob-ubo-progress__bar {
-  height: 4px; border-radius: 999px;
-  background: var(--c-border-soft); overflow: hidden;
-}
-.ob-ubo-progress__fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--c-success) 0%, #1cc36a 100%);
-  border-radius: 999px;
-  transition: width .4s cubic-bezier(.2,.9,.3,1);
-}
-
 /* Person card wrapper — different background for pending */
 .ob-person-card {
   background: #fff;
@@ -870,33 +842,6 @@ html { overflow-y: scroll; }
 .ob-person-card .ob-person {
   border: 0; border-radius: 0; background: transparent;
 }
-
-/* Pending row footer — last seen + resend / copy actions */
-.ob-person-pending {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px;
-  padding: 10px 16px 12px;
-  border-top: 1px dashed var(--c-border);
-  background: #FAFBFC;
-  flex-wrap: wrap;
-}
-.ob-person-pending__msg {
-  font-size: 12px; color: var(--c-muted); line-height: 16px;
-}
-.ob-person-pending__actions {
-  display: inline-flex; gap: 4px;
-}
-.ob-person-pending__btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: transparent; border: 0;
-  padding: 6px 10px; border-radius: 8px;
-  font-family: inherit;
-  font-size: 12px; font-weight: 600;
-  color: var(--c-accent);
-  cursor: pointer;
-  transition: background .12s;
-}
-.ob-person-pending__btn:hover { background: rgba(0, 111, 255, .08); }
 
 /* Floating shadow for primary CTA in submission flow */
 .ob-btn.primary-dark {

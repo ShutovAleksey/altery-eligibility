@@ -465,41 +465,12 @@
   display: flex; flex-direction: column; gap: 16px;
 }
 
-/* Method tabs (Card / Apple Pay / Google Pay / SEPA) */
-.pp-pay__tabs {
-  display: inline-flex; gap: 4px;
-  padding: 4px;
-  background: var(--c-bg-2);
-  border-radius: 10px;
-  align-self: flex-start;
-}
-.pp-pay__tab {
-  border: 0; background: transparent;
-  padding: 8px 14px;
-  font-size: 13px; font-weight: 600;
-  color: var(--c-muted);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background .15s, color .15s, box-shadow .15s;
-}
-.pp-pay__tab:hover { color: var(--c-ink-2); }
-.pp-pay__tab.is-on {
-  background: var(--c-ink);
-  color: var(--c-on-ink, #fff);
-  box-shadow: 0 1px 2px rgba(17, 20, 26, .14);
-}
-
-/* Card brand pill in card-number input rightSlot */
-.pp-pay__brand {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 3px 7px;
-  background: #1A1F71; color: #fff;
-  font-size: 10px; font-weight: 700;
-  letter-spacing: .04em;
-  border-radius: 4px;
-  font-family: var(--ff-mono, ui-monospace);
-}
-.pp-pay__brand-sep { opacity: .7; font-weight: 800; letter-spacing: 0; }
+/* NOTE: .pp-pay__tabs, .pp-pay__tab, .pp-pay__brand, .pp-pay__wallet*
+   were styling for the custom method-tab and wallet rows we replaced
+   with Stripe's Payment Element (commit cd156df). The Element ships
+   its own tab/wallet UI with its own appearance options, so those
+   selectors are gone here. .pp-pay__save / __legal stay — they're
+   used by the surrounding form copy + legal footer. */
 
 .pp-pay__save {
   display: flex; align-items: flex-start; gap: 10px;
@@ -520,26 +491,6 @@
 }
 .pp-pay__legal a {
   color: var(--c-ink-2); text-decoration: underline;
-}
-
-/* Wallet panels (Apple Pay / Google Pay) */
-.pp-pay__wallet {
-  display: flex; flex-direction: column; gap: 16px;
-}
-.pp-pay__wallet-card {
-  display: flex; flex-direction: column; align-items: flex-start;
-  padding: 24px;
-  background: var(--c-bg-2);
-  border-radius: 12px;
-  color: var(--c-ink);
-}
-.pp-pay__wallet-card > svg { margin-bottom: 12px; }
-.pp-pay__wallet-title {
-  font-size: 16px; font-weight: 600; color: var(--c-ink);
-  margin-bottom: 4px;
-}
-.pp-pay__wallet-sub {
-  font-size: 13px; line-height: 18px; color: var(--c-muted);
 }
 
 /* ── Order summary (sticky right column) ─────────────────────── */
@@ -820,7 +771,6 @@
   .pp-card__amount { font-size: 32px; }
   .pp-card__name { font-size: 24px; }
   .pp-pay__summary { position: static; }
-  .pp-pay__tabs { width: 100%; overflow-x: auto; }
   .pp-success__title { font-size: 24px; line-height: 30px; }
   .pp-detail-head__title { font-size: 26px; line-height: 32px; }
 }
