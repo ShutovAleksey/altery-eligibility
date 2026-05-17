@@ -172,7 +172,7 @@ function ScreenUboList({ next, back, ubos, auth, onAddPerson, onEditPerson, onCo
         <WhyWeAsk>{t("ob.ubo.why")}</WhyWeAsk>
 
         <div className="ob-actions">
-          <Button variant="outline" size="lg" onClick={back} iconLeft="arrowLeft">{t("ob.common.back")}</Button>
+          <Button variant="ghost" size="lg" onClick={back} iconLeft="arrowLeft">{t("ob.common.back")}</Button>
         </div>
       </div>
     );
@@ -215,7 +215,7 @@ function ScreenUboList({ next, back, ubos, auth, onAddPerson, onEditPerson, onCo
         </Alert>
 
         <div className="ob-actions between">
-          <Button variant="outline" size="lg" onClick={() => setMode("question")}>{t("ob.common.back")}</Button>
+          <Button variant="ghost" size="lg" onClick={() => setMode("question")}>{t("ob.common.back")}</Button>
           <Button variant="primary" size="lg"
             disabled={!canConfirm}
             iconRight="arrowRight"
@@ -276,7 +276,7 @@ function ScreenUboList({ next, back, ubos, auth, onAddPerson, onEditPerson, onCo
       <WhyWeAsk>{t("ob.ubo.why")}</WhyWeAsk>
 
       <div className="ob-actions between">
-        <Button variant="outline" size="lg" onClick={back} iconLeft="arrowLeft">{t("ob.common.back")}</Button>
+        <Button variant="ghost" size="lg" onClick={back} iconLeft="arrowLeft">{t("ob.common.back")}</Button>
         <Button variant="primary" size="lg" onClick={next} iconRight="arrowRight" disabled={ubos.length === 0}>{t("ob.common.continue")}</Button>
       </div>
     </div>
@@ -379,7 +379,7 @@ function ScreenUboForm({ onSave, onCancel, draft, updateUboDraft }) {
       <Alert tone="info">{t("ob.uboForm.alert")}</Alert>
 
       <div className="ob-actions between">
-        <Button variant="outline" size="lg" onClick={onCancel}>{t("ob.common.cancel")}</Button>
+        <Button variant="ghost" size="lg" onClick={onCancel}>{t("ob.common.cancel")}</Button>
         <Button variant="primary" size="lg" onClick={onSave} iconRight="send" disabled={!canSave}>{t("ob.uboForm.send")}</Button>
       </div>
     </div>

@@ -374,7 +374,7 @@ function ScreenPlanDetails({ next, back, planId, setPlanId, currency, setCurrenc
       </Alert>
 
       <div className="ob-actions between">
-        <Button variant="outline" size="lg" onClick={back} iconLeft="arrowLeft">Back to plans</Button>
+        <Button variant="ghost" size="lg" onClick={back} iconLeft="arrowLeft">Back to plans</Button>
         <Button variant="primary" size="lg" onClick={() => next("documents")} iconRight="arrowRight">
           Continue with {plan.name}
         </Button>

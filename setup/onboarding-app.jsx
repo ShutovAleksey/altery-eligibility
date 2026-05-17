@@ -434,7 +434,7 @@ function ResumeModal({ email, lastSavedAt, onClose }) {
               placeholder="you@yourcompany.com"
             />
             <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-              <Button variant="outline" size="lg" onClick={onClose} style={{ flex: 1 }}>Keep working</Button>
+              <Button variant="ghost" size="lg" onClick={onClose} style={{ flex: 1 }}>Keep working</Button>
               <Button variant="primary" size="lg" onClick={() => setSent(true)} style={{ flex: 1 }}>Send link</Button>
             </div>
             <div style={{ marginTop: 16, fontSize: 12, color: "var(--c-muted)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
