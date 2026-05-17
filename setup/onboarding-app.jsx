@@ -165,12 +165,9 @@ function useTweaks(defaults) {
 }
 
 function App() {
-  const t = useT();
   const [step, setStep] = useState("prep");
   const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULS);
   const [showSaveModal, setShowSaveModal] = useState(false);
-  const [celebration, setCelebration] = useState(null); // { message }
-  const prevSectionRef = useRef(null);
 
   // formState — single source of truth for user-entered data, persisted to
   // localStorage so a reload mid-flow doesn't lose progress. Initialised below
@@ -279,24 +276,6 @@ function App() {
     window.addEventListener("ob-jump", handler);
     return () => window.removeEventListener("ob-jump", handler);
   }, []);
-
-  // Detect when we cross a section boundary → trigger celebration toast
-  useEffect(() => {
-    const sec = getCurrentSection(step);
-    const prev = prevSectionRef.current;
-    if (prev && sec && prev.id !== sec.id) {
-      // Find the index of the previous section to know which one was just completed
-      const prevIdx = SECTIONS.findIndex((s) => s.id === prev.id);
-      const newIdx = SECTIONS.findIndex((s) => s.id === sec.id);
-      if (newIdx > prevIdx) {
-        // SECTIONS entries carry `labelKey` (an i18n key), not a literal
-        // `label`. Resolve it via t() so the toast shows the actual section
-        // name instead of the string "undefined".
-        setCelebration({ message: t(prev.labelKey) + " — done" });
-      }
-    }
-    if (sec) prevSectionRef.current = sec;
-  }, [step]);
 
   const idx = ALL_STEPS.indexOf(step);
   const next = () => setStep(ALL_STEPS[Math.min(ALL_STEPS.length - 1, idx + 1)]);
@@ -414,9 +393,6 @@ function App() {
       <main className="ob-main">
         <div key={step}>{renderStep()}</div>
       </main>
-      {celebration && (
-        <Celebrate message={celebration.message} onDone={() => setCelebration(null)} />
-      )}
       {showSaveModal && (
         <ResumeModal
           email="anna@orbit.io"
