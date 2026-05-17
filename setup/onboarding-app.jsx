@@ -1,5 +1,5 @@
 // Onboarding flow — main App
-const { useMemo: _useMemo, useCallback: _useCallback } = React;
+const { useMemo: _useMemo, useCallback: _useCallback, useReducer: _useReducer } = React;
 
 // ─────────────────────────────────────────────────────────────────
 // Type definitions (JSDoc — picked up by IDEs without a build step)
@@ -204,16 +204,128 @@ function hydrateFormState(checkerParams) {
   };
 }
 
+// Stable ID for a newly-added UBO. randomUUID exists in all modern browsers
+// we ship to (Safari 15.4+, Chrome 92+, Firefox 95+); falls back to a
+// time+random string on the off-chance it's missing.
+function makeUboId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `ubo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Reducer + actions
+// ─────────────────────────────────────────────────────────────────
+// All formState mutations route through dispatch + this reducer so the
+// shape of every transition is documented in one place. Screen helpers
+// (updateAuth, setCountry, …) are thin wrappers below.
+
 /**
- * React state hook that owns the persistent form-state pair. Writes to
- * localStorage on every change with a fresh `lastSavedAt` timestamp;
- * silently skips persistence when storage is full / unavailable.
+ * @typedef Action
+ * @property {string} type
+ * @property {*} [payload]
+ */
+
+/** @enum {string} */
+const ACT = Object.freeze({
+  AUTH_PATCH:          "auth/patch",
+  BUSINESS_PATCH:      "business/patch",
+  SET_COUNTRY:         "contact/setCountry",
+  SET_INBOUND:         "activity/setInbound",
+  SET_OUTBOUND:        "activity/setOutbound",
+  UBO_DRAFT_PATCH:     "uboDraft/patch",
+  UBO_DRAFT_LOAD:      "uboDraft/loadExisting",
+  UBO_DRAFT_CLEAR:     "uboDraft/clear",
+  UBO_DRAFT_SEED_AUTH: "uboDraft/seedFromAuth",
+  UBO_DRAFT_COMMIT:    "ubos/commitDraft",
+  UBOS_CONFIRM_SOLE:   "ubos/confirmSole",
+});
+
+/**
+ * @param {FormState} state
+ * @param {Action}    action
+ * @returns {FormState}
+ */
+function formReducer(state, action) {
+  switch (action.type) {
+    case ACT.AUTH_PATCH:
+      return { ...state, auth: { ...state.auth, ...action.payload } };
+    case ACT.BUSINESS_PATCH:
+      return { ...state, business: { ...state.business, ...action.payload } };
+    case ACT.SET_COUNTRY:
+      return { ...state, contact: { ...state.contact, country: action.payload } };
+    case ACT.SET_INBOUND:
+      return { ...state, activity: { ...state.activity, inboundChannels: action.payload } };
+    case ACT.SET_OUTBOUND:
+      return { ...state, activity: { ...state.activity, outboundChannels: action.payload } };
+    case ACT.UBO_DRAFT_PATCH:
+      return { ...state, uboDraft: { ...state.uboDraft, ...action.payload } };
+    case ACT.UBO_DRAFT_LOAD: {
+      const target = state.ubos.find((u) => u.id === action.payload);
+      if (!target) return state;
+      return { ...state, uboDraft: { ...INITIAL_UBO_DRAFT, ...target, editingId: action.payload } };
+    }
+    case ACT.UBO_DRAFT_CLEAR:
+      return { ...state, uboDraft: INITIAL_UBO_DRAFT };
+    case ACT.UBO_DRAFT_SEED_AUTH:
+      // Pre-fill the very first UBO from the auth section — the lead applicant
+      // is almost always the first person added. Triggered by ScreenUboList's
+      // "Add" when ubos.length === 0.
+      return {
+        ...state,
+        uboDraft: {
+          ...INITIAL_UBO_DRAFT,
+          firstName: state.auth.firstName || "",
+          lastName:  state.auth.lastName  || "",
+          email:     state.auth.email     || "",
+        },
+      };
+    case ACT.UBO_DRAFT_COMMIT: {
+      // Append a new UBO, or replace the record being edited (when
+      // uboDraft.editingId is set). Always resets the draft afterwards.
+      const { editingId, ...fields } = state.uboDraft;
+      const ubos = editingId
+        ? state.ubos.map((u) => (u.id === editingId ? { ...u, ...fields } : u))
+        : [...state.ubos, { id: makeUboId(), ...fields }];
+      return { ...state, ubos, uboDraft: INITIAL_UBO_DRAFT };
+    }
+    case ACT.UBOS_CONFIRM_SOLE: {
+      // Sole-director shortcut: replace the whole ubos array with one record
+      // built from auth + the two inline fields (dob, country).
+      const { dateOfBirth, country } = action.payload;
+      return {
+        ...state,
+        ubos: [{
+          id: makeUboId(),
+          firstName: state.auth.firstName || "",
+          lastName:  state.auth.lastName  || "",
+          email:     state.auth.email     || "",
+          dateOfBirth,
+          country,
+          role: "both",
+          stakePercent: "100",
+        }],
+        uboDraft: INITIAL_UBO_DRAFT,
+      };
+    }
+    default:
+      return state;
+  }
+}
+
+/**
+ * React state hook that owns the persistent form-state pair. Backed by
+ * useReducer so every mutation has a typed action name (handy in React
+ * DevTools and for future logging/replay). Writes to localStorage on
+ * every change with a fresh `lastSavedAt` timestamp; silently skips
+ * persistence when storage is full / unavailable.
  *
  * @param {CheckerParams} checkerParams
- * @returns {[FormState, React.Dispatch<React.SetStateAction<FormState>>]}
+ * @returns {[FormState, React.Dispatch<Action>]}
  */
 function useFormState(checkerParams) {
-  const [formState, setFormState] = useState(() => hydrateFormState(checkerParams));
+  const [formState, dispatch] = _useReducer(formReducer, checkerParams, hydrateFormState);
   useEffect(() => {
     try {
       window.localStorage.setItem(
@@ -225,7 +337,7 @@ function useFormState(checkerParams) {
       );
     } catch (e) { /* quota / private-mode → silently skip persistence */ }
   }, [formState]);
-  return [formState, setFormState];
+  return [formState, dispatch];
 }
 
 // Exposed for ScreenSubmit (and the future /api/submit-kyb success handler):
@@ -234,16 +346,6 @@ function useFormState(checkerParams) {
 window.__obClearFormState = function clearFormState() {
   try { window.localStorage.removeItem(FORM_STORAGE_KEY); } catch (e) {}
 };
-
-// Stable ID for a newly-added UBO. randomUUID exists in all modern browsers
-// we ship to (Safari 15.4+, Chrome 92+, Firefox 95+); falls back to a
-// time+random string on the off-chance it's missing.
-function makeUboId() {
-  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
-  }
-  return `ubo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
 
 const ALL_STEPS = [
   "prep",
@@ -301,62 +403,21 @@ function App() {
     };
   }, []);
 
-  // Persistent form state — survives reload. Phase 1 covers country, activity
-  // channels, current UBO role, and the URL-param handoff (plan/currency/email/
-  // token). Other fields will move in here as we wire real inputs in Phase 2.
-  const [formState, setFormState] = useFormState(checkerParams);
+  // Persistent form state — survives reload. Backed by useReducer; the
+  // helpers below are thin wrappers around typed dispatch actions so screen
+  // call-sites stay terse (e.g. updateAuth({email}) instead of dispatch({
+  // type: ACT.AUTH_PATCH, payload: {email} })).
+  const [formState, dispatch] = useFormState(checkerParams);
 
-  const updateAuth = _useCallback(
-    (patch) => setFormState((s) => ({ ...s, auth: { ...s.auth, ...patch } })),
-    []
-  );
-  const updateBusiness = _useCallback(
-    (patch) => setFormState((s) => ({ ...s, business: { ...s.business, ...patch } })),
-    []
-  );
-  const setCountry = _useCallback(
-    (code) => setFormState((s) => ({ ...s, contact: { ...s.contact, country: code } })),
-    []
-  );
-  const setInboundChannels = _useCallback(
-    (arr) => setFormState((s) => ({ ...s, activity: { ...s.activity, inboundChannels: arr } })),
-    []
-  );
-  const setOutboundChannels = _useCallback(
-    (arr) => setFormState((s) => ({ ...s, activity: { ...s.activity, outboundChannels: arr } })),
-    []
-  );
-  const updateUboDraft = _useCallback(
-    (patch) => setFormState((s) => ({ ...s, uboDraft: { ...s.uboDraft, ...patch } })),
-    []
-  );
-
-  // Commit the draft as either a new UBO (when editingId is null) or as
-  // an update to the existing record. Resets the draft so the next visit
-  // to the form starts blank.
-  const saveUboDraft = _useCallback(() => {
-    setFormState((s) => {
-      const { editingId, ...fields } = s.uboDraft;
-      const ubos = editingId
-        ? s.ubos.map((u) => (u.id === editingId ? { ...u, ...fields } : u))
-        : [...s.ubos, { id: makeUboId(), ...fields }];
-      return { ...s, ubos, uboDraft: INITIAL_UBO_DRAFT };
-    });
-  }, []);
-
-  // Load an existing UBO into the draft for editing.
-  const loadUboIntoDraft = _useCallback((id) => {
-    setFormState((s) => {
-      const target = s.ubos.find((u) => u.id === id);
-      if (!target) return s;
-      return { ...s, uboDraft: { ...INITIAL_UBO_DRAFT, ...target, editingId: id } };
-    });
-  }, []);
-
-  // Throw away whatever is in the draft (e.g. user pressed Cancel).
-  const clearUboDraft = _useCallback(() => {
-    setFormState((s) => ({ ...s, uboDraft: INITIAL_UBO_DRAFT }));
-  }, []);
+  const updateAuth         = _useCallback((patch) => dispatch({ type: ACT.AUTH_PATCH,       payload: patch }), []);
+  const updateBusiness     = _useCallback((patch) => dispatch({ type: ACT.BUSINESS_PATCH,   payload: patch }), []);
+  const setCountry         = _useCallback((code)  => dispatch({ type: ACT.SET_COUNTRY,      payload: code  }), []);
+  const setInboundChannels = _useCallback((arr)   => dispatch({ type: ACT.SET_INBOUND,      payload: arr   }), []);
+  const setOutboundChannels= _useCallback((arr)   => dispatch({ type: ACT.SET_OUTBOUND,     payload: arr   }), []);
+  const updateUboDraft     = _useCallback((patch) => dispatch({ type: ACT.UBO_DRAFT_PATCH,  payload: patch }), []);
+  const saveUboDraft       = _useCallback(()      => dispatch({ type: ACT.UBO_DRAFT_COMMIT }),                  []);
+  const loadUboIntoDraft   = _useCallback((id)    => dispatch({ type: ACT.UBO_DRAFT_LOAD,   payload: id    }), []);
+  const clearUboDraft      = _useCallback(()      => dispatch({ type: ACT.UBO_DRAFT_CLEAR }),                   []);
 
   // Document uploads are deliberately NOT in formState/localStorage. The
   // raw File blobs can't survive serialisation, and persisting just the
@@ -418,43 +479,16 @@ function App() {
                                       ubos={formState.ubos}
                                       auth={formState.auth}
                                       onAddPerson={() => {
-                                        // Pre-fill the very first UBO from the auth section — the
-                                        // lead applicant is almost always the first person added.
-                                        // Subsequent adds open a blank form.
                                         if (formState.ubos.length === 0) {
-                                          setFormState((s) => ({
-                                            ...s,
-                                            uboDraft: {
-                                              ...INITIAL_UBO_DRAFT,
-                                              firstName: s.auth.firstName || "",
-                                              lastName: s.auth.lastName || "",
-                                              email: s.auth.email || "",
-                                            },
-                                          }));
+                                          dispatch({ type: ACT.UBO_DRAFT_SEED_AUTH });
                                         } else {
-                                          clearUboDraft();
+                                          dispatch({ type: ACT.UBO_DRAFT_CLEAR });
                                         }
                                         setStep("ubo-form");
                                       }}
                                       onEditPerson={(id) => { loadUboIntoDraft(id); setStep("ubo-form"); }}
-                                      onConfirmSole={({ dateOfBirth, country }) => {
-                                        // Sole-director shortcut: build the UBO record entirely
-                                        // from auth + the two extra fields, replace any existing
-                                        // ubos array (sole means sole), and jump to review.
-                                        setFormState((s) => ({
-                                          ...s,
-                                          ubos: [{
-                                            id: makeUboId(),
-                                            firstName: s.auth.firstName || "",
-                                            lastName: s.auth.lastName || "",
-                                            email: s.auth.email || "",
-                                            dateOfBirth,
-                                            country,
-                                            role: "both",
-                                            stakePercent: "100",
-                                          }],
-                                          uboDraft: INITIAL_UBO_DRAFT,
-                                        }));
+                                      onConfirmSole={(payload) => {
+                                        dispatch({ type: ACT.UBOS_CONFIRM_SOLE, payload });
                                         setStep("review");
                                       }}/>;
       case "ubo-form":      return <ScreenUboForm
