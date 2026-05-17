@@ -140,10 +140,24 @@ function PasswordChecklist({ rules }) {
 // ── Step 3: Email verification ──────────────────
 // The verification code is one-time material — never persisted. It exists
 // only in this screen's local state; reloading the page wipes it.
+const RESEND_COOLDOWN_S = 60;
 function ScreenVerify({ next, back, email }) {
   const t = useT();
   const [code, setCode] = useState("");
+  // Mounting this screen implies a code was just sent (either by the previous
+  // step or by a prior resend). Start the cooldown at the full window so the
+  // user doesn't spam-click during the first minute.
+  const [secondsLeft, setSecondsLeft] = useState(RESEND_COOLDOWN_S);
+  useEffect(() => {
+    if (secondsLeft <= 0) return;
+    const id = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
+    return () => clearTimeout(id);
+  }, [secondsLeft]);
+
   const canContinue = code.length === 6;
+  const canResend = secondsLeft <= 0;
+  const formatMMSS = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+
   return (
     <div className="ob-content fade-in">
       <TopRow onBack={back} />
@@ -153,7 +167,14 @@ function ScreenVerify({ next, back, email }) {
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, color: "var(--c-muted)" }}>
         <span>{t("ob.verify.didnt")}</span>
-        <Button variant="link" size="sm" style={{ color: "var(--c-accent)" }}>{t("ob.verify.resend")}</Button>
+        <Button
+          variant="link" size="sm"
+          style={{ color: canResend ? "var(--c-accent)" : "var(--c-muted)" }}
+          disabled={!canResend}
+          onClick={() => { /* TODO Phase 3: call /api/auth/resend-verification */ setSecondsLeft(RESEND_COOLDOWN_S); }}
+        >
+          {canResend ? t("ob.verify.resend") : t("ob.verify.resendIn", { time: formatMMSS(secondsLeft) })}
+        </Button>
       </div>
       <div className="ob-actions">
         <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!canContinue}>{t("ob.common.continue")}</Button>

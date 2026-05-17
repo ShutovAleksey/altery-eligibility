@@ -107,7 +107,8 @@
     "ob.verify.leadPost": " gesendet. Der Code ist 10 Minuten gültig.",
     "ob.verify.error": "Code ist falsch oder abgelaufen",
     "ob.verify.didnt": "Code nicht erhalten?",
-    "ob.verify.resend": "Erneut senden in 0:42",
+    "ob.verify.resend": "Erneut senden",
+    "ob.verify.resendIn": "Erneut senden in {time}",
 
     "ob.phone.title": "Mobilnummer hinzufügen",
     "ob.phone.lead": "Wir verwenden sie für die 2-Faktor-Authentifizierung und um Sie zu erreichen, wenn eine Zahlung Ihre Freigabe braucht.",
@@ -423,7 +424,8 @@
     "ob.verify.leadPost": ". Код действует 10 минут.",
     "ob.verify.error": "Код неверный или истёк",
     "ob.verify.didnt": "Не получили код?",
-    "ob.verify.resend": "Отправить снова через 0:42",
+    "ob.verify.resend": "Отправить снова",
+    "ob.verify.resendIn": "Отправить снова через {time}",
 
     "ob.phone.title": "Добавьте мобильный номер",
     "ob.phone.lead": "Нужен для двухфакторной аутентификации и связи, если платёж требует вашего одобрения.",

@@ -120,7 +120,8 @@
     "ob.verify.leadPost": ". The code is valid for 10 minutes.",
     "ob.verify.error": "Code is incorrect or expired",
     "ob.verify.didnt": "Didn't get the code?",
-    "ob.verify.resend": "Resend in 0:42",
+    "ob.verify.resend": "Resend code",
+    "ob.verify.resendIn": "Resend in {time}",
 
     // ── Phone ──
     "ob.phone.title": "Add your mobile number",

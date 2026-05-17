@@ -104,7 +104,8 @@
     "ob.verify.leadPost": ". De code is 10 minuten geldig.",
     "ob.verify.error": "Code is onjuist of verlopen",
     "ob.verify.didnt": "Code niet ontvangen?",
-    "ob.verify.resend": "Opnieuw sturen over 0:42",
+    "ob.verify.resend": "Opnieuw sturen",
+    "ob.verify.resendIn": "Opnieuw sturen over {time}",
 
     "ob.phone.title": "Voeg een mobiel nummer toe",
     "ob.phone.lead": "We gebruiken het voor 2-factor authenticatie en om u te bereiken als een betaling uw goedkeuring nodig heeft.",
@@ -420,7 +421,8 @@
     "ob.verify.leadPost": " adresine gönderdik. Kod 10 dakika geçerlidir.",
     "ob.verify.error": "Kod yanlış veya süresi dolmuş",
     "ob.verify.didnt": "Kod gelmedi mi?",
-    "ob.verify.resend": "0:42 sonra tekrar gönder",
+    "ob.verify.resend": "Tekrar gönder",
+    "ob.verify.resendIn": "{time} sonra tekrar gönder",
 
     "ob.phone.title": "Mobil numara ekleyin",
     "ob.phone.lead": "İki adımlı doğrulama için ve bir ödeme onayınızı gerektirdiğinde size ulaşmak için kullanırız.",
@@ -736,7 +738,8 @@
     "ob.verify.leadPost": ". Il codice è valido 10 minuti.",
     "ob.verify.error": "Codice errato o scaduto",
     "ob.verify.didnt": "Non hai ricevuto il codice?",
-    "ob.verify.resend": "Reinvia tra 0:42",
+    "ob.verify.resend": "Reinvia codice",
+    "ob.verify.resendIn": "Reinvia tra {time}",
 
     "ob.phone.title": "Aggiungi un numero di cellulare",
     "ob.phone.lead": "Lo usiamo per l'autenticazione a due fattori e per contattarti se un pagamento richiede la tua approvazione.",

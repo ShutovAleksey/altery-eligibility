@@ -104,7 +104,8 @@
     "ob.verify.leadPost": ". El código es válido durante 10 minutos.",
     "ob.verify.error": "El código es incorrecto o ha caducado",
     "ob.verify.didnt": "¿No recibiste el código?",
-    "ob.verify.resend": "Reenviar en 0:42",
+    "ob.verify.resend": "Reenviar código",
+    "ob.verify.resendIn": "Reenviar en {time}",
 
     "ob.phone.title": "Añade un móvil",
     "ob.phone.lead": "Lo usamos para la autenticación de dos factores y para localizarte si un pago necesita tu aprobación.",
@@ -420,7 +421,8 @@
     "ob.verify.leadPost": ". Kod jest ważny przez 10 minut.",
     "ob.verify.error": "Kod jest nieprawidłowy lub wygasł",
     "ob.verify.didnt": "Nie otrzymałeś kodu?",
-    "ob.verify.resend": "Wyślij ponownie za 0:42",
+    "ob.verify.resend": "Wyślij ponownie",
+    "ob.verify.resendIn": "Wyślij ponownie za {time}",
 
     "ob.phone.title": "Dodaj numer telefonu",
     "ob.phone.lead": "Używamy go do uwierzytelniania dwuskładnikowego i kontaktu, gdy płatność wymaga zatwierdzenia.",
@@ -736,7 +738,8 @@
     "ob.verify.leadPost": ". O código é válido durante 10 minutos.",
     "ob.verify.error": "O código está incorreto ou expirou",
     "ob.verify.didnt": "Não recebeu o código?",
-    "ob.verify.resend": "Reenviar em 0:42",
+    "ob.verify.resend": "Reenviar código",
+    "ob.verify.resendIn": "Reenviar em {time}",
 
     "ob.phone.title": "Adicione um número de telemóvel",
     "ob.phone.lead": "Usamo-lo para autenticação de dois fatores e para o contactar se um pagamento precisar da sua aprovação.",
@@ -1052,7 +1055,8 @@
     "ob.verify.leadPost": ". Le code est valable 10 minutes.",
     "ob.verify.error": "Le code est incorrect ou expiré",
     "ob.verify.didnt": "Vous n'avez pas reçu le code ?",
-    "ob.verify.resend": "Renvoyer dans 0:42",
+    "ob.verify.resend": "Renvoyer le code",
+    "ob.verify.resendIn": "Renvoyer dans {time}",
 
     "ob.phone.title": "Ajoutez un numéro de mobile",
     "ob.phone.lead": "Nous l'utilisons pour l'authentification à deux facteurs et pour vous joindre si un paiement nécessite votre approbation.",
