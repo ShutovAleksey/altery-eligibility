@@ -136,37 +136,20 @@ const ALL_STEPS = [
   "submit",
 ];
 
-const TWEAK_DEFAULS = /*EDITMODE-BEGIN*/{
-  "stateVariant": "default",
-  "submitState": "pending",
-  "currency": "GBP",
-  "selectedPlan": "pro"
-}/*EDITMODE-END*/;
-
-function useTweaks(defaults) {
-  const [t, setT] = useState(defaults);
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.data?.type === "__edit_mode_load") {
-        setT((prev) => ({ ...prev, ...e.data.values }));
-      }
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, []);
-  const set = (key, value) => {
-    setT((prev) => {
-      const next = typeof key === "object" ? { ...prev, ...key } : { ...prev, [key]: value };
-      window.parent.postMessage({ type: "__edit_mode_set_keys", edits: typeof key === "object" ? key : { [key]: value } }, "*");
-      return next;
-    });
-  };
-  return [t, set];
-}
+// Vestigial demo-state for screen variants that still consult
+// `state === "empty" | "filled" | "default"` to decide their visual look
+// (mostly the few not-yet-wired Select dropdowns on the Activity step and
+// the ScreenSubmit branch chooser). Constant for now — when those screens
+// migrate to real form state these refs disappear with them.
+// Previously a `useTweaks` hook drove this via Figma EditMode postMessage
+// integration; that surface (the Tweaks panel) has been removed.
+const TWEAKS = Object.freeze({
+  stateVariant: "default",
+  submitState: "pending",
+});
 
 function App() {
   const [step, setStep] = useState("prep");
-  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULS);
   const [showSaveModal, setShowSaveModal] = useState(false);
 
   // formState — single source of truth for user-entered data, persisted to
@@ -271,18 +254,12 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    const handler = (e) => setStep(e.detail);
-    window.addEventListener("ob-jump", handler);
-    return () => window.removeEventListener("ob-jump", handler);
-  }, []);
-
   const idx = ALL_STEPS.indexOf(step);
   const next = () => setStep(ALL_STEPS[Math.min(ALL_STEPS.length - 1, idx + 1)]);
   const back = () => setStep(ALL_STEPS[Math.max(0, idx - 1)]);
 
   const renderStep = () => {
-    const s = tweaks.stateVariant;
+    const s = TWEAKS.stateVariant;
     switch (step) {
       case "prep":          return <ScreenPrep next={next} />;
       case "welcome":       return <ScreenWelcome next={next} state={s}
@@ -367,7 +344,7 @@ function App() {
                                       next={() => setStep("submit")}
                                       back={() => setStep("review")}
                                     />;
-      case "submit":        return <ScreenSubmit state={tweaks.submitState} setStep={setStep}/>;
+      case "submit":        return <ScreenSubmit state={TWEAKS.submitState} setStep={setStep}/>;
       case "applications-list": return <ApplicationsList setStep={setStep}/>;
       default: return null;
     }
