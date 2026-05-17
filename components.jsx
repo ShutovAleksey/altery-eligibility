@@ -145,7 +145,7 @@ style={{ animation: "spin .8s linear infinite" }}>
 // ════════════════════════════════════════════════════════════════════════════
 // IconButton — REQUIRES title/aria-label for screen readers
 // ════════════════════════════════════════════════════════════════════════════
-const IconButton = ({ icon, size = "md", variant = "ghost", onClick, style, title, "aria-label": ariaLabel, disabled, ...rest }) => {
+const IconButton = ({ icon, size = "md", variant = "ghost", onClick, style, title, "aria-label": ariaLabel, disabled }) => {
   const [h, setH] = React.useState(false);
   const v = btnVariants[variant];
   const dims = { sm: 28, md: 36, lg: 44 }[size];
@@ -171,9 +171,8 @@ const IconButton = ({ icon, size = "md", variant = "ghost", onClick, style, titl
       onMouseLeave={() => setH(false)}
       onClick={onClick}
       title={title}
-      aria-label={label}
-      {...rest}>
-      
+      aria-label={label}>
+
       <Icon name={icon} size={size === "sm" ? 16 : 18} aria-hidden="true" />
     </button>);
 
@@ -195,7 +194,7 @@ const useId = (prefix = "id") => {
 const Input = ({
   label, hint, error, icon, iconRight, prefix, suffix, value, onChange,
   type = "text", placeholder, required, disabled, size = "md", style,
-  onFocus, onBlur, id: idProp, "aria-label": ariaLabel, ...rest
+  onFocus, onBlur, id: idProp, "aria-label": ariaLabel
 }) => {
   const [focused, setFocused] = React.useState(false);
   const [hover, setHover] = React.useState(false);
@@ -248,9 +247,8 @@ const Input = ({
           style={{
             flex: 1, minWidth: 0, background: "transparent",
             color: "var(--c-ink)"
-          }}
-          {...rest} />
-        
+          }} />
+
         {suffix && <span style={{ color: "var(--c-muted)", fontSize: "var(--fs-body)" }}>{suffix}</span>}
         {iconRight && <Icon name={iconRight} size={18} color="var(--c-muted)" aria-hidden="true" />}
       </div>
@@ -274,7 +272,7 @@ const Input = ({
 const Textarea = ({
   label, hint, error, value, onChange, placeholder, required, disabled, readOnly,
   rows = 4, resize = "vertical", maxLength, showCount, style,
-  onFocus, onBlur, id: idProp, "aria-label": ariaLabel, ...rest
+  onFocus, onBlur, id: idProp, "aria-label": ariaLabel
 }) => {
   const [focused, setFocused] = React.useState(false);
   const [hover, setHover] = React.useState(false);
@@ -326,9 +324,8 @@ const Textarea = ({
             display: "block", width: "100%", background: "transparent",
             color: "var(--c-ink)", resize, padding: 0,
             fontFamily: "inherit", fontSize: "var(--fs-body)", lineHeight: "var(--lh-body)"
-          }}
-          {...rest} />
-        
+          }} />
+
       </div>
       {(hint || error || showCount && maxLength) &&
       <div id={hintId}
@@ -359,9 +356,10 @@ const Tag = ({ children, tone = "neutral", icon, dot, size = "md", style, onRemo
     green: { bg: "var(--c-success-soft)", fg: "var(--c-success)", dot: "var(--c-success)" },
     red: { bg: "var(--c-danger-soft)", fg: "var(--c-danger)", dot: "var(--c-danger)" },
     orange: { bg: "var(--c-warning-soft)", fg: "var(--c-warning)", dot: "var(--c-warning)" },
-    purple: { bg: "var(--c-purple-soft)", fg: "var(--c-purple)", dot: "var(--c-purple)" }
+    purple: { bg: "var(--c-purple-soft)", fg: "var(--c-purple)", dot: "var(--c-purple)" },
+    grey: { bg: "var(--c-bg-2)", fg: "var(--c-muted)", dot: "var(--c-muted)" }
   };
-  const t = tones[tone];
+  const t = tones[tone] || tones.neutral;
   const pad = size === "sm" ? "2px 8px" : "4px 10px";
   const fs = size === "sm" ? 11 : "var(--fs-small)";
   return (
@@ -753,7 +751,7 @@ const Segmented = ({ options, value, onChange, size = "md", style, ariaLabel = "
 // ════════════════════════════════════════════════════════════════════════════
 // Card
 // ════════════════════════════════════════════════════════════════════════════
-const Card = ({ children, padding = 20, hover, onClick, style, interactive, as: Tag = "div", ...rest }) => {
+const Card = ({ children, padding = 20, hover, onClick, style, interactive, as: Tag = "div" }) => {
   const [h, setH] = React.useState(false);
   const isInteractive = !!(interactive || onClick);
   return (
@@ -778,9 +776,8 @@ const Card = ({ children, padding = 20, hover, onClick, style, interactive, as: 
         borderColor: h && interactive ? "var(--c-border)" : "var(--c-border-soft)",
         color: "var(--c-ink)",
         ...style
-      }}
-      {...rest}>
-      
+      }}>
+
       {children}
     </Tag>);
 
