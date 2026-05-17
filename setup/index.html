@@ -34,7 +34,7 @@
        Load order matters: primitives → components → onboarding atoms/shell →
        screens → app. Babel compiles each JSX inline; later files reference
        globals exported by earlier ones via Object.assign(window, ...). -->
-  <script type="text/babel" src="icons.jsx"></script>
+  <script type="text/babel" src="/icons.jsx"></script>
   <script type="text/babel" src="flags.jsx"></script>
   <!-- Canonical AlteryPay DS components — shared with the eligibility checker
        at /index.html so both surfaces render the same Button, Input, Tag,

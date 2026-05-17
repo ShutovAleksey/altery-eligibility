@@ -8364,6 +8364,8 @@
        Alert, Select, etc.) — those are dual-defined for now and will migrate
        in follow-up commits. -->
   <script type="text/babel" data-presets="react" src="/components.jsx"></script>
+  <!-- Shared icon set — JSX-based, used by both checker and onboarding. -->
+  <script type="text/babel" data-presets="react" src="/icons.jsx"></script>
   <!-- EC data constants — pure data, no JSX, loaded as a classic script so
        Babel never touches it. Exports EC_COUNTRIES, EC_PLANS, EC_ENTITIES …
        to window for the inline block below to reference unqualified. -->
@@ -8385,36 +8387,9 @@
       return window.__I18N.t;
     }
 
-    // ──────────────────── Icon set ────────────────────
-    const ICONS = {
-      check: <><path d="M4 12l5 5L20 6"/></>,
-      close: <><path d="M6 6l12 12"/><path d="M18 6L6 18"/></>,
-      chevronDown: <><path d="M6 9l6 6 6-6"/></>,
-      arrowRight: <><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></>,
-      arrowLeft: <><path d="M19 12H5"/><path d="M11 5l-7 7 7 7"/></>,
-      alert: <><path d="M10.3 3.86l-8.1 14A2 2 0 004 21h16a2 2 0 001.7-3.1l-8-14a2 2 0 00-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></>,
-      info: <><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></>,
-      check_circle: <><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-6"/></>,
-      x_circle: <><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6"/><path d="M9 9l6 6"/></>,
-      search: <><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></>,
-    };
-    const Icon = ({ name, size = 20, color = "currentColor", stroke = 1.6, style, ...rest }) => {
-      const paths = ICONS[name];
-      if (!paths) return null;
-      // Coerce size to a finite positive number. Without this, a CSS-var
-      // string or NaN ends up in <svg width="..."/> as an invalid attribute,
-      // and iOS Safari falls back to SVG-2 default (300×150) which blows
-      // up the surrounding flex layout. Chrome/Firefox handle it via auto
-      // flex sizing so the bug is invisible on desktop.
-      const px = Number.isFinite(+size) && +size > 0 ? +size : 20;
-      return (
-        <svg {...rest} width={px} height={px} viewBox="0 0 24 24" fill="none"
-             stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round"
-             style={{ flex: "0 0 auto", ...style }} aria-hidden="true">
-          {paths}
-        </svg>
-      );
-    };
+    // ──────────────────── Icon / ICONS ────────────────────
+    // Moved to /icons.jsx (shared with /setup/index.html).
+    // window.Icon, window.ICONS set there via Object.assign.
 
     // ──────────────────── Flag ────────────────────
     // Renders the inline base64 data URI for the country code from
@@ -12488,11 +12463,6 @@
         </div>
       );
     }
-
-    // Expose Icon to the global scope so the shared /components.jsx Button
-    // (which renders <Icon> for iconLeft/iconRight) can resolve it at render
-    // time. The checker's own inline JSX continues to use the local const.
-    Object.assign(window, { Icon });
 
     ReactDOM.createRoot(document.getElementById("root")).render(<EcApp />);
   </script>
