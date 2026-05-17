@@ -137,10 +137,9 @@ function ScreenUboList({ next, back, addPerson }) {
 }
 
 // ── UBO form ──────────────────
-function ScreenUboForm({ next, back, state }) {
+function ScreenUboForm({ next, back, state, role, onChangeRole }) {
   const t = useT();
   const filled = state !== "empty";
-  const [role, setRole] = useState("director");
   const roles = [
     { id: "director", label: t("ob.uboForm.role.dir") },
     { id: "both", label: t("ob.uboForm.role.both") },
@@ -157,7 +156,7 @@ function ScreenUboForm({ next, back, state }) {
             <SelectableListItem
               key={r.id}
               selected={role === r.id}
-              onClick={() => setRole(r.id)}
+              onClick={() => onChangeRole(r.id)}
               title={r.label}
               style={{ flex: 1, height: 48 }}
             />

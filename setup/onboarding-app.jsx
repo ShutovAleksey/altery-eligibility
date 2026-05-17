@@ -1,5 +1,67 @@
 // Onboarding flow — main App
-const { useMemo: _useMemo } = React;
+const { useMemo: _useMemo, useCallback: _useCallback } = React;
+
+// localStorage key for the persisted onboarding form state. Bump the suffix
+// (`:v2`, `:v3`, …) whenever the shape changes; hydration will refuse to load
+// anything from an older version and the user will start fresh.
+const FORM_STORAGE_KEY = "altery:ob:formState:v1";
+
+// Whitelist of fields that survive a reload. Sensitive material (password,
+// 2FA code, card data) is deliberately absent — never persist those.
+const INITIAL_FORM_STATE = {
+  _v: 1,
+  contact:  { country: null },
+  activity: { inboundChannels: [], outboundChannels: [] },
+  uboDraft: { role: "director" },
+  plan:     { selectedPlanId: null, billingCurrency: null },
+  meta:     { email: null, token: null, startedAt: null, lastSavedAt: null },
+};
+
+function hydrateFormState(checkerParams) {
+  try {
+    const raw = window.localStorage.getItem(FORM_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed._v === INITIAL_FORM_STATE._v) return parsed;
+    }
+  } catch (e) { /* storage unavailable / parse error → fall through to seed */ }
+  return {
+    ...INITIAL_FORM_STATE,
+    plan: {
+      selectedPlanId: checkerParams.plan || null,
+      billingCurrency: checkerParams.currency || null,
+    },
+    meta: {
+      ...INITIAL_FORM_STATE.meta,
+      email: checkerParams.email || null,
+      token: checkerParams.token || null,
+      startedAt: new Date().toISOString(),
+    },
+  };
+}
+
+function useFormState(checkerParams) {
+  const [formState, setFormState] = useState(() => hydrateFormState(checkerParams));
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        FORM_STORAGE_KEY,
+        JSON.stringify({
+          ...formState,
+          meta: { ...formState.meta, lastSavedAt: new Date().toISOString() },
+        })
+      );
+    } catch (e) { /* quota / private-mode → silently skip persistence */ }
+  }, [formState]);
+  return [formState, setFormState];
+}
+
+// Exposed for ScreenSubmit (and the future /api/submit-kyb success handler):
+// once the application is accepted server-side, wipe the local copy so a
+// returning visitor gets a clean slate.
+window.__obClearFormState = function clearFormState() {
+  try { window.localStorage.removeItem(FORM_STORAGE_KEY); } catch (e) {}
+};
 
 const ALL_STEPS = [
   "prep",
@@ -53,6 +115,10 @@ function App() {
   const [celebration, setCelebration] = useState(null); // { message }
   const prevSectionRef = useRef(null);
 
+  // formState — single source of truth for user-entered data, persisted to
+  // localStorage so a reload mid-flow doesn't lose progress. Initialised below
+  // (after checkerParams is computed, since the seed depends on URL params).
+
   // ── Eligibility-checker handoff ───────────────────────────────
   // When the user arrives from altery.com (eligibility checker → "Start
   // setup"), the checker passes their recommended plan, entity, session
@@ -71,6 +137,28 @@ function App() {
       currency:(sp.get("currency") || "GBP").toUpperCase(),   // billing currency
     };
   }, []);
+
+  // Persistent form state — survives reload. Phase 1 covers country, activity
+  // channels, current UBO role, and the URL-param handoff (plan/currency/email/
+  // token). Other fields will move in here as we wire real inputs in Phase 2.
+  const [formState, setFormState] = useFormState(checkerParams);
+
+  const setCountry = _useCallback(
+    (code) => setFormState((s) => ({ ...s, contact: { ...s.contact, country: code } })),
+    []
+  );
+  const setInboundChannels = _useCallback(
+    (arr) => setFormState((s) => ({ ...s, activity: { ...s.activity, inboundChannels: arr } })),
+    []
+  );
+  const setOutboundChannels = _useCallback(
+    (arr) => setFormState((s) => ({ ...s, activity: { ...s.activity, outboundChannels: arr } })),
+    []
+  );
+  const setUboRole = _useCallback(
+    (role) => setFormState((s) => ({ ...s, uboDraft: { ...s.uboDraft, role } })),
+    []
+  );
 
   // If the visitor came from the checker (token present), skip the
   // generic prep screen and go straight to welcome — they've already
@@ -114,12 +202,20 @@ function App() {
       case "password":      return <ScreenPassword next={next} back={back} state={s}/>;
       case "verify":        return <ScreenVerify next={next} back={back} state={s}/>;
       case "phone":         return <ScreenPhone next={next} back={back} state={s}/>;
-      case "country":       return <ScreenCountry next={next} back={back} state={s}/>;
+      case "country":       return <ScreenCountry next={next} back={back} state={s}
+                                      country={formState.contact.country}
+                                      onSelectCountry={setCountry}/>;
       case "business-info": return <ScreenBusinessInfo next={next} back={back} state={s}/>;
-      case "activity":      return <ScreenActivity next={next} back={back} state={s}/>;
+      case "activity":      return <ScreenActivity next={next} back={back} state={s}
+                                      inboundChannels={formState.activity.inboundChannels}
+                                      outboundChannels={formState.activity.outboundChannels}
+                                      onChangeInbound={setInboundChannels}
+                                      onChangeOutbound={setOutboundChannels}/>;
       case "documents":     return <ScreenDocuments next={next} back={back} state={s === "default" ? "complete" : s}/>;
       case "ubo-list":      return <ScreenUboList next={next} back={back} addPerson={() => setStep("ubo-form")}/>;
-      case "ubo-form":      return <ScreenUboForm next={() => setStep("ubo-list")} back={() => setStep("ubo-list")} state={s}/>;
+      case "ubo-form":      return <ScreenUboForm next={() => setStep("ubo-list")} back={() => setStep("ubo-list")} state={s}
+                                      role={formState.uboDraft.role}
+                                      onChangeRole={setUboRole}/>;
       case "review":        return <ScreenReview next={() => setStep("payment")} back={back} setStep={setStep}/>;
       case "payment":       return <ScreenActivation
                                       planId={checkerParams.plan}

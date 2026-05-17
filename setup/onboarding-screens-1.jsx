@@ -198,10 +198,10 @@ const COUNTRIES = [
 
 
 // ── Step 5: Country of incorporation ──────────────────
-function ScreenCountry({ next, back, state }) {
+function ScreenCountry({ next, back, country, onSelectCountry }) {
   const t = useT();
+  // q (search query) stays local — it's UI ephemeral, not form data.
   const [q, setQ] = useState("");
-  const [selected, setSelected] = useState(state === "empty" ? null : "GB");
   const filtered = COUNTRIES.filter((c) => c.name.toLowerCase().includes(q.toLowerCase()));
   return (
     <div className="ob-content fade-in">
@@ -214,15 +214,15 @@ function ScreenCountry({ next, back, state }) {
         {filtered.map((c) =>
         <SelectableListItem
           key={c.code}
-          selected={selected === c.code}
-          onClick={() => setSelected(c.code)}
+          selected={country === c.code}
+          onClick={() => onSelectCountry(c.code)}
           leading={<Flag code={c.code} size={28} />}
           title={c.name}
           meta={t(c.metaKey)} />
         )}
       </div>
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!selected}>{t("ob.common.continue")}</Button>
+        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!country}>{t("ob.common.continue")}</Button>
       </div>
     </div>);
 }
@@ -273,13 +273,17 @@ function ScreenBusinessInfo({ next, back, state }) {
 }
 
 // ── Step 7: Expected activity ──────────────────
-function ScreenActivity({ next, back, state }) {
+function ScreenActivity({ next, back, state, inboundChannels, outboundChannels, onChangeInbound, onChangeOutbound }) {
   const t = useT();
   const filled = state !== "empty";
-  const [inboundChannels, setInbound] = useState(filled ? new Set(["sepa", "swift"]) : new Set());
-  const [outboundChannels, setOutbound] = useState(filled ? new Set(["sepa", "cards"]) : new Set());
-  const togSet = (set, key) => {
-    const n = new Set(set);n.has(key) ? n.delete(key) : n.add(key);return n;
+  // Channels arrive as plain arrays (JSON-serialisable for localStorage); use
+  // Set internally for O(1) membership checks, then emit back as array.
+  const inboundSet = new Set(inboundChannels || []);
+  const outboundSet = new Set(outboundChannels || []);
+  const toggle = (set, key) => {
+    const n = new Set(set);
+    n.has(key) ? n.delete(key) : n.add(key);
+    return [...n];
   };
   const channels = [
   { id: "sepa", label: t("ob.act.ch.sepa") },
@@ -334,8 +338,8 @@ function ScreenActivity({ next, back, state }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 6 }}>
                 {channels.map((c) =>
                 <Checkbox key={c.id}
-                  checked={inboundChannels.has(c.id)}
-                  onChange={() => setInbound(togSet(inboundChannels, c.id))}
+                  checked={inboundSet.has(c.id)}
+                  onChange={() => onChangeInbound(toggle(inboundSet, c.id))}
                   label={<>{c.label}{c.note && <Tag tone="orange" size="sm" style={{ marginLeft: 8 }}>{c.note}</Tag>}</>} />
                 )}
               </div>
@@ -358,8 +362,8 @@ function ScreenActivity({ next, back, state }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 10, paddingTop: 6 }}>
                 {channels.map((c) =>
                 <Checkbox key={c.id}
-                  checked={outboundChannels.has(c.id)}
-                  onChange={() => setOutbound(togSet(outboundChannels, c.id))}
+                  checked={outboundSet.has(c.id)}
+                  onChange={() => onChangeOutbound(toggle(outboundSet, c.id))}
                   label={<>{c.label}{c.note && <Tag tone="orange" size="sm" style={{ marginLeft: 8 }}>{c.note}</Tag>}</>} />
                 )}
               </div>
