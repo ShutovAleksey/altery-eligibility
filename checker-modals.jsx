@@ -796,6 +796,48 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup }) {
   return ReactDOM.createPortal(content, document.body);
 }
 
+// ──────────────────── Payment-modal Stripe constants ────────────────────
+// Demo limitations (clearly documented to user):
+//   1. `pk_test_...` placeholder — replace with your Stripe pk to enable
+//   2. Real `stripe.confirmPayment(clientSecret)` needs a backend to create
+//      the PaymentIntent. The submit button here validates the form via
+//      elements.submit() then shows a demo-mode notice in place of the
+//      actual charge. Backend integration is a one-line swap on the marked
+//      TODO inside EcPaymentModal.
+//   3. Amounts use EUR for max payment-method coverage; real pricing
+//      currency localises by country of incorporation in production.
+
+// Stripe credentials — REPLACE BEFORE PRODUCTION.
+// The "pk_test_..." here is Stripe's well-known docs/demo test key, useful
+// for local testing only. The real key is fetched at runtime from
+// /api/config; this is the fallback if that endpoint is unreachable.
+const STRIPE_PUBLISHABLE_KEY = "pk_test_TYooMQauvdEDq54NiTphI7jx";
+
+// Per-plan demo amounts in EUR cents. Used because EUR unlocks the broadest
+// payment method set (SEPA / iDEAL / Bancontact / EPS / etc.). The user's
+// plan-price display stays in the entity's pricing currency (GBP for UK,
+// EUR for EU, USD for MENA) — these amounts are the EUR-equivalent for
+// the Stripe demo charge only.
+const STRIPE_DEMO_AMOUNTS = {
+  starter: 5500,   // €55  (≈ £50)
+  pro:     11000,  // €110 (≈ £100)
+  ultra:   33000,  // €330 (≈ £300)
+};
+
+// Payment-method matrix surfaced in the fallback UI when Stripe can't load
+// in the current environment. This isn't a fake Stripe widget — it's an
+// honest "here's what would appear" reference list. The set reflects what
+// Stripe enables for EUR currency + EU customer location (max coverage),
+// grouped by category. Brand names aren't translated.
+const STRIPE_FALLBACK_METHODS = [
+  { labelKey: "ec.r.payment.fallback.cards",     items: "Visa · Mastercard · Amex · JCB · Discover · UnionPay" },
+  { labelKey: "ec.r.payment.fallback.wallets",   items: "Apple Pay · Google Pay · Link · Samsung Pay" },
+  { labelKey: "ec.r.payment.fallback.bankDebit", items: "SEPA Direct Debit · BACS · iDEAL · Bancontact" },
+  { labelKey: "ec.r.payment.fallback.bnpl",      items: "Klarna · Afterpay · Clearpay · Affirm" },
+  { labelKey: "ec.r.payment.fallback.local",     items: "EPS · P24 · Giropay · Sofort · BLIK · Multibanco" },
+  { labelKey: "ec.r.payment.fallback.transfer",  items: "Bank transfer · Wire" },
+];
+
 function EcPaymentModal({ activePlan, onClose }) {
   const t = useT();
   const mountRef = useRef(null);

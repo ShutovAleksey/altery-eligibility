@@ -8544,93 +8544,29 @@
       );
     }
 
-    // ──────────────────── Button ────────────────────
-    // Moved to /components.jsx (canonical AlteryPay DS source — shared with
-    // /setup/index.html). window.Button is set there by Object.assign(window).
-    // The inline block below references `Button` and falls back to the global
-    // via the standard scope chain since the local `const Button` is gone.
-
-    // ──────────────────── Input / Tag / Alert / Select / SelectableListItem ────────────────────
-    // Moved to /components.jsx (canonical AlteryPay DS — shared with /setup/).
-    // window.{Input,Tag,Alert,Select,SelectableListItem} set there via Object.assign;
-    // the inline JSX below resolves them through the standard scope chain.
-
-    // ──────────────────── Title / Field / WhyWeAsk ────────────────────
-    // Moved to /checker-atoms.jsx (loaded as text/babel in <head>).
-    // window.{Title,Field,WhyWeAsk} set there via Object.assign.
-
     // ════════════════════════════════════════════════════════════════════════
-    //  ELIGIBILITY CHECKER — data, routing, screens
-    // ════════════════════════════════════════════════════════════════════════
-
-    // ──────────────────── EC data constants ────────────────────
-    // Moved to /checker-data.js — loaded as a classic <script> in <head>.
-    // EC_COUNTRIES, EC_PLANS, EC_ENTITIES, etc. are on window via the
-    // explicit Object.assign export at the bottom of that file.
-
-    // EC pure helpers (ecRecommend, ecCurrencyFlag, ecComputeCostBreakdown, …)
-    // → moved to /checker-helpers.js (loaded as classic <script> in <head>).
-
-    // ──────────────────── Decorative icons (small) ────────────────────
-    // ──────────────────── EcIco + question/result screens ────────────────────
-    // Moved to /checker-screens.jsx (loaded as text/babel in <head>).
-    // window.{EcIco, EcIntro, EcCountry, …, EcResultBlocked} set there.
-    // ──────────────────── Modals (Fees, BankHistory, Perks, PlanComparison, Handoff, Payment) ────────────────────
-    // Moved to /checker-modals.jsx (loaded as text/babel in <head>).
-
-    // ──────────────────── Payment modal (Stripe) ────────────────────
-    // Stripe Payment Element with deferred-flow setup (no PaymentIntent
-    // pre-creation needed for display). Demonstrates the full breadth of
-    // payment methods enabled on the Stripe account — for an EU-located
-    // customer in EUR currency, this includes card / Apple Pay / Google
-    // Pay / Link / SEPA Direct Debit / iDEAL / Bancontact / EPS / P24 /
-    // Giropay / Sofort / Klarna / Multibanco / BLIK / bank transfer.
+    //  Everything that used to live inline below this point is now in its
+    //  own module — see the <script src=…> tags at the top of <head>.
     //
-    // Demo limitations (clearly documented to user):
-    //   1. `pk_test_...` placeholder — replace with your Stripe pk to enable
-    //   2. Real `stripe.confirmPayment(clientSecret)` needs a backend to
-    //      create the PaymentIntent. The submit button here validates the
-    //      form via elements.submit() then shows a demo-mode notice in
-    //      place of the actual charge. Backend integration is a one-line
-    //      swap on the marked TODO below.
-    //   3. Amounts use EUR for max payment-method coverage; real pricing
-    //      currency localises by country of incorporation in production.
-
-    // Stripe credentials — REPLACE BEFORE PRODUCTION.
-    // The "pk_test_..." here is Stripe's well-known docs/demo test key,
-    // useful for local testing only. Your Stripe account's own publishable
-    // key goes here for the demo to actually load the Payment Element.
-    const STRIPE_PUBLISHABLE_KEY = "pk_test_TYooMQauvdEDq54NiTphI7jx";
-
-    // Per-plan demo amounts in EUR cents. Used because EUR unlocks the
-    // broadest payment method set (SEPA / iDEAL / Bancontact / EPS / etc.)
-    // The user's plan-price display stays in the entity's pricing currency
-    // (GBP for UK, EUR for EU, USD for MENA) — these amounts are the
-    // EUR-equivalent for the Stripe demo charge only.
-    const STRIPE_DEMO_AMOUNTS = {
-      starter: 5500,   // €55  (≈ £50)
-      pro:     11000,  // €110 (≈ £100)
-      ultra:   33000,  // €330 (≈ £300)
-    };
-
-    // Payment-method matrix surfaced in the fallback UI when Stripe can't
-    // load in the current environment. This isn't a fake Stripe widget —
-    // it's an honest "here's what would appear" reference list. The set
-    // reflects what Stripe enables for EUR currency + EU customer location
-    // (max coverage), grouped by category. Brand names aren't translated.
-    const STRIPE_FALLBACK_METHODS = [
-      { labelKey: "ec.r.payment.fallback.cards",     items: "Visa · Mastercard · Amex · JCB · Discover · UnionPay" },
-      { labelKey: "ec.r.payment.fallback.wallets",   items: "Apple Pay · Google Pay · Link · Samsung Pay" },
-      { labelKey: "ec.r.payment.fallback.bankDebit", items: "SEPA Direct Debit · BACS · iDEAL · Bancontact" },
-      { labelKey: "ec.r.payment.fallback.bnpl",      items: "Klarna · Afterpay · Clearpay · Affirm" },
-      { labelKey: "ec.r.payment.fallback.local",     items: "EPS · P24 · Giropay · Sofort · BLIK · Multibanco" },
-      { labelKey: "ec.r.payment.fallback.transfer",  items: "Bank transfer · Wire" },
-    ];
-
-    // ──────────────────── PDF / email helpers ────────────────────
-    // ecLoadStripe, ecWaitForPdfLibs, ecBuildAnalysisHTML,
-    // ecSendAnalysisEmail → moved to /checker-pdf.js (classic <script>
-    // in <head>); window.{ec*} resolved at call time.
+    //    DS primitives  → /components.jsx
+    //    Icon + ICONS   → /icons.jsx
+    //    Atoms          → /checker-atoms.jsx
+    //    EcIco + screens (incl. EcApp) → /checker-screens.jsx
+    //    Modals (Fees / Perks / Handoff / Payment / …) → /checker-modals.jsx
+    //    EC data        → /checker-data.js
+    //    EC helpers     → /checker-helpers.js
+    //    PDF assets     → /checker-pdf-assets.js
+    //    PDF + email    → /checker-pdf.js
+    //
+    //  What stays inline:
+    //    - useT (i18n React hook, exported to window so /checker-atoms.jsx
+    //      and the rest can resolve it at render time)
+    //    - FLAG_FILES, CURRENCY_TO_COUNTRY, Flag (coupled to the
+    //      window.__FLAGS bootstrap higher up in this file)
+    //    - LangSwitcher (checker-specific variant; setup has its own in
+    //      /setup/i18n-react.jsx)
+    //    - ReactDOM.createRoot(<EcApp />) mount call
+    // ════════════════════════════════════════════════════════════════════════
 
     ReactDOM.createRoot(document.getElementById("root")).render(<EcApp />);
   </script>
