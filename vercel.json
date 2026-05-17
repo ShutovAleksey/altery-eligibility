@@ -1,5 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
-  "trailingSlash": false
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/setup/:token", "destination": "/setup/index.html?token=:token" }
+  ],
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 10
+    }
+  }
 }

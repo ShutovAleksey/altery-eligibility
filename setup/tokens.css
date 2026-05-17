@@ -1,0 +1,453 @@
+/* ==========================================================================
+   Altery Design System — design tokens
+   ==========================================================================
+   Two layers:
+   1. RAW palette / scale tokens (--p-*, --raw-*) — never change between themes
+   2. SEMANTIC tokens (--c-*, --sh-*, etc.) — what components actually use,
+      and what re-maps under [data-theme="dark"]
+   ========================================================================== */
+
+:root {
+  /* ────────────────────────────────────────────────────────────────────────
+     RAW PALETTE — keep these stable across themes
+     ──────────────────────────────────────────────────────────────────────── */
+
+  /* Brand blues */
+  --p-blue-900: #001749;
+  --p-blue-800: #001e66;
+  --p-blue-700: #002780;   /* corporate primary */
+  --p-blue-600: #0056cc;
+  --p-blue-500: #006FFF;   /* accent */
+  --p-blue-400: #4d96ff;
+  --p-blue-300: #80b3ff;
+  --p-blue-200: #b3d1ff;
+  --p-blue-100: #D6E4FF;
+  --p-blue-50:  #EBF1FF;
+
+  /* Neutrals (warm grey, slight blue undertone) */
+  --p-neutral-1000: #05060A;
+  --p-neutral-950:  #0A0E1A;
+  --p-neutral-900:  #11141A;   /* ink */
+  --p-neutral-850:  #1A1F2A;
+  --p-neutral-800:  #232934;
+  --p-neutral-700:  #31343A;   /* ink-2 */
+  --p-neutral-600:  #4A4F58;
+  --p-neutral-500:  #69707C;   /* muted */
+  --p-neutral-400:  #99A1B2;   /* muted-2 */
+  --p-neutral-300:  #BDC3CC;
+  --p-neutral-200:  #D7DAE0;   /* border */
+  --p-neutral-150:  #EBEDF2;   /* border-soft */
+  --p-neutral-100:  #F2F4F7;
+  --p-neutral-50:   #F7F8FB;   /* bg */
+  --p-neutral-25:   #FCFCFD;
+  --p-neutral-0:    #FFFFFF;
+
+  /* Semantic palette — green / red / amber / purple */
+  --p-green-700: #086E39;
+  --p-green-600: #0A9F52;
+  --p-green-500: #1BC56B;
+  --p-green-100: #C7F0D9;
+  --p-green-50:  #E8F7EF;
+
+  --p-red-700:   #9A0F0E;
+  --p-red-600:   #CD1918;
+  --p-red-500:   #EE3433;
+  --p-red-100:   #FFD5D2;
+  --p-red-50:    #FFF4F2;
+
+  --p-amber-700: #C45200;
+  --p-amber-600: #FF771C;
+  --p-amber-500: #FF9447;
+  --p-amber-100: #FFD9BD;
+  --p-amber-50:  #FFF0E4;
+
+  --p-purple-600: #9747FF;
+  --p-purple-500: #B17AFF;
+  --p-purple-100: #E1CFFF;
+  --p-purple-50:  #F3EAFF;
+
+  /* ────────────────────────────────────────────────────────────────────────
+     SEMANTIC TOKENS — components reference ONLY these
+     ──────────────────────────────────────────────────────────────────────── */
+
+  /* Brand */
+  --c-primary:        var(--p-blue-700);
+  --c-primary-hover:  var(--p-blue-800);
+  --c-primary-active: var(--p-blue-900);
+  --c-primary-soft:   var(--p-blue-50);
+  --c-on-primary:     var(--p-neutral-0);
+
+  --c-accent:         var(--p-blue-500);
+  --c-accent-hover:   var(--p-blue-600);
+  --c-accent-soft:    var(--p-blue-50);
+  --c-accent-soft-hover: var(--p-blue-100);
+  --c-on-accent:      var(--p-neutral-0);
+
+  /* Status */
+  --c-danger:         var(--p-red-600);
+  --c-danger-hover:   var(--p-red-700);
+  --c-danger-soft:    var(--p-red-50);
+  --c-on-danger:      var(--p-neutral-0);
+
+  --c-success:        var(--p-green-600);
+  --c-success-hover:  var(--p-green-700);
+  --c-success-soft:   var(--p-green-50);
+  --c-on-success:     var(--p-neutral-0);
+
+  --c-warning:        var(--p-amber-600);
+  --c-warning-soft:   var(--p-amber-50);
+  --c-on-warning:     var(--p-neutral-900);
+
+  --c-purple:         var(--p-purple-600);
+  --c-purple-soft:    var(--p-purple-50);
+
+  /* Neutrals — semantic */
+  --c-ink:            var(--p-neutral-900);  /* primary text */
+  --c-ink-2:          var(--p-neutral-700);  /* body text */
+  --c-muted:          var(--p-neutral-500);  /* secondary text */
+  --c-muted-2:        var(--p-neutral-400);  /* tertiary / placeholder */
+  --c-border:         var(--p-neutral-200);
+  --c-border-soft:    var(--p-neutral-150);
+  --c-border-strong:  var(--p-neutral-300);
+  --c-bg:             var(--p-neutral-50);   /* app background */
+  --c-bg-2:           var(--p-neutral-100);  /* sunken / tinted bg */
+  --c-surface:        var(--p-neutral-0);    /* cards, modals */
+  --c-surface-2:      var(--p-neutral-25);   /* second-level surfaces */
+  --c-surface-hover:  var(--p-neutral-50);   /* row hover */
+  --c-overlay:        rgba(13, 18, 35, 0.45);  /* modal backdrop — neutral */
+  --c-divider:        var(--p-neutral-150);
+
+  /* Progress / meter track — needs to read clearly on white surfaces.
+     One step darker than --c-bg-2 so the bar contrasts. */
+  --c-progress-track: var(--p-neutral-200);
+
+  /* Skeleton shimmer — base + highlight */
+  --c-skel-base:      var(--p-neutral-150);
+  --c-skel-hi:        var(--p-neutral-50);
+
+  /* Disabled */
+  --c-disabled-bg:    var(--p-neutral-100);
+  --c-disabled-fg:    var(--p-neutral-400);
+  --c-disabled-border: var(--p-neutral-200);
+
+  /* Focus */
+  --c-focus:          var(--p-blue-500);
+  --sh-focus:         0 0 0 3px rgba(0, 111, 255, 0.30);
+  --sh-focus-danger:  0 0 0 3px rgba(205, 25, 24, 0.28);
+
+  /* Chart accents (composable on dashboards) */
+  --c-chart-1: var(--p-blue-500);
+  --c-chart-2: var(--p-green-600);
+  --c-chart-3: var(--p-amber-600);
+  --c-chart-4: var(--p-purple-600);
+  --c-chart-5: var(--p-red-500);
+  --c-chart-6: var(--p-neutral-500);
+
+  /* Soft alpha overlays — use on hover/active without recomputing colors */
+  --c-hover-alpha:   rgba(0, 39, 128, 0.04);
+  --c-active-alpha:  rgba(0, 39, 128, 0.08);
+  --c-press-alpha:   rgba(0, 39, 128, 0.12);
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Radii
+     ──────────────────────────────────────────────────────────────────────── */
+  --r-xs:   6px;
+  --r-sm:   8px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-xl:   20px;
+  --r-2xl:  24px;
+  --r-pill: 999px;
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Shadows — drift with theme (dark theme replaces these)
+     ──────────────────────────────────────────────────────────────────────── */
+  --sh-1: 0 1px 2px rgba(0, 5, 55, 0.04), 0 0 0 1px rgba(0, 5, 55, 0.04);
+  --sh-2: 0 1px 3px rgba(0, 5, 55, 0.06), 0 4px 12px rgba(0, 5, 55, 0.05);
+  --sh-3: 0 8px 32px rgba(0, 5, 55, 0.12), 0 2px 6px rgba(0, 5, 55, 0.06);
+  --sh-4: 0 24px 64px rgba(0, 5, 55, 0.20), 0 6px 16px rgba(0, 5, 55, 0.10);
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Spacing — 4-pt scale
+     ──────────────────────────────────────────────────────────────────────── */
+  --s-0:  0;
+  --s-1:  4px;
+  --s-2:  8px;
+  --s-3:  12px;
+  --s-4:  16px;
+  --s-5:  20px;
+  --s-6:  24px;
+  --s-7:  28px;
+  --s-8:  32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --s-14: 56px;
+  --s-16: 64px;
+  --s-20: 80px;
+  --s-24: 96px;
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Typography
+     ──────────────────────────────────────────────────────────────────────── */
+  --ff:      "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --ff-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Type scale — paired (size, line-height, letter-spacing, weight) */
+  --fs-display: 40px; --lh-display: 48px; --tr-display: -0.02em;
+  --fs-h1:      32px; --lh-h1:      40px; --tr-h1:      -0.02em;
+  --fs-h2:      24px; --lh-h2:      32px; --tr-h2:      -0.015em;
+  --fs-h3:      20px; --lh-h3:      28px; --tr-h3:      -0.012em;
+  --fs-h4:      16px; --lh-h4:      24px; --tr-h4:      -0.005em;
+  --fs-body:    14px; --lh-body:    20px; --tr-body:    -0.01em;
+  --fs-small:   12px; --lh-small:   16px; --tr-small:   0;
+  --fs-overline:11px; --lh-overline:14px; --tr-overline:0.08em;
+
+  --fw-regular: 400;
+  --fw-medium:  500;
+  --fw-semibold:600;
+  --fw-bold:    700;
+
+  /* ────────────────────────────────────────────────────────────────────────
+     Motion
+     ──────────────────────────────────────────────────────────────────────── */
+  --motion-fast:   120ms;
+  --motion-base:   180ms;
+  --motion-slow:   280ms;
+  --easing-out:    cubic-bezier(0.2, 0.7, 0.2, 1);
+  --easing-spring: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Density */
+  --dense: 0;
+}
+
+/* ============================================================================
+   DARK THEME — re-map semantic tokens only; raw palette unchanged
+   ============================================================================ */
+:root[data-theme="dark"] {
+  /* Brand — accent (#006FFF) becomes the primary action surface in dark.
+     Original primary navy becomes a deep "tinted surface" instead. */
+  --c-primary:        var(--p-blue-500);
+  --c-primary-hover:  var(--p-blue-400);
+  --c-primary-active: var(--p-blue-300);
+  --c-primary-soft:   rgba(0, 111, 255, 0.16);
+  --c-on-primary:     var(--p-neutral-0);
+
+  --c-accent:         var(--p-blue-400);
+  --c-accent-hover:   var(--p-blue-300);
+  --c-accent-soft:    rgba(0, 111, 255, 0.18);
+  --c-accent-soft-hover: rgba(0, 111, 255, 0.26);
+  --c-on-accent:      var(--p-neutral-0);
+
+  /* Status — bumped saturation for AA on dark surfaces */
+  --c-danger:         #FF5C5B;
+  --c-danger-hover:   #FF7A79;
+  --c-danger-soft:    rgba(238, 52, 51, 0.18);
+  --c-on-danger:      var(--p-neutral-0);
+
+  --c-success:        #2EE08A;
+  --c-success-hover:  #4DEEA0;
+  --c-success-soft:   rgba(27, 197, 107, 0.18);
+  --c-on-success:     var(--p-neutral-1000);
+
+  --c-warning:        #FFA15B;
+  --c-warning-soft:   rgba(255, 119, 28, 0.18);
+  --c-on-warning:     var(--p-neutral-1000);
+
+  --c-purple:         #B17AFF;
+  --c-purple-soft:    rgba(151, 71, 255, 0.18);
+
+  /* Neutrals (graphite, slight warm undertone — easier on the eyes than pure black) */
+  --c-ink:            #F2F4F7;
+  --c-ink-2:          #D7DAE0;
+  --c-muted:          #99A1B2;
+  --c-muted-2:        #69707C;
+  --c-border:         #2C313B;
+  --c-border-soft:    #1F242E;
+  --c-border-strong:  #3A4150;
+  --c-bg:             #0A0E1A;          /* app background */
+  --c-bg-2:           #11141A;          /* sunken */
+  --c-surface:        #161A24;          /* cards, modals */
+  --c-surface-2:      #1A1F2A;          /* second-level */
+  --c-surface-hover:  #1F242E;
+  --c-overlay:        rgba(0, 0, 0, 0.65);
+  --c-divider:        #1F242E;
+
+  --c-progress-track: #2C313B;        /* one step lighter than --c-border */
+
+  --c-skel-base:      #232934;
+  --c-skel-hi:        #2C313B;
+
+  --c-disabled-bg:    #1A1F2A;
+  --c-disabled-fg:    #4A4F58;
+  --c-disabled-border:#2C313B;
+
+  --c-focus:          var(--p-blue-400);
+  --sh-focus:         0 0 0 3px rgba(77, 150, 255, 0.45);
+  --sh-focus-danger:  0 0 0 3px rgba(255, 92, 91, 0.45);
+
+  /* Chart in dark */
+  --c-chart-1: #4D96FF;
+  --c-chart-2: #2EE08A;
+  --c-chart-3: #FFA15B;
+  --c-chart-4: #B17AFF;
+  --c-chart-5: #FF7A79;
+  --c-chart-6: #99A1B2;
+
+  --c-hover-alpha:   rgba(255, 255, 255, 0.04);
+  --c-active-alpha:  rgba(255, 255, 255, 0.08);
+  --c-press-alpha:   rgba(255, 255, 255, 0.12);
+
+  /* Shadows — deeper, lower-alpha so they're felt without halos */
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.40), 0 0 0 1px rgba(0, 0, 0, 0.40);
+  --sh-2: 0 1px 3px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.35);
+  --sh-3: 0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 6px rgba(0, 0, 0, 0.40);
+  --sh-4: 0 24px 64px rgba(0, 0, 0, 0.65), 0 6px 16px rgba(0, 0, 0, 0.45);
+}
+
+/* ============================================================================
+   BASE
+   ============================================================================ */
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  font-family: var(--ff);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  letter-spacing: var(--tr-body);
+  color: var(--c-ink);
+  background: var(--c-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+button { font-family: inherit; color: inherit; }
+input, select, textarea {
+  font-family: inherit;
+  font-size: var(--fs-body);
+  letter-spacing: var(--tr-body);
+  color: var(--c-ink);
+}
+input:focus, textarea:focus, select:focus { outline: none; }
+a { color: var(--c-accent); text-decoration: none; }
+a:hover { color: var(--c-accent-hover); }
+
+/* Type utilities */
+.t-display       { font-size: var(--fs-display); line-height: var(--lh-display); font-weight: var(--fw-semibold); letter-spacing: var(--tr-display); }
+.t-h1            { font-size: var(--fs-h1);      line-height: var(--lh-h1);      font-weight: var(--fw-semibold); letter-spacing: var(--tr-h1); }
+.t-h2            { font-size: var(--fs-h2);      line-height: var(--lh-h2);      font-weight: var(--fw-semibold); letter-spacing: var(--tr-h2); }
+.t-h3            { font-size: var(--fs-h3);      line-height: var(--lh-h3);      font-weight: var(--fw-semibold); letter-spacing: var(--tr-h3); }
+.t-h4            { font-size: var(--fs-h4);      line-height: var(--lh-h4);      font-weight: var(--fw-semibold); letter-spacing: var(--tr-h4); }
+.t-body          { font-size: var(--fs-body);    line-height: var(--lh-body);    letter-spacing: var(--tr-body); }
+.t-body-strong   { font-size: var(--fs-body);    line-height: var(--lh-body);    font-weight: var(--fw-semibold); letter-spacing: var(--tr-body); }
+.t-small         { font-size: var(--fs-small);   line-height: var(--lh-small);   letter-spacing: var(--tr-small); color: var(--c-muted); }
+.t-small-strong  { font-size: var(--fs-small);   line-height: var(--lh-small);   font-weight: var(--fw-semibold); letter-spacing: var(--tr-small); }
+.t-overline      { font-size: var(--fs-overline);line-height: var(--lh-overline);font-weight: var(--fw-semibold); letter-spacing: var(--tr-overline); text-transform: uppercase; color: var(--c-muted); }
+.t-mono          { font-family: var(--ff-mono); font-variant-numeric: tabular-nums; }
+.tabular         { font-variant-numeric: tabular-nums; }
+
+/* Scrollbar */
+::-webkit-scrollbar          { width: 10px; height: 10px; }
+::-webkit-scrollbar-track    { background: transparent; }
+::-webkit-scrollbar-thumb    { background: var(--c-border); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: var(--c-muted-2); background-clip: padding-box; border: 2px solid transparent; }
+
+/* ============================================================================
+   FOCUS — visible 2px ring on EVERY interactive element via :focus-visible.
+   Components that want a custom ring can opt-out with .no-focus-ring or an
+   explicit override.
+   ============================================================================ */
+*:focus { outline: none; }
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+[role="option"]:focus-visible,
+[role="menuitem"]:focus-visible,
+[role="checkbox"]:focus-visible,
+[role="radio"]:focus-visible,
+[role="switch"]:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  box-shadow: var(--sh-focus);
+  outline: none;
+  border-radius: inherit;
+}
+
+.focus-ring:focus-visible { box-shadow: var(--sh-focus); outline: none; }
+.focus-ring-danger:focus-visible { box-shadow: var(--sh-focus-danger); outline: none; }
+
+/* Bare native input/select/textarea — used inside our Input/Select/Textarea
+   wrappers that draw the focus ring on the OUTER container. The inner native
+   element must NEVER show its own ring (avoids double-ring). */
+.input-bare,
+.input-bare:focus,
+.input-bare:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute; top: -64px; left: 12px; z-index: 1000;
+  background: var(--c-primary); color: var(--c-on-primary);
+  padding: 10px 16px; border-radius: var(--r-md);
+  font-size: var(--fs-body); font-weight: var(--fw-semibold);
+  transition: top var(--motion-base) var(--easing-out);
+}
+.skip-link:focus { top: 12px; color: var(--c-on-primary); }
+
+/* Visually hidden */
+.sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0;
+}
+
+/* Motion primitives */
+@keyframes fadeIn      { from { opacity: 0; transform: translateY(4px);}  to { opacity: 1; transform: none;} }
+@keyframes fadeInUp    { from { opacity: 0; transform: translateY(12px);} to { opacity: 1; transform: none;} }
+@keyframes scaleIn     { from { opacity: 0; transform: scale(.96);}       to { opacity: 1; transform: scale(1);} }
+@keyframes slideInRight{ from { opacity: 0; transform: translateX(12px);} to { opacity: 1; transform: none;} }
+@keyframes shimmer     { 0%   { background-position: -200% 0;}            100% { background-position: 200% 0;} }
+@keyframes spin        { to   { transform: rotate(360deg);} }
+@keyframes tt-in {
+  from { opacity: 0; transform: var(--tt-from); }
+  to   { opacity: 1; transform: var(--tt-to); }
+}
+
+.fade-in        { animation: fadeIn      var(--motion-base) var(--easing-out); }
+.fade-in-up     { animation: fadeInUp    var(--motion-slow) var(--easing-spring) both; }
+.scale-in       { animation: scaleIn     var(--motion-base) var(--easing-spring) both; }
+.slide-in-right { animation: slideInRight var(--motion-base) var(--easing-out) both; }
+
+/* Skeleton shimmer — theme-aware via tokens */
+.skel-shimmer {
+  background: linear-gradient(90deg, var(--c-skel-base) 0%, var(--c-skel-hi) 50%, var(--c-skel-base) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+/* ============================================================================
+   REDUCED MOTION
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Responsive breakpoints utility */
+.mobile-only  { display: none; }
+.desktop-only { display: block; }
+@media (max-width: 860px) {
+  .mobile-only  { display: block; }
+  .desktop-only { display: none; }
+}
