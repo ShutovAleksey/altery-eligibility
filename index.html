@@ -8355,6 +8355,16 @@
        React app — components, atoms, eligibility checker. Everything renders
        through Babel-standalone in the browser; matches the prototype's load order.
        ============================================================================ -->
+
+  <!-- Canonical AlteryPay DS Button + supporting btn-helpers + Spinner.
+       Shared with /setup/index.html so the checker and onboarding render the
+       same Button. Loaded BEFORE the inline block below, so window.Button is
+       defined by the time the inline screens reference it. The inline block
+       still defines the rest of the checker-specific components (Input, Tag,
+       Alert, Select, etc.) — those are dual-defined for now and will migrate
+       in follow-up commits. -->
+  <script type="text/babel" data-presets="react" src="/components.jsx"></script>
+
   <script type="text/babel" data-presets="react">
     const { useState, useEffect, useRef, useMemo, useLayoutEffect, useSyncExternalStore } = React;
 
@@ -8533,61 +8543,10 @@
     }
 
     // ──────────────────── Button ────────────────────
-    const btnBase = {
-      display: "inline-flex", alignItems: "center", justifyContent: "center",
-      gap: "var(--s-2)", border: "1px solid transparent",
-      borderRadius: "var(--r-md)", fontWeight: "var(--fw-medium)",
-      fontFamily: "inherit", letterSpacing: "var(--tr-body)",
-      cursor: "pointer",
-      transition: "background var(--motion-base) var(--easing-out), color var(--motion-base) var(--easing-out), border-color var(--motion-base) var(--easing-out), box-shadow var(--motion-base) var(--easing-out)",
-      whiteSpace: "nowrap", userSelect: "none",
-    };
-    const btnSizes = {
-      // iconSize is explicit per size — previously we used sz.fontSize + 2,
-      // which silently broke when fontSize was a CSS-var string ("var(--fs-h4)"
-      // + 2 = "var(--fs-h4)2"). Chrome/Firefox fall back to flex auto-sizing
-      // for invalid SVG width/height; iOS Safari follows SVG-2 spec strictly
-      // and reverts to 300×150, which explodes the button layout on mobile.
-      sm: { padding: "6px 12px",  fontSize: 13,                lineHeight: "18px",         borderRadius: "var(--r-sm)", height: 32, iconSize: 14 },
-      md: { padding: "8px 16px",  fontSize: "var(--fs-body)",  lineHeight: "var(--lh-body)", borderRadius: "var(--r-md)", height: 36, iconSize: 16 },
-      lg: { padding: "10px 20px", fontSize: 15,                lineHeight: "22px",         borderRadius: "var(--r-md)", height: 44, iconSize: 17 },
-      xl: { padding: "12px 24px", fontSize: "var(--fs-h4)",    lineHeight: "var(--lh-h4)", borderRadius: 14,            height: 52, iconSize: 20 },
-    };
-    const btnVariants = {
-      primary: { bg: "var(--c-primary)", fg: "var(--c-on-primary)", bgH: "var(--c-primary-hover)", bgA: "var(--c-primary-active)" },
-      outline: { bg: "var(--c-surface)", fg: "var(--c-ink)", bd: "var(--c-border)", bgH: "var(--c-bg)", bgA: "var(--c-bg-2)" },
-      ghost:   { bg: "transparent", fg: "var(--c-ink)", bgH: "var(--c-hover-alpha)", bgA: "var(--c-active-alpha)" },
-    };
-    const Button = ({ children, size = "md", variant = "primary", iconLeft, iconRight,
-                     disabled, full, style, onClick, type = "button", ...rest }) => {
-      const [h, setH] = useState(false);
-      const [a, setA] = useState(false);
-      const v = btnVariants[variant] || btnVariants.primary;
-      const sz = btnSizes[size];
-      const s = {
-        ...btnBase, ...sz,
-        width: full ? "100%" : undefined,
-        background: disabled ? "var(--c-disabled-bg)" : a && v.bgA ? v.bgA : h ? v.bgH : v.bg,
-        color: disabled ? "var(--c-disabled-fg)" : v.fg,
-        borderColor: disabled ? "var(--c-disabled-border)" : v.bd || "transparent",
-        pointerEvents: disabled ? "none" : "auto",
-        ...style,
-      };
-      return (
-        <button
-          type={type} style={s} disabled={disabled}
-          onMouseEnter={() => setH(true)}
-          onMouseLeave={() => { setH(false); setA(false); }}
-          onMouseDown={() => setA(true)}
-          onMouseUp={() => setA(false)}
-          onClick={onClick} {...rest}
-        >
-          {iconLeft && <Icon name={iconLeft} size={sz.iconSize} />}
-          {children && <span>{children}</span>}
-          {iconRight && <Icon name={iconRight} size={sz.iconSize} />}
-        </button>
-      );
-    };
+    // Moved to /components.jsx (canonical AlteryPay DS source — shared with
+    // /setup/index.html). window.Button is set there by Object.assign(window).
+    // The inline block below references `Button` and falls back to the global
+    // via the standard scope chain since the local `const Button` is gone.
 
     // ──────────────────── Input ────────────────────
     let __inputId = 0;
@@ -13367,6 +13326,11 @@
         </div>
       );
     }
+
+    // Expose Icon to the global scope so the shared /components.jsx Button
+    // (which renders <Icon> for iconLeft/iconRight) can resolve it at render
+    // time. The checker's own inline JSX continues to use the local const.
+    Object.assign(window, { Icon });
 
     ReactDOM.createRoot(document.getElementById("root")).render(<EcApp />);
   </script>

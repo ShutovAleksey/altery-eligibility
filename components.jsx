@@ -22,10 +22,15 @@ const btnBase = {
   userSelect: "none"
 };
 const btnSizes = {
-  sm: { padding: "6px 12px", fontSize: 13, lineHeight: "18px", borderRadius: "var(--r-sm)", height: 32 },
-  md: { padding: "8px 16px", fontSize: "var(--fs-body)", lineHeight: "var(--lh-body)", borderRadius: "var(--r-md)", height: 36 },
-  lg: { padding: "10px 20px", fontSize: 15, lineHeight: "22px", borderRadius: "var(--r-md)", height: 44 },
-  xl: { padding: "12px 24px", fontSize: "var(--fs-h4)", lineHeight: "var(--lh-h4)", borderRadius: 14, height: 52 }
+  // iconSize is explicit per size. Previously the icons used `sz.fontSize + 2`,
+  // which broke when fontSize was a CSS-var string ("var(--fs-h4)" + 2 →
+  // "var(--fs-h4)2"). Chrome/Firefox fall back to flex auto-sizing for invalid
+  // SVG width/height; iOS Safari follows SVG-2 spec strictly and reverts the
+  // icon to 300×150, which explodes the button layout.
+  sm: { padding: "6px 12px",  fontSize: 13,                lineHeight: "18px",            borderRadius: "var(--r-sm)", height: 32, iconSize: 14 },
+  md: { padding: "8px 16px",  fontSize: "var(--fs-body)",  lineHeight: "var(--lh-body)",  borderRadius: "var(--r-md)", height: 36, iconSize: 16 },
+  lg: { padding: "10px 20px", fontSize: 15,                lineHeight: "22px",            borderRadius: "var(--r-md)", height: 44, iconSize: 17 },
+  xl: { padding: "12px 24px", fontSize: "var(--fs-h4)",    lineHeight: "var(--lh-h4)",    borderRadius: 14,             height: 52, iconSize: 20 }
 };
 const btnVariants = {
   primary: { bg: "var(--c-primary)", fg: "var(--c-on-primary)", bgH: "var(--c-primary-hover)", bgA: "var(--c-primary-active)" },
@@ -93,9 +98,9 @@ const Button = (props) => {
       onMouseUp={() => setA(false)}
       onClick={onClick}>
 
-      {loading ? <Spinner size={sz.fontSize + 2} /> : iconLeft && <Icon name={iconLeft} size={sz.fontSize + 2} aria-hidden="true" />}
+      {loading ? <Spinner size={sz.iconSize} /> : iconLeft && <Icon name={iconLeft} size={sz.iconSize} aria-hidden="true" />}
       {children && <span>{children}</span>}
-      {iconRight && !loading && <Icon name={iconRight} size={sz.fontSize + 2} aria-hidden="true" />}
+      {iconRight && !loading && <Icon name={iconRight} size={sz.iconSize} aria-hidden="true" />}
     </button>);
 
 };

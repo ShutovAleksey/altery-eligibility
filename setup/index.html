@@ -36,7 +36,10 @@
        globals exported by earlier ones via Object.assign(window, ...). -->
   <script type="text/babel" src="icons.jsx"></script>
   <script type="text/babel" src="flags.jsx"></script>
-  <script type="text/babel" src="components.jsx"></script>
+  <!-- Canonical AlteryPay DS components — shared with the eligibility checker
+       at /index.html so both surfaces render the same Button, Input, Tag,
+       Alert, Select, etc. instead of dragging duplicate inline copies. -->
+  <script type="text/babel" src="/components.jsx"></script>
   <script type="text/babel" src="i18n-react.jsx"></script>
   <script type="text/babel" src="date-picker.jsx"></script>
   <script type="text/babel" src="phone-input.jsx"></script>
