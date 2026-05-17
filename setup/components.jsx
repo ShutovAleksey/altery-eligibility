@@ -39,30 +39,33 @@ const btnVariants = {
 };
 
 const Button = (props) => {
-  // The previous version used a single-pattern destructure that mixed an
-  // identifier rename (`ariaLabel`) with a string-keyed rename
-  // (`"aria-label": ariaLabelProp`) and `...rest`. Some Babel-standalone
-  // builds (observed on @babel/standalone 7.29.0 in-browser) silently
-  // leaked the string-keyed and adjacent identifier props into `rest`,
-  // which then got spread onto the inner `<button>` and triggered
-  // "React does not recognize the iconRight prop on a DOM element".
-  // Two-step destructure + an explicit allowlist for the spread fixes it.
-  const {
-    children, size = "md", variant = "primary",
-    iconLeft, iconRight,
-    loading, disabled, full, style, onClick, type = "button",
-    ariaLabel,
-    ...rest
-  } = props;
-  const ariaLabelProp = rest["aria-label"];
-  // Drop anything we already consumed or never want on the DOM <button>.
-  // Object spread + omit so we don't mutate the caller's props object.
-  const { iconLeft: _il, iconRight: _ir, "aria-label": _al, ...domProps } = rest;
+  // Read every prop by direct lookup — no destructure, no rest, no spread
+  // onto the DOM <button>. The previous Button used an object destructure
+  // that mixed an identifier rename with a string-keyed rename
+  // (`"aria-label": ariaLabelProp`) plus `...rest`; on @babel/standalone
+  // 7.29.0 (the in-browser Babel) that pattern silently leaked props such
+  // as `iconRight` into rest and then onto the inner <button>, which
+  // produced both the React "unknown prop on DOM" warning AND, when an
+  // unknown attribute happened to override an inline style, the buttons
+  // rendering with browser-default chrome. This shape is exact: known
+  // props only, nothing else reaches the DOM.
+  const children = props.children;
+  const size = props.size || "md";
+  const variant = props.variant || "primary";
+  const iconLeft = props.iconLeft;
+  const iconRight = props.iconRight;
+  const loading = props.loading;
+  const disabled = props.disabled;
+  const full = props.full;
+  const style = props.style;
+  const onClick = props.onClick;
+  const type = props.type || "button";
+  const ariaLabelProp = props["aria-label"] || props.ariaLabel;
 
   const [h, setH] = React.useState(false);
   const [a, setA] = React.useState(false);
-  const v = btnVariants[variant];
-  const sz = btnSizes[size];
+  const v = btnVariants[variant] || btnVariants.primary;
+  const sz = btnSizes[size] || btnSizes.md;
   const isDisabled = disabled || loading;
   const s = {
     ...btnBase,
@@ -83,13 +86,12 @@ const Button = (props) => {
       disabled={isDisabled}
       aria-disabled={isDisabled || undefined}
       aria-busy={loading || undefined}
-      aria-label={ariaLabelProp || ariaLabel || (!labelFromChildren && (iconLeft || iconRight) ? iconLeft || iconRight : undefined)}
+      aria-label={ariaLabelProp || (!labelFromChildren && (iconLeft || iconRight) ? iconLeft || iconRight : undefined)}
       onMouseEnter={() => setH(true)}
       onMouseLeave={() => {setH(false);setA(false);}}
       onMouseDown={() => setA(true)}
       onMouseUp={() => setA(false)}
-      onClick={onClick}
-      {...domProps}>
+      onClick={onClick}>
 
       {loading ? <Spinner size={sz.fontSize + 2} /> : iconLeft && <Icon name={iconLeft} size={sz.fontSize + 2} aria-hidden="true" />}
       {children && <span>{children}</span>}
