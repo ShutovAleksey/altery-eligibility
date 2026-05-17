@@ -392,7 +392,6 @@ function ScreenActivation({ planId, currency, mode, next, back }) {
   const plan = PLANS.find((p) => p.id === planId) || PLANS[1];
   const price = priceFor(plan, cur);
   const [state, setState] = _pUseState("idle"); // idle → processing → success
-  const [method, setMethod] = _pUseState("card");
 
   // Pre-submit mode runs the same payment surface but reframes the
   // copy: the application hasn't been approved yet, so this is an
@@ -400,6 +399,113 @@ function ScreenActivation({ planId, currency, mode, next, back }) {
   // Once paid, ScreenSubmit renders the KYB-in-review queue state and
   // the fee is held until approval (refunded on rejection within 5 BD).
   const isPresubmit = mode === "presubmit";
+
+  // ── Stripe wiring ───────────────────────────────────────────
+  // The previous card/Apple Pay/Google Pay/SEPA tabs were a mock UI.
+  // Replaced by Stripe's hosted Payment Element, which handles tab
+  // switching, validation, 3DS, wallet pre-fills, and PCI scope on
+  // its own. We just need a clientSecret from /api/create-payment-
+  // intent and a mount node. If either env var (publishable / secret)
+  // is missing on Vercel we surface a hard error in the form area
+  // instead of silently rendering nothing.
+  const [stripeError, setStripeError] = _pUseState(null);
+  const [paymentError, setPaymentError] = _pUseState(null);
+  const [stripeReady, setStripeReady] = _pUseState(typeof window !== "undefined" && !!window.Stripe);
+  const [stripe, setStripe] = _pUseState(null);
+  const [elements, setElements] = _pUseState(null);
+  const elementRef = React.useRef(null);
+
+  // Stripe.js loads `async` from the CDN in setup/index.html; poll until
+  // window.Stripe is exposed. Bails out after ~10s — past that the script
+  // tag almost certainly failed (network / CSP / ad-blocker).
+  React.useEffect(() => {
+    if (stripeReady) return;
+    let elapsed = 0;
+    const id = setInterval(() => {
+      if (window.Stripe) {
+        setStripeReady(true);
+        clearInterval(id);
+      } else if ((elapsed += 100) > 10000) {
+        clearInterval(id);
+        setStripeError("Stripe.js failed to load. Check that https://js.stripe.com/v3/ is reachable.");
+      }
+    }, 100);
+    return () => clearInterval(id);
+  }, [stripeReady]);
+
+  // Once Stripe.js is up, fetch the publishable key and create the
+  // PaymentIntent in parallel-ish (key → Stripe instance → intent).
+  React.useEffect(() => {
+    if (!stripeReady) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const cfg = await fetch("/api/config").then((r) => r.json());
+        if (!cfg.publishableKey) {
+          if (!cancelled) setStripeError("STRIPE_PUBLISHABLE_KEY is not set in Vercel env vars.");
+          return;
+        }
+        const stripeInst = window.Stripe(cfg.publishableKey);
+        const piRes = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ planId: plan.id, currency: cur.toLowerCase() }),
+        });
+        const piData = await piRes.json();
+        if (!piRes.ok || !piData.clientSecret) {
+          if (!cancelled) setStripeError(piData.error || "Failed to create payment intent.");
+          return;
+        }
+        const elems = stripeInst.elements({
+          clientSecret: piData.clientSecret,
+          appearance: {
+            theme: "stripe",
+            variables: {
+              colorPrimary: "#002780",
+              fontFamily: "Inter, system-ui, sans-serif",
+              borderRadius: "10px",
+            },
+          },
+        });
+        if (cancelled) return;
+        setStripe(stripeInst);
+        setElements(elems);
+      } catch (err) {
+        if (!cancelled) setStripeError("Could not initialise payments: " + (err.message || err));
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [stripeReady, plan.id, cur]);
+
+  // Mount the Payment Element when the elements instance is ready AND
+  // the container <div> is committed to the DOM. The cleanup unmounts
+  // so we don't leak DOM nodes when the user navigates back.
+  React.useEffect(() => {
+    if (!elements || !elementRef.current) return;
+    const pe = elements.create("payment", { layout: "tabs" });
+    pe.mount(elementRef.current);
+    return () => { try { pe.unmount(); } catch (e) { /* element already gone */ } };
+  }, [elements]);
+
+  const handlePay = async () => {
+    if (!stripe || !elements) return;
+    setState("processing");
+    setPaymentError(null);
+    // redirect: "if_required" keeps the user on this page for cards that
+    // don't need 3DS; methods that do need a redirect (e.g. iDEAL) go
+    // off-site and come back via return_url.
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: { return_url: window.location.href },
+      redirect: "if_required",
+    });
+    if (error) {
+      setPaymentError(error.message || "Payment failed");
+      setState("idle");
+      return;
+    }
+    setState("success");
+  };
 
   // On successful pre-submit payment, transition to the submit screen.
   // useEffect rather than a setTimeout-in-render so the side effect
@@ -490,9 +596,6 @@ function ScreenActivation({ planId, currency, mode, next, back }) {
   const ctaText = isPresubmit
     ? `Authorise & submit · ${formatPrice(price, sym)}`
     : `Activate account · Pay ${formatPrice(price, sym)}`;
-  const ctaWalletText = isPresubmit
-    ? `Authorise & submit · ${formatPrice(price, sym)}`
-    : `Activate · ${formatPrice(price, sym)}`;
   const legalText = isPresubmit
     ? `Recipient: Altery EMI Ltd · FCA #901037. You authorise Altery to capture the ${formatPrice(price, sym)} ${plan.name} activation fee from your card after your KYB application is approved. No charge before approval.`
     : `Recipient: Altery EMI Ltd · FCA #901037. You authorise Altery to charge your card now for the ${formatPrice(price, sym)} ${plan.name} activation fee.`;
@@ -513,49 +616,35 @@ function ScreenActivation({ planId, currency, mode, next, back }) {
 
       <div className="pp-pay">
         <div className="pp-pay__form">
-          <div className="pp-pay__tabs" role="tablist" aria-label="Payment method">
-            {[
-              { id: "card", label: "Card" },
-              { id: "applepay", label: "Apple Pay" },
-              { id: "googlepay", label: "Google Pay" },
-              { id: "sepa", label: "SEPA" },
-            ].map((m) => (
-              <button
-                key={m.id}
-                type="button"
-                role="tab"
-                aria-selected={method === m.id}
-                className={`pp-pay__tab ${method === m.id ? "is-on" : ""}`}
-                onClick={() => setMethod(m.id)}
-              >
-                {m.label}
-              </button>
-            ))}
-          </div>
-
-          {method === "card" && (
-            <div className="ob-fields">
-              <Input label="Email" type="email" defaultValue="anna@orbit.io"/>
-              <Input
-                label="Card number"
-                defaultValue="4242 4242 4242 4242"
-                suffix={<span className="pp-pay__brand">VISA <span className="pp-pay__brand-sep">··</span></span>}
-              />
-              <div className="ob-fields row">
-                <Input label="Expiry" defaultValue="04 / 29"/>
-                <Input label="CVC" defaultValue="123"/>
+          {stripeError ? (
+            <Alert tone="danger" title="Payment unavailable">
+              <div>{stripeError}</div>
+              <div style={{marginTop: 10, fontSize: 12, lineHeight: 1.5}}>
+                Set <code>STRIPE_PUBLISHABLE_KEY</code> and <code>STRIPE_SECRET_KEY</code> in
+                Vercel Dashboard → Project Settings → Environment Variables, then redeploy.
               </div>
-              <Input label="Cardholder name" defaultValue="Anna Petrenko"/>
-
+            </Alert>
+          ) : !elements ? (
+            <div style={{
+              padding: "40px 16px", textAlign: "center",
+              color: "var(--c-muted)", fontSize: 14,
+            }}>
+              Loading payment form…
+            </div>
+          ) : (
+            <div className="ob-fields">
+              {/* Stripe Payment Element mounts here. Style is configured
+                  via the `appearance` option above; layout="tabs" renders
+                  Card / Apple Pay / Google Pay / SEPA / etc. as tabs
+                  natively, replacing the custom .pp-pay__tabs row. */}
+              <div ref={elementRef} />
+              {paymentError && <Alert tone="danger">{paymentError}</Alert>}
               <Button
                 variant="primary"
                 size="xl"
-                onClick={() => {
-                  setState("processing");
-                  setTimeout(() => setState("success"), 1400);
-                }}
+                onClick={handlePay}
                 loading={state === "processing"}
-                disabled={state === "processing"}
+                disabled={state === "processing" || !stripe}
                 iconLeft="lock"
                 full
               >
@@ -564,25 +653,6 @@ function ScreenActivation({ planId, currency, mode, next, back }) {
               <p className="pp-pay__legal">
                 {legalText}
               </p>
-            </div>
-          )}
-
-          {method !== "card" && (
-            <div className="pp-pay__wallet">
-              <div className="pp-pay__wallet-card">
-                <div className="pp-pay__wallet-title">Continue with {method === "applepay" ? "Apple Pay" : method === "googlepay" ? "Google Pay" : "SEPA Direct Debit"}</div>
-                <div className="pp-pay__wallet-sub">{isPresubmit ? `Authorise ${formatPrice(price, sym)} — captured on approval.` : `Authorise ${formatPrice(price, sym)} to activate your account.`}</div>
-              </div>
-              <Button
-                variant="primary"
-                size="xl"
-                onClick={() => { setState("processing"); setTimeout(() => setState("success"), 1400); }}
-                loading={state === "processing"}
-                full
-                iconLeft="lock"
-              >
-                {ctaWalletText}
-              </Button>
             </div>
           )}
         </div>
