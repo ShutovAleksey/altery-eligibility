@@ -43,46 +43,58 @@ function ScreenPrep({ next }) {
 }
 
 // ── Step 1: Welcome / name + email ──────────────────
-function ScreenWelcome({ next, state }) {
+function ScreenWelcome({ next, auth, updateAuth }) {
   const t = useT();
-  const err = state === "error";
-  const filled = state === "filled" || state === "default";
   // Render the TOS checkbox label with two inline links — replace <a>…</a> + <b>…</b> in the translated string.
   const tos = t("ob.welcome.tos");
   const tosParts = tos.split(/<a>|<\/a>|<b>|<\/b>/);
   // tosParts: [pre, link1, mid, link2, post]
+  const emailLooksValid = /\S+@\S+\.\S+/.test(auth.email);
+  const canContinue = auth.firstName.trim() && auth.lastName.trim() && emailLooksValid && auth.tosAccepted;
   return (
     <div className="ob-content fade-in">
       <Title display illu={<Ico.rocket />} title={t("ob.welcome.title")} lead={t("ob.welcome.lead")} />
       <div className="ob-fields">
         <div className="ob-fields row">
           <Input label={t("ob.welcome.firstName")} placeholder="Anna"
-            value={filled ? "Anna" : ""} onChange={() => {}}
-            error={err && t("ob.common.required")} />
+            value={auth.firstName} onChange={(e) => updateAuth({ firstName: e.target.value })} />
           <Input label={t("ob.welcome.lastName")} placeholder="Petrenko"
-            value={filled ? "Petrenko" : ""} onChange={() => {}}
-            error={err && t("ob.common.required")} />
+            value={auth.lastName} onChange={(e) => updateAuth({ lastName: e.target.value })} />
         </div>
         <Input label={t("ob.welcome.email")} type="email" placeholder="anna@yourcompany.com"
-          value={filled ? "anna@orbit.io" : ""} onChange={() => {}} />
+          value={auth.email} onChange={(e) => updateAuth({ email: e.target.value })} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <Checkbox checked={filled} onChange={() => {}} label={
+        <Checkbox checked={auth.tosAccepted} onChange={(checked) => updateAuth({ tosAccepted: checked })} label={
           <>{tosParts[0]}<a href="#">{tosParts[1]}</a>{tosParts[2]}<a href="#">{tosParts[3]}</a>{tosParts[4]}</>
         } />
-        <Checkbox checked={false} onChange={() => {}} label={t("ob.welcome.marketing")} />
+        <Checkbox checked={auth.marketingAccepted} onChange={(checked) => updateAuth({ marketingAccepted: checked })} label={t("ob.welcome.marketing")} />
       </div>
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight">{t("ob.common.continue")}</Button>
+        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!canContinue}>{t("ob.common.continue")}</Button>
       </div>
     </div>);
 }
 
 // ── Step 2: Password ──────────────────
-function ScreenPassword({ next, back, state }) {
+// Password is intentionally NOT persisted to localStorage — it's collected
+// here only to be sent to the auth backend on submit. Local state lives and
+// dies with the screen; refreshing this page wipes both fields.
+function ScreenPassword({ next, back }) {
   const t = useT();
-  const filled = state !== "empty";
-  const err = state === "error";
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+
+  const rules = [
+    { ok: password.length >= 10,        label: t("ob.password.r1") },
+    { ok: /[A-Z]/.test(password),       label: t("ob.password.r2") },
+    { ok: /\d/.test(password),          label: t("ob.password.r3") },
+    { ok: /[^A-Za-z0-9]/.test(password), label: t("ob.password.r4") },
+  ];
+  const strongEnough = rules.every((r) => r.ok);
+  const mismatch = confirm.length > 0 && password !== confirm;
+  const canContinue = strongEnough && password === confirm;
+
   return (
     <div className="ob-content fade-in">
       <TopRow onBack={back} />
@@ -90,29 +102,22 @@ function ScreenPassword({ next, back, state }) {
       <div className="ob-fields">
         <Input label={t("ob.password.label")} type="password"
           placeholder={t("ob.password.placeholder")}
-          value={filled ? "••••••••••" : ""} onChange={() => {}}
-          hint={!err && t("ob.password.hint")}
-          error={err && t("ob.password.weak")} />
+          value={password} onChange={(e) => setPassword(e.target.value)}
+          hint={!password || strongEnough ? t("ob.password.hint") : undefined}
+          error={password && !strongEnough ? t("ob.password.weak") : undefined} />
         <Input label={t("ob.password.confirm")} type="password"
           placeholder={t("ob.password.repeat")}
-          value={filled ? "••••••••••" : ""} onChange={() => {}}
-          error={err && t("ob.password.mismatch")} />
+          value={confirm} onChange={(e) => setConfirm(e.target.value)}
+          error={mismatch ? t("ob.password.mismatch") : undefined} />
       </div>
-      <PasswordChecklist filled={filled} />
+      <PasswordChecklist rules={rules} />
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!filled || err}>{t("ob.common.continue")}</Button>
+        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!canContinue}>{t("ob.common.continue")}</Button>
       </div>
     </div>);
 }
 
-function PasswordChecklist({ filled }) {
-  const t = useT();
-  const rules = [
-  { ok: filled, label: t("ob.password.r1") },
-  { ok: filled, label: t("ob.password.r2") },
-  { ok: filled, label: t("ob.password.r3") },
-  { ok: false, label: t("ob.password.r4") }];
-
+function PasswordChecklist({ rules }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
       {rules.map((r, i) =>
@@ -133,47 +138,48 @@ function PasswordChecklist({ filled }) {
 }
 
 // ── Step 3: Email verification ──────────────────
-function ScreenVerify({ next, back, state }) {
+// The verification code is one-time material — never persisted. It exists
+// only in this screen's local state; reloading the page wipes it.
+function ScreenVerify({ next, back, email }) {
   const t = useT();
-  const err = state === "error";
-  const value = state === "filled" || state === "error" ? "123456" : "";
+  const [code, setCode] = useState("");
+  const canContinue = code.length === 6;
   return (
     <div className="ob-content fade-in">
       <TopRow onBack={back} />
-      <Title illu={<Ico.shield />} title={t("ob.verify.title")} lead={<>{t("ob.verify.leadPre")}<strong>anna@orbit.io</strong>{t("ob.verify.leadPost")}</>} />
+      <Title illu={<Ico.shield />} title={t("ob.verify.title")} lead={<>{t("ob.verify.leadPre")}<strong>{email || "your email"}</strong>{t("ob.verify.leadPost")}</>} />
       <div>
-        <CodeInput length={6} value={value} onChange={() => {}} error={err} />
-        {err &&
-        <div style={{ marginTop: 8, fontSize: 12, color: "var(--c-danger)" }}>
-            {t("ob.verify.error")}
-          </div>
-        }
+        <CodeInput length={6} value={code} onChange={setCode} />
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, color: "var(--c-muted)" }}>
         <span>{t("ob.verify.didnt")}</span>
         <Button variant="link" size="sm" style={{ color: "var(--c-accent)" }}>{t("ob.verify.resend")}</Button>
       </div>
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={err}>{t("ob.common.continue")}</Button>
+        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!canContinue}>{t("ob.common.continue")}</Button>
       </div>
     </div>);
 }
 
 // ── Step 4: Phone number ──────────────────
-function ScreenPhone({ next, back, state }) {
+function ScreenPhone({ next, back, phone, updateAuth }) {
   const t = useT();
-  const filled = state !== "empty";
+  // PhoneInput is uncontrolled (it parses `value` once on mount and manages
+  // its own internal state thereafter). We seed it from formState.auth.phone
+  // and write back the E.164 string on every change.
+  const hasPhone = (phone || "").replace(/\D/g, "").length >= 7;
   return (
     <div className="ob-content fade-in">
       <TopRow onBack={back} />
       <Title title={t("ob.phone.title")} lead={t("ob.phone.lead")} />
       <div className="ob-fields">
         <PhoneInput label={t("ob.phone.label")} defaultCountry="GB"
-          value={filled ? "+44 20 7946 0123" : ""} onChange={() => {}} />
+          value={phone || ""}
+          onChange={(v) => updateAuth({ phone: v.e164 || "" })} />
       </div>
       <WhyWeAsk>{t("ob.phone.why")}</WhyWeAsk>
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!filled}>{t("ob.phone.send")}</Button>
+        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!hasPhone}>{t("ob.phone.send")}</Button>
       </div>
     </div>);
 }

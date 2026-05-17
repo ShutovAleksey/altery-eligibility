@@ -4,17 +4,18 @@ const { useMemo: _useMemo, useCallback: _useCallback } = React;
 // localStorage key for the persisted onboarding form state. Bump the suffix
 // (`:v2`, `:v3`, …) whenever the shape changes; hydration will refuse to load
 // anything from an older version and the user will start fresh.
-const FORM_STORAGE_KEY = "altery:ob:formState:v1";
+const FORM_STORAGE_KEY = "altery:ob:formState:v2";
 
 // Whitelist of fields that survive a reload. Sensitive material (password,
 // 2FA code, card data) is deliberately absent — never persist those.
 const INITIAL_FORM_STATE = {
-  _v: 1,
+  _v: 2,
+  auth:     { firstName: "", lastName: "", email: "", phone: "", tosAccepted: false, marketingAccepted: false },
   contact:  { country: null },
   activity: { inboundChannels: [], outboundChannels: [] },
   uboDraft: { role: "director" },
   plan:     { selectedPlanId: null, billingCurrency: null },
-  meta:     { email: null, token: null, startedAt: null, lastSavedAt: null },
+  meta:     { token: null, startedAt: null, lastSavedAt: null },
 };
 
 function hydrateFormState(checkerParams) {
@@ -27,13 +28,16 @@ function hydrateFormState(checkerParams) {
   } catch (e) { /* storage unavailable / parse error → fall through to seed */ }
   return {
     ...INITIAL_FORM_STATE,
+    auth: {
+      ...INITIAL_FORM_STATE.auth,
+      email: checkerParams.email || "",
+    },
     plan: {
       selectedPlanId: checkerParams.plan || null,
       billingCurrency: checkerParams.currency || null,
     },
     meta: {
       ...INITIAL_FORM_STATE.meta,
-      email: checkerParams.email || null,
       token: checkerParams.token || null,
       startedAt: new Date().toISOString(),
     },
@@ -143,6 +147,10 @@ function App() {
   // token). Other fields will move in here as we wire real inputs in Phase 2.
   const [formState, setFormState] = useFormState(checkerParams);
 
+  const updateAuth = _useCallback(
+    (patch) => setFormState((s) => ({ ...s, auth: { ...s.auth, ...patch } })),
+    []
+  );
   const setCountry = _useCallback(
     (code) => setFormState((s) => ({ ...s, contact: { ...s.contact, country: code } })),
     []
@@ -198,10 +206,15 @@ function App() {
     const s = tweaks.stateVariant;
     switch (step) {
       case "prep":          return <ScreenPrep next={next} />;
-      case "welcome":       return <ScreenWelcome next={next} state={s}/>;
+      case "welcome":       return <ScreenWelcome next={next} state={s}
+                                      auth={formState.auth}
+                                      updateAuth={updateAuth}/>;
       case "password":      return <ScreenPassword next={next} back={back} state={s}/>;
-      case "verify":        return <ScreenVerify next={next} back={back} state={s}/>;
-      case "phone":         return <ScreenPhone next={next} back={back} state={s}/>;
+      case "verify":        return <ScreenVerify next={next} back={back} state={s}
+                                      email={formState.auth.email}/>;
+      case "phone":         return <ScreenPhone next={next} back={back} state={s}
+                                      phone={formState.auth.phone}
+                                      updateAuth={updateAuth}/>;
       case "country":       return <ScreenCountry next={next} back={back} state={s}
                                       country={formState.contact.country}
                                       onSelectCountry={setCountry}/>;
