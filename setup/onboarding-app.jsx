@@ -13,16 +13,47 @@ const FORM_STORAGE_KEY = "altery:ob:formState:v2";
 // renaming/removing — `hydrateFormState` shallow-merges saved data on top of
 // the defaults, so additive changes don't require a `_v` bump. Bump `_v`
 // only on truly breaking changes (rename/remove/restructure).
+const INITIAL_UBO_DRAFT = {
+  editingId: null,         // null = new, string id = editing existing
+  firstName: "",
+  lastName: "",
+  email: "",
+  dateOfBirth: null,       // YYYY-MM-DD local
+  country: "",
+  role: "director",
+  stakePercent: "",        // empty for "director"; numeric string otherwise
+};
+
 const INITIAL_FORM_STATE = {
   _v: 2,
   auth:     { firstName: "", lastName: "", email: "", phone: "", tosAccepted: false, marketingAccepted: false },
   contact:  { country: null },
   business: { companyName: "", tradingName: "", companyNumber: "", dateOfIncorporation: null, address: "", industry: "", website: "" },
   activity: { inboundChannels: [], outboundChannels: [] },
-  uboDraft: { role: "director" },
+  ubos:     [],
+  uboDraft: INITIAL_UBO_DRAFT,
   plan:     { selectedPlanId: null, billingCurrency: null },
   meta:     { token: null, startedAt: null, lastSavedAt: null },
 };
+
+// Per-slice deep-merge so additive shape changes (new fields inside an
+// existing slice) appear automatically for users whose saved payload predates
+// the new field. Arrays replace as-is — never merge user-curated lists.
+function mergeFormState(defaults, saved) {
+  const out = { ...defaults };
+  for (const key of Object.keys(saved || {})) {
+    const dv = defaults[key];
+    const sv = saved[key];
+    if (Array.isArray(dv) || Array.isArray(sv)) {
+      out[key] = sv;
+    } else if (dv && typeof dv === "object" && sv && typeof sv === "object") {
+      out[key] = { ...dv, ...sv };
+    } else {
+      out[key] = sv;
+    }
+  }
+  return out;
+}
 
 function hydrateFormState(checkerParams) {
   try {
@@ -30,11 +61,10 @@ function hydrateFormState(checkerParams) {
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && parsed._v === INITIAL_FORM_STATE._v) {
-        // Shallow merge over defaults so any newly-added top-level slice is
-        // present even if the saved payload predates that slice. This lets us
-        // ship additive shape changes without forcing a _v bump that wipes
-        // the user's in-progress data.
-        return { ...INITIAL_FORM_STATE, ...parsed };
+        // Per-slice deep-merge so newly-added fields inside an existing slice
+        // (e.g. extending uboDraft from {role} → {role, firstName, …}) show up
+        // even when the saved payload predates them. Arrays replace as-is.
+        return mergeFormState(INITIAL_FORM_STATE, parsed);
       }
     }
   } catch (e) { /* storage unavailable / parse error → fall through to seed */ }
@@ -78,6 +108,16 @@ function useFormState(checkerParams) {
 window.__obClearFormState = function clearFormState() {
   try { window.localStorage.removeItem(FORM_STORAGE_KEY); } catch (e) {}
 };
+
+// Stable ID for a newly-added UBO. randomUUID exists in all modern browsers
+// we ship to (Safari 15.4+, Chrome 92+, Firefox 95+); falls back to a
+// time+random string on the off-chance it's missing.
+function makeUboId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `ubo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
 
 const ALL_STEPS = [
   "prep",
@@ -179,10 +219,37 @@ function App() {
     (arr) => setFormState((s) => ({ ...s, activity: { ...s.activity, outboundChannels: arr } })),
     []
   );
-  const setUboRole = _useCallback(
-    (role) => setFormState((s) => ({ ...s, uboDraft: { ...s.uboDraft, role } })),
+  const updateUboDraft = _useCallback(
+    (patch) => setFormState((s) => ({ ...s, uboDraft: { ...s.uboDraft, ...patch } })),
     []
   );
+
+  // Commit the draft as either a new UBO (when editingId is null) or as
+  // an update to the existing record. Resets the draft so the next visit
+  // to the form starts blank.
+  const saveUboDraft = _useCallback(() => {
+    setFormState((s) => {
+      const { editingId, ...fields } = s.uboDraft;
+      const ubos = editingId
+        ? s.ubos.map((u) => (u.id === editingId ? { ...u, ...fields } : u))
+        : [...s.ubos, { id: makeUboId(), ...fields }];
+      return { ...s, ubos, uboDraft: INITIAL_UBO_DRAFT };
+    });
+  }, []);
+
+  // Load an existing UBO into the draft for editing.
+  const loadUboIntoDraft = _useCallback((id) => {
+    setFormState((s) => {
+      const target = s.ubos.find((u) => u.id === id);
+      if (!target) return s;
+      return { ...s, uboDraft: { ...INITIAL_UBO_DRAFT, ...target, editingId: id } };
+    });
+  }, []);
+
+  // Throw away whatever is in the draft (e.g. user pressed Cancel).
+  const clearUboDraft = _useCallback(() => {
+    setFormState((s) => ({ ...s, uboDraft: INITIAL_UBO_DRAFT }));
+  }, []);
 
   // If the visitor came from the checker (token present), skip the
   // generic prep screen and go straight to welcome — they've already
@@ -243,10 +310,15 @@ function App() {
                                       onChangeInbound={setInboundChannels}
                                       onChangeOutbound={setOutboundChannels}/>;
       case "documents":     return <ScreenDocuments next={next} back={back} state={s === "default" ? "complete" : s}/>;
-      case "ubo-list":      return <ScreenUboList next={next} back={back} addPerson={() => setStep("ubo-form")}/>;
-      case "ubo-form":      return <ScreenUboForm next={() => setStep("ubo-list")} back={() => setStep("ubo-list")} state={s}
-                                      role={formState.uboDraft.role}
-                                      onChangeRole={setUboRole}/>;
+      case "ubo-list":      return <ScreenUboList next={next} back={back}
+                                      ubos={formState.ubos}
+                                      onAddPerson={() => { clearUboDraft(); setStep("ubo-form"); }}
+                                      onEditPerson={(id) => { loadUboIntoDraft(id); setStep("ubo-form"); }}/>;
+      case "ubo-form":      return <ScreenUboForm
+                                      onSave={() => { saveUboDraft(); setStep("ubo-list"); }}
+                                      onCancel={() => { clearUboDraft(); setStep("ubo-list"); }}
+                                      draft={formState.uboDraft}
+                                      updateUboDraft={updateUboDraft}/>;
       case "review":        return <ScreenReview next={() => setStep("payment")} back={back} setStep={setStep}/>;
       case "payment":       return <ScreenActivation
                                       planId={checkerParams.plan}

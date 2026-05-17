@@ -50,70 +50,51 @@ function ScreenDocuments({ next, back, state }) {
 
 // ── UBO list ──────────────────
 // Role/seen are i18n keys + interp vars so they translate at render time.
-const PEOPLE = [
-  { id: "1", name: "Stepan Mitaki",   roleKey: "ob.ubo.role.dirUbo",       roleVars: { pct: 24 }, status: "complete", seenKey: "ob.ubo.seen.daysAgo",      seenVars: { n: 2 } },
-  { id: "2", name: "Francis Monte",   roleKey: "ob.ubo.role.shareholder",  roleVars: { pct: 18 }, status: "complete", seenKey: "ob.ubo.seen.yesterday",    seenVars: {} },
-  { id: "3", name: "Rick Hubert",     roleKey: "ob.ubo.role.dirBoard",     roleVars: {},          status: "complete", seenKey: "ob.ubo.seen.hoursAgo",     seenVars: { n: 3 } },
-  { id: "4", name: "Samantha Morgan", roleKey: "ob.ubo.role.shareholder",  roleVars: { pct: 15 }, status: "pending",  seenKey: "ob.ubo.seen.idInProgress", seenVars: {} },
-  { id: "5", name: "Nikolay Avetkin", roleKey: "ob.ubo.role.shareholder",  roleVars: { pct: 10 }, status: "pending",  seenKey: "ob.ubo.seen.linkSent",     seenVars: { n: 4 } },
-];
-
-function PendingActionRow({ person, t: tProp }) {
-  const tHook = useT();
-  const t = tProp || tHook;
-  return (
-    <div className="ob-person-pending">
-      <div className="ob-person-pending__msg">{t(person.seenKey, person.seenVars)}</div>
-      <div className="ob-person-pending__actions">
-        <button type="button" className="ob-person-pending__btn">
-          <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M2 4.5 8 9l6-4.5M2 4.5v7A1.5 1.5 0 0 0 3.5 13h9a1.5 1.5 0 0 0 1.5-1.5v-7M2 4.5 3.5 3h9L14 4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          {t("ob.ubo.resend")}
-        </button>
-        <button type="button" className="ob-person-pending__btn">
-          <svg viewBox="0 0 16 16" width="13" height="13" fill="none"><path d="M5 8h6m-6 0L8 5m-3 3 3 3M3 3.5v9A1.5 1.5 0 0 0 4.5 14h7a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 11.5 2h-7A1.5 1.5 0 0 0 3 3.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/></svg>
-          {t("ob.ubo.copy")}
-        </button>
-      </div>
-    </div>
-  );
+// Compose the human-readable role label for the list card from a saved UBO
+// record. "Director" stands alone; "both" and "ubo" append the stake when
+// known. Falls back to the bare role label when stake is missing.
+function formatUboRoleLabel(t, ubo) {
+  if (ubo.role === "director") return t("ob.uboForm.role.dir");
+  const base = ubo.role === "both" ? t("ob.uboForm.role.both") : t("ob.uboForm.role.ubo");
+  const pct = Number(ubo.stakePercent);
+  return Number.isFinite(pct) && pct > 0 ? `${base} (${pct}%)` : base;
 }
 
-function ScreenUboList({ next, back, addPerson }) {
+function ScreenUboList({ next, back, ubos, onAddPerson, onEditPerson }) {
   const t = useT();
-  const verified = PEOPLE.filter((p) => p.status === "complete").length;
   return (
     <div className="ob-content fade-in">
       <TopRow onBack={back} />
       <Title title={t("ob.ubo.title")} lead={t("ob.ubo.lead")} />
 
-      <div className="ob-ubo-progress">
-        <div className="ob-ubo-progress__head">
-          <span className="ob-ubo-progress__title">{t("ob.ubo.progress", { verified, total: PEOPLE.length })}</span>
-          <span className="ob-ubo-progress__meta">{t("ob.ubo.progressMeta")}</span>
+      {ubos.length > 0 ? (
+        <div style={{display:"flex", flexDirection:"column", gap:10}}>
+          {ubos.map((p) => (
+            <div key={p.id} className="ob-person-card is-pending">
+              <PersonRow
+                name={`${p.firstName} ${p.lastName}`.trim() || t("ob.uboForm.firstNamePh")}
+                role={formatUboRoleLabel(t, p)}
+                status={t("ob.ubo.pending")}
+                statusTone="neutral"
+                onEdit={() => onEditPerson(p.id)}
+                style={{ border: 0, borderRadius: 0, background: "transparent" }}
+              />
+            </div>
+          ))}
         </div>
-        <div className="ob-ubo-progress__bar">
-          <div className="ob-ubo-progress__fill" style={{ width: `${(verified / PEOPLE.length) * 100}%` }}/>
+      ) : (
+        <div style={{
+          padding: "20px 16px",
+          border: "1px dashed var(--c-border)", borderRadius: 12,
+          background: "var(--c-surface)",
+          color: "var(--c-muted)", fontSize: 14, textAlign: "center",
+        }}>
+          {t("ob.ubo.lead")}
         </div>
-      </div>
-
-      <div style={{display:"flex", flexDirection:"column", gap:10}}>
-        {PEOPLE.map((p) => (
-          <div key={p.id} className={`ob-person-card ${p.status === "complete" ? "is-complete" : "is-pending"}`}>
-            <PersonRow
-              name={p.name}
-              role={t(p.roleKey, p.roleVars)}
-              status={p.status === "complete" ? t("ob.ubo.verified") : t("ob.ubo.pending")}
-              statusTone={p.status === "complete" ? "green" : "neutral"}
-              onEdit={() => {}}
-              style={{ border: 0, borderRadius: 0, background: "transparent" }}
-            />
-            {p.status === "pending" && <PendingActionRow person={p} t={t}/>}
-          </div>
-        ))}
-      </div>
+      )}
 
       <button
-        onClick={addPerson}
+        onClick={onAddPerson}
         style={{
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
           height: 56, padding: "0 16px",
@@ -130,24 +111,54 @@ function ScreenUboList({ next, back, addPerson }) {
 
       <div className="ob-actions between">
         <Button variant="outline" size="lg" onClick={back} iconLeft="arrowLeft">{t("ob.common.back")}</Button>
-        <Button variant="primary" size="lg" onClick={next} iconRight="arrowRight">{t("ob.common.continue")}</Button>
+        <Button variant="primary" size="lg" onClick={next} iconRight="arrowRight" disabled={ubos.length === 0}>{t("ob.common.continue")}</Button>
       </div>
     </div>
   );
 }
 
 // ── UBO form ──────────────────
-function ScreenUboForm({ next, back, state, role, onChangeRole }) {
+// The form edits `formState.uboDraft`. On Save it commits the draft into
+// `formState.ubos` (appending a new record, or replacing in place when the
+// draft has an `editingId`) and navigates back to the list.
+function ScreenUboForm({ onSave, onCancel, draft, updateUboDraft }) {
   const t = useT();
-  const filled = state !== "empty";
   const roles = [
     { id: "director", label: t("ob.uboForm.role.dir") },
     { id: "both", label: t("ob.uboForm.role.both") },
     { id: "ubo", label: t("ob.uboForm.role.ubo") },
   ];
+
+  // dateOfBirth: stored as local-time "YYYY-MM-DD" — same convention as
+  // business.dateOfIncorporation, same reason (avoid UTC-midnight bug).
+  const dobValue = (() => {
+    if (!draft.dateOfBirth) return null;
+    const [y, m, d] = draft.dateOfBirth.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  })();
+  const onDobChange = (d) => {
+    if (!d) return updateUboDraft({ dateOfBirth: null });
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    updateUboDraft({ dateOfBirth: iso });
+  };
+
+  const emailLooksValid = /\S+@\S+\.\S+/.test(draft.email);
+  const stakeNum = Number(draft.stakePercent);
+  const stakeOk = draft.role === "director"
+    ? true
+    : Number.isFinite(stakeNum) && stakeNum > 0 && stakeNum <= 100;
+  const canSave =
+    draft.firstName.trim() &&
+    draft.lastName.trim() &&
+    emailLooksValid &&
+    draft.dateOfBirth &&
+    draft.country &&
+    draft.role &&
+    stakeOk;
+
   return (
     <div className="ob-content fade-in">
-      <TopRow onBack={back} />
+      <TopRow onBack={onCancel} />
       <Title title={t("ob.uboForm.title")} lead={t("ob.uboForm.lead")} />
 
       <Field label={t("ob.uboForm.role")}>
@@ -155,8 +166,8 @@ function ScreenUboForm({ next, back, state, role, onChangeRole }) {
           {roles.map((r) => (
             <SelectableListItem
               key={r.id}
-              selected={role === r.id}
-              onClick={() => onChangeRole(r.id)}
+              selected={draft.role === r.id}
+              onClick={() => updateUboDraft({ role: r.id })}
               title={r.label}
               style={{ flex: 1, height: 48 }}
             />
@@ -167,18 +178,18 @@ function ScreenUboForm({ next, back, state, role, onChangeRole }) {
       <div className="ob-fields">
         <div className="ob-fields row">
           <Input label={t("ob.uboForm.firstName")} placeholder={t("ob.uboForm.firstNamePh")}
-                 value={filled ? "Marco" : ""} onChange={() => {}}/>
+                 value={draft.firstName} onChange={(e) => updateUboDraft({ firstName: e.target.value })}/>
           <Input label={t("ob.uboForm.lastName")} placeholder={t("ob.uboForm.lastNamePh")}
-                 value={filled ? "Rossi" : ""} onChange={() => {}}/>
+                 value={draft.lastName} onChange={(e) => updateUboDraft({ lastName: e.target.value })}/>
         </div>
         <Input label={t("ob.uboForm.email")} placeholder={t("ob.uboForm.emailPh")}
-               value={filled ? "marco@orbit.io" : ""} onChange={() => {}}/>
+               value={draft.email} onChange={(e) => updateUboDraft({ email: e.target.value })}/>
         <div className="ob-fields row">
           <DatePicker label={t("ob.uboForm.dob")}
-                 value={filled ? new Date(1985, 8, 4) : null} onChange={() => {}}
+                 value={dobValue} onChange={onDobChange}
                  maxDate={new Date()}/>
           <Select label={t("ob.uboForm.country")}
-                 value={filled ? "IT" : ""} onChange={() => {}}
+                 value={draft.country} onChange={(v) => updateUboDraft({ country: v })}
                  placeholder={t("ob.uboForm.countryPh")}
                  options={[
                    {value:"GB", flag:"GB", label:"United Kingdom"},
@@ -191,9 +202,10 @@ function ScreenUboForm({ next, back, state, role, onChangeRole }) {
                    {value:"PL", flag:"PL", label:"Poland"},
                  ]}/>
         </div>
-        {role !== "director" && (
+        {draft.role !== "director" && (
           <Input label={t("ob.uboForm.stake")} hint={t("ob.uboForm.stakeHint")}
-                 value={filled ? "25" : ""} onChange={() => {}}
+                 value={draft.stakePercent}
+                 onChange={(e) => updateUboDraft({ stakePercent: e.target.value.replace(/[^0-9.]/g, "") })}
                  placeholder="0" suffix="%"/>
         )}
       </div>
@@ -201,8 +213,8 @@ function ScreenUboForm({ next, back, state, role, onChangeRole }) {
       <Alert tone="info">{t("ob.uboForm.alert")}</Alert>
 
       <div className="ob-actions between">
-        <Button variant="outline" size="lg" onClick={back}>{t("ob.common.cancel")}</Button>
-        <Button variant="primary" size="lg" onClick={next} iconRight="send" disabled={!filled}>{t("ob.uboForm.send")}</Button>
+        <Button variant="outline" size="lg" onClick={onCancel}>{t("ob.common.cancel")}</Button>
+        <Button variant="primary" size="lg" onClick={onSave} iconRight="send" disabled={!canSave}>{t("ob.uboForm.send")}</Button>
       </div>
     </div>
   );
