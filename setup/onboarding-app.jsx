@@ -433,9 +433,13 @@ function ResumeModal({ email, lastSavedAt, onClose }) {
               onChange={(e) => setEmailVal(e.target.value)}
               placeholder="you@yourcompany.com"
             />
-            <div style={{ display: "flex", gap: 12, marginTop: 20 }}>
-              <Button variant="ghost" size="lg" onClick={onClose} style={{ flex: 1 }}>Keep working</Button>
-              <Button variant="primary" size="lg" onClick={() => setSent(true)} style={{ flex: 1 }}>Send link</Button>
+            {/* Stacked primary-on-top, ghost-below — same shape as the
+                checker's handoff modal ("Start setup" full-width primary +
+                "Or send me the full proposal" as a secondary link beneath).
+                Matches the AlteryPay DS mobile "Stacked actions" pattern. */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 20 }}>
+              <Button variant="primary" size="lg" onClick={() => setSent(true)} iconRight="arrowRight" full>Send link</Button>
+              <Button variant="ghost" size="lg" onClick={onClose} full>Keep working</Button>
             </div>
             <div style={{ marginTop: 16, fontSize: 12, color: "var(--c-muted)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
               <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--c-success)", boxShadow: "0 0 0 4px rgba(10,159,82,.12)" }}/>
@@ -454,8 +458,8 @@ function ResumeModal({ email, lastSavedAt, onClose }) {
             </div>
             <h3>Link sent to {emailVal}</h3>
             <p>The link works for 14 days. You can also log back in any time — your application will be waiting on the dashboard.</p>
-            <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-              <Button variant="primary" size="lg" onClick={onClose} style={{ flex: 1 }}>Got it</Button>
+            <div style={{ marginTop: 8 }}>
+              <Button variant="primary" size="lg" onClick={onClose} full>Got it</Button>
             </div>
           </React.Fragment>
         )}
