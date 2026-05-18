@@ -417,8 +417,6 @@
     "ec.q6.opt.yes.desc": "We accept crypto payments, hold digital assets, or run a crypto-native service.",
     "ec.q6.alert.reroute.title": "Heads up: this routes you to our UK entity",
     "ec.q6.alert.reroute.body": "Your {country} incorporation would normally route to Altery EU (Cyprus, CBC), but Cyprus EMI doesn't onboard crypto businesses. We'll open your account with Altery Ltd (UK, FCA-authorised), which can serve crypto operations.",
-    "ec.r.reroute.title": "Why UK, not EU?",
-    "ec.r.reroute.body": "Your {country} incorporation would normally route to Altery EU (Cyprus, CBC), but Cyprus EMI doesn't onboard crypto businesses. You're with Altery Ltd (UK, FCA-authorised) instead — it can serve crypto operations across Faster Payments, SEPA and SWIFT rails.",
   });
   Object.assign(D.ru, {
     "ec.q6.title": "Работает ли ваш бизнес с криптой?",
@@ -430,8 +428,6 @@
     "ec.q6.opt.yes.desc": "Принимаем крипто-платежи, держим цифровые активы или ведём крипто-нативный сервис.",
     "ec.q6.alert.reroute.title": "Меняем маршрут на британскую лицензию",
     "ec.q6.alert.reroute.body": "Регистрация в стране {country} обычно ведёт к Altery EU (Кипр, CBC), но кипрская EMI не работает с крипто-бизнесом. Откроем счёт через Altery Ltd (Великобритания, FCA) — она поддерживает крипто-операции.",
-    "ec.r.reroute.title": "Почему UK, а не EU?",
-    "ec.r.reroute.body": "Регистрация в стране {country} обычно ведёт к Altery EU (Кипр, CBC), но кипрская EMI не работает с крипто-бизнесом. Поэтому вы у Altery Ltd (Великобритания, FCA) — она работает с криптой через Faster Payments, SEPA и SWIFT.",
   });
   Object.assign(D.de, {
     "ec.q6.title": "Arbeitet Ihr Unternehmen mit Krypto?",
@@ -443,8 +439,6 @@
     "ec.q6.opt.yes.desc": "Wir akzeptieren Krypto-Zahlungen, halten digitale Vermögenswerte oder betreiben einen Krypto-Dienst.",
     "ec.q6.alert.reroute.title": "Hinweis: Wir leiten Sie zu unserer UK-Einheit weiter",
     "ec.q6.alert.reroute.body": "Ihre Eintragung in {country} würde normalerweise zu Altery EU (Zypern, CBC) führen, aber die zypriotische EMI-Lizenz erlaubt kein Onboarding von Krypto-Unternehmen. Wir eröffnen Ihr Konto bei Altery Ltd (UK, FCA-lizenziert), die Krypto-Geschäfte abdecken kann.",
-    "ec.r.reroute.title": "Warum UK statt EU?",
-    "ec.r.reroute.body": "Ihre Eintragung in {country} würde normalerweise zu Altery EU (Zypern, CBC) führen, aber die zypriotische EMI-Lizenz deckt keine Krypto-Unternehmen ab. Sie sind stattdessen bei Altery Ltd (UK, FCA) — sie kann Krypto-Geschäfte über Faster Payments, SEPA und SWIFT bedienen.",
   });
   Object.assign(D.nl, {
     "ec.q6.title": "Werkt uw bedrijf met crypto?",
@@ -456,8 +450,6 @@
     "ec.q6.opt.yes.desc": "We accepteren crypto-betalingen, houden digitale activa aan of zijn een crypto-native dienst.",
     "ec.q6.alert.reroute.title": "Let op: we routeren u naar onze UK-entiteit",
     "ec.q6.alert.reroute.body": "Uw inschrijving in {country} zou normaal gesproken naar Altery EU (Cyprus, CBC) gaan, maar Cyprus EMI onboardt geen crypto-bedrijven. We openen uw rekening bij Altery Ltd (UK, FCA-vergund), die crypto-operaties wel kan ondersteunen.",
-    "ec.r.reroute.title": "Waarom UK, niet EU?",
-    "ec.r.reroute.body": "Uw inschrijving in {country} zou normaal naar Altery EU (Cyprus, CBC) gaan, maar Cyprus EMI dekt geen crypto-bedrijven. U bent in plaats daarvan bij Altery Ltd (UK, FCA) — zij kunnen crypto-operaties bedienen via Faster Payments, SEPA en SWIFT.",
   });
   Object.assign(D.tr, {
     "ec.q6.title": "İşletmeniz kripto ile çalışıyor mu?",
@@ -469,8 +461,6 @@
     "ec.q6.opt.yes.desc": "Kripto ödeme kabul ediyor, dijital varlık tutuyor veya kripto-yerli hizmet veriyoruz.",
     "ec.q6.alert.reroute.title": "Bilgi: Sizi UK lisansımıza yönlendiriyoruz",
     "ec.q6.alert.reroute.body": "{country} tescili normalde Altery EU (Kıbrıs, CBC) yönlendirilirdi, ancak Kıbrıs EMI lisansı kripto işletmelerini kabul etmiyor. Hesabınızı kripto faaliyetlerini destekleyen Altery Ltd (Birleşik Krallık, FCA) ile açacağız.",
-    "ec.r.reroute.title": "Neden UK, EU değil?",
-    "ec.r.reroute.body": "{country} tescili normalde Altery EU (Kıbrıs, CBC) olurdu, ancak Kıbrıs EMI kripto işletmelerini kapsamıyor. Bunun yerine Altery Ltd (Birleşik Krallık, FCA) ile birliktesiniz — Faster Payments, SEPA ve SWIFT üzerinden kripto operasyonlarını destekleyebilir.",
   });
   Object.assign(D.it, {
     "ec.q6.title": "La tua attività opera con crypto?",
@@ -482,8 +472,6 @@
     "ec.q6.opt.yes.desc": "Accettiamo pagamenti in crypto, deteniamo asset digitali o gestiamo un servizio crypto-nativo.",
     "ec.q6.alert.reroute.title": "Nota: ti indirizziamo all'entità UK",
     "ec.q6.alert.reroute.body": "La tua registrazione in {country} di norma porterebbe a Altery EU (Cipro, CBC), ma la licenza EMI di Cipro non accoglie attività crypto. Apriremo il tuo conto con Altery Ltd (UK, FCA), che può servire operazioni crypto.",
-    "ec.r.reroute.title": "Perché UK, non EU?",
-    "ec.r.reroute.body": "La tua registrazione in {country} di norma porterebbe a Altery EU (Cipro, CBC), ma la licenza EMI di Cipro non copre attività crypto. Sei invece con Altery Ltd (UK, FCA) — può servire operazioni crypto su Faster Payments, SEPA e SWIFT.",
   });
   Object.assign(D.es, {
     "ec.q6.title": "¿Tu empresa trabaja con cripto?",
@@ -495,8 +483,6 @@
     "ec.q6.opt.yes.desc": "Aceptamos pagos en cripto, mantenemos activos digitales o tenemos servicio cripto-nativo.",
     "ec.q6.alert.reroute.title": "Aviso: te redirigimos a nuestra entidad UK",
     "ec.q6.alert.reroute.body": "Tu constitución en {country} normalmente iría a Altery EU (Chipre, CBC), pero la licencia EMI de Chipre no admite negocios cripto. Abriremos tu cuenta con Altery Ltd (Reino Unido, FCA), que sí puede atender operaciones cripto.",
-    "ec.r.reroute.title": "¿Por qué UK y no EU?",
-    "ec.r.reroute.body": "Tu constitución en {country} normalmente iría a Altery EU (Chipre, CBC), pero la licencia EMI de Chipre no cubre negocios cripto. Estás con Altery Ltd (Reino Unido, FCA) — puede atender operaciones cripto en Faster Payments, SEPA y SWIFT.",
   });
   Object.assign(D.pl, {
     "ec.q6.title": "Czy Twoja firma działa z kryptowalutami?",
@@ -508,8 +494,6 @@
     "ec.q6.opt.yes.desc": "Przyjmujemy płatności krypto, trzymamy aktywa cyfrowe lub prowadzimy usługę crypto-native.",
     "ec.q6.alert.reroute.title": "Uwaga: kierujemy do naszej brytyjskiej spółki",
     "ec.q6.alert.reroute.body": "Rejestracja w {country} zwykle prowadziłaby do Altery EU (Cypr, CBC), ale cypryjska licencja EMI nie obsługuje firm krypto. Otworzymy konto z Altery Ltd (Wielka Brytania, FCA), która obsługuje operacje krypto.",
-    "ec.r.reroute.title": "Dlaczego UK, a nie EU?",
-    "ec.r.reroute.body": "Rejestracja w {country} zwykle prowadziłaby do Altery EU (Cypr, CBC), ale cypryjska EMI nie obejmuje firm krypto. Zamiast tego jesteś z Altery Ltd (Wielka Brytania, FCA) — obsługuje operacje krypto przez Faster Payments, SEPA i SWIFT.",
   });
   Object.assign(D.pt, {
     "ec.q6.title": "A sua empresa lida com cripto?",
@@ -521,8 +505,6 @@
     "ec.q6.opt.yes.desc": "Aceitamos pagamentos cripto, mantemos ativos digitais ou operamos serviço cripto-nativo.",
     "ec.q6.alert.reroute.title": "Aviso: vamos encaminhá-lo para a nossa entidade UK",
     "ec.q6.alert.reroute.body": "A sua constituição em {country} normalmente iria para Altery EU (Chipre, CBC), mas a licença EMI de Chipre não aceita negócios cripto. Abriremos a sua conta com Altery Ltd (Reino Unido, FCA), que pode servir operações cripto.",
-    "ec.r.reroute.title": "Porquê UK, não EU?",
-    "ec.r.reroute.body": "A sua constituição em {country} normalmente iria para Altery EU (Chipre, CBC), mas a licença EMI de Chipre não cobre negócios cripto. Está antes com Altery Ltd (Reino Unido, FCA) — pode servir operações cripto em Faster Payments, SEPA e SWIFT.",
   });
   Object.assign(D.fr, {
     "ec.q6.title": "Votre entreprise traite-t-elle de la crypto ?",
@@ -534,8 +516,6 @@
     "ec.q6.opt.yes.desc": "Nous acceptons des paiements crypto, détenons des actifs numériques ou exploitons un service crypto-natif.",
     "ec.q6.alert.reroute.title": "Note : nous vous orientons vers notre entité UK",
     "ec.q6.alert.reroute.body": "Votre immatriculation en {country} mènerait normalement à Altery EU (Chypre, CBC), mais la licence EMI chypriote n'accepte pas les entreprises crypto. Nous ouvrirons votre compte avec Altery Ltd (Royaume-Uni, FCA), qui peut servir les opérations crypto.",
-    "ec.r.reroute.title": "Pourquoi UK et non EU ?",
-    "ec.r.reroute.body": "Votre immatriculation en {country} mènerait normalement à Altery EU (Chypre, CBC), mais la licence EMI chypriote ne couvre pas les entreprises crypto. Vous êtes plutôt avec Altery Ltd (Royaume-Uni, FCA) — elle peut servir les opérations crypto sur Faster Payments, SEPA et SWIFT.",
   });
 
   // ─────────── Hero crypto-fluent badge ──────────

@@ -657,11 +657,17 @@
        surface + standard border (matches the plan card's elevation), so
        the two read as a tightly coupled pair: rationale → recommendation.
        Bullets use circular primary-navy check marks (matching the Q3
+    /* Savings-opportunity card. Three blocks stacked:
+         (1) eyebrow + context line
+         (2) side-by-side cost comparison (bank → Altery), arrow between
+         (3) hero savings band — loss-framed, dramatic typography
+       The comparison row is the "show, don't tell" of the value. The
+       hero band keeps loss framing intent ("leaving on the table"). */
     .ec-opportunity {
       background: #FFFFFF;
       border: 1px solid var(--c-border);
       border-radius: 16px;
-      padding: 22px 24px;
+      padding: 24px;
       margin: 0 0 20px;
     }
     .ec-opportunity__eyebrow {
@@ -670,20 +676,92 @@
       color: var(--c-muted);
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
-    .ec-opportunity__lead {
+    .ec-opportunity__context {
       font-size: 14px;
       line-height: 21px;
       color: var(--c-ink-soft);
-      margin: 0 0 18px;
+      margin: 0 0 20px;
     }
+
+    /* Bank vs Altery comparison row. CSS grid keeps the arrow centered
+       between the two cells regardless of label-line wrap. Cells get
+       slight contrast: from-cell is muted/grey (the old, expensive way),
+       to-cell is accent-soft (the better way). Strikethrough on bank
+       amount is a subtle visual reinforcement. */
+    .ec-opportunity__compare {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: stretch;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .ec-opportunity__compare__cell {
+      padding: 16px 18px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .ec-opportunity__compare__cell--from {
+      background: var(--c-bg-2);
+    }
+    .ec-opportunity__compare__cell--to {
+      background: var(--c-accent-soft);
+    }
+    .ec-opportunity__compare__label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--c-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .ec-opportunity__compare__cell--to .ec-opportunity__compare__label {
+      color: var(--c-primary);
+    }
+    .ec-opportunity__compare__amount {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--c-ink);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+    }
+    .ec-opportunity__compare__cell--from .ec-opportunity__compare__amount {
+      color: var(--c-muted);
+      text-decoration: line-through;
+      text-decoration-thickness: 1.5px;
+      text-decoration-color: var(--c-muted-2);
+    }
+    .ec-opportunity__compare__cell--to .ec-opportunity__compare__amount {
+      color: var(--c-primary);
+    }
+    .ec-opportunity__compare__per {
+      font-size: 12px;
+      color: var(--c-muted);
+      margin-top: 4px;
+    }
+    .ec-opportunity__compare__cell--to .ec-opportunity__compare__per {
+      color: var(--c-primary);
+      opacity: 0.75;
+    }
+    .ec-opportunity__compare__arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--c-accent);
+    }
+
+    /* Hero savings band — loss-framed, big and centred. */
     .ec-opportunity__band {
       background: #FFF7ED;
       border: 1.5px solid #C2410C;
-      border-radius: 12px;
-      padding: 16px 20px;
-      margin-bottom: 12px;
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-bottom: 14px;
+      text-align: center;
     }
     .ec-opportunity__band__label {
       font-size: 11px;
@@ -691,44 +769,54 @@
       color: #C2410C;
       text-transform: uppercase;
       letter-spacing: 0.08em;
-      margin-bottom: 6px;
-    }
-    .ec-opportunity__band__row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      flex-wrap: wrap;
-      gap: 10px;
+      margin-bottom: 10px;
     }
     .ec-opportunity__band__monthly {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 40px;
+      font-weight: 800;
       color: #C2410C;
-      letter-spacing: -0.01em;
+      letter-spacing: -0.02em;
       font-variant-numeric: tabular-nums;
-      line-height: 1.1;
+      line-height: 1.05;
+      margin-bottom: 8px;
     }
     .ec-opportunity__band__per {
-      font-size: 14px;
+      font-size: 18px;
       font-weight: 500;
       color: #C2410C;
       margin-left: 4px;
+      letter-spacing: 0;
     }
     .ec-opportunity__band__annual {
       font-size: 13px;
       color: #C2410C;
       font-weight: 500;
       font-variant-numeric: tabular-nums;
+      opacity: 0.85;
     }
+
     .ec-opportunity__note {
       font-size: 12px;
       line-height: 17px;
       color: var(--c-muted);
       font-style: italic;
     }
+
     @media (max-width: 640px) {
-      .ec-opportunity { padding: 18px 18px; }
-      .ec-opportunity__band__monthly { font-size: 24px; }
+      .ec-opportunity { padding: 20px 18px; }
+      .ec-opportunity__compare {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .ec-opportunity__compare__arrow {
+        transform: rotate(90deg);
+        justify-self: center;
+        padding: 4px 0;
+      }
+      .ec-opportunity__compare__amount { font-size: 20px; }
+      .ec-opportunity__band { padding: 20px 18px; }
+      .ec-opportunity__band__monthly { font-size: 32px; }
+      .ec-opportunity__band__per { font-size: 16px; }
     }
 
        services check + Q5 crypto card check) for visual consistency with

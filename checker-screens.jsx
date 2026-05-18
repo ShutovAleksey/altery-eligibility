@@ -987,30 +987,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
           )}
         </div>
 
-        {/* Crypto-reroute callout — only when EU + crypto exposure forced
-            a switch from Altery EU (Cyprus, CBC) to Altery Ltd (UK, FCA).
-            Sits between the hero (which already shows the FINAL entity)
-            and the account preview, so it reads as "here's why your
-            entity is UK", not as a buried footnote. Caveats below are
-            for things-to-know; this is a routing-decision explainer,
-            which is a different category and deserves its own visual
-            slot. We pass the country's localised name in so the body
-            can read naturally ("Your Germany incorporation…"). */}
-        {rec.cryptoReroute && (
-          <div className="ec-result__reroute">
-            <span className="ec-result__reroute__icon" aria-hidden="true">
-              <EcIco.info style={{ width: 18, height: 18 }} />
-            </span>
-            <div className="ec-result__reroute__body">
-              <div className="ec-result__reroute__title">
-                {t("ec.r.reroute.title")}
-              </div>
-              <div className="ec-result__reroute__text">
-                {t("ec.r.reroute.body", { country: rec.country ? t("ec.country." + rec.country.code) : "" })}
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* "Your opportunity" hook block — the conversion lever.
             Computes the Altery-vs-bank monthly cost projection
@@ -1031,23 +1007,40 @@ function EcResultApproved({ rec, onBack, onReset }) {
           return (
             <div className="ec-opportunity">
               <div className="ec-opportunity__eyebrow">{t("ec.r.opportunity.head")}</div>
-              <p className="ec-opportunity__lead">
-                {t("ec.r.opportunity.lead", {
-                  volume: ecFormatVolume(rec.monthlyVolume),
-                  bankCost: fmt(cost.bank.total),
-                  alteryCost: fmt(cost.altery.total),
-                })}
+              <p className="ec-opportunity__context">
+                {t("ec.r.opportunity.lead", { volume: ecFormatVolume(rec.monthlyVolume) })}
               </p>
+
+              {/* Side-by-side comparison — show, don't tell. Old prose
+                  ("Companies typically spend X, with Altery that drops to Y")
+                  is now a visual juxtaposition: muted bank cost with subtle
+                  strikethrough → primary-navy Altery cost. */}
+              <div className="ec-opportunity__compare">
+                <div className="ec-opportunity__compare__cell ec-opportunity__compare__cell--from">
+                  <div className="ec-opportunity__compare__label">{t("ec.r.opportunity.bankLabel")}</div>
+                  <div className="ec-opportunity__compare__amount">{fmt(cost.bank.total)}</div>
+                  <div className="ec-opportunity__compare__per">{t("ec.r.opportunity.perMonth")}</div>
+                </div>
+                <div className="ec-opportunity__compare__arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+                    <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div className="ec-opportunity__compare__cell ec-opportunity__compare__cell--to">
+                  <div className="ec-opportunity__compare__label">{t("ec.r.opportunity.alteryLabel")}</div>
+                  <div className="ec-opportunity__compare__amount">{fmt(cost.altery.total)}</div>
+                  <div className="ec-opportunity__compare__per">{t("ec.r.opportunity.perMonth")}</div>
+                </div>
+              </div>
+
               <div className="ec-opportunity__band">
                 <div className="ec-opportunity__band__label">{t("ec.r.opportunity.leaving")}</div>
-                <div className="ec-opportunity__band__row">
-                  <div className="ec-opportunity__band__monthly">
-                    {fmt(cost.savings.monthly)}
-                    <span className="ec-opportunity__band__per">{t("ec.r.opportunity.perMonth")}</span>
-                  </div>
-                  <div className="ec-opportunity__band__annual">
-                    {t("ec.r.opportunity.annualPrefix")} <strong>{fmt(cost.savings.annual)}</strong> {t("ec.r.opportunity.annualSuffix")}
-                  </div>
+                <div className="ec-opportunity__band__monthly">
+                  {fmt(cost.savings.monthly)}
+                  <span className="ec-opportunity__band__per">{t("ec.r.opportunity.perMonth")}</span>
+                </div>
+                <div className="ec-opportunity__band__annual">
+                  {t("ec.r.opportunity.annualPrefix")} <strong>{fmt(cost.savings.annual)}</strong> {t("ec.r.opportunity.annualSuffix")}
                 </div>
               </div>
               <div className="ec-opportunity__note">{t("ec.r.opportunity.note")}</div>
