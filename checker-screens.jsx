@@ -1051,7 +1051,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
                   <span className="ec-r__iban__body">{maskTailDots(heroIban.value)}</span>
                 </div>
                 <div className="ec-r__iban__caption">
-                  Example of your local {heroIban.currency} format · allocated after KYB
+                  {t("ec.r.iban.caption", { currency: heroIban.currency })}
                 </div>
               </div>
             )}
@@ -1063,34 +1063,33 @@ function EcResultApproved({ rec, onBack, onReset }) {
         <div className="ec-r__grid">
           {cost && cost.savings && cost.savings.monthly >= 100 && (
             <section className="ec-r__card ec-r__savings">
-              <div className="ec-r__cardEyebrow">Your estimated savings</div>
+              <div className="ec-r__cardEyebrow">{t("ec.r.savings.head")}</div>
               <div className="ec-r__compare">
                 <div className="ec-r__compare__col">
-                  <div className="ec-r__compare__label">Traditional bank</div>
+                  <div className="ec-r__compare__label">{t("ec.r.savings.bank")}</div>
                   <div className="ec-r__compare__amount ec-r__compare__amount--strike">{fmtNarrow(cost.bank.total)}</div>
-                  <div className="ec-r__compare__cycle">/month</div>
+                  <div className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</div>
                 </div>
                 <div className="ec-r__compare__arrow" aria-hidden="true">
                   <EcIco.arrowRight style={{ width: 20, height: 20 }} />
                 </div>
                 <div className="ec-r__compare__col ec-r__compare__col--us">
-                  <div className="ec-r__compare__label">With Altery</div>
+                  <div className="ec-r__compare__label">{t("ec.r.savings.altery")}</div>
                   <div className="ec-r__compare__amount">{fmtNarrow(cost.altery.total)}</div>
-                  <div className="ec-r__compare__cycle">/month</div>
+                  <div className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</div>
                 </div>
               </div>
               <div className="ec-r__savingsHero">
-                <div className="ec-r__savingsHero__label">You save up to</div>
+                <div className="ec-r__savingsHero__label">{t("ec.r.savings.heroLabel")}</div>
                 <div className="ec-r__savingsHero__amount">
-                  {fmtNarrow(cost.savings.monthly)}<span className="ec-r__savingsHero__cycle">/month</span>
+                  {fmtNarrow(cost.savings.monthly)}<span className="ec-r__savingsHero__cycle">{t("ec.r.savings.cycle")}</span>
                 </div>
                 <div className="ec-r__savingsHero__year">
-                  ≈ {fmtNarrow(cost.savings.annual)} per year
+                  {t("ec.r.savings.year", { amount: fmtNarrow(cost.savings.annual) })}
                 </div>
               </div>
               <p className="ec-r__savings__note">
-                Estimate based on your ~{ecFormatVolume(rec.monthlyVolume)} monthly volume,
-                blended SEPA + SWIFT mix. Full line-by-line breakdown is in your proposal PDF.
+                {t("ec.r.savings.note", { volume: ecFormatVolume(rec.monthlyVolume) })}
               </p>
             </section>
           )}
@@ -1098,7 +1097,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
           <section className="ec-r__card ec-r__plan2">
             <div className="ec-r__planHead">
               <div>
-                <div className="ec-r__cardEyebrow">{planName} plan</div>
+                <div className="ec-r__cardEyebrow">{t("ec.r.plan.eyebrow", { plan: planName })}</div>
                 <div className="ec-r__planFit">{t(activePlan.fitKey)}</div>
               </div>
               <div className="ec-r__planPrice">
@@ -1199,7 +1198,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
                 <rect x="2" y="3.5" width="12" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.4"/>
                 <path d="m2.5 4.5 5.5 4 5.5-4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              Email this proposal as PDF
+              {t("ec.r.cta.email")}
             </button>
           </div>
           <div className="ec-r__action__foot">
