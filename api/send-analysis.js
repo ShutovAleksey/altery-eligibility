@@ -268,6 +268,13 @@ export default async function handler(req, res) {
     // Resend API call. The `attachments` array takes either a `path`
     // (URL or local file) or `content` (base64 string). We send the
     // base64 we received from the client directly.
+    // Compute the actual `from` address being sent so we can echo it back
+    // on a failure. Common debugging case: domain verified in Resend but
+    // FROM_EMAIL env var still empty (falls back to sandbox sender), or
+    // value points at the wrong sub/parent domain.
+    const fromAddress = process.env.FROM_EMAIL || FROM_DEFAULT;
+    const fromEnvSet  = Boolean(process.env.FROM_EMAIL);
+
     const resendRes = await fetch(RESEND_API, {
       method: "POST",
       headers: {
@@ -275,7 +282,7 @@ export default async function handler(req, res) {
         "Content-Type":  "application/json",
       },
       body: JSON.stringify({
-        from:    process.env.FROM_EMAIL || FROM_DEFAULT,
+        from:    fromAddress,
         to:      [cleanEmail],
         subject,
         html,
@@ -296,12 +303,18 @@ export default async function handler(req, res) {
     // recipient, etc.). Bubble the message up to the client for visibility.
     if (!resendRes.ok) {
       const errBody = await resendRes.text();
-      console.error("[send-analysis] Resend error:", resendRes.status, errBody);
+      console.error("[send-analysis] Resend error:", resendRes.status, errBody, "from=", fromAddress, "fromEnvSet=", fromEnvSet);
       return res.status(502).json({
         error: "Email service rejected the send",
         code:  "resend_error",
         upstream_status: resendRes.status,
         upstream_body:   errBody.slice(0, 500),
+        // Diagnostic echo — helps debug FROM_EMAIL env var mismatches
+        // (the single most common cause of upstream rejection after
+        // domain verification). Safe to expose: this is the public
+        // sender address, not a secret.
+        sender_used:     fromAddress,
+        sender_from_env: fromEnvSet,
       });
     }
 
