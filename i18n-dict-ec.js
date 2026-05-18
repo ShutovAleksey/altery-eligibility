@@ -41,13 +41,9 @@
 
     // Q1 country
     "ec.q2.title": "Where is your company incorporated?",
-    "ec.q2.lead": "This decides which Altery entity will issue your account — UK (Altery Ltd, FCA), EU (Altery EU, CBC) or UAE (Altery MENA, DFSA).",
+    "ec.q2.lead": "Pick the country shown on your registration certificate. We'll route the application from there.",
     "ec.q2.input.label": "Country of incorporation",
     "ec.q2.input.placeholder": "Search country",
-    "ec.q2.tag.uk": "FCA · Altery Ltd",
-    "ec.q2.tag.eu": "CBC · Altery EU",
-    "ec.q2.tag.mena": "DFSA · Altery MENA",
-    "ec.q2.tag.row": "Manual review",
     "ec.q2.tag.corporate": "Corporate only [1]",
     "ec.q2.input.hintMatch": "{n} of {total} countries match",
     "ec.q2.input.hintTotal": "{n} countries supported",

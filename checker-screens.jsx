@@ -298,12 +298,11 @@ function EcCountry({ value, onChange, onBack, onNext }) {
     );
   };
 
-  const metaFor = (c) =>
-    c.corporate ? t("ec.q2.tag.corporate")
-    : c.region === "uk"   ? t("ec.q2.tag.uk")
-    : c.region === "eu"   ? t("ec.q2.tag.eu")
-    : c.region === "mena" ? t("ec.q2.tag.mena")
-    : t("ec.q2.tag.row");
+  // Only Corporate-only countries get a right-side tag now. The previous
+  // entity-routing tags (FCA · Altery Ltd / CBC · Altery EU / DFSA · Altery
+  // MENA / Manual review) leaked internal entity structure into a question
+  // where the user just picks a country — routing is our concern, not theirs.
+  const metaFor = (c) => c.corporate ? t("ec.q2.tag.corporate") : null;
 
   const nameOf = (c) => t("ec.country." + c.code);
   const collator = useMemo(() => new Intl.Collator(undefined, { sensitivity: "base" }), []);
@@ -352,20 +351,23 @@ function EcCountry({ value, onChange, onBack, onNext }) {
   const visible = isSearching ? searchResults : EC_COUNTRIES;
   const showCorporateNote = visible.some((c) => c.corporate);
 
-  const renderRow = (c) => (
-    <button
-      key={c.code}
-      type="button"
-      role="option"
-      aria-selected={value === c.code}
-      className="ec-country-row"
-      onClick={() => handleSelect(c.code)}
-    >
-      <Flag code={c.code} size={24} />
-      <span className="ec-country-row__name">{nameOf(c)}</span>
-      <span className="ec-country-row__meta">{metaFor(c)}</span>
-    </button>
-  );
+  const renderRow = (c) => {
+    const meta = metaFor(c);
+    return (
+      <button
+        key={c.code}
+        type="button"
+        role="option"
+        aria-selected={value === c.code}
+        className="ec-country-row"
+        onClick={() => handleSelect(c.code)}
+      >
+        <Flag code={c.code} size={24} />
+        <span className="ec-country-row__name">{nameOf(c)}</span>
+        {meta && <span className="ec-country-row__meta">{meta}</span>}
+      </button>
+    );
+  };
 
   return (
     <div className="ec-content fade-in">
