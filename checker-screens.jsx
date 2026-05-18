@@ -916,382 +916,286 @@ function EcResultApproved({ rec, onBack, onReset }) {
   const heroIban = ecHeroIdentifier(entity);
   const heroIbanFlag = heroIban ? ecCurrencyFlag(heroIban.currency) : null;
 
+  // Result-page V2 (per RESULT-REDESIGN-BRIEF.md). Pass 1 — structure + spacing,
+  // placeholder English copy, no animations, no i18n yet. Pass 2 ports copy to
+  // 10 languages; Pass 3 adds hero number count-up + scroll-fade outcome cards.
+  const cost = ecComputeCostBreakdown(rec);
+  const outcomes = cost && cost.savings && cost.savings.annual
+    ? ecOutcomesForSavings(cost.savings.annual)
+    : [];
+  // €9,500 → €9 500 (narrow no-break space U+202F per brief §3.6).
+  // European convention; looks more premium than the comma form.
+  const NBSP = " ";
+  const fmtNarrow = (n) => "€" + (n || 0).toLocaleString("en-US").replace(/,/g, NBSP);
+
   return (
     <div className="ec-content fade-in">
-      <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
-        <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.editAnswers")}
-      </button>
+      <div className="ec-result-v2">
+        <button className="ec-result-v2__back" onClick={onBack} type="button">
+          <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> Edit answers
+        </button>
 
-      <div className="ec-result">
-        {/* Hero — solid navy, accent text via semantic span (not <b> for color) */}
-        <div className="ec-result__hero">
-          {/* Persona line — small framing tag for ICP-aligned industries.
-              Names what the persona DOES (multi-platform revenue / store
-              payouts / instructor pay), not what Altery offers. Sets up
-              the whole result page as "we read your industry and tailored
-              this". Skipped for generic industries (ecom/marketplace/
-              prof/other) — they get the standard hero only. */}
-          {rec.ind && ["saas","apps","games","edtech","affiliate","creator","crypto"].includes(rec.ind.value) && (
-            <div className="ec-result__personaLine">
-              {t("ec.r.persona." + rec.ind.value + ".line")}
-            </div>
-          )}
-          <div className="ec-result__heroEyebrow">
-            {t(isOnRecommended ? "ec.r.eyebrow" : "ec.r.eyebrow.selected")}
-          </div>
-          <h1 className="ec-result__heroTitle">
-            <span className="ec-result__hero__accent">{entityName}</span><br />
-            {t("ec.r.title.middle")}{" "}
-            <span className="ec-result__hero__accent">{planName}</span>
-            {t("ec.r.title.after")}
+        {/* ─── Section A — HERO ─────────────────────────────────────────
+            Above-the-fold: one-line personal answer + the savings hero
+            number (massive type, mono, tabular figures) + one loss-framed
+            line + one primary CTA paired with a single secondary text-link.
+            Must fit a 768px viewport on a 13" laptop — no scroll. */}
+        <section className="ec-result-v2__hero">
+          <h1 className="ec-result-v2__answer">
+            You qualify for Altery {planName} · {entityName}
           </h1>
-          <p className="ec-result__heroLead">
-            {t("ec.r.lead", { entity: entityName, licence: entityLicence, note: entityNote })}
-          </p>
-          <div className="ec-result__badges">
-            <div className="ec-result__entity">
-              <span className="ec-result__dot" aria-hidden="true" />
-              {t("ec.r.entity.status", { licence: entityLicence })}
-            </div>
-            {/* Crypto-fluent badge — shown for any user with crypto
-                signal (industry = "Crypto & Web3" OR services include
-                crypto rails), not just the EU→UK reroute case.
-                UK/MENA/ROW crypto users get the same visible
-                acknowledgment. The reroute callout below explains the
-                entity change specifically when it happened; this badge
-                is broader — "we work with crypto businesses, period". */}
-            {rec.cryptoActive && (
-              <div className="ec-result__cryptoBadge">
-                <EcIco.token style={{ width: 14, height: 14 }} aria-hidden="true" />
-                {t("ec.r.crypto.fluent")}
-              </div>
-            )}
-          </div>
 
-          {/* Primary identifier chip — the "this is your account" moment.
-              Sits below the licence pill; flag + currency code + actual
-              IBAN (or sort+account for UK GBP local) in monospace, with
-              an explicit "Preview" badge so users don't mistake it for
-              their real number. Skipped for SWIFT-only primaries. */}
-          {heroIban && (
-            <div className="ec-result__primaryIban" aria-label={`${heroIban.currency} ${heroIban.value}`}>
-              {heroIbanFlag && (
-                <span className="ec-result__primaryIban__flag">
-                  <Flag code={heroIbanFlag} size={22} />
+          {cost && cost.savings && cost.savings.monthly >= 100 && (
+            <div className="ec-result-v2__savings">
+              <div className="ec-result-v2__savings__eyebrow">
+                Your monthly saving vs typical bank
+              </div>
+              <div className="ec-result-v2__savings__number">
+                {fmtNarrow(cost.savings.monthly)}
+                <span style={{ fontSize: "0.35em", fontWeight: 500, color: "#69707C", marginLeft: 8 }}>
+                  / month
                 </span>
-              )}
-              <span className="ec-result__primaryIban__currency">{heroIban.currency}</span>
-              <span className="ec-result__primaryIban__sep" aria-hidden="true" />
-              <span className="ec-result__primaryIban__value">{maskTailDots(heroIban.value)}</span>
+              </div>
+              <div className="ec-result-v2__savings__annual">
+                {fmtNarrow(cost.savings.annual)} per year
+              </div>
             </div>
           )}
-        </div>
 
+          <p className="ec-result-v2__loss">
+            That's what you're leaving on the table every month with traditional banking.
+          </p>
 
-        {/* "Your opportunity" hook block — the conversion lever.
-            Computes the Altery-vs-bank monthly cost projection
-            with the same helper that drives the PDF, so what the
-            user sees on screen is exactly what arrives in their
-            inbox. Two psychological levers stacked: (1) specific
-            personalised numbers based on their stated volume,
-            which converts generic marketing into "this is about
-            me", and (2) loss framing ("leaving on the table"
-            rather than "could save") because loss aversion is
-            ~2× stronger than gain motivation. The closing line
-            explicitly creates a curiosity gap that the email PDF
-            resolves — driving capture rates on the handoff CTA. */}
-        {(() => {
-          const cost = ecComputeCostBreakdown(rec);
-          if (!cost || cost.savings.monthly < 100) return null;
-          const fmt = (n) => "€" + (n || 0).toLocaleString("en-US");
-          return (
-            <div className="ec-opportunity">
-              <div className="ec-opportunity__eyebrow">{t("ec.r.opportunity.head")}</div>
-              <p className="ec-opportunity__context">
-                {t("ec.r.opportunity.lead", { volume: ecFormatVolume(rec.monthlyVolume) })}
-              </p>
+          <div className="ec-result-v2__hero__cta">
+            <button
+              className="ec-result-v2__cta"
+              type="button"
+              onClick={() => setHandoffOpen(true)}
+            >
+              Start your setup →
+            </button>
+            <button
+              className="ec-result-v2__cta__link"
+              type="button"
+              onClick={() => setHandoffOpen(true)}
+            >
+              Email me the proposal
+            </button>
+          </div>
+        </section>
 
-              {/* Side-by-side comparison — show, don't tell. Old prose
-                  ("Companies typically spend X, with Altery that drops to Y")
-                  is now a visual juxtaposition: muted bank cost with subtle
-                  strikethrough → primary-navy Altery cost. */}
-              <div className="ec-opportunity__compare">
-                <div className="ec-opportunity__compare__cell ec-opportunity__compare__cell--from">
-                  <div className="ec-opportunity__compare__label">{t("ec.r.opportunity.bankLabel")}</div>
-                  <div className="ec-opportunity__compare__amount">{fmt(cost.bank.total)}</div>
-                  <div className="ec-opportunity__compare__per">{t("ec.r.opportunity.perMonth")}</div>
+        {/* ─── Section B — WHY ──────────────────────────────────────────
+            60/40 asymmetric layout: left rationale (3 bullets pulled from
+            ecRecommend's reasoning array, cites user's own answers back),
+            right product-facts card (honest, not invented). */}
+        <section className="ec-result-v2__section">
+          <div className="ec-result-v2__section__eyebrow">Why this is your answer</div>
+          <div className="ec-result-v2__why">
+            <div>
+              <ul className="ec-result-v2__rationale__list">
+                {(rec.reasoning || []).slice(0, 3).map((b, i) => (
+                  <li key={i} className="ec-result-v2__rationale__item">
+                    {t(b.key, b.vars || {})}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <aside className="ec-result-v2__stats">
+              <div className="ec-result-v2__stats__row">
+                <div className="ec-result-v2__stats__num">
+                  {entity.accounts.length} currencies
                 </div>
-                <div className="ec-opportunity__compare__arrow" aria-hidden="true">
-                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-                    <path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </div>
-                <div className="ec-opportunity__compare__cell ec-opportunity__compare__cell--to">
-                  <div className="ec-opportunity__compare__label">{t("ec.r.opportunity.alteryLabel")}</div>
-                  <div className="ec-opportunity__compare__amount">{fmt(cost.altery.total)}</div>
-                  <div className="ec-opportunity__compare__per">{t("ec.r.opportunity.perMonth")}</div>
+                <div className="ec-result-v2__stats__label">
+                  Local IBAN + SWIFT covered
                 </div>
               </div>
-
-              <div className="ec-opportunity__band">
-                <div className="ec-opportunity__band__label">{t("ec.r.opportunity.leaving")}</div>
-                <div className="ec-opportunity__band__monthly">
-                  {fmt(cost.savings.monthly)}
-                  <span className="ec-opportunity__band__per">{t("ec.r.opportunity.perMonth")}</span>
-                </div>
-                <div className="ec-opportunity__band__annual">
-                  {t("ec.r.opportunity.annualPrefix")} <strong>{fmt(cost.savings.annual)}</strong> {t("ec.r.opportunity.annualSuffix")}
+              <div className="ec-result-v2__stats__row">
+                <div className="ec-result-v2__stats__num">{entityLicence}</div>
+                <div className="ec-result-v2__stats__label">
+                  Regulator on your entity
                 </div>
               </div>
-              <div className="ec-opportunity__note">{t("ec.r.opportunity.note")}</div>
-            </div>
-          );
-        })()}
+              <div className="ec-result-v2__stats__row">
+                <div className="ec-result-v2__stats__num">90 days</div>
+                <div className="ec-result-v2__stats__label">
+                  Price held at this rate
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
 
-        {/* "Why we recommend X" reasoning block — the gold-tier
-            conversion moment. 3 dynamic bullets that cite the user's
-            own answers back ("Your €175k/mo crosses…", "Mass payouts
-            you selected…"). Generated in ecRecommend based on which
-            signals pushed the user to this tier; rendered here as
-            primary supporting evidence for the plan card below. */}
-        {rec.reasoning && rec.reasoning.length > 0 && (
-          <div className="ec-reasoning">
-            <div className="ec-reasoning__head">
-              {t("ec.r.reasoning.head", { plan: t(rec.plan.nameKey) })}
+        {/* ─── Section B.5 — Compact plan card ──────────────────────────
+            Name + price as one row, top 4 perks, single "Compare all"
+            link → opens the existing EcPlanComparisonModal. Fee preview
+            moves to the EcFeesModal (no inline fee table on the page). */}
+        <section className="ec-result-v2__section">
+          <div className="ec-result-v2__plan">
+            <div className="ec-result-v2__plan__row">
+              <span className="ec-result-v2__plan__name">{planName}</span>
+              <span className="ec-result-v2__plan__price">
+                {activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}
+                {" "}
+                <small style={{ fontSize: "0.55em", color: "#69707C", fontWeight: 500 }}>
+                  {t(activePlan.cycleKey)}
+                </small>
+              </span>
             </div>
-            <ul className="ec-reasoning__list">
-              {rec.reasoning.map((b, i) => (
-                <li key={i} className="ec-reasoning__item">
-                  <span className="ec-reasoning__check" aria-hidden="true">
-                    <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
-                      <path d="m3.5 8 3 3 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <ul className="ec-result-v2__plan__perks">
+              {activePlan.perkKeys.slice(0, 4).map((k, i) => (
+                <li key={i} className="ec-result-v2__plan__perk">{t(k)}</li>
+              ))}
+            </ul>
+            <button
+              className="ec-result-v2__plan__link"
+              type="button"
+              onClick={() => setComparisonOpen(true)}
+            >
+              Compare all plans →
+            </button>
+          </div>
+        </section>
+
+        {/* ─── Section C — Outcome cards ────────────────────────────────
+            Translates the abstract annual saving into concrete business
+            outcomes via ecOutcomesForSavings (already used in PDF). Three
+            beige cards in a row, IBM Plex Mono numbers, no icons. */}
+        {outcomes.length > 0 && cost && (
+          <section className="ec-result-v2__section">
+            <div className="ec-result-v2__section__eyebrow">
+              What {fmtNarrow(cost.savings.annual)} per year could fund
+            </div>
+            <div className="ec-result-v2__outcomes">
+              {outcomes.map((o, i) => {
+                const headline = {
+                  "ec.pdf.outcomes.hire":      `${o.value}×`,
+                  "ec.pdf.outcomes.hireMid":   "1×",
+                  "ec.pdf.outcomes.runway":    `${o.value} months`,
+                  "ec.pdf.outcomes.marketing": `${NBSP}€${o.value}k`.replace(NBSP, ""),
+                }[o.key] || "";
+                const title = {
+                  "ec.pdf.outcomes.hire":      "Senior hire",
+                  "ec.pdf.outcomes.hireMid":   "Mid-level hire",
+                  "ec.pdf.outcomes.runway":    "Extra runway",
+                  "ec.pdf.outcomes.marketing": "Growth budget",
+                }[o.key] || "";
+                return (
+                  <div key={i} className="ec-result-v2__outcome">
+                    <div className="ec-result-v2__outcome__num">{headline}</div>
+                    <div className="ec-result-v2__outcome__title">{title}</div>
+                    <div className="ec-result-v2__outcome__body">
+                      {t(o.key, { value: o.value })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* ─── Section D — 5-minute prep checklist ──────────────────────
+            Pre-empts the Signicat 38%-abandon-because-no-documents finding.
+            Subtle border (no fill), green tick is the only accent. */}
+        <section className="ec-result-v2__section">
+          <div className="ec-result-v2__prep">
+            <div className="ec-result-v2__section__eyebrow" style={{ margin: 0 }}>
+              Before you start setup
+            </div>
+            <h3 className="ec-result-v2__section__title" style={{ marginBottom: 24, marginTop: 8 }}>
+              Have these ready — about 5 minutes
+            </h3>
+            <ul className="ec-result-v2__prep__list">
+              {[
+                "Incorporation certificate (PDF or photo)",
+                "Proof of business address (utility bill or lease)",
+                "Director ID (passport or driving licence)",
+                "UBO information — anyone with 25%+ ownership",
+                "Last 3 months of bank statements (any bank)",
+              ].map((item, i) => (
+                <li key={i} className="ec-result-v2__prep__item">
+                  <span className="ec-result-v2__prep__check" aria-hidden="true">
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+                      <path d="m3.5 8 3 3 6-6" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
                   </span>
-                  <span className="ec-reasoning__text">{t(b.key, b.vars || {})}</span>
+                  {item}
                 </li>
               ))}
             </ul>
-          </div>
-        )}
-
-        {/* Plan card — moved up from "after capabilities" to "right after
-            hero/reroute" so price + perks land in the user's first
-            visible scroll. The hero answers "what entity" + "which plan
-            name"; this card answers "how much" + "what's included" —
-            they're tightly coupled questions that should be adjacent.
-            Layout: [icon-box] [name + tagline] ────── [price] / perks.
-            Reflects active plan — recommended OR user-overridden via the
-            comparison modal. */}
-        <div className="ec-plan">
-          <div className="ec-plan__head">
-            <div className="ec-plan__nameBlock">
-              <div className="ec-plan__iconBox">
-                <EcPlanIcon iconKey={activePlan.iconKey} size={22} />
-              </div>
-              <div className="ec-plan__name">
-                <b>{planName}</b>
-                <span>{t(activePlan.taglineKey)}</span>
-              </div>
-            </div>
-            <div className="ec-plan__price">
-              {activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price} <small>{t(activePlan.cycleKey)}</small>
+            <div className="ec-result-v2__prep__footer">
+              <span>5 min prep + 8 min onboarding</span>
+              <button
+                className="ec-result-v2__prep__link"
+                type="button"
+                onClick={() => setHandoffOpen(true)}
+              >
+                Save this list
+              </button>
             </div>
           </div>
-          {/* "Suitable for" — extends the tagline with concrete customer-
-              profile copy from plan.fitKey. Reuses the same translations
-              the modal's compare-card uses (ec.r.plan.compare.fitsHead +
-              ec.plan.*.fit) so the recommendation reads identically on
-              the main card and inside the compare modal. */}
-          <div className="ec-plan__fits">
-            <div className="ec-plan__fits__head">{t("ec.r.plan.compare.fitsHead")}</div>
-            <div className="ec-plan__fits__text">{t(activePlan.fitKey)}</div>
-          </div>
-          <div className="ec-plan__perks">
-            {/* Entity-specific currency perk — sits at the top of the
-                perks list using the same visual treatment as plan
-                perks (check icon + line). Text varies by entity so
-                user sees the actual currency/rail story for the
-                jurisdiction they'll be routed to (UK gets GBP+EUR
-                local, EU gets SEPA Instant, MENA gets USD+AED local).
-                Replaces the old EcAccountPreview panel, which took
-                ~450px to convey the same information visually. */}
-            {entity.currencyPerkKey && (
-              <div className="ec-plan__perk">
-                <EcIco.check className="ec-plan__perk__tick" style={{ width: 16, height: 16 }} />
-                <span>{t(entity.currencyPerkKey)}</span>
-              </div>
-            )}
-            {activePlan.perkKeys.map((k, i) => (
-              <div className="ec-plan__perk" key={i}>
-                <EcIco.check className="ec-plan__perk__tick" style={{ width: 16, height: 16 }} />
-                <span>{t(k)}</span>
-              </div>
-            ))}
-          </div>
-          {/* Fee preview — top 4 per-transaction fees inline so B2B
-              users can estimate operational cost without opening the
-              full fees modal. Values pulled from EC_FEE_SCHEDULE for
-              the active entity's region (UK/EU vs RoW). FX markup is
-              plan-tier-specific (Starter 0.8% / Pro 0.7% / Ultra 0.5%
-              — canonical Altery data). "See full schedule →" link
-              routes to the same EcFeesModal as the (now-removed)
-              duplicate "View all fees" link previously did. */}
-          {(() => {
-            const region = ecFeeRegion(entity);
-            const schedule = EC_FEE_SCHEDULE[region];
-            const fxByPlan = { starter: "0.8%", pro: "0.7%", ultra: "0.5%" };
-            const subscriptionPrice = activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price;
-            const subscriptionCycle = t(activePlan.cycleKey);
-            return (
-              <div className="ec-plan__feePreview">
-                <div className="ec-plan__feePreview__head">
-                  <span className="ec-plan__feePreview__title">{t("ec.r.fees.head")}</span>
-                  <a
-                    role="button"
-                    tabIndex={0}
-                    className="ec-plan__feePreview__link"
-                    onClick={() => setFeesOpen(true)}
-                    onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setFeesOpen(true); } }}
-                  >
-                    {t("ec.r.fees.seeAll")}
-                  </a>
-                </div>
-                <div className="ec-plan__feePreview__list">
-                  <div className="ec-plan__feePreview__row">
-                    <span className="ec-plan__feePreview__label">{t("ec.r.fees.subscription")}</span>
-                    <span className="ec-plan__feePreview__value">{subscriptionPrice} {subscriptionCycle}</span>
-                  </div>
-                  <div className="ec-plan__feePreview__row">
-                    <span className="ec-plan__feePreview__label">{t("ec.r.plan.compare.fee.sepa")}</span>
-                    <span className="ec-plan__feePreview__value">{schedule.sepa}</span>
-                  </div>
-                  <div className="ec-plan__feePreview__row">
-                    <span className="ec-plan__feePreview__label">{t("ec.r.plan.compare.fee.swift")}</span>
-                    <span className="ec-plan__feePreview__value">{schedule.swiftEurOut}</span>
-                  </div>
-                  <div className="ec-plan__feePreview__row">
-                    <span className="ec-plan__feePreview__label">{t("ec.r.plan.compare.fee.fxMarkup")}</span>
-                    <span className="ec-plan__feePreview__value">{fxByPlan[activePlan.id]}</span>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-          {/* Secondary actions — Compare opens the plan-comparison
-              modal. The old "View all fees" link was removed when
-              the fee preview gained its own "See full schedule →"
-              link inside the preview block — consolidating two
-              fees-related actions into one. */}
-          <div className="ec-plan__links">
-            <a
-              role="button"
-              tabIndex={0}
-              onClick={() => setComparisonOpen(true)}
-              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setComparisonOpen(true); } }}
-            >
-              {t("ec.r.plan.compareAll")}
-            </a>
-          </div>
-          <div className="ec-plan__switch">
-            {t("ec.r.plan.switch")}
-          </div>
-        </div>
+        </section>
 
-        {/* Supported countries — kept as compact list under plan */}
-        <div className="ec-capabilities">
-          <div className="ec-capabilities__section">
-            <div className="ec-capabilities__head">{t("ec.r.cards.countries")}</div>
-            <div className="ec-capabilities__items">
-              {entity.countries.map((c) => (
-                <div key={c} className="ec-capabilities__item">
-                  <span className="ec-capabilities__item__flag"><Flag code={c} size={22} /></span>
-                  <span className="ec-capabilities__item__name">{t("ec.country." + c)}</span>
-                </div>
-              ))}
-              <div className="ec-capabilities__item ec-capabilities__item--more">
-                <span className="ec-capabilities__item__flag" aria-hidden="true" style={{
-                  background: "var(--c-bg-2)", display: "inline-flex",
-                  alignItems: "center", justifyContent: "center"
-                }}>
-                  <EcIco.globe style={{ width: 14, height: 14, color: "var(--c-muted)" }} />
-                </span>
-                <span>{t("ec.r.cards.countriesMore")}</span>
-              </div>
+        {/* ─── Section E — Share affordance ─────────────────────────────
+            Brief: B2B purchases involve ~13 stakeholders on average. Make
+            the forward-to-CFO action explicit. Two equal outlined-navy
+            buttons. Both currently chain to the existing EcHandoffModal;
+            Pass 2 will wire a real PDF download path + an alternate
+            "send to colleague" email flow. */}
+        <section className="ec-result-v2__section">
+          <div className="ec-result-v2__share">
+            <div className="ec-result-v2__section__eyebrow">
+              Sharing with your CFO or board?
+            </div>
+            <p className="ec-result-v2__share__body">
+              A proposal PDF with the full cost breakdown, comparison vs typical bank,
+              and a 30-day validity. Designed to forward.
+            </p>
+            <div className="ec-result-v2__share__actions">
+              <button
+                className="ec-result-v2__share__btn"
+                type="button"
+                onClick={() => setHandoffOpen(true)}
+              >
+                Download proposal as PDF
+              </button>
+              <button
+                className="ec-result-v2__share__btn"
+                type="button"
+                onClick={() => setHandoffOpen(true)}
+              >
+                Email to a colleague
+              </button>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Altery's actual product solutions surfaced as a horizontal
-            scroll-snap slider — Multi-entity account, Multi-user
-            access, API, Business cards, Mass payments. Copy + creative
-            assets pulled directly from altery.com/business. Distinct
-            from plan perks (which vary by tier and live in the plan
-            card above) — these are entity-/plan-agnostic features. */}
-        <EcPerks services={rec.services} />
+        {/* ─── Section F — Quiet trust strip ────────────────────────────
+            Single horizontal row of true facts, 12px muted caps. No logos
+            we can't legitimately name; no invented claims. */}
+        <section className="ec-result-v2__trust">
+          FCA-regulated EMI · Funds safeguarded at partner banks · 245 countries supported
+        </section>
 
-        {/* Caveats — quiet section, no alert icon, no card chrome */}
-        {caveats.length > 0 && (
-          <div className="ec-caveats">
-            <div className="ec-caveats__head">{t("ec.r.caveats.head")}</div>
-            <ul className="ec-caveats__list">
-              {caveats.map((c, i) => (
-                <li className="ec-caveats__row" key={i}>
-                  <span className="ec-tagslot"><Tag tone={c.tone} size="sm">{t(c.tagKey)}</Tag></span>
-                  <span>{t(c.textKey, c.vars || {})}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Bank rejection history — optional. Sales-gold signal:
-            if user says yes, sales has a strong outreach hook. The
-            block is deliberately subtle (muted card, secondary
-            styling) so it never competes with the primary CTA. */}
-        <EcBankHistory />
-
-        <div className="ec-actions">
-          <Button
-            variant="primary"
-            size="xl"
-            iconRight="arrowRight"
+        {/* ─── Section G — Footer CTA repeat ───────────────────────────
+            For users who scrolled the whole page. Same copy as A4. */}
+        <section className="ec-result-v2__footer">
+          <p className="ec-result-v2__footer__lead">Ready when you are.</p>
+          <button
+            className="ec-result-v2__cta"
+            type="button"
             onClick={() => setHandoffOpen(true)}
           >
-            {t("ec.r.cta.continue")}
-          </Button>
-          <Button variant="outline" size="xl" onClick={onReset}>
-            {t("common.startOver")}
-          </Button>
-        </div>
-
-        {/* Support footer — quiet, single-line. Lives below CTAs so it
-            doesn't compete with the primary action but is reachable
-            without scrolling past the recommendation. Pattern adapted
-            from 3S Money's footer; their version also includes
-            "Progress automatically saved" + phone number, both of
-            which we skip here: we don't have session-resume yet, and
-            a public hotline isn't set up. Honest minimum: an email
-            channel. Both prefix text and email are localised so the
-            support address can be region-specific in future without
-            code changes. */}
-        <div className="ec-support">
-          <span>{t("ec.support.questionsPrefix")}</span>{" "}
-          <a className="ec-support__link" href={"mailto:" + t("ec.support.email")}>
-            {t("ec.support.email")}
-          </a>
-        </div>
+            Start your setup →
+          </button>
+        </section>
       </div>
 
-      {/* Plan comparison modal — mounted conditionally; portaled to body
-          by the component itself to escape transform-creating ancestors. */}
+      {/* Modals — unchanged from v1; portaled to body by each component. */}
       {comparisonOpen && (
         <EcPlanComparisonModal
           activePlanId={activePlan.id}
           recommendedPlanId={recommendedPlan.id}
           onSelect={(planId) => {
-            // Selecting the recommended plan again clears the override
-            // so the page reverts to "Recommended for your business"
-            // framing. Selecting any other plan sets the override.
             setSelectedPlanId(planId === recommendedPlan.id ? null : planId);
             setComparisonOpen(false);
           }}
@@ -1299,9 +1203,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
         />
       )}
 
-      {/* Fees modal — canonical Altery fee schedule for the active
-          plan and entity region. Opens from the "View all fees" link
-          on the plan card. */}
       {feesOpen && (
         <EcFeesModal
           plan={activePlan}
@@ -1310,24 +1211,12 @@ function EcResultApproved({ rec, onBack, onReset }) {
         />
       )}
 
-      {/* Handoff modal — soft email capture before Stripe. Continue
-          path chains to payment; email-only path stays in modal with
-          success state. See EcHandoffModal docblock for full flow. */}
       {handoffOpen && (
         <EcHandoffModal
           rec={rec}
           onClose={() => setHandoffOpen(false)}
           onContinueToSetup={() => {
             setHandoffOpen(false);
-            // Hand off to the onboarding flow (separate page at
-            // /setup/). The user has already chosen the plan and
-            // entity in the checker — pass both via URL params so
-            // the onboarding can pre-fill the payment screen and
-            // skip the generic prep checklist. Currency follows
-            // the entity: GBP for UK, EUR for EU/MENA. Volume is
-            // a hint, not yet used downstream. Payment happens at
-            // the end of onboarding, before submit — replaces the
-            // pre-onboarding Stripe modal.
             const params = new URLSearchParams({
               token:    ecGenProposalRef(),
               plan:     activePlan.id,
@@ -1340,10 +1229,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
         />
       )}
 
-      {/* Payment modal — Stripe Payment Element on the active plan.
-          Opens from the "Set up this account" CTA. Demo wiring; real
-          charge requires backend PaymentIntent creation (marked TODO
-          in EcPaymentModal.handlePay). */}
       {paymentOpen && (
         <EcPaymentModal
           activePlan={activePlan}
@@ -1353,7 +1238,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
     </div>
   );
 }
-
 function EcResultBlocked({ rec, onBack, onReset }) {
   const t = useT();
   // Industry name is interpolated as lowercase to read naturally inside

@@ -2751,3 +2751,422 @@
        Transition extended to include transform; only :active applies it,
        so border/bg shifts on hover/select stay smooth. */
     .ec-chip:active { transform: scale(0.97); }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       RESULT PAGE V2 — Pass 1 (structure + spacing only, per
+       RESULT-REDESIGN-BRIEF.md). Class prefix .ec-result-v2-* to avoid
+       colliding with the legacy .ec-result-* classes — those stay until
+       the redesign is confirmed and a follow-up commit can prune them.
+       Brief mandates: type scale exact, palette restricted, spacing in 4px
+       multiples, 96-128px between major sections, no gradients/shadows.
+       ════════════════════════════════════════════════════════════════════════ */
+    .ec-result-v2 {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 64px 32px 96px;
+      color: #11141A;
+      font-family: var(--ff);
+    }
+
+    /* Section A — HERO. Fits within a 768px viewport with no scroll on a
+       13" laptop. The savings number is the single biggest type on the
+       whole page by a 1.6× margin over the next size — hierarchy by size,
+       not weight. */
+    .ec-result-v2__hero {
+      padding-bottom: 96px;
+    }
+    .ec-result-v2__answer {
+      font-size: 56px;
+      line-height: 1.15;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #11141A;
+      margin: 0 0 48px;
+    }
+    .ec-result-v2__savings {
+      display: inline-block;
+      padding: 32px 40px;
+      background: #FFF7ED;
+      border-radius: 12px;
+      margin-bottom: 24px;
+    }
+    .ec-result-v2__savings__eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      color: #69707C;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .ec-result-v2__savings__number {
+      font-family: var(--ff-mono);
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+      font-size: 88px;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      font-weight: 700;
+      color: #C2410C;
+    }
+    .ec-result-v2__savings__annual {
+      font-family: var(--ff-mono);
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+      font-size: 24px;
+      font-weight: 500;
+      color: #69707C;
+      margin-top: 12px;
+    }
+    .ec-result-v2__loss {
+      font-size: 18px;
+      line-height: 1.5;
+      color: #69707C;
+      margin: 0 0 48px;
+      max-width: 640px;
+    }
+    .ec-result-v2__hero__cta {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .ec-result-v2__cta {
+      background: #002780;
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 16px 28px;
+      border-radius: 6px;
+      border: 0;
+      cursor: pointer;
+      letter-spacing: 0;
+      font-family: inherit;
+      transition: background-color 200ms ease;
+    }
+    .ec-result-v2__cta:hover { background: #001E66; }
+    .ec-result-v2__cta__link {
+      background: none;
+      border: 0;
+      color: #002780;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 0;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      font-family: inherit;
+    }
+
+    /* Sections B–F share the same vertical rhythm — 96px top + 96px bottom
+       padding, dividers via top border. G (footer CTA) has its own treatment. */
+    .ec-result-v2__section {
+      padding: 96px 0;
+      border-top: 1px solid #D7DAE0;
+    }
+    .ec-result-v2__section__eyebrow {
+      font-size: 12px;
+      font-weight: 600;
+      color: #69707C;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 24px;
+    }
+    .ec-result-v2__section__title {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: #11141A;
+      margin: 0 0 32px;
+      line-height: 1.15;
+    }
+
+    /* Section B — Why (60/40 asymmetric). Brief: left rationale, right
+       product-facts card. Stats card uses border+bg-tint, NOT shadow. */
+    .ec-result-v2__why {
+      display: grid;
+      grid-template-columns: 6fr 4fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .ec-result-v2__rationale__list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+    .ec-result-v2__rationale__item {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #11141A;
+      margin: 0 0 16px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .ec-result-v2__rationale__item::before {
+      content: "·";
+      position: absolute;
+      left: 4px;
+      top: -4px;
+      font-size: 28px;
+      line-height: 1;
+      color: #69707C;
+    }
+    .ec-result-v2__stats {
+      background: #FFFFFF;
+      border: 1px solid #D7DAE0;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .ec-result-v2__stats__row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 20px;
+    }
+    .ec-result-v2__stats__row:last-child { margin-bottom: 0; }
+    .ec-result-v2__stats__num {
+      font-family: var(--ff-mono);
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+      font-size: 24px;
+      font-weight: 600;
+      color: #11141A;
+      letter-spacing: -0.01em;
+      line-height: 1.1;
+    }
+    .ec-result-v2__stats__label {
+      font-size: 12px;
+      color: #69707C;
+    }
+
+    /* Section B.5 — Compact plan card. Sits between B (why) and C (outcomes).
+       Plan name + price as one row, top 3-4 perks, single Compare link. */
+    .ec-result-v2__plan {
+      border: 1px solid #D7DAE0;
+      border-radius: 12px;
+      padding: 32px;
+    }
+    .ec-result-v2__plan__row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+    .ec-result-v2__plan__name {
+      font-size: 24px;
+      font-weight: 600;
+      color: #11141A;
+      letter-spacing: -0.01em;
+    }
+    .ec-result-v2__plan__price {
+      font-family: var(--ff-mono);
+      font-variant-numeric: tabular-nums;
+      font-size: 24px;
+      font-weight: 500;
+      color: #11141A;
+    }
+    .ec-result-v2__plan__perks {
+      list-style: none;
+      margin: 0 0 24px;
+      padding: 0;
+    }
+    .ec-result-v2__plan__perk {
+      font-size: 15px;
+      line-height: 1.5;
+      color: #11141A;
+      margin-bottom: 8px;
+      padding-left: 20px;
+      position: relative;
+    }
+    .ec-result-v2__plan__perk::before {
+      content: "·";
+      position: absolute;
+      left: 4px;
+      top: -4px;
+      font-size: 28px;
+      line-height: 1;
+      color: #69707C;
+    }
+    .ec-result-v2__plan__link {
+      font-size: 14px;
+      color: #002780;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+    }
+
+    /* Section C — Outcome cards. Beige bg (one accent moment for this
+       section per brief). Three equal-width cards. */
+    .ec-result-v2__outcomes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .ec-result-v2__outcome {
+      background: #F0EBE3;
+      border-radius: 12px;
+      padding: 32px 24px;
+    }
+    .ec-result-v2__outcome__num {
+      font-family: var(--ff-mono);
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+      font-size: 32px;
+      font-weight: 600;
+      color: #11141A;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+      line-height: 1.1;
+    }
+    .ec-result-v2__outcome__title {
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1.3;
+      color: #11141A;
+      margin-bottom: 8px;
+    }
+    .ec-result-v2__outcome__body {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #69707C;
+    }
+
+    /* Section D — 5-minute prep checklist. Subtle border, no fill — the
+       single accent moment is the green checkmarks. */
+    .ec-result-v2__prep {
+      border: 1px solid #D7DAE0;
+      border-radius: 12px;
+      padding: 32px;
+    }
+    .ec-result-v2__prep__list {
+      list-style: none;
+      margin: 0 0 24px;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .ec-result-v2__prep__item {
+      display: flex;
+      gap: 12px;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #11141A;
+      align-items: flex-start;
+    }
+    .ec-result-v2__prep__check {
+      flex: 0 0 20px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0A9F52;
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+    .ec-result-v2__prep__footer {
+      font-size: 13px;
+      color: #69707C;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid #D7DAE0;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .ec-result-v2__prep__link {
+      font-size: 13px;
+      color: #002780;
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      font-family: inherit;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* Section E — Share. Subtle navy tint background as the section accent. */
+    .ec-result-v2__share {
+      background: #F4F6FC;
+      border-radius: 12px;
+      padding: 32px;
+    }
+    .ec-result-v2__share__body {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #69707C;
+      margin: 0 0 24px;
+      max-width: 560px;
+    }
+    .ec-result-v2__share__actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .ec-result-v2__share__btn {
+      flex: 1;
+      min-width: 200px;
+      background: #FFFFFF;
+      border: 1px solid #002780;
+      color: #002780;
+      border-radius: 6px;
+      padding: 14px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      text-align: center;
+      transition: background-color 200ms ease;
+    }
+    .ec-result-v2__share__btn:hover { background: #EBF1FF; }
+
+    /* Section F — Trust strip. Quiet single horizontal row of facts,
+       all caps with letter-spacing for institutional feel. */
+    .ec-result-v2__trust {
+      padding: 48px 0;
+      border-top: 1px solid #D7DAE0;
+      border-bottom: 1px solid #D7DAE0;
+      text-align: center;
+      font-size: 12px;
+      color: #69707C;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      line-height: 1.7;
+    }
+
+    /* Section G — Footer CTA. Soft container, same CTA copy as A. */
+    .ec-result-v2__footer {
+      padding: 64px 0 0;
+      text-align: center;
+    }
+    .ec-result-v2__footer__lead {
+      font-size: 15px;
+      color: #69707C;
+      margin: 0 0 24px;
+    }
+
+    /* Back-to-edit link at the top of the page — same component as Q
+       screens, kept for consistency with the rest of the flow. */
+    .ec-result-v2__back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #69707C;
+      background: none;
+      border: 0;
+      padding: 8px 0;
+      cursor: pointer;
+      margin-bottom: 32px;
+      font-family: inherit;
+    }
+    .ec-result-v2__back:hover { color: #11141A; }
