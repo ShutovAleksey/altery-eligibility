@@ -189,9 +189,7 @@
     "ec.r.bankHistory.yes": "Sì",
     "ec.r.bankHistory.no": "No",
     "ec.r.bankHistory.prefer": "Preferisco non dirlo",
-    "ec.r.bankHistory.thanks.yes": "Grazie — ti indirizziamo a uno specialista che vede questo spesso.",
-    "ec.r.bankHistory.thanks.no": "Capito — una storia pulita è anche un contesto utile.",
-    "ec.r.bankHistory.thanks.prefer": "Nessun problema — grazie per averlo detto.",
+    "ec.r.bankHistory.skip": "Salta",
 
     "common.close": "Chiudi",
 
@@ -566,9 +564,7 @@
     "ec.r.bankHistory.yes": "Sí",
     "ec.r.bankHistory.no": "No",
     "ec.r.bankHistory.prefer": "Prefiero no decirlo",
-    "ec.r.bankHistory.thanks.yes": "Gracias — te dirigiremos a un especialista que ve esto a menudo.",
-    "ec.r.bankHistory.thanks.no": "Entendido — historial limpio también es contexto útil.",
-    "ec.r.bankHistory.thanks.prefer": "Sin problema — gracias por avisar.",
+    "ec.r.bankHistory.skip": "Omitir",
 
     "common.close": "Cerrar",
 

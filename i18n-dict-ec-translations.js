@@ -193,9 +193,7 @@
     "ec.r.bankHistory.yes": "Ja",
     "ec.r.bankHistory.no": "Nein",
     "ec.r.bankHistory.prefer": "Möchte nicht sagen",
-    "ec.r.bankHistory.thanks.yes": "Danke — wir leiten Sie zu einem Spezialisten, der das oft sieht.",
-    "ec.r.bankHistory.thanks.no": "Verstanden — saubere Historie ist auch nützlicher Kontext.",
-    "ec.r.bankHistory.thanks.prefer": "Kein Problem — danke für die Info.",
+    "ec.r.bankHistory.skip": "Überspringen",
 
     "common.close": "Schließen",
 
@@ -570,9 +568,7 @@
     "ec.r.bankHistory.yes": "Да",
     "ec.r.bankHistory.no": "Нет",
     "ec.r.bankHistory.prefer": "Предпочитаю не отвечать",
-    "ec.r.bankHistory.thanks.yes": "Спасибо — направим к специалисту, который часто работает с такими случаями.",
-    "ec.r.bankHistory.thanks.no": "Понятно — чистая история тоже полезный контекст.",
-    "ec.r.bankHistory.thanks.prefer": "Без проблем — спасибо что сообщили.",
+    "ec.r.bankHistory.skip": "Пропустить",
 
     "common.close": "Закрыть",
 

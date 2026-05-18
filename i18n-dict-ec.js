@@ -284,9 +284,7 @@
     "ec.r.bankHistory.yes": "Yes",
     "ec.r.bankHistory.no": "No",
     "ec.r.bankHistory.prefer": "Prefer not to say",
-    "ec.r.bankHistory.thanks.yes": "Thanks — we'll route to a specialist who sees this often.",
-    "ec.r.bankHistory.thanks.no": "Got it — clean history is useful context too.",
-    "ec.r.bankHistory.thanks.prefer": "No problem — thanks for letting us know.",
+    "ec.r.bankHistory.skip": "Skip",
 
     // Common
     "common.close": "Close",

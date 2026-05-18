@@ -869,79 +869,10 @@
       .ec-reasoning__text { font-size: 13.5px; line-height: 20px; }
     }
 
-    /* ─── Bank history — optional inline question ──────────────────────
-       Subtle card on the result page asking "have you been rejected by
-       a bank/EMI?". Sits between caveats and CTAs — present but not
-       blocking. Two visual states (question → answered), with the
-       answered state collapsing to a single-line acknowledgment so the
-       block doesn't dominate after the user has decided. Tone is
-       conversational; treatment is intentionally quieter than the
-       reasoning block (which is primary supporting evidence) and the
-       plan card (which is the offer). Distinguished from caveats by
-       its interactivity — caveats are read-only "things to know". */
-    .ec-bankHistory {
-      background: var(--c-bg);
-      border: 1px solid var(--c-border);
-      border-radius: 12px;
-      padding: 18px 20px;
-    }
-    .ec-bankHistory__head { margin-bottom: 14px; }
-    .ec-bankHistory__title {
-      font-size: 14px; font-weight: 600;
-      color: var(--c-ink);
-      line-height: 20px;
-    }
-    .ec-bankHistory__lead {
-      font-size: 13px; line-height: 19px;
-      color: var(--c-muted);
-      margin-top: 4px;
-    }
-    .ec-bankHistory__options {
-      display: flex; gap: 8px; flex-wrap: wrap;
-    }
-    .ec-bankHistory__opt {
-      background: var(--c-surface);
-      border: 1px solid var(--c-border);
-      border-radius: 9px;
-      padding: 9px 16px;
-      font-size: 13.5px; font-weight: 500;
-      color: var(--c-ink);
-      cursor: pointer;
-      font-family: inherit;
-      transition: background .15s ease, border-color .15s ease, transform .12s ease;
-    }
-    .ec-bankHistory__opt:hover {
-      background: var(--c-accent-soft, var(--c-bg));
-      border-color: var(--c-primary);
-    }
-    .ec-bankHistory__opt:active { transform: scale(0.98); }
-    .ec-bankHistory__opt:focus-visible {
-      outline: 2px solid var(--c-primary);
-      outline-offset: 2px;
-    }
-    /* Answered state — single line with check + thanks */
-    .ec-bankHistory--answered {
-      display: flex; gap: 10px;
-      align-items: center;
-      padding: 14px 18px;
-      background: var(--c-success-soft, var(--c-bg));
-      border-color: var(--c-success, var(--c-border));
-    }
-    .ec-bankHistory__icon {
-      flex-shrink: 0;
-      color: var(--c-success, var(--c-primary));
-      display: inline-flex;
-      align-items: center;
-    }
-    .ec-bankHistory__thanks {
-      font-size: 13.5px; line-height: 19px;
-      color: var(--c-ink-2);
-      flex: 1; min-width: 0;
-    }
-    @media (max-width: 640px) {
-      .ec-bankHistory { padding: 14px 16px; }
-      .ec-bankHistory__opt { padding: 8px 14px; font-size: 13px; }
-    }
+    /* .ec-bankHistory* rules deleted — the bank-rejection inline block on
+       the result page was removed; the Q now runs as a proper optional
+       quiz step (EcBankHistoryStep) styled with the standard SelectableListItem +
+       back/skip controls used by every other Q screen. */
 
     .ec-country-footnote {
       font-size: 12px; line-height: 18px;

@@ -32,7 +32,10 @@ Object.values(EC_ENTITIES).forEach((e) => {
 });
 
 // Pure routing function — answers → recommendation. Easy to test in isolation.
-function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corridors, txCount, services }) {
+// bankHistory ("yes" | "no" | "prefer" | null) is a sales signal from the
+// optional post-corridor Q; doesn't affect routing, rides along on the
+// recommendation so the PDF/email payload can surface it.
+function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corridors, txCount, services, bankHistory }) {
   const country = EC_COUNTRIES.find((c) => c.code === countryCode);
   const ind = EC_INDUSTRIES.find((i) => i.value === industry);
 
@@ -186,7 +189,7 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
     .sort((a, b) => b.priority - a.priority)
     .slice(0, 3);
 
-  return { kind: "approved", entity, plan, caveats, country, ind, monthlyVolume, cryptoReroute, cryptoActive, services: svcs, tierSignals, reasoning: reasoningTop };
+  return { kind: "approved", entity, plan, caveats, country, ind, monthlyVolume, cryptoReroute, cryptoActive, services: svcs, tierSignals, reasoning: reasoningTop, bankHistory: bankHistory || null };
 }
 
 // Derive a transaction-count assumption from the monthly volume

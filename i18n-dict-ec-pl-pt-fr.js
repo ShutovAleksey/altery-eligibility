@@ -190,9 +190,7 @@
     "ec.r.bankHistory.yes": "Tak",
     "ec.r.bankHistory.no": "Nie",
     "ec.r.bankHistory.prefer": "Wolę nie mówić",
-    "ec.r.bankHistory.thanks.yes": "Dziękujemy — skierujemy Cię do specjalisty, który często to widzi.",
-    "ec.r.bankHistory.thanks.no": "Rozumiem — czysta historia to też przydatny kontekst.",
-    "ec.r.bankHistory.thanks.prefer": "Bez problemu — dzięki za informację.",
+    "ec.r.bankHistory.skip": "Pomiń",
 
     "common.close": "Zamknij",
 
@@ -567,9 +565,7 @@
     "ec.r.bankHistory.yes": "Sim",
     "ec.r.bankHistory.no": "Não",
     "ec.r.bankHistory.prefer": "Prefiro não dizer",
-    "ec.r.bankHistory.thanks.yes": "Obrigado — encaminhamos para um especialista que vê isto frequentemente.",
-    "ec.r.bankHistory.thanks.no": "Percebido — historial limpo também é contexto útil.",
-    "ec.r.bankHistory.thanks.prefer": "Sem problema — obrigado por informar.",
+    "ec.r.bankHistory.skip": "Ignorar",
 
     "common.close": "Fechar",
 
@@ -942,9 +938,7 @@
     "ec.r.bankHistory.yes": "Oui",
     "ec.r.bankHistory.no": "Non",
     "ec.r.bankHistory.prefer": "Préfère ne pas dire",
-    "ec.r.bankHistory.thanks.yes": "Merci — nous vous orientons vers un spécialiste qui voit cela souvent.",
-    "ec.r.bankHistory.thanks.no": "Compris — un historique propre est aussi un contexte utile.",
-    "ec.r.bankHistory.thanks.prefer": "Pas de problème — merci pour l'info.",
+    "ec.r.bankHistory.skip": "Passer",
 
     "common.close": "Fermer",
 

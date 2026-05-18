@@ -189,9 +189,7 @@
     "ec.r.bankHistory.yes": "Ja",
     "ec.r.bankHistory.no": "Nee",
     "ec.r.bankHistory.prefer": "Liever niet zeggen",
-    "ec.r.bankHistory.thanks.yes": "Bedankt — we routeren u naar een specialist die dit vaak ziet.",
-    "ec.r.bankHistory.thanks.no": "Begrepen — schone historie is ook nuttige context.",
-    "ec.r.bankHistory.thanks.prefer": "Geen probleem — bedankt voor de info.",
+    "ec.r.bankHistory.skip": "Overslaan",
 
     "common.close": "Sluiten",
 
@@ -566,9 +564,7 @@
     "ec.r.bankHistory.yes": "Evet",
     "ec.r.bankHistory.no": "Hayır",
     "ec.r.bankHistory.prefer": "Söylememeyi tercih ederim",
-    "ec.r.bankHistory.thanks.yes": "Teşekkürler — bunu sıkça gören bir uzmana yönlendireceğiz.",
-    "ec.r.bankHistory.thanks.no": "Anlaşıldı — temiz geçmiş de yararlı bir bağlam.",
-    "ec.r.bankHistory.thanks.prefer": "Sorun değil — bilgi için teşekkürler.",
+    "ec.r.bankHistory.skip": "Geç",
 
     "common.close": "Kapat",
 

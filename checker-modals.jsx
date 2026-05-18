@@ -12,7 +12,6 @@
 // /index.html after /checker-screens.jsx. Exports to window:
 //
 //   EcFeesModal          — full fee schedule popup, opened by the "View all fees" link
-//   EcBankHistory        — inline trust-signals strip (used inside the handoff modal)
 //   EcPerks              — perk grid (used on the result page and in the handoff)
 //   EcPlanComparisonModal — "Compare plans" popup with three plan cards
 //   EcPlanIcon           — small helper, renders a tier icon from EcIco
@@ -167,51 +166,9 @@ function EcFeesModal({ plan, entity, onClose }) {
 //   • onError → React state tracks per-card failures and re-renders
 //     without the image div. Card collapses to title+body — no
 //     broken-image icon, no layout glitch.
-// ── EcBankHistory ──────────────────────────────────────────────────
-// Optional inline question on the result page: "Have you been
-// declined or restricted by another bank or EMI before?". Lives
-// between caveats and the primary CTAs so it's findable but never
-// blocks the path to "Set up account". Two visual states: question
-// (title + lead + 3 buttons) and answered (single-line confirmation
-// with check icon). State is local — for the prototype the answer
-// is purely cosmetic; in production we'd lift it up to the result
-// payload so sales has a warm hook ("we saw you ran the checker and
-// mentioned a previous rejection — we route those to specialist").
-function EcBankHistory() {
-  const t = useT();
-  const [answer, setAnswer] = useState(null);
-  if (answer) {
-    return (
-      <div className="ec-bankHistory ec-bankHistory--answered">
-        <span className="ec-bankHistory__icon" aria-hidden="true">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="m3.5 8 3 3 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </span>
-        <span className="ec-bankHistory__thanks">{t("ec.r.bankHistory.thanks." + answer)}</span>
-      </div>
-    );
-  }
-  return (
-    <div className="ec-bankHistory">
-      <div className="ec-bankHistory__head">
-        <div className="ec-bankHistory__title">{t("ec.r.bankHistory.title")}</div>
-        <div className="ec-bankHistory__lead">{t("ec.r.bankHistory.lead")}</div>
-      </div>
-      <div className="ec-bankHistory__options" role="group" aria-label={t("ec.r.bankHistory.title")}>
-        <button type="button" className="ec-bankHistory__opt" onClick={() => setAnswer("yes")}>
-          {t("ec.r.bankHistory.yes")}
-        </button>
-        <button type="button" className="ec-bankHistory__opt" onClick={() => setAnswer("no")}>
-          {t("ec.r.bankHistory.no")}
-        </button>
-        <button type="button" className="ec-bankHistory__opt" onClick={() => setAnswer("prefer")}>
-          {t("ec.r.bankHistory.prefer")}
-        </button>
-      </div>
-    </div>
-  );
-}
+// EcBankHistory deleted — the bank-rejection Q now lives as a proper
+// optional step in the quiz (EcBankHistoryStep in /checker-screens.jsx)
+// with the answer threaded into rec.bankHistory via ecRecommend.
 
 function EcPerks({ services }) {
   const t = useT();
@@ -1365,7 +1322,7 @@ function EcPaymentModal({ activePlan, onClose }) {
 }
 
 Object.assign(window, {
-  EcFeesModal, EcBankHistory, EcPerks,
+  EcFeesModal, EcPerks,
   EcPlanComparisonModal, EcPlanIcon, EcPlanCompareCard,
   EcHandoffModal, EcPaymentModal,
 });
