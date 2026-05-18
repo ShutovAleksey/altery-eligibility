@@ -162,11 +162,12 @@ function EcApp() {
   // services: multi-select of products/use-cases the user wants.
   // Drives plan tier hint (Pro for mass/cards/multiEntity, Ultra for
   // API, specialist review for crypto rails) and result page perk
-  // emphasis ordering. Default pre-selects "accounts" + "crossBorder"
-  // — universal needs for any digital business looking at Altery, so
-  // picking them up-front means a fresh user only ticks specialist
-  // extras (mass/cards/multiUser/multiEntity/API/crypto).
-  const [services, setServices] = useState(new Set(["accounts", "crossBorder"]));
+  // emphasis ordering. Starts empty — the user explicitly ticks what
+  // applies. Pre-selecting "accounts"/"crossBorder" looked smart on
+  // paper but biases the recommendation before any input, and leaves
+  // a confusing "why are these already checked?" signal for fresh
+  // visitors who haven't read the question yet.
+  const [services, setServices] = useState(new Set());
   const [volumeIdx, setVolumeIdx] = useState(2);
   const [corridors, setCorridors] = useState(new Set());
   const [txCount, setTxCount] = useState("med");
