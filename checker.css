@@ -340,6 +340,10 @@
       min-height: calc(100vh - 200px);
     }
     .ec-content > * { width: 100%; min-width: 0; }
+    /* Result page uses a wider container — the side-by-side savings +
+       plan cards need more room than question screens. Per the new
+       result-page design (Eligibility Checker.html in the design archive). */
+    .ec-content--wide { max-width: 880px; }
 
     .ec-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
@@ -665,208 +669,18 @@
          (3) hero savings band — loss-framed, dramatic typography
        The comparison row is the "show, don't tell" of the value. The
        hero band keeps loss framing intent ("leaving on the table"). */
-    .ec-opportunity {
-      background: #FFFFFF;
-      border: 1px solid var(--c-border);
-      border-radius: 16px;
-      padding: 24px;
-      margin: 0 0 20px;
-    }
-    .ec-opportunity__eyebrow {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--c-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 8px;
-    }
-    .ec-opportunity__context {
-      font-size: 14px;
-      line-height: 21px;
-      color: var(--c-ink-soft);
-      margin: 0 0 20px;
-    }
-
     /* Bank vs Altery comparison row. CSS grid keeps the arrow centered
        between the two cells regardless of label-line wrap. Cells get
        slight contrast: from-cell is muted/grey (the old, expensive way),
        to-cell is accent-soft (the better way). Strikethrough on bank
        amount is a subtle visual reinforcement. */
-    .ec-opportunity__compare {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: stretch;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .ec-opportunity__compare__cell {
-      padding: 16px 18px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .ec-opportunity__compare__cell--from {
-      background: var(--c-bg-2);
-    }
-    .ec-opportunity__compare__cell--to {
-      background: var(--c-accent-soft);
-    }
-    .ec-opportunity__compare__label {
-      font-size: 11px;
-      font-weight: 600;
-      color: var(--c-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 8px;
-    }
-    .ec-opportunity__compare__cell--to .ec-opportunity__compare__label {
-      color: var(--c-primary);
-    }
-    .ec-opportunity__compare__amount {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--c-ink);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.01em;
-      line-height: 1.1;
-    }
-    .ec-opportunity__compare__cell--from .ec-opportunity__compare__amount {
-      color: var(--c-muted);
-      text-decoration: line-through;
-      text-decoration-thickness: 1.5px;
-      text-decoration-color: var(--c-muted-2);
-    }
-    .ec-opportunity__compare__cell--to .ec-opportunity__compare__amount {
-      color: var(--c-primary);
-    }
-    .ec-opportunity__compare__per {
-      font-size: 12px;
-      color: var(--c-muted);
-      margin-top: 4px;
-    }
-    .ec-opportunity__compare__cell--to .ec-opportunity__compare__per {
-      color: var(--c-primary);
-      opacity: 0.75;
-    }
-    .ec-opportunity__compare__arrow {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--c-accent);
-    }
-
     /* Hero savings band — loss-framed, big and centred. */
-    .ec-opportunity__band {
-      background: #FFF7ED;
-      border: 1.5px solid #C2410C;
-      border-radius: 14px;
-      padding: 22px 24px;
-      margin-bottom: 14px;
-      text-align: center;
-    }
-    .ec-opportunity__band__label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #C2410C;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 10px;
-    }
-    .ec-opportunity__band__monthly {
-      font-size: 40px;
-      font-weight: 800;
-      color: #C2410C;
-      letter-spacing: -0.02em;
-      font-variant-numeric: tabular-nums;
-      line-height: 1.05;
-      margin-bottom: 8px;
-    }
-    .ec-opportunity__band__per {
-      font-size: 18px;
-      font-weight: 500;
-      color: #C2410C;
-      margin-left: 4px;
-      letter-spacing: 0;
-    }
-    .ec-opportunity__band__annual {
-      font-size: 13px;
-      color: #C2410C;
-      font-weight: 500;
-      font-variant-numeric: tabular-nums;
-      opacity: 0.85;
-    }
-
-    .ec-opportunity__note {
-      font-size: 12px;
-      line-height: 17px;
-      color: var(--c-muted);
-      font-style: italic;
-    }
-
     @media (max-width: 640px) {
-      .ec-opportunity { padding: 20px 18px; }
-      .ec-opportunity__compare {
-        grid-template-columns: 1fr;
-        gap: 8px;
-      }
-      .ec-opportunity__compare__arrow {
-        transform: rotate(90deg);
-        justify-self: center;
-        padding: 4px 0;
-      }
-      .ec-opportunity__compare__amount { font-size: 20px; }
-      .ec-opportunity__band { padding: 20px 18px; }
-      .ec-opportunity__band__monthly { font-size: 32px; }
-      .ec-opportunity__band__per { font-size: 16px; }
     }
 
        services check + Q5 crypto card check) for visual consistency with
        the rest of the questionnaire's selection language. */
-    .ec-reasoning {
-      background: var(--c-surface);
-      border: 1px solid var(--c-border);
-      border-radius: 14px;
-      padding: 20px 22px;
-      margin: 4px 0 0;
-    }
-    .ec-reasoning__head {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--c-primary);
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      margin: 0 0 14px;
-    }
-    .ec-reasoning__list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: flex; flex-direction: column;
-      gap: 12px;
-    }
-    .ec-reasoning__item {
-      display: flex; gap: 12px;
-      align-items: flex-start;
-    }
-    .ec-reasoning__check {
-      flex-shrink: 0;
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      background: var(--c-primary);
-      color: #fff;
-      display: inline-flex; align-items: center; justify-content: center;
-      margin-top: 1px;
-    }
-    .ec-reasoning__text {
-      font-size: 14px;
-      line-height: 21px;
-      color: var(--c-ink);
-      flex: 1; min-width: 0;
-    }
     @media (max-width: 640px) {
-      .ec-reasoning { padding: 16px 18px; }
-      .ec-reasoning__text { font-size: 13.5px; line-height: 20px; }
     }
 
     /* .ec-bankHistory* rules deleted — the bank-rejection inline block on
@@ -1065,13 +879,6 @@
        so it reads as a phrase, not a label. Color matches the title
        accent (p-blue-200) for AA contrast on the navy hero. Only renders
        for ICP-aligned industries — generic users get the original hero. */
-    .ec-result__personaLine {
-      font-size: 13px; font-weight: 500;
-      line-height: 19px;
-      letter-spacing: -0.005em;
-      color: var(--p-blue-200);
-      margin-bottom: 10px;
-    }
     .ec-result__heroTitle {
       margin: 0 0 12px;
       font-size: 32px; line-height: 38px; font-weight: 700;
@@ -1087,20 +894,6 @@
       color: rgba(255, 255, 255, .78);
       max-width: 480px;
     }
-    .ec-result__entity {
-      display: inline-flex; align-items: center; gap: 8px;
-      margin-top: 16px;
-      padding: 6px 12px 6px 8px;
-      background: rgba(255, 255, 255, .08);
-      border-radius: 999px;
-      font-size: 12px; color: rgba(255, 255, 255, .9);
-      font-variant-numeric: tabular-nums;
-    }
-    .ec-result__entity .ec-result__dot {
-      width: 6px; height: 6px; border-radius: 999px;
-      background: #1BC56B;
-      animation: ec-pulse 2.4s ease-in-out infinite;
-    }
     @keyframes ec-pulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(27, 197, 107, 0.4); }
       50%      { box-shadow: 0 0 0 5px rgba(27, 197, 107, 0); }
@@ -1110,30 +903,10 @@
        in a flex container. Same margin-top the entity pill used to carry —
        moved up to the wrapper so both pills share consistent spacing from
        the hero lead. Wrap allows narrow viewports to stack vertically. */
-    .ec-result__badges {
-      display: flex; flex-wrap: wrap; gap: 8px;
-      margin-top: 16px;
-    }
-    .ec-result__badges .ec-result__entity {
-      margin-top: 0;
-    }
     /* Crypto-fluent badge — shows when user answered yes to Q5 crypto
        exposure, regardless of whether the EU→UK reroute fired. Reuses the
        coin+₿ icon from Q5 for visual continuity. Same pill styling as the
        entity-status badge so they read as a peer-pair, not a hierarchy. */
-    .ec-result__cryptoBadge {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 6px 12px;
-      background: rgba(255, 255, 255, .08);
-      border-radius: 999px;
-      font-size: 12px; font-weight: 500;
-      color: rgba(255, 255, 255, .9);
-    }
-    .ec-result__cryptoBadge svg {
-      flex-shrink: 0;
-      opacity: 0.85;
-    }
-
     /* ─── Hero primary identifier chip ──
        The single most operationally useful element on the result page.
        Sits below the licence pill in the hero, shows a real-format account
@@ -1142,59 +915,7 @@
        "Inactive IBAN" chip pattern but reframed: "Preview" is honest about
        it being a placeholder format, not "Inactive" (which implies a real
        account in disabled state). Mono-rendered for banking authenticity. */
-    .ec-result__primaryIban {
-      display: inline-flex; align-items: center; gap: 12px;
-      margin-top: 14px;
-      padding: 10px 14px 10px 10px;
-      background: rgba(255, 255, 255, .05);
-      border: 1px solid rgba(255, 255, 255, .1);
-      border-radius: 12px;
-      max-width: 100%;
-      flex-wrap: wrap;
-    }
-    .ec-result__primaryIban__flag {
-      flex: 0 0 22px; width: 22px; height: 22px;
-      border-radius: 999px; overflow: hidden;
-      background: rgba(255, 255, 255, .1);
-    }
-    .ec-result__primaryIban__currency {
-      font-size: 12px; font-weight: 600;
-      color: rgba(255, 255, 255, .65);
-      letter-spacing: 0.02em;
-    }
-    .ec-result__primaryIban__sep {
-      width: 1px; height: 14px;
-      background: rgba(255, 255, 255, .14);
-      flex: 0 0 1px;
-    }
-    .ec-result__primaryIban__value {
-      font-family: var(--ff-mono);
-      font-size: 13px;
-      color: rgba(255, 255, 255, .95);
-      letter-spacing: 0.02em;
-      font-variant-numeric: tabular-nums;
-      word-break: break-all;
-      flex: 1 1 auto;
-      min-width: 0;
-    }
-    .ec-result__primaryIban__badge {
-      flex: 0 0 auto;
-      font-size: 10px; font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: rgba(255, 255, 255, .55);
-      padding: 3px 7px;
-      background: rgba(255, 255, 255, .06);
-      border: 1px solid rgba(255, 255, 255, .08);
-      border-radius: 4px;
-    }
     @media (max-width: 640px) {
-      .ec-result__primaryIban {
-        padding: 10px 12px;
-        gap: 8px;
-      }
-      .ec-result__primaryIban__value { font-size: 12px; flex-basis: 100%; order: 5; }
-      .ec-result__primaryIban__sep { display: none; }
     }
 
     /* ─── Plan comparison modal ──
@@ -1506,12 +1227,6 @@
     /* On the result-page plan card the head is now:
        [icon-box] [name + tagline stack] ────── [price]
        Echoes Altery's pricing-page card layout 1:1. */
-    .ec-plan__head { gap: 16px; }
-    .ec-plan__nameBlock { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; }
-    .ec-plan__name { display: flex; flex-direction: column; gap: 2px; align-items: flex-start; min-width: 0; }
-    .ec-plan__name b { font-size: 16px; line-height: 20px; }
-    .ec-plan__name span { font-size: 12px; line-height: 17px; }
-
     /* Bulk-row binary marker — tick instead of plain "Yes", mirroring
        Altery's comparison page where binary capabilities show as ✓ */
     .ec-plan-compare__feeValue--tick {
@@ -2219,99 +1934,14 @@
     /* Capability section — single container with internal dividers between
        sub-sections. Was two bordered cards in a 2-col grid; consolidated to
        reduce nested card chrome. Plan card stays separate (different role). */
-    .ec-capabilities {
-      background: var(--c-surface);
-      border: 1px solid var(--c-border);
-      border-radius: 14px;
-      overflow: hidden;
-    }
-    .ec-capabilities__section { padding: 18px 20px; }
-    .ec-capabilities__section + .ec-capabilities__section {
-      border-top: 1px solid var(--c-border-soft);
-    }
-    .ec-capabilities__head {
-      font-size: 12px; font-weight: 600;
-      color: var(--c-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
-    }
-    .ec-capabilities__items { display: flex; flex-direction: column; gap: 2px; }
-    .ec-capabilities__item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 8px 0;
-      font-size: 14px; color: var(--c-ink);
-    }
-    .ec-capabilities__item__flag {
-      width: 22px; height: 22px; flex: 0 0 22px;
-      border-radius: 999px; overflow: hidden;
-      background: var(--c-border-soft);
-    }
-    .ec-capabilities__item__name { flex: 1; min-width: 0; font-weight: 500; }
-    .ec-capabilities__item--more {
-      color: var(--c-muted); font-size: 13px;
-      padding: 8px 0;
-    }
-    .ec-capabilities__sectionNote {
-      font-size: 12px; color: var(--c-muted);
-      margin-top: 10px;
-    }
-
-    .ec-plan {
-      background: var(--c-surface);
-      border: 1px solid var(--c-border);
-      border-radius: 14px;
-      padding: 20px;
-      display: flex; flex-direction: column; gap: 16px;
-    }
-    .ec-plan__head {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px;
-    }
-    .ec-plan__name { display: flex; align-items: baseline; gap: 8px; }
-    .ec-plan__name b { font-size: 16px; font-weight: 600; color: var(--c-ink); letter-spacing: -0.005em; }
-    .ec-plan__name span { font-size: 12px; color: var(--c-muted); }
     /* Price gets prominent treatment — primary commercial anchor on the
        card. 32px headline with tabular numerals keeps decimal/digit
        alignment stable across plan tiers (£50/£100/£500 line up). The
        "/month" suffix stays muted to keep the focus on the figure. */
-    .ec-plan__price {
-      font-size: 32px; font-weight: 700; color: var(--c-ink);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
-      line-height: 1.05;
-    }
-    .ec-plan__price small {
-      font-size: 13px; color: var(--c-muted); font-weight: 400;
-      letter-spacing: 0; margin-left: 4px;
-    }
     /* Plan card secondary actions — Compare and View fees links sit on
        one row above the soft "you can switch plans..." note. Middle-dot
        separator visually decouples them from neighbouring text. */
-    .ec-plan__links {
-      display: flex; align-items: center; gap: 10px;
-      font-size: 13px; color: var(--c-ink-2);
-    }
-    .ec-plan__links a {
-      color: var(--c-primary);
-      text-decoration: none;
-      cursor: pointer;
-      border-bottom: 1px solid transparent;
-      transition: border-color .12s;
-    }
     .ec-plan__links a:hover,
-    .ec-plan__links a:focus-visible { border-bottom-color: currentColor; outline: none; }
-    .ec-plan__links__sep { color: var(--c-border); }
-    .ec-plan__perks {
-      display: flex; flex-direction: column; gap: 8px;
-      font-size: 14px; color: var(--c-ink-2); line-height: 20px;
-    }
-    .ec-plan__perk { display: flex; align-items: flex-start; gap: 10px; }
-    .ec-plan__perk__tick {
-      flex: 0 0 16px; width: 16px; height: 16px;
-      color: var(--c-success);
-      margin-top: 4px;
-    }
     /* Fee preview — sits inside the plan card, between perks and the
        compare/switch links. Surfaces the 4 most-relevant per-transaction
        fees inline (subscription, outgoing SEPA, outgoing SWIFT, FX
@@ -2320,48 +1950,7 @@
        full EcFeesModal for the complete breakdown. Border-top divider
        separates it visually from the perks list above; same colour
        treatment as .ec-plan__fits for consistency. */
-    .ec-plan__feePreview {
-      padding-top: 16px;
-      margin-top: 4px;
-      border-top: 1px solid var(--c-border-soft);
-    }
-    .ec-plan__feePreview__head {
-      display: flex; align-items: baseline; justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .ec-plan__feePreview__title {
-      font-size: 11px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.05em;
-      color: var(--c-muted);
-    }
-    .ec-plan__feePreview__link {
-      font-size: 12px;
-      color: var(--c-primary);
-      text-decoration: none;
-      cursor: pointer;
-      border-bottom: 1px solid transparent;
-      transition: border-color .12s;
-    }
     .ec-plan__feePreview__link:hover,
-    .ec-plan__feePreview__link:focus-visible {
-      border-bottom-color: currentColor;
-      outline: none;
-    }
-    .ec-plan__feePreview__list {
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .ec-plan__feePreview__row {
-      display: flex; align-items: baseline; justify-content: space-between;
-      gap: 12px;
-      font-size: 13px;
-    }
-    .ec-plan__feePreview__label { color: var(--c-muted); }
-    .ec-plan__feePreview__value {
-      color: var(--c-ink);
-      font-weight: 500;
-      font-variant-numeric: tabular-nums;
-      text-align: right;
-    }
     /* "Suitable for" section — surfaces the plan's fitKey on the main plan
        card so users don't need to open the comparison modal to see whether
        the recommendation actually matches their profile. Same label
@@ -2369,31 +1958,6 @@
        fits section inside the modal — cross-surface consistency. Sits
        between head (identity) and perks (features) to match buyer logic:
        what is it → is it for me → what do I get. */
-    .ec-plan__fits {
-      padding: 14px 14px 14px 0;
-      border-top: 1px solid var(--c-border-soft);
-      border-bottom: 1px solid var(--c-border-soft);
-      margin: -4px 0;
-    }
-    .ec-plan__fits__head {
-      font-size: 11px; font-weight: 600;
-      text-transform: uppercase; letter-spacing: 0.05em;
-      color: var(--c-muted);
-      margin-bottom: 6px;
-    }
-    .ec-plan__fits__text {
-      font-size: 13px; line-height: 19px;
-      color: var(--c-ink-2);
-    }
-    .ec-plan__switch {
-      font-size: 12px; color: var(--c-muted);
-      display: flex; align-items: center; gap: 6px;
-      padding-top: 12px;
-      border-top: 1px solid var(--c-border-soft);
-    }
-    .ec-plan__switch a { color: var(--c-accent); font-weight: 500; cursor: pointer; }
-    .ec-plan__switch a:hover { text-decoration: underline; }
-
     /* Caveats — maximally quiet. No alert-icon (the head says "worth knowing",
        not "warning"), no card border. Indented context, not a callout. */
     .ec-caveats {
@@ -2416,19 +1980,6 @@
        gray as fine-print, link in accent colour for hover affordance.
        Centred to read as a "if you got this far, here's a way out" anchor
        rather than a competing CTA. */
-    .ec-support {
-      font-size: 13px; line-height: 19px;
-      color: var(--c-muted);
-      text-align: center;
-      padding: 12px 8px 4px;
-    }
-    .ec-support__link {
-      color: var(--c-primary);
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .ec-support__link:hover { text-decoration: underline; }
-
     /* ─── "Built to back your business" perks slider ───────────────────
        Horizontal scroll-snap carousel surfacing Altery's actual product
        solutions (Multi-entity account, Multi-user access, API, Business
@@ -2611,18 +2162,6 @@
          German `ec.plan.ultra.fit` ("Über 1 Mio. €/Monat, komplexe Strukturen")
          collides with the price on the same row. Stack name/fit vertically;
          price stays right-top aligned. */
-      .ec-plan__head { align-items: flex-start; }
-      .ec-plan__name {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 4px;
-        flex: 1;
-        min-width: 0;
-      }
-      .ec-plan__name span { font-size: 12px; line-height: 16px; }
-      .ec-plan__price { flex-shrink: 0; font-size: 26px; }
-      .ec-plan__price small { font-size: 12px; }
-
       /* ── Slider head ──
          "Combined incoming + outgoing volume" runs ~32 chars in German/NL.
          Allow value to wrap below the label rather than colliding. */
@@ -2631,12 +2170,9 @@
       /* ── Plan switch ──
          "You can switch plans any time from the dashboard." + "Compare all plans →"
          is a ~80-char sentence in fr/it/de/ru. Wrap the inline link below. */
-      .ec-plan__switch { flex-wrap: wrap; line-height: 18px; }
-
       /* ── Result hero entity pill ──
          Russian/German licence + status strings push past hero padding without
          a max-width clamp. */
-      .ec-result__entity { max-width: 100%; }
       .ec-result__hero { padding: 24px 22px; border-radius: 18px; }
       .ec-result__heroTitle { font-size: 24px; line-height: 30px; }
 
