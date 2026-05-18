@@ -303,7 +303,7 @@
     "ec.handoff.email.placeholder": "you@company.com",
     "ec.handoff.email.error": "Please enter a valid email address.",
     "ec.handoff.email.send": "Send analysis",
-    "ec.handoff.email.back": "← Back",
+    "ec.handoff.email.back": "Back",
     "ec.handoff.submitting": "Sending…",
     "ec.handoff.privacy": "Only used to send the analysis and follow up on your application. No marketing emails.",
     "ec.handoff.error": "Couldn't send right now. Please try again in a moment.",

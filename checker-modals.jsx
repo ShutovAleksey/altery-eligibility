@@ -639,15 +639,13 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup }) {
             </ul>
 
             <div className="ec-handoff__field">
-              <label className="ec-handoff__label" htmlFor="ec-handoff-email">
-                {t("ec.handoff.email.label")}
-              </label>
-              <input
+              <Input
                 id="ec-handoff-email"
                 type="email"
                 inputMode="email"
                 autoComplete="email"
-                className={"ec-handoff__input" + (showError ? " is-error" : "")}
+                size="lg"
+                label={t("ec.handoff.email.label")}
                 placeholder={t("ec.handoff.email.placeholder")}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -657,10 +655,8 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup }) {
                 }}
                 disabled={submitting}
                 autoFocus
+                error={showError ? t("ec.handoff.email.error") : undefined}
               />
-              {showError && (
-                <div className="ec-handoff__error" role="alert">{t("ec.handoff.email.error")}</div>
-              )}
             </div>
 
             {submitError && (
@@ -671,20 +667,23 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup }) {
               <Button
                 variant="primary"
                 size="xl"
+                full
                 onClick={sendEmail}
                 disabled={submitting || !isValid}
               >
                 {submitting ? t("ec.handoff.submitting") : t("ec.handoff.email.send")}
               </Button>
+              <Button
+                variant="ghost"
+                size="xl"
+                full
+                iconLeft="arrowLeft"
+                onClick={() => setStage("commit")}
+                disabled={submitting}
+              >
+                {t("ec.handoff.email.back")}
+              </Button>
             </div>
-            <button
-              className="ec-handoff__altLink"
-              type="button"
-              onClick={() => setStage("commit")}
-              disabled={submitting}
-            >
-              {t("ec.handoff.email.back")}
-            </button>
             <p className="ec-handoff__privacy">{t("ec.handoff.trust")}</p>
           </>
           );

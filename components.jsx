@@ -194,7 +194,8 @@ const useId = (prefix = "id") => {
 const Input = ({
   label, hint, error, icon, iconRight, prefix, suffix, value, onChange,
   type = "text", placeholder, required, disabled, size = "md", style,
-  onFocus, onBlur, id: idProp, "aria-label": ariaLabel
+  onFocus, onBlur, onKeyDown, id: idProp, "aria-label": ariaLabel,
+  autoFocus, autoComplete, inputMode, name, maxLength, pattern
 }) => {
   const [focused, setFocused] = React.useState(false);
   const [hover, setHover] = React.useState(false);
@@ -238,11 +239,18 @@ const Input = ({
           placeholder={placeholder}
           disabled={disabled}
           required={required}
+          name={name}
+          autoFocus={autoFocus}
+          autoComplete={autoComplete}
+          inputMode={inputMode}
+          maxLength={maxLength}
+          pattern={pattern}
           aria-invalid={!!error || undefined}
           aria-describedby={hintId}
           aria-label={!label ? ariaLabel : undefined}
           onFocus={(e) => {setFocused(true);onFocus?.(e);}}
           onBlur={(e) => {setFocused(false);onBlur?.(e);}}
+          onKeyDown={onKeyDown}
           className="input-bare"
           style={{
             flex: 1, minWidth: 0, background: "transparent",
