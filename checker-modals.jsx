@@ -577,23 +577,29 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup }) {
               {t("ec.handoff.title", { plan: t(rec.plan.nameKey) })}
             </h2>
             <p className="ec-handoff__lead">{t("ec.handoff.lead")}</p>
+            {/* Stacked action pair — primary "Start setup" + secondary
+                "Or send me the full proposal" — matches the
+                AlteryPay DS pattern used by ResumeModal in onboarding
+                (full-width primary on top, ghost full-width below). */}
             <div className="ec-handoff__actions">
               <Button
                 variant="primary"
                 size="xl"
+                full
                 onClick={onContinueToSetup}
                 iconRight="arrowRight"
               >
                 {t("ec.handoff.continue")}
               </Button>
+              <Button
+                variant="ghost"
+                size="xl"
+                full
+                onClick={() => setStage("email")}
+              >
+                {t("ec.handoff.emailOnly")}
+              </Button>
             </div>
-            <button
-              className="ec-handoff__altLink"
-              type="button"
-              onClick={() => setStage("email")}
-            >
-              {t("ec.handoff.emailOnly")}
-            </button>
           </>
         )}
 

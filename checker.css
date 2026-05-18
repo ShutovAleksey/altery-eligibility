@@ -1665,6 +1665,12 @@
       color: var(--c-ink);
       margin: 0 0 6px;
     }
+    /* Email input on the handoff modal. The whole field uses DS tokens
+       (--r-md radius, --sh-focus ring) so its focus state matches every
+       other Input in the app. We render a bespoke <input> here rather
+       than the DS <Input> because we need extra HTML attributes
+       (inputMode="email", autoComplete="email", autoFocus, onKeyDown
+       for Enter-to-submit) that the slim DS Input doesn't pass through. */
     .ec-handoff__input {
       width: 100%;
       box-sizing: border-box;
@@ -1673,20 +1679,21 @@
       color: var(--c-ink);
       background: var(--c-surface);
       border: 1px solid var(--c-border);
-      border-radius: 10px;
+      border-radius: var(--r-md);
       font-family: inherit;
-      transition: border-color .15s ease, box-shadow .15s ease;
+      transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
     }
     .ec-handoff__input::placeholder { color: var(--c-muted); }
     .ec-handoff__input:hover { border-color: var(--c-muted-2); }
     .ec-handoff__input:focus {
       outline: none;
-      border-color: var(--c-primary);
-      box-shadow: 0 0 0 3px rgba(0, 39, 128, .12);
+      border-color: var(--c-accent);
+      box-shadow: var(--sh-focus);
     }
-    .ec-handoff__input.is-error { border-color: var(--c-danger, #C03A2B); }
+    .ec-handoff__input.is-error { border-color: var(--c-danger); }
     .ec-handoff__input.is-error:focus {
-      box-shadow: 0 0 0 3px rgba(192, 58, 43, .12);
+      border-color: var(--c-danger);
+      box-shadow: var(--sh-focus-danger);
     }
     .ec-handoff__input:disabled {
       background: var(--c-bg);
@@ -1727,34 +1734,6 @@
       display: inline-flex; align-items: center; justify-content: center;
       margin: 4px 0 16px;
     }
-    /* Secondary "Email me the analysis" path link — button styled as
-       text-link so it sits below the primary CTA without competing.
-       Centered under the action stack; tap target stays comfortable
-       through generous vertical padding. */
-    .ec-handoff__altLink {
-      display: block;
-      margin: 14px auto 0;
-      background: none;
-      border: 0;
-      padding: 8px 12px;
-      font-family: inherit;
-      font-size: 13.5px;
-      font-weight: 500;
-      color: var(--c-primary);
-      cursor: pointer;
-      text-decoration: underline;
-      text-underline-offset: 3px;
-      text-decoration-thickness: 1px;
-      border-radius: 6px;
-      transition: opacity .15s ease;
-    }
-    .ec-handoff__altLink:hover { opacity: 0.75; }
-    .ec-handoff__altLink:disabled { opacity: 0.4; cursor: not-allowed; }
-    .ec-handoff__altLink:focus-visible {
-      outline: 2px solid var(--c-primary);
-      outline-offset: 2px;
-    }
-
     /* Value-prop list — three concrete bullets shown on email stage
        so the user reads what they're getting before they type. Each
        bullet a single concrete deliverable, with the first one
