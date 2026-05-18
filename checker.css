@@ -2682,3 +2682,433 @@
        Transition extended to include transform; only :active applies it,
        so border/bg shifts on hover/select stay smooth. */
     .ec-chip:active { transform: scale(0.97); }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       RESULT PAGE V3 — design ported from /business-ds project
+       (Eligibility Checker.html in the design archive).
+       New visual language:
+         - Dark-gradient hero card with pills + IBAN chip
+         - Two-column grid: savings comparison + plan card
+         - EcPerks slider preserved between grid and coverage strip
+         - Coverage strip with country pills + "+N more via SWIFT"
+         - Caveats card (when present)
+         - Action bar — primary CTA + expandable email capture + footer reset
+       Class prefix .ec-r__ — coexists with legacy .ec-result__ classes
+       until the redesign is confirmed and a follow-up commit prunes the dead
+       rules. CSS values mostly verbatim from the design source; some token
+       names swapped to match our project's existing custom-property set.
+       ════════════════════════════════════════════════════════════════════════ */
+    .ec-r { display: flex; flex-direction: column; gap: 20px; }
+    .ec-r__backLink { align-self: flex-start; margin-bottom: 4px; }
+
+    /* ── Hero ─────────────────────────────────────────────────────── */
+    .ec-r__hero {
+      position: relative;
+      border-radius: 24px;
+      background:
+        radial-gradient(120% 80% at 100% 0%, rgba(0, 111, 255, .32) 0%, transparent 55%),
+        linear-gradient(160deg, #000C2E 0%, #001A5C 55%, #002780 100%);
+      color: #fff;
+      overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0, 12, 46, .22);
+    }
+    .ec-r__hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      mask-image: radial-gradient(80% 60% at 30% 80%, #000 0%, transparent 80%);
+    }
+    .ec-r__hero__inner {
+      position: relative; z-index: 1;
+      padding: 36px 36px 32px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .ec-r__heroEyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, .72);
+    }
+    .ec-r__heroEyebrow__dot {
+      width: 6px; height: 6px; border-radius: 999px;
+      background: #2EE08A;
+      box-shadow: 0 0 0 4px rgba(46, 224, 138, .18);
+    }
+    .ec-r__heroTitle {
+      margin: 0;
+      font-size: 40px; line-height: 1.08; font-weight: 700;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
+      color: #fff;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .ec-r__heroTitle__entity { color: #fff; }
+    .ec-r__heroTitle__rest {
+      color: rgba(255, 255, 255, .72);
+      font-weight: 500;
+    }
+    .ec-r__heroTitle__rest b {
+      color: #80B3FF;
+      font-weight: 700;
+    }
+    .ec-r__heroLead {
+      margin: 0;
+      font-size: 14px; line-height: 1.55;
+      color: rgba(255, 255, 255, .76);
+      max-width: 540px;
+    }
+    .ec-r__pills {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-top: 4px;
+    }
+    .ec-r__pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 14px;
+      background: rgba(255, 255, 255, .06);
+      border: 1px solid rgba(255, 255, 255, .14);
+      border-radius: 999px;
+      font-size: 12px; font-weight: 500;
+      color: rgba(255, 255, 255, .92);
+    }
+    .ec-r__pill--live { padding-left: 10px; }
+    .ec-r__pill__dot {
+      width: 6px; height: 6px; border-radius: 999px;
+      background: #2EE08A;
+      box-shadow: 0 0 0 3px rgba(46, 224, 138, .22);
+    }
+    /* IBAN preview — subtle dark chip inside the hero */
+    .ec-r__iban { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+    .ec-r__iban__chip {
+      display: inline-flex; align-items: center; gap: 12px;
+      width: fit-content; max-width: 100%;
+      padding: 10px 16px 10px 10px;
+      background: rgba(0, 0, 0, .28);
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 12px;
+      color: rgba(255, 255, 255, .92);
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum";
+    }
+    .ec-r__iban__flag {
+      width: 22px; height: 22px; border-radius: 999px; overflow: hidden;
+      background: rgba(255,255,255,.08);
+      flex: 0 0 22px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .ec-r__iban__currency { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; }
+    .ec-r__iban__sep {
+      width: 1px; height: 18px;
+      background: rgba(255, 255, 255, .18);
+    }
+    .ec-r__iban__body {
+      font-size: 13px; letter-spacing: 0.06em;
+      color: rgba(255, 255, 255, .78);
+    }
+    .ec-r__iban__caption {
+      font-size: 11px; color: rgba(255, 255, 255, .48);
+      letter-spacing: 0.01em;
+    }
+
+    /* ── Two-column grid: savings + plan ─────────────────────────── */
+    .ec-r__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 720px) {
+      .ec-r__grid { grid-template-columns: 1fr; }
+    }
+    .ec-r__card {
+      background: #fff;
+      border: 1px solid var(--c-border);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 2px 4px rgba(17, 20, 26, .02);
+    }
+    .ec-r__cardEyebrow {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+      margin-bottom: 14px;
+    }
+
+    /* ── Savings card ─────────────────────────────────────────────── */
+    .ec-r__savings { gap: 0; }
+    .ec-r__compare {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0 18px;
+      border-bottom: 1px dashed var(--c-border-soft);
+    }
+    .ec-r__compare__col {
+      display: flex; flex-direction: column; gap: 2px;
+      min-width: 0;
+    }
+    .ec-r__compare__label {
+      font-size: 11px; font-weight: 600; letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+    }
+    .ec-r__compare__amount {
+      font-size: 22px; font-weight: 700;
+      color: var(--c-ink);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+      margin-top: 2px;
+    }
+    .ec-r__compare__amount--strike {
+      color: var(--c-muted-2);
+      text-decoration: line-through;
+      text-decoration-color: var(--c-muted-2);
+      text-decoration-thickness: 1.5px;
+    }
+    .ec-r__compare__col--us .ec-r__compare__amount { color: var(--c-primary); }
+    .ec-r__compare__cycle {
+      font-size: 11px; color: var(--c-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .ec-r__compare__arrow {
+      width: 32px; height: 32px;
+      border-radius: 999px;
+      background: var(--c-accent-soft);
+      color: var(--c-accent);
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .ec-r__savingsHero {
+      padding: 20px 0 16px;
+      display: flex; flex-direction: column;
+      align-items: baseline;
+      gap: 2px;
+    }
+    .ec-r__savingsHero__label {
+      font-size: 12px; font-weight: 500;
+      color: var(--c-muted);
+    }
+    .ec-r__savingsHero__amount {
+      font-size: 44px; font-weight: 700;
+      color: var(--c-primary);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      display: inline-flex; align-items: baseline;
+      margin: 2px 0;
+    }
+    .ec-r__savingsHero__cycle {
+      font-size: 16px; font-weight: 500;
+      color: var(--c-primary);
+      opacity: .7;
+      margin-left: 6px;
+    }
+    .ec-r__savingsHero__year {
+      font-size: 13px; font-weight: 500;
+      color: var(--c-ink-2);
+      font-variant-numeric: tabular-nums;
+    }
+    .ec-r__savings__note {
+      margin: 0;
+      font-size: 12px; line-height: 1.55;
+      color: var(--c-muted);
+      padding-top: 12px;
+      border-top: 1px solid var(--c-border-soft);
+    }
+
+    /* ── Plan card v2 ─────────────────────────────────────────────── */
+    .ec-r__plan2 { gap: 0; }
+    .ec-r__planHead {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 12px; margin-bottom: 18px;
+    }
+    .ec-r__planHead > div:first-child { min-width: 0; }
+    .ec-r__planFit {
+      font-size: 13px; color: var(--c-ink-2);
+      margin-top: 2px;
+    }
+    .ec-r__planPrice {
+      display: inline-flex; align-items: baseline; gap: 4px;
+      flex: 0 0 auto;
+    }
+    .ec-r__planPrice__amount {
+      font-size: 28px; font-weight: 700;
+      color: var(--c-ink);
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+    }
+    .ec-r__planPrice__cycle {
+      font-size: 12px; color: var(--c-muted);
+      font-weight: 500;
+    }
+    .ec-r__perks {
+      list-style: none; margin: 0; padding: 16px 0;
+      display: flex; flex-direction: column; gap: 10px;
+      font-size: 13px; color: var(--c-ink-2); line-height: 1.45;
+      border-top: 1px solid var(--c-border-soft);
+    }
+    .ec-r__perk {
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .ec-r__perk__tick {
+      flex: 0 0 18px; width: 18px; height: 18px; border-radius: 999px;
+      background: var(--c-primary-soft);
+      color: var(--c-primary);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .ec-r__planFoot {
+      display: flex; flex-direction: column; gap: 6px;
+      padding-top: 12px;
+      border-top: 1px solid var(--c-border-soft);
+    }
+    .ec-r__planFoot__link {
+      font-size: 13px; font-weight: 500;
+      color: var(--c-accent);
+      cursor: pointer;
+      background: none; border: 0; padding: 0;
+      font-family: inherit;
+      text-align: left;
+      align-self: flex-start;
+    }
+    .ec-r__planFoot__link:hover { text-decoration: underline; }
+    .ec-r__planFoot__sub {
+      font-size: 12px; color: var(--c-muted);
+    }
+
+    /* ── Coverage strip ───────────────────────────────────────────── */
+    .ec-r__coverage {
+      background: #fff;
+      border: 1px solid var(--c-border);
+      border-radius: 20px;
+      padding: 20px 24px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 2px 4px rgba(17, 20, 26, .02);
+    }
+    .ec-r__coverage .ec-r__cardEyebrow { margin-bottom: 12px; }
+    .ec-r__coverage__row {
+      display: flex; flex-wrap: wrap; align-items: center;
+      gap: 8px 18px;
+    }
+    .ec-r__coverage__flags {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    .ec-r__coverage__flag {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px 6px 8px;
+      border: 1px solid var(--c-border);
+      border-radius: 999px;
+      font-size: 13px; font-weight: 500;
+      color: var(--c-ink);
+      background: var(--c-surface-2, #fafbfc);
+    }
+    .ec-r__coverage__more {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; color: var(--c-muted);
+      margin-left: auto;
+    }
+    .ec-r__coverage__moreIcon {
+      width: 22px; height: 22px; border-radius: 999px;
+      background: var(--c-bg-2);
+      color: var(--c-muted);
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    /* ── Caveats ──────────────────────────────────────────────────── */
+    .ec-r__caveats {
+      background: #fff;
+      border: 1px solid var(--c-border);
+      border-radius: 20px;
+      padding: 20px 24px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 2px 4px rgba(17, 20, 26, .02);
+    }
+    .ec-r__caveatsList {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .ec-r__caveatsRow {
+      display: grid; grid-template-columns: auto 1fr;
+      gap: 12px; align-items: flex-start;
+      font-size: 13px; line-height: 1.5;
+      color: var(--c-ink-2);
+    }
+
+    /* ── Action bar ───────────────────────────────────────────────── */
+    .ec-r__action {
+      display: flex; flex-direction: column; gap: 12px;
+      padding: 24px;
+      background: linear-gradient(180deg, #fff 0%, var(--c-bg-2) 140%);
+      border: 1px solid var(--c-border);
+      border-radius: 20px;
+      box-shadow: 0 2px 4px rgba(17, 20, 26, .02);
+    }
+    .ec-r__action__primary {
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+    }
+    .ec-r__action__primary > button:first-child {
+      flex: 1; min-width: 220px;
+    }
+    .ec-r__action__secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 18px;
+      background: transparent;
+      border: 1px solid var(--c-border-strong);
+      border-radius: 14px;
+      font: inherit;
+      font-size: 14px; font-weight: 500;
+      color: var(--c-ink);
+      cursor: pointer;
+      transition: border-color .12s, background .12s, color .12s;
+      height: 52px;
+    }
+    .ec-r__action__secondary:hover {
+      border-color: var(--c-primary);
+      color: var(--c-primary);
+      background: var(--c-primary-soft);
+    }
+    .ec-r__action__foot {
+      display: flex; align-items: center; gap: 10px;
+      padding-top: 4px;
+      font-size: 12px; color: var(--c-muted);
+      flex-wrap: wrap;
+    }
+    .ec-r__action__reset {
+      background: transparent; border: 0; padding: 0;
+      color: var(--c-muted);
+      font: inherit;
+      font-size: 12px; font-weight: 500;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-color: var(--c-border-strong);
+    }
+    .ec-r__action__reset:hover { color: var(--c-ink); text-decoration-color: currentColor; }
+    .ec-r__action__sep {
+      width: 1px; height: 12px;
+      background: var(--c-border);
+    }
+    .ec-r__action__foot a { color: var(--c-accent); font-weight: 500; }
+    .ec-r__action__foot a:hover { text-decoration: underline; }
+
+    /* ── Mobile tuning ────────────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .ec-r { gap: 16px; }
+      .ec-r__hero { border-radius: 20px; }
+      .ec-r__hero__inner { padding: 24px 22px; gap: 14px; }
+      .ec-r__heroTitle { font-size: 30px; }
+      .ec-r__card { padding: 20px; border-radius: 18px; }
+      .ec-r__coverage,
+      .ec-r__caveats,
+      .ec-r__action { padding: 18px 20px; border-radius: 18px; }
+      .ec-r__compare { grid-template-columns: 1fr auto 1fr; gap: 6px; }
+      .ec-r__compare__amount { font-size: 18px; }
+      .ec-r__savingsHero__amount { font-size: 36px; }
+      .ec-r__planPrice__amount { font-size: 24px; }
+      .ec-r__action__primary { flex-direction: column; }
+      .ec-r__action__primary > * { width: 100%; flex: none; }
+      .ec-r__action__secondary { justify-content: center; }
+    }
