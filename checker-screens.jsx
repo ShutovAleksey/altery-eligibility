@@ -52,24 +52,27 @@ const EcIco = {
   // mirroring the conventional "i" glyph. Used in the crypto-reroute
   // callout to signal "here's an explanation" rather than "warning".
   info: (p) => <svg viewBox="0 0 16 16" fill="none" {...p}><circle cx="8" cy="8" r="6.5" stroke="currentColor" strokeWidth="1.4"/><path d="M8 5.2v.3M8 7v3.8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>,
-  // ─── Intro value-card icons ──────────────────────────────
-  // Three Tabler icons (MIT-licensed) used in the intro screen's
-  // value cards. Chosen over generic globe/info/alert to give each
-  // card a content-specific visual hook:
-  //   • route — two waypoints with an S-curve path between them.
-  //     Communicates "we route you to the right entity first time"
-  //     for Card 1's "No 'wrong entity' restart" value-prop.
-  //   • eye — classic eye shape with pupil. Communicates
-  //     transparency / visibility for Card 2's "Caveats now, not
-  //     after KYB" — we *show* you the limitations upfront.
-  //   • ban — universal "prohibited" symbol (circle with diagonal
-  //     slash). Communicates blocked / not-allowed for Card 3's
-  //     "Fast no's, not slow no's" — clearer than a generic alert.
-  // All three use stroke-width 1.6 to match the rest of EcIco's
-  // outline family (chess pieces, search, copy, close, info).
+  // ─── Intro value-card + eyebrow icons ───────────────────
+  // Outline-stroke 1.6 icons aligned with the rest of the EcIco family.
+  //   • route / eye / ban — kept (used elsewhere in the checker).
+  //   • sparkles — 4-point star plus two accent dots. Lives inline with
+  //     the intro eyebrow ("Personalised plan · 90 seconds") to give a
+  //     small but unmistakable "this is built just for you" cue before
+  //     the user reads the title.
+  //   • target — concentric rings with a solid centre dot. Communicates
+  //     "calibrated to you / aimed at your situation" for Row 1 of the
+  //     intro value list ("A plan tailored to your business"). Stronger
+  //     than the previous "route" icon, which read more like wayfinding.
+  //   • stack — three offset layers. Communicates "a kit of products
+  //     stacked together" for Row 2 ("Every product we'd open for you")
+  //     — fits the products-on-offer story better than the previous
+  //     "bolt" icon, which read as speed/energy.
   route: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 19a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path d="M19 7a2 2 0 1 0 0 -4a2 2 0 0 0 0 4"/><path d="M11 19h5.5a3.5 3.5 0 0 0 0 -7h-8a3.5 3.5 0 0 1 0 -7h4.5"/></svg>,
   eye: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0"/><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6"/></svg>,
   ban: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"/><path d="M5.7 5.7l12.6 12.6"/></svg>,
+  sparkles: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M11 4l1.8 5.4l5.4 1.8l-5.4 1.8l-1.8 5.4l-1.8 -5.4l-5.4 -1.8l5.4 -1.8z"/><circle cx="19" cy="5" r="1.2" fill="currentColor" stroke="none"/><circle cx="20" cy="18" r="0.9" fill="currentColor" stroke="none"/></svg>,
+  target: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/></svg>,
+  stack: (p) => <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" {...p}><path d="M12 3l9 5l-9 5l-9 -5z"/><path d="M3 12l9 5l9 -5"/><path d="M3 17l9 5l9 -5"/></svg>,
   search: (p) => <svg viewBox="0 0 24 24" fill="none" {...p}><circle cx="11" cy="11" r="6.5" stroke="currentColor" strokeWidth="1.6"/><path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
   copy: (p) => <svg viewBox="0 0 16 16" fill="none" {...p}><rect x="5" y="5" width="8" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.4"/><path d="M3.5 10.5V4.5A1.5 1.5 0 0 1 5 3h6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/></svg>,
   close: (p) => <svg viewBox="0 0 16 16" fill="none" {...p}><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/></svg>,
@@ -230,8 +233,17 @@ function EcIntro({ onStart }) {
   const t = useT();
   return (
     <div className="ec-content fade-in">
+      {/* Eyebrow with an inline sparkle icon — visual "this is built
+          specifically for you" cue before the user reads the title.
+          Title accepts JSX as `eyebrow`, so we compose a span here
+          instead of inserting markup into the i18n string. */}
       <Title display
-        eyebrow={t("ec.intro.eyebrow")}
+        eyebrow={
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <EcIco.sparkles style={{ width: 14, height: 14 }} aria-hidden="true" />
+            {t("ec.intro.eyebrow")}
+          </span>
+        }
         title={t("ec.intro.title")}
         lead={t("ec.intro.lead", { total: TOTAL_STEPS })} />
 
@@ -239,19 +251,19 @@ function EcIntro({ onStart }) {
         {/* Sales-led ordering — three claims, narrowing from setup to
             wallet: (1) we tailor a plan to you, (2) here is what we
             would open and which products you'd get, (3) here is the
-            monthly cost. The user does not care which entity issues
-            the account; they care whether it opens and what it costs.
-            Row 3 (cost) carries the success-green accent because
-            that's the line that closes the sale. */}
+            monthly cost. Row 3 (cost) carries the success-green
+            accent because that's the line that closes the sale.
+            Icons: target = calibrated to you, stack = kit of products,
+            banknote = money. */}
         <div className="ec-value__row">
-          <span className="ec-value__icon"><EcIco.route style={{ width: 18, height: 18 }} /></span>
+          <span className="ec-value__icon"><EcIco.target style={{ width: 18, height: 18 }} /></span>
           <div>
             <div className="ec-value__title">{t("ec.intro.value1.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value1.body")}</div>
           </div>
         </div>
         <div className="ec-value__row">
-          <span className="ec-value__icon" style={{ background: "var(--c-warning-soft)", color: "var(--c-warning)" }}><EcIco.bolt style={{ width: 18, height: 18 }} /></span>
+          <span className="ec-value__icon" style={{ background: "var(--c-warning-soft)", color: "var(--c-warning)" }}><EcIco.stack style={{ width: 18, height: 18 }} /></span>
           <div>
             <div className="ec-value__title">{t("ec.intro.value2.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value2.body")}</div>
