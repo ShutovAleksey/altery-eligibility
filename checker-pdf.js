@@ -906,7 +906,7 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       ? forwardedBy.trim()
       : "";
     const forwardedByBanner = safeForwarder
-      ? t("ec.email.forwarded.banner", { forwarder: safeForwarder })
+      ? t("ec.email.forwarded.banner", { forwarder: safeForwarder, plan: planName })
       : "";
     const forwardedByLabel = safeForwarder
       ? t("ec.email.forwarded.label")
