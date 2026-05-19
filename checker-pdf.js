@@ -558,6 +558,53 @@ ${checklistHTML}
 // content is approximated by character-ratio across lines (not
 // word-perfect, but selection rectangles align with the bitmap text
 // well enough that drag-select-and-copy produces the right output).
+// Walk the rendered DOM for <a href> elements and overlay a clickable
+// link annotation on the current PDF page wherever they appear. This is
+// the bitmap-PDF analogue of a real hyperlink — pdf.link() adds an
+// invisible hot-zone region that PDF readers treat as clickable; on
+// click the reader opens the target URL.
+//
+// Without these annotations, our html2canvas pipeline produces a PDF
+// where any <a href="..."> in the source HTML renders as plain visible
+// text — the underlying anchor tag is flattened to pixels and stripped
+// of clickability. Adding pdf.link() restores it.
+//
+// Multi-line links use Range.getClientRects() so each visually-wrapped
+// line gets its own hit region — selecting / clicking on line 2 of a
+// wrapped link still routes to the same URL.
+function ecAddLinkAnnotations(pdf, target, sliceTopPx, sliceBottomPx, pxPerMm, canvasScale) {
+  const targetRect = target.getBoundingClientRect();
+  const anchors = target.querySelectorAll("a[href]");
+  for (const a of anchors) {
+    const url = a.getAttribute("href");
+    if (!url) continue;
+    // Skip in-page anchors and mailto/tel (mailto's the email client's
+    // problem already — actually let's keep these too since they're
+    // genuinely useful in a printed proposal); only really skip empty
+    // or javascript: hrefs.
+    if (url.startsWith("javascript:") || url === "#") continue;
+
+    const range = document.createRange();
+    range.selectNodeContents(a);
+    const rects = range.getClientRects();
+    if (!rects.length) continue;
+
+    for (const rect of rects) {
+      const topCanvasPx    = (rect.top    - targetRect.top) * canvasScale;
+      const bottomCanvasPx = (rect.bottom - targetRect.top) * canvasScale;
+      // Skip rects whose entire vertical range falls outside this page.
+      if (bottomCanvasPx <= sliceTopPx || topCanvasPx >= sliceBottomPx) continue;
+
+      const xMm    = (rect.left - targetRect.left) * canvasScale / pxPerMm;
+      const wMm    = rect.width  * canvasScale / pxPerMm;
+      const hMm    = rect.height * canvasScale / pxPerMm;
+      const yPageMm = (topCanvasPx - sliceTopPx) / pxPerMm;
+      // jsPDF.link signature: link(x, y, w, h, { url })
+      pdf.link(xMm, yPageMm, wMm, hMm, { url });
+    }
+  }
+}
+
 function ecAddInvisibleTextLayer(pdf, target, sliceTopPx, sliceBottomPx, pxPerMm, canvasScale) {
   const targetRect = target.getBoundingClientRect();
   const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT, {
@@ -808,6 +855,11 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
       // Font is the jsPDF default Helvetica — sizes track CSS computed
       // font-size; positions track each text-rect's bounding box.
       ecAddInvisibleTextLayer(pdf, target, sliceY, sliceEndY, pxPerMm, CANVAS_SCALE);
+      // And: hyperlink hot-zones for every <a href> element on this page,
+      // so the "Schedule a 15-min intro call" CTA (and any other anchors)
+      // are actually clickable in the resulting PDF. Without this the
+      // bitmap-PDF strips clickability — anchor tags flatten to pixels.
+      ecAddLinkAnnotations(pdf, target, sliceY, sliceEndY, pxPerMm, CANVAS_SCALE);
 
       sliceY  = sliceEndY;
       pageIdx += 1;
