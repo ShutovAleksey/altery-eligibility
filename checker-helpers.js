@@ -212,6 +212,22 @@ function ecEstimateTxCount(monthlyVolume) {
 // are larger, but the math we show has to survive scrutiny.
 //
 // Assumptions documented inline so future-us can audit them:
+// Parse a fee string like "€10 + 0.25%" or "€15 + 0.5%" into a flat+pct
+// pair the cost math can work with. Pct strings like "up to 0.8%" parse
+// to 0.008; bare numbers parse to flat only. Anything unparseable falls
+// back to {flat: 0, pct: 0} so a missing field can never throw.
+function ecParseFee(raw) {
+  if (!raw || typeof raw !== "string") return { flat: 0, pct: 0 };
+  // Match an optional currency-symbol + number for flat, and an optional
+  // "+ X%" or "X%" for the percentage part.
+  const flatMatch = raw.match(/[€£$]\s*([\d.]+)/);
+  const pctMatch  = raw.match(/([\d.]+)\s*%/);
+  return {
+    flat: flatMatch ? parseFloat(flatMatch[1]) : 0,
+    pct:  pctMatch  ? parseFloat(pctMatch[1])  / 100 : 0,
+  };
+}
+
 function ecComputeCostBreakdown(rec) {
   const vol = rec?.monthlyVolume || 0;
   if (vol < 1000) return null;  // not enough to project credibly
@@ -222,15 +238,26 @@ function ecComputeCostBreakdown(rec) {
   // (~20-40%), high-growth marketplaces often run >80%.
   const fxVolume = vol * 0.60;
 
-  // Altery rails (from public fees page, business plan tier):
-  const ALTERY_FX_MARKUP  = 0.0065;  // 0.65% — mid of 0.5–0.7% Pro range
-  const ALTERY_SWIFT_FLAT = 10;       // €10 per outgoing
-  const ALTERY_SWIFT_PCT  = 0.0025;   // + 0.25% of tx value
-  const ALTERY_LOCAL      = 1;        // €1 per SEPA/FPS
+  // Altery rails — read the active plan's published fees so the
+  // projection moves with plan tier. Each plan exposes a fees object:
+  //   { sepa: "€1", swift: "€10 + 0.25%", fxMarkup: "up to 0.7%" }
+  // We parse the strings once here and use them as multipliers below.
+  // Falls back to the historical Pro-tier defaults if a field is
+  // missing — this keeps the helper resilient if a plan is added
+  // without all fee fields populated.
+  const planFees = rec.plan?.fees || {};
+  const fxFee    = ecParseFee(planFees.fxMarkup);
+  const swiftFee = ecParseFee(planFees.swift);
+  const sepaFee  = ecParseFee(planFees.sepa);
+  const ALTERY_FX_MARKUP  = fxFee.pct    || 0.0065;
+  const ALTERY_SWIFT_FLAT = swiftFee.flat || 10;
+  const ALTERY_SWIFT_PCT  = swiftFee.pct  || 0.0025;
+  const ALTERY_LOCAL      = sepaFee.flat  || 1;
 
   // Industry-average traditional business bank (HSBC/Barclays/
   // Deutsche/Santander SMB tier — public retail business pricing,
-  // averaged):
+  // averaged). Plan-independent — the comparison side is always the
+  // same legacy bank baseline.
   const BANK_FX_MARKUP   = 0.025;     // 2.5% — typical mid of 2–4% spread
   const BANK_SWIFT_FLAT  = 40;        // €40 per outgoing — typical
   const BANK_LOCAL       = 0.5;       // €0.50 — bank local cheaper but
