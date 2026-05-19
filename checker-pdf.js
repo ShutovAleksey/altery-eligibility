@@ -572,9 +572,10 @@ ${checklistHTML}
 // Multi-line links use Range.getClientRects() so each visually-wrapped
 // line gets its own hit region — selecting / clicking on line 2 of a
 // wrapped link still routes to the same URL.
-function ecAddLinkAnnotations(pdf, target, sliceTopPx, sliceBottomPx, pxPerMm, canvasScale) {
+function ecAddLinkAnnotations(pdf, target, sliceTopPx, sliceBottomPx, pxPerMm, canvasScale, pageTopMm) {
   const targetRect = target.getBoundingClientRect();
   const anchors = target.querySelectorAll("a[href]");
+  const topOffsetMm = pageTopMm || 0;
   for (const a of anchors) {
     const url = a.getAttribute("href");
     if (!url) continue;
@@ -598,15 +599,16 @@ function ecAddLinkAnnotations(pdf, target, sliceTopPx, sliceBottomPx, pxPerMm, c
       const xMm    = (rect.left - targetRect.left) * canvasScale / pxPerMm;
       const wMm    = rect.width  * canvasScale / pxPerMm;
       const hMm    = rect.height * canvasScale / pxPerMm;
-      const yPageMm = (topCanvasPx - sliceTopPx) / pxPerMm;
+      const yPageMm = topOffsetMm + (topCanvasPx - sliceTopPx) / pxPerMm;
       // jsPDF.link signature: link(x, y, w, h, { url })
       pdf.link(xMm, yPageMm, wMm, hMm, { url });
     }
   }
 }
 
-function ecAddInvisibleTextLayer(pdf, target, sliceTopPx, sliceBottomPx, pxPerMm, canvasScale) {
+function ecAddInvisibleTextLayer(pdf, target, sliceTopPx, sliceBottomPx, pxPerMm, canvasScale, pageTopMm) {
   const targetRect = target.getBoundingClientRect();
+  const topOffsetMm = pageTopMm || 0;
   const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT, {
     acceptNode: (n) => n.textContent.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
   });
@@ -635,7 +637,7 @@ function ecAddInvisibleTextLayer(pdf, target, sliceTopPx, sliceBottomPx, pxPerMm
       if (lineBottomCanvasPx <= sliceTopPx || lineTopCanvasPx >= sliceBottomPx) continue;
 
       const xMm = (rect.left - targetRect.left) * canvasScale / pxPerMm;
-      const pageRelTopMm = (lineTopCanvasPx - sliceTopPx) / pxPerMm;
+      const pageRelTopMm = topOffsetMm + (lineTopCanvasPx - sliceTopPx) / pxPerMm;
       // Baseline roughly = top + 80% of font-size (matches Helvetica's
       // ascender height ≈ 0.8 em). Imperfect for the actual rendered
       // font (Inter / IBM Plex Mono) but close enough — used for
@@ -800,14 +802,21 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
     const pageWidth  = pdf.internal.pageSize.getWidth();   // 210mm
     const pageHeight = pdf.internal.pageSize.getHeight();  // 297mm
 
-    // Reserve 12mm at the bottom of each page for the page-number
-    // line. We slice the captured canvas into chunks that fit in
-    // (pageHeight − footerHeight) instead of pageHeight, then
-    // stamp the page numbers into the reserved band after. This
-    // is cleaner than overlaying numbers on top of the rendered
-    // image, which would risk colliding with footer text.
-    const footerHeight    = 12;                 // mm reserved at bottom
-    const contentHeight   = pageHeight - footerHeight;
+    // Reserve breathing room at the top and bottom of every page. The
+    // captured canvas is one continuous render of the whole document;
+    // without explicit margins the slicer butted content right up against
+    // the page edge on every page after the first, which made the PDF
+    // feel cramped — text touching the top fold, no whitespace below the
+    // last paragraph before the page number band.
+    //
+    // We treat the page as: [topMargin][content area][bottomMargin], with
+    // the content image placed at y=topMargin and the page-number footer
+    // drawn inside bottomMargin. Width still maps 1:1 to pageWidth so
+    // content scale is unchanged — only the per-page slice height shrinks,
+    // which adds pages but preserves typography exactly.
+    const topMargin       = 14;                 // mm reserved at top
+    const bottomMargin    = 14;                 // mm reserved at bottom (incl. page number)
+    const contentHeight   = pageHeight - topMargin - bottomMargin;
     const pxPerMm         = canvas.width / pageWidth;
     const slicePxHeight   = Math.floor(contentHeight * pxPerMm);
 
@@ -845,7 +854,7 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       const sliceMmHeight = thisSlicePx / pxPerMm;
 
       if (pageIdx > 0) pdf.addPage();
-      pdf.addImage(sliceImgData, "JPEG", 0, 0, pageWidth, sliceMmHeight);
+      pdf.addImage(sliceImgData, "JPEG", 0, topMargin, pageWidth, sliceMmHeight);
 
       // Invisible text layer — for every text node intersecting this
       // slice, place its content at the matching position with PDF
@@ -853,13 +862,15 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       // not drawn; the bitmap underneath provides the actual visual).
       // Same trick OCR'd PDFs use for "scanned + searchable" documents.
       // Font is the jsPDF default Helvetica — sizes track CSS computed
-      // font-size; positions track each text-rect's bounding box.
-      ecAddInvisibleTextLayer(pdf, target, sliceY, sliceEndY, pxPerMm, CANVAS_SCALE);
+      // font-size; positions track each text-rect's bounding box. The
+      // last arg shifts every Y coordinate down by topMargin so the
+      // selection regions align with the image's new in-page origin.
+      ecAddInvisibleTextLayer(pdf, target, sliceY, sliceEndY, pxPerMm, CANVAS_SCALE, topMargin);
       // And: hyperlink hot-zones for every <a href> element on this page,
       // so the "Schedule a 15-min intro call" CTA (and any other anchors)
       // are actually clickable in the resulting PDF. Without this the
       // bitmap-PDF strips clickability — anchor tags flatten to pixels.
-      ecAddLinkAnnotations(pdf, target, sliceY, sliceEndY, pxPerMm, CANVAS_SCALE);
+      ecAddLinkAnnotations(pdf, target, sliceY, sliceEndY, pxPerMm, CANVAS_SCALE, topMargin);
 
       sliceY  = sliceEndY;
       pageIdx += 1;
