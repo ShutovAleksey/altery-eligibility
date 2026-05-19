@@ -541,485 +541,6 @@ ${checklistHTML}
 }
 
 // Convert a Blob to a base64 string (without the data:URL prefix).
-// ───────────────────────────────────────────────────────────────────────
-// Native PDF generator (replaces the html2canvas → bitmap pipeline).
-//
-// Why this rewrite: the user reported that the previous PDF (a) couldn't
-// have text copied / selected / searched, and (b) sliced elements mid-cut
-// across page boundaries. The first problem is fundamental to html2canvas
-// — it rasterises everything to pixels, so the resulting PDF is a glorified
-// scan. The invisible-text overlay trick worked for Latin only and broke
-// on Cyrillic / CJK because jsPDF's default font (Helvetica) has no
-// glyphs there.
-//
-// This module instead builds the PDF natively via jsPDF's text + rect +
-// line primitives, with the Inter variable font embedded for full
-// multi-language support (Inter covers Latin Extended + Cyrillic + Greek
-// in a single ~860 KB TTF). Every character is native PDF text — fully
-// selectable, fully searchable, fully copyable in any PDF reader.
-//
-// Trade-off accepted in exchange for that text quality:
-//   - The dark-navy radial-gradient hero band of the screen result page
-//     is replaced by a flat ink/navy header. jsPDF has no native gradient
-//     primitive; faking it via gridded fills looks worse than a clean flat.
-//   - Custom flag SVGs are not embedded — we use just the country code.
-//   - Visual fidelity is roughly Stripe/Mercury receipt-tier (clean,
-//     editorial, no ornament) rather than the marketing-grade hero card.
-//
-// File size benefit: ~80–200 KB native PDF vs ~900 KB bitmap PDF.
-
-// Lazy-load Inter font binary (~860 KB) on first PDF generation; cached
-// in window.__INTER_TTF afterwards. We fetch the static TTF from /fonts/,
-// base64-encode it, and hand to jsPDF's VFS so it can embed.
-async function ecLoadInterFont() {
-  if (window.__INTER_TTF) return window.__INTER_TTF;
-  const resp = await fetch("/fonts/Inter.ttf", { cache: "force-cache" });
-  if (!resp.ok) throw new Error("Failed to load /fonts/Inter.ttf: " + resp.status);
-  const buf = await resp.arrayBuffer();
-  // Base64-encode in 16 KB chunks — String.fromCharCode chokes on the
-  // full ~860 KB array via spread (call-stack overflow) in some engines.
-  const bytes = new Uint8Array(buf);
-  const CHUNK = 0x4000;
-  let binary = "";
-  for (let i = 0; i < bytes.length; i += CHUNK) {
-    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
-  }
-  window.__INTER_TTF = btoa(binary);
-  return window.__INTER_TTF;
-}
-
-// Build the entire proposal PDF natively. Returns nothing — mutates the
-// jsPDF instance directly. Caller is responsible for output / saving.
-function ecBuildNativePdf(pdf, rec, t) {
-  // ── Layout constants ─────────────────────────────────────────────
-  const PAGE_W = 210, PAGE_H = 297;        // A4 portrait, mm
-  const MARGIN = { top: 18, right: 18, bottom: 24, left: 18 };
-  const CONTENT_W = PAGE_W - MARGIN.left - MARGIN.right;  // 174 mm
-  const PT_TO_MM = 0.3528;                 // 1 pt ≈ 0.3528 mm
-
-  // Brand palette (mirrors the on-screen result-page tokens)
-  const C = {
-    ink:         [17, 20, 26],
-    inkSoft:     [75, 80, 99],
-    muted:       [105, 112, 124],
-    mutedSoft:   [155, 161, 170],
-    border:      [215, 218, 224],
-    borderSoft:  [232, 233, 237],
-    surface:     [255, 255, 255],
-    surfaceTint: [248, 247, 244],
-    beige:       [240, 235, 227],
-    beigeBorder: [229, 224, 213],
-    navy:        [0, 39, 128],
-    navyDark:    [0, 12, 46],
-    accent:      [0, 111, 255],
-    accentSoft:  [235, 241, 255],
-    orange:      [194, 65, 12],
-    orangeBg:    [255, 247, 237],
-    green:       [10, 159, 82],
-    white:       [255, 255, 255],
-  };
-
-  // ── Cursor + paint state ─────────────────────────────────────────
-  let y = MARGIN.top;
-  let onFirstPage = true;
-
-  pdf.setFont("Inter", "normal");
-
-  const setFill   = (rgb) => pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
-  const setStroke = (rgb) => pdf.setDrawColor(rgb[0], rgb[1], rgb[2]);
-  const setColor  = (rgb) => pdf.setTextColor(rgb[0], rgb[1], rgb[2]);
-
-  function newPage() {
-    pdf.addPage();
-    y = MARGIN.top;
-    onFirstPage = false;
-  }
-  function ensureSpace(needMm) {
-    if (y + needMm > PAGE_H - MARGIN.bottom) newPage();
-  }
-
-  // Compute the visual height a text string would occupy at given size +
-  // width (used for "ensure block fits on page or push to next" logic).
-  function measureText(text, size, maxW) {
-    pdf.setFontSize(size);
-    const lines = pdf.splitTextToSize(String(text), maxW);
-    return lines.length * size * 1.35 * PT_TO_MM;
-  }
-
-  // Draw a text block at the current Y. Advances Y. opts:
-  //   { size=10, color=C.ink, x=MARGIN.left, maxWidth=CONTENT_W,
-  //     align="left"|"center"|"right", lineHeight=1.35,
-  //     upper=false, letterSpacing=0 }
-  function drawText(text, opts = {}) {
-    const size = opts.size || 10;
-    const color = opts.color || C.ink;
-    const x = opts.x ?? MARGIN.left;
-    const maxW = opts.maxWidth ?? CONTENT_W;
-    const align = opts.align || "left";
-    const lineHeight = opts.lineHeight || 1.35;
-    let body = String(text == null ? "" : text);
-    if (opts.upper) body = body.toUpperCase();
-
-    pdf.setFontSize(size);
-    setColor(color);
-
-    if (opts.letterSpacing) {
-      pdf.setCharSpace(opts.letterSpacing);
-    }
-
-    const lines = pdf.splitTextToSize(body, maxW);
-    const lineMm = size * lineHeight * PT_TO_MM;
-    // Baseline is ~0.78 of font-size below top-of-line in mm
-    const ascentMm = size * 0.78 * PT_TO_MM;
-
-    for (const line of lines) {
-      ensureSpace(lineMm);
-      const tx = align === "right"  ? x + maxW
-              : align === "center" ? x + maxW / 2
-              : x;
-      pdf.text(line, tx, y + ascentMm, { align });
-      y += lineMm;
-    }
-
-    if (opts.letterSpacing) pdf.setCharSpace(0);
-  }
-
-  // Draw a filled / stroked rectangle at the current Y (or absolute Y if
-  // opts.yAbs provided). Does NOT advance Y on its own — callers that
-  // want the cursor to land beneath the box should add { advance: true }.
-  function drawRect(x, w, h, opts = {}) {
-    const yAt = opts.yAbs ?? y;
-    if (opts.fill && opts.stroke) {
-      setFill(opts.fill);
-      setStroke(opts.stroke);
-      pdf.setLineWidth(opts.lineWidth || 0.2);
-      pdf.roundedRect(x, yAt, w, h, opts.r || 0, opts.r || 0, "FD");
-    } else if (opts.fill) {
-      setFill(opts.fill);
-      pdf.roundedRect(x, yAt, w, h, opts.r || 0, opts.r || 0, "F");
-    } else if (opts.stroke) {
-      setStroke(opts.stroke);
-      pdf.setLineWidth(opts.lineWidth || 0.2);
-      pdf.roundedRect(x, yAt, w, h, opts.r || 0, opts.r || 0, "S");
-    }
-    if (opts.advance) y = yAt + h;
-  }
-
-  // Horizontal rule
-  function drawHr(opts = {}) {
-    const x = opts.x ?? MARGIN.left;
-    const w = opts.width ?? CONTENT_W;
-    const color = opts.color || C.borderSoft;
-    setStroke(color);
-    pdf.setLineWidth(opts.lineWidth || 0.2);
-    pdf.line(x, y, x + w, y);
-    if (opts.advance) y += (opts.gap || 4);
-  }
-
-  // ── Currency formatter — narrow no-break space thousands separator ──
-  const NBSP = " ";
-  const fmtMoney = (n, curr = "€") => curr + (Math.round(n) || 0).toLocaleString("en-US").replace(/,/g, NBSP);
-  const fmtVolume = (typeof window.ecFormatVolume === "function")
-    ? window.ecFormatVolume
-    : (n) => fmtMoney(n);
-
-  // ── Compute the recommendation breakdown — same helpers as on-screen ─
-  const cost = (typeof window.ecComputeCostBreakdown === "function")
-    ? window.ecComputeCostBreakdown(rec)
-    : null;
-  const outcomes = (cost && cost.savings && typeof window.ecOutcomesForSavings === "function")
-    ? window.ecOutcomesForSavings(cost.savings.annual || 0)
-    : [];
-
-  const entity = rec.entity || {};
-  const plan = rec.plan || {};
-  const entityName = t(entity.nameKey || "ec.entity.uk.name");
-  const entityLicence = t(entity.licenceKey || "ec.entity.uk.licence");
-  const entityNote = t(entity.noteKey || "ec.entity.uk.note");
-  const planName = t(plan.nameKey || "ec.plan.starter.name");
-  const planFit = t(plan.fitKey || "ec.plan.starter.fit");
-  const planPrice = plan.priceKey ? t(plan.priceKey) : (plan.price || "");
-  const planCycle = t(plan.cycleKey || "ec.plan.cycle.month");
-
-  // Persona line — only for ICP-aligned industries
-  const personaIndustries = ["saas", "apps", "games", "edtech", "affiliate", "creator", "crypto"];
-  const personaLine = rec.ind && personaIndustries.includes(rec.ind.value)
-    ? t("ec.r.persona." + rec.ind.value + ".line")
-    : "";
-
-  // ─────────────────────────────────────────────────────────────────
-  // SECTION: HEADER — Altery wordmark + entity status line
-  // ─────────────────────────────────────────────────────────────────
-  // Solid navy band, height ~24mm. Wordmark as bold text (we don't have
-  // the logo SVG renderable in jsPDF without rasterising it; the text
-  // wordmark is recognisable and stays selectable).
-  setFill(C.navyDark);
-  pdf.rect(0, 0, PAGE_W, 28, "F");
-  drawText("ALTERY", {
-    size: 18,
-    color: C.white,
-    x: MARGIN.left,
-    maxWidth: CONTENT_W,
-    letterSpacing: 0.5,
-  });
-  y -= 1;  // tighten before subtitle
-  drawText("Business finance for digital companies banks struggle to understand.", {
-    size: 9,
-    color: [180, 200, 230],
-    x: MARGIN.left,
-    maxWidth: CONTENT_W,
-  });
-  y = 36;  // jump below the band
-
-  // ─────────────────────────────────────────────────────────────────
-  // SECTION: HERO — proposal-style title block
-  // ─────────────────────────────────────────────────────────────────
-  if (personaLine) {
-    drawText(personaLine, { size: 11, color: C.accent });
-    y += 1;
-  }
-  drawText(t("ec.r.eyebrow") || "Recommended for your business", {
-    size: 9, color: C.muted, upper: true, letterSpacing: 0.6,
-  });
-  y += 2;
-  drawText(entityName, { size: 22, color: C.ink });
-  drawText((t("ec.r.title.middle") || "on the") + " " + planName + (t("ec.r.title.after") || " plan."), {
-    size: 22, color: C.muted,
-  });
-  y += 3;
-  drawText(t("ec.r.lead", { entity: entityName, licence: entityLicence, note: entityNote }), {
-    size: 11, color: C.inkSoft,
-  });
-  y += 4;
-  // Entity-status pill (beige)
-  const pillText = `${entityName} · ${entityLicence}`;
-  pdf.setFontSize(9);
-  const pillTextW = pdf.getTextWidth(pillText);
-  const pillW = pillTextW + 14;
-  drawRect(MARGIN.left, pillW, 8, { fill: C.beige, stroke: C.beigeBorder, r: 4 });
-  setFill(C.green);
-  pdf.circle(MARGIN.left + 4, y + 4, 1.2, "F");
-  setColor(C.ink);
-  pdf.text(pillText, MARGIN.left + 8, y + 5.4);
-  y += 14;
-
-  // ─────────────────────────────────────────────────────────────────
-  // SECTION: SAVINGS — comparison table + monthly saving hero band
-  // ─────────────────────────────────────────────────────────────────
-  if (cost && cost.savings && cost.savings.monthly >= 100) {
-    // Estimate height to push the whole block to next page if it won't fit
-    ensureSpace(80);
-
-    drawText(t("ec.r.savings.head") || "Your monthly costs — comparison", {
-      size: 9, color: C.muted, upper: true, letterSpacing: 0.6,
-    });
-    y += 3;
-
-    // Two-column comparison card
-    const cardH = 36;
-    const colW = (CONTENT_W - 6) / 2;
-    drawRect(MARGIN.left, colW, cardH, { stroke: C.border, r: 4 });
-    drawRect(MARGIN.left + colW + 6, colW, cardH, { stroke: C.border, r: 4 });
-
-    // Left col — Altery
-    pdf.setFontSize(9); setColor(C.muted);
-    pdf.text((t("ec.r.savings.altery") || "ALTERY").toUpperCase(), MARGIN.left + 6, y + 7);
-    pdf.setFontSize(12); setColor(C.ink);
-    const altX = MARGIN.left + 6;
-    let lineY = y + 14;
-    const altLines = [
-      ["Plan subscription", planPrice + " " + planCycle],
-      ["FX margin",         fmtMoney(cost.altery.fx)],
-      ["SWIFT cross-border", fmtMoney(cost.altery.swift)],
-      ["Local payments",    fmtMoney(cost.altery.local)],
-    ];
-    for (const [label, val] of altLines) {
-      pdf.setFontSize(10); setColor(C.inkSoft);
-      pdf.text(label, altX, lineY);
-      setColor(C.ink);
-      pdf.text(String(val), MARGIN.left + colW - 6, lineY, { align: "right" });
-      lineY += 6;
-    }
-    setStroke(C.borderSoft); pdf.setLineWidth(0.15);
-    pdf.line(MARGIN.left + 6, lineY - 3, MARGIN.left + colW - 6, lineY - 3);
-    pdf.setFontSize(11); setColor(C.ink);
-    pdf.text("Total / month", altX, lineY + 1);
-    pdf.text(fmtMoney(cost.altery.total), MARGIN.left + colW - 6, lineY + 1, { align: "right" });
-
-    // Right col — typical bank
-    const bankX = MARGIN.left + colW + 12;
-    pdf.setFontSize(9); setColor(C.muted);
-    pdf.text((t("ec.r.savings.bank") || "TYPICAL BUSINESS BANK").toUpperCase(), bankX, y + 7);
-    lineY = y + 14;
-    const bankLines = [
-      ["FX margin",         fmtMoney(cost.bank.fx)],
-      ["SWIFT cross-border", fmtMoney(cost.bank.swift)],
-      ["Local payments",    fmtMoney(cost.bank.local)],
-    ];
-    for (const [label, val] of bankLines) {
-      pdf.setFontSize(10); setColor(C.inkSoft);
-      pdf.text(label, bankX, lineY);
-      setColor(C.ink);
-      pdf.text(String(val), MARGIN.left + 2 * colW - 6 + 6, lineY, { align: "right" });
-      lineY += 6;
-    }
-    setStroke(C.borderSoft);
-    pdf.line(bankX, lineY - 3, MARGIN.left + 2 * colW - 6 + 6, lineY - 3);
-    pdf.setFontSize(11); setColor(C.ink);
-    pdf.text("Total / month", bankX, lineY + 1);
-    pdf.text(fmtMoney(cost.bank.total), MARGIN.left + 2 * colW - 6 + 6, lineY + 1, { align: "right" });
-
-    y += cardH + 6;
-
-    // Savings hero band
-    ensureSpace(28);
-    drawRect(MARGIN.left, CONTENT_W, 26, { fill: C.orangeBg, stroke: C.orange, r: 4, lineWidth: 0.4 });
-    pdf.setFontSize(9); setColor(C.orange);
-    pdf.text((t("ec.r.savings.heroLabel") || "YOUR MONTHLY SAVING").toUpperCase(), MARGIN.left + 8, y + 8);
-    pdf.setFontSize(22); setColor(C.orange);
-    pdf.text(fmtMoney(cost.savings.monthly), MARGIN.left + 8, y + 19);
-    pdf.setFontSize(11); setColor(C.orange);
-    const monthSuffix = (t("ec.r.savings.cycle") || "/month");
-    const monthW = pdf.getTextWidth(fmtMoney(cost.savings.monthly));
-    pdf.text(monthSuffix, MARGIN.left + 8 + monthW + 2, y + 19);
-    pdf.setFontSize(11); setColor(C.orange);
-    pdf.text(fmtMoney(cost.savings.annual) + " / year", MARGIN.left + CONTENT_W - 8, y + 19, { align: "right" });
-    y += 30;
-
-    drawText(t("ec.r.savings.note", { volume: fmtVolume(rec.monthlyVolume) }), {
-      size: 9, color: C.muted, lineHeight: 1.45,
-    });
-    y += 6;
-  }
-
-  // ─────────────────────────────────────────────────────────────────
-  // SECTION: OUTCOMES — "What €X / year could fund"
-  // ─────────────────────────────────────────────────────────────────
-  if (outcomes && outcomes.length) {
-    ensureSpace(40);
-    drawText((t("ec.pdf.outcomes.head", { amount: cost && cost.savings ? fmtMoney(cost.savings.annual) : "" }) || "WHAT THIS COULD FUND"), {
-      size: 9, color: C.muted, upper: true, letterSpacing: 0.6,
-    });
-    y += 3;
-    const boxH = Math.max(20, outcomes.length * 9 + 12);
-    drawRect(MARGIN.left, CONTENT_W, boxH, { fill: C.beige, r: 4 });
-    let boxY = y + 8;
-    for (const o of outcomes) {
-      setFill(C.navy);
-      pdf.circle(MARGIN.left + 8, boxY - 1, 1.4, "F");
-      setColor(C.ink);
-      pdf.setFontSize(10);
-      pdf.text(t(o.key, { value: o.value }), MARGIN.left + 14, boxY);
-      boxY += 8;
-    }
-    y += boxH + 6;
-  }
-
-  // ─────────────────────────────────────────────────────────────────
-  // SECTION: REASONING — "Why we recommend X" bullets
-  // ─────────────────────────────────────────────────────────────────
-  if (rec.reasoning && rec.reasoning.length) {
-    ensureSpace(30);
-    drawText(t("ec.r.reasoning.head", { plan: planName }) || "Why we recommend this plan", {
-      size: 9, color: C.muted, upper: true, letterSpacing: 0.6,
-    });
-    y += 3;
-    for (const r of rec.reasoning.slice(0, 3)) {
-      const bulletText = t(r.key, r.vars || {});
-      const bulletH = measureText(bulletText, 10, CONTENT_W - 8) + 2;
-      ensureSpace(bulletH);
-      // navy circle bullet
-      setFill(C.navy);
-      pdf.circle(MARGIN.left + 2.2, y + 2.5, 1.6, "F");
-      setColor(C.white);
-      pdf.setFontSize(7);
-      pdf.text("✓", MARGIN.left + 2.2, y + 3.3, { align: "center" });
-      // text body
-      drawText(bulletText, {
-        size: 10, color: C.inkSoft, x: MARGIN.left + 8, maxWidth: CONTENT_W - 8,
-      });
-      y += 1;
-    }
-    y += 4;
-  }
-
-  // ─────────────────────────────────────────────────────────────────
-  // SECTION: SERVICES — selected services list (from rec.services)
-  // ─────────────────────────────────────────────────────────────────
-  if (rec.services && rec.services.length) {
-    ensureSpace(20);
-    drawText(t("ec.pdf.services.head") || "Selected services", {
-      size: 9, color: C.muted, upper: true, letterSpacing: 0.6,
-    });
-    y += 3;
-    for (const svcId of rec.services) {
-      const svcLabelKey = "ec.q3.opt." + svcId + ".title";
-      const svcDescKey  = "ec.q3.opt." + svcId + ".desc";
-      const label = t(svcLabelKey);
-      const desc  = t(svcDescKey);
-      const labelH = measureText(label, 11, CONTENT_W - 4);
-      const descH  = desc && desc !== svcDescKey
-        ? measureText(desc, 9, CONTENT_W - 4) + 1
-        : 0;
-      ensureSpace(labelH + descH + 6);
-      drawRect(MARGIN.left, CONTENT_W, labelH + descH + 6, { fill: C.surfaceTint, r: 3 });
-      const startY = y;
-      drawText(label, { size: 11, color: C.ink, x: MARGIN.left + 6, maxWidth: CONTENT_W - 12 });
-      if (desc && desc !== svcDescKey) {
-        drawText(desc, { size: 9, color: C.muted, x: MARGIN.left + 6, maxWidth: CONTENT_W - 12 });
-      }
-      y = startY + labelH + descH + 7;
-    }
-    y += 2;
-  }
-
-  // ─────────────────────────────────────────────────────────────────
-  // SECTION: SETUP URL — big navy box with the personal /setup link
-  // ─────────────────────────────────────────────────────────────────
-  ensureSpace(30);
-  const refToken = (typeof window.ecGenProposalRef === "function") ? window.ecGenProposalRef() : "EL-0000";
-  const setupUrl = "altery.com/setup/" + refToken.toLowerCase().replace(/-/g, "");
-  drawText(t("ec.pdf.nextSteps.continueLabel") || "CONTINUE YOUR SETUP", {
-    size: 9, color: C.muted, upper: true, letterSpacing: 0.6,
-  });
-  y += 3;
-  drawRect(MARGIN.left, CONTENT_W, 18, { fill: C.navy, r: 4 });
-  pdf.setFontSize(14); setColor(C.white);
-  pdf.text(setupUrl, MARGIN.left + 8, y + 11);
-  y += 22;
-
-  // ─────────────────────────────────────────────────────────────────
-  // SECTION: VALIDITY + FOOTER
-  // ─────────────────────────────────────────────────────────────────
-  ensureSpace(20);
-  const validUntil = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-  drawText(t("ec.pdf.validity", { date: validUntil }) || `This proposal is valid for 30 days from issue (through ${validUntil}). Rates and conditions confirmed at activation.`, {
-    size: 8, color: C.muted, lineHeight: 1.45,
-  });
-  y += 6;
-
-  // Footer band — Altery legal line at the very bottom of the LAST page
-  const totalPages = pdf.internal.getNumberOfPages();
-  pdf.setPage(totalPages);
-  setFill(C.surfaceTint);
-  pdf.rect(0, PAGE_H - 18, PAGE_W, 18, "F");
-  setColor(C.ink);
-  pdf.setFontSize(9);
-  pdf.text("Altery", MARGIN.left, PAGE_H - 11);
-  pdf.setFontSize(8); setColor(C.muted);
-  pdf.text(t("ec.pdf.footer.entities") || "Altery Ltd (UK · FCA-licensed EMI) · Altery EU (CY · Central Bank of Cyprus EMI) · Altery MENA (DIFC · DFSA)",
-    MARGIN.left, PAGE_H - 6, { maxWidth: CONTENT_W });
-
-  // ─────────────────────────────────────────────────────────────────
-  // PAGE NUMBERS — stamp "n / N" centered above the footer band
-  // ─────────────────────────────────────────────────────────────────
-  for (let p = 1; p <= totalPages; p++) {
-    pdf.setPage(p);
-    pdf.setFontSize(8); setColor(C.muted);
-    pdf.text(`${p} / ${totalPages}`, PAGE_W / 2, PAGE_H - 20, { align: "center" });
-  }
-}
-
 // Walk the rendered DOM and overlay each text node onto the current
 // PDF page with renderingMode="invisible" — the bitmap on the page
 // stays the visible representation, the invisible text rides on top
@@ -1135,98 +656,252 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
   const langCode = (window.__I18N && typeof window.__I18N.getLang === "function")
     ? window.__I18N.getLang() : "en";
 
+  const html = ecBuildAnalysisHTML({ rec, email, t, langCode });
+
+  // ── Mount strategy ────────────────────────────────────────────
+  // Past attempts failed because html2pdf's worker chain wraps our
+  // element in its own overlay/container with style overrides that
+  // race html2canvas's capture step — the canvas ended up the right
+  // *height* (so PDF had right number of pages) but blank content.
+  //
+  // We now bypass html2pdf entirely and call html2canvas + jsPDF
+  // directly. Mount uses a 0×0 overflow:hidden wrapper around a
+  // full-size inner element. The wrapper visually clips everything
+  // to zero (user sees nothing flash on screen), but the inner
+  // element's getBoundingClientRect() reports its full intrinsic
+  // size — which is what html2canvas uses to allocate the capture
+  // canvas. No position:fixed shenanigans, no left:-9999px, no
+  // opacity tricks; just normal flow constrained by a clip.
+  const wrapper = document.createElement("div");
+  wrapper.style.cssText = "position:fixed;left:0;top:0;width:0;height:0;overflow:hidden;z-index:-1;pointer-events:none;";
+
+  const inner = document.createElement("div");
+  inner.style.cssText = "width:720px;background:#fff;";
+  inner.innerHTML = html;
+  wrapper.appendChild(inner);
+
+  document.body.appendChild(wrapper);
+
+  // Wait for one full paint cycle (double-RAF) plus a generous
+  // image-decode window. The inline base64 logo decodes async
+  // even though no network is involved; 250ms covers slow devices.
+  await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+  await new Promise((r) => setTimeout(r, 250));
+
   const planSlug = (rec.plan?.id || "plan").toLowerCase();
   const stamp = new Date().toISOString().slice(0, 10);
   const filename = `Altery-eligibility-${planSlug}-${stamp}.pdf`;
 
-  // ── Build the PDF natively via jsPDF ──────────────────────────────
-  // The previous html2canvas pipeline produced a bitmap PDF with no
-  // selectable text (the invisible-text overlay hack worked for Latin
-  // only — Cyrillic / CJK characters silently dropped because jsPDF's
-  // default Helvetica has no glyphs there). Now we draw the proposal
-  // natively, embedding the Inter variable TTF for full Unicode
-  // coverage. Every character is real PDF text — fully selectable,
-  // searchable, copy-able, accessible to screen readers.
-  const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
-  const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
-
-  // Load + register Inter (~860 KB TTF) so jsPDF can embed it.
   try {
-    const interB64 = await ecLoadInterFont();
-    pdf.addFileToVFS("Inter.ttf", interB64);
-    pdf.addFont("Inter.ttf", "Inter", "normal");
-  } catch (e) {
-    console.warn("[ecSendAnalysisEmail] Inter font load failed, falling back to Helvetica (no Cyrillic):", e);
-  }
+    // Step 1 — render the element to a canvas via html2canvas. We
+    // pass the inner element directly (not its parent) so dimensions
+    // are read from the element's own border box, ignoring the 0×0
+    // wrapper clip.
+    const target = inner.firstElementChild;
 
-  ecBuildNativePdf(pdf, rec, t);
+    // Before rendering, collect Y positions of every element in the
+    // target's DOM — these become candidate page-break points so the
+    // slicing step never cuts through the middle of a card / table row /
+    // heading. Y is in CSS pixels relative to the target's top edge.
+    // canvas is rendered at scale=2 so canvas-pixel Y = CSS Y * 2.
+    const CANVAS_SCALE = 2;
+    const targetRect = target.getBoundingClientRect();
+    const breakCandidates = new Set([0]);
+    const collectBreaks = (el) => {
+      if (!el || el.nodeType !== 1) return;
+      const r = el.getBoundingClientRect();
+      const localY = Math.round((r.top - targetRect.top) * CANVAS_SCALE);
+      if (localY > 0) breakCandidates.add(localY);
+      for (const child of el.children) collectBreaks(child);
+    };
+    collectBreaks(target);
 
-  const blob = pdf.output("blob");
-  const totalPages = pdf.internal.getNumberOfPages();
-  console.info("[ecSendAnalysisEmail] PDF blob:", blob.size, "bytes, pages:", totalPages);
+    const canvas = await window.html2canvas(target, {
+      scale: CANVAS_SCALE,
+      useCORS: true,
+      allowTaint: true,         // lets the inline base64 PNG render even on strict origins
+      logging: false,
+      backgroundColor: "#ffffff",
+      // foreignObjectRendering is false by default and we keep it that
+      // way: the SVG-foreignObject path produces blank canvases for
+      // some templates; walking the DOM by hand is slower but reliable.
+      foreignObjectRendering: false,
+      imageTimeout: 3000,
+    });
 
-  const pdfBase64 = await ecBlobToBase64(blob);
+    // Add the canvas tail as a final candidate (so the last page can
+    // slice cleanly to the very bottom).
+    breakCandidates.add(canvas.height);
+    const breakYs = [...breakCandidates].sort((a, b) => a - b);
 
-  // ── Email body fields the server template needs ──────────────────
-  const planName = t(rec.plan.nameKey);
-  const entityName = t(rec.entity.nameKey);
-  const personaIndustries = ["saas", "apps", "games", "edtech", "affiliate", "creator", "crypto"];
-  const personaLine = rec.ind && personaIndustries.includes(rec.ind.value)
-    ? t("ec.r.persona." + rec.ind.value + ".line")
-    : "";
-  const sessionToken = (Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4)).toLowerCase();
-  const sessionLink = "https://altery.com/setup/" + sessionToken;
-
-  const emailStrings = {
-    subject:        t("ec.email.subject",   { plan: planName }),
-    preheader:      t("ec.email.preheader", { plan: planName, entity: entityName }),
-    eyebrow:        t("ec.email.eyebrow"),
-    titleMid:       t("ec.r.title.middle"),
-    titleEnd:       t("ec.r.title.after"),
-    lead:           t("ec.email.lead"),
-    pillActive:     t("ec.email.pillActive"),
-    cta:            t("ec.email.cta"),
-    tail1:          t("ec.email.tail1"),
-    tail2:          t("ec.email.tail2"),
-    calendlyCta:    t("ec.email.calendlyCta"),
-    footerTagline:  t("ec.pdf.footer.tagline"),
-    footerEntities: t("ec.pdf.footer.entities"),
-  };
-
-  const apiRes = await fetch("/api/send-analysis", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email,
-      pdfBase64,
-      filename,
-      planName,
-      entityName,
-      personaLine,
-      sessionLink,
-      langCode,
-      calendlyURL: EC_CALENDLY_URL,
-      emailStrings,
-    }),
-  });
-
-  if (!apiRes.ok) {
-    let detail = "";
-    try {
-      const j = await apiRes.json();
-      detail = j?.error || j?.code || "";
-      console.error("[ecSendAnalysisEmail] API error:", apiRes.status, j);
-    } catch (_) {
-      detail = "HTTP " + apiRes.status;
+    // Sanity check — empty canvas means html2canvas silently failed.
+    // Throwing here is better than shipping a blank PDF.
+    if (!canvas || canvas.width < 50 || canvas.height < 50) {
+      throw new Error("html2canvas produced empty canvas: " + (canvas?.width || 0) + "×" + (canvas?.height || 0));
     }
-    throw new Error("Email send failed: " + detail);
-  }
 
-  const okJson = await apiRes.json().catch(() => ({}));
-  return { ok: true, id: okJson?.id || null };
+    const imgData = canvas.toDataURL("image/jpeg", 0.94);
+    if (!imgData || imgData.length < 2000) {
+      throw new Error("Canvas produced empty data URL (length=" + (imgData?.length || 0) + ")");
+    }
+
+    // Step 2 — build the PDF. html2pdf's bundle exposes jsPDF as
+    // window.jspdf.jsPDF; some loaders expose plain window.jsPDF
+    // instead, so we accept both.
+    const jsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+    const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+    const pageWidth  = pdf.internal.pageSize.getWidth();   // 210mm
+    const pageHeight = pdf.internal.pageSize.getHeight();  // 297mm
+
+    // Reserve 12mm at the bottom of each page for the page-number
+    // line. We slice the captured canvas into chunks that fit in
+    // (pageHeight − footerHeight) instead of pageHeight, then
+    // stamp the page numbers into the reserved band after. This
+    // is cleaner than overlaying numbers on top of the rendered
+    // image, which would risk colliding with footer text.
+    const footerHeight    = 12;                 // mm reserved at bottom
+    const contentHeight   = pageHeight - footerHeight;
+    const pxPerMm         = canvas.width / pageWidth;
+    const slicePxHeight   = Math.floor(contentHeight * pxPerMm);
+
+    // Smart slicing — for each page, find the largest pre-collected
+    // element-top Y that fits within (sliceY, sliceY + maxSlicePx]. That
+    // becomes the slice end, so the cut lands BETWEEN elements instead of
+    // through the middle of one. Fallback to a strict max-height slice
+    // only when no candidate fits (i.e. a single element is taller than
+    // a page — unavoidable mid-element cut in that case).
+    let sliceY = 0;
+    let pageIdx = 0;
+    while (sliceY < canvas.height) {
+      const maxEndY = Math.min(sliceY + slicePxHeight, canvas.height);
+      // Largest candidate Y that's strictly > sliceY and ≤ maxEndY
+      let sliceEndY = -1;
+      for (const y of breakYs) {
+        if (y > sliceY && y <= maxEndY) sliceEndY = y;
+      }
+      // Fallback when nothing fits (single element bigger than one page,
+      // or final tail that doesn't reach any candidate)
+      if (sliceEndY === -1) sliceEndY = maxEndY;
+
+      const thisSlicePx = sliceEndY - sliceY;
+
+      // Draw the slice into a throwaway canvas at full resolution,
+      // export as JPEG, and place on the page.
+      const sliceCanvas = document.createElement("canvas");
+      sliceCanvas.width  = canvas.width;
+      sliceCanvas.height = thisSlicePx;
+      const sctx = sliceCanvas.getContext("2d");
+      sctx.fillStyle = "#ffffff";
+      sctx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+      sctx.drawImage(canvas, 0, sliceY, canvas.width, thisSlicePx, 0, 0, canvas.width, thisSlicePx);
+      const sliceImgData = sliceCanvas.toDataURL("image/jpeg", 0.94);
+      const sliceMmHeight = thisSlicePx / pxPerMm;
+
+      if (pageIdx > 0) pdf.addPage();
+      pdf.addImage(sliceImgData, "JPEG", 0, 0, pageWidth, sliceMmHeight);
+
+      // Invisible text layer — for every text node intersecting this
+      // slice, place its content at the matching position with PDF
+      // renderingMode "invisible" (text is selectable + copy-able but
+      // not drawn; the bitmap underneath provides the actual visual).
+      // Same trick OCR'd PDFs use for "scanned + searchable" documents.
+      // Font is the jsPDF default Helvetica — sizes track CSS computed
+      // font-size; positions track each text-rect's bounding box.
+      ecAddInvisibleTextLayer(pdf, target, sliceY, sliceEndY, pxPerMm, CANVAS_SCALE);
+
+      sliceY  = sliceEndY;
+      pageIdx += 1;
+    }
+
+    // Stamp page numbers in the reserved footer band. Muted grey
+    // small print, centered. Format mirrors common business
+    // document conventions: "2 / 5" rather than "Page 2 of 5"
+    // because the latter is wordy in non-English layouts.
+    const totalPages = pdf.internal.getNumberOfPages();
+    for (let p = 1; p <= totalPages; p++) {
+      pdf.setPage(p);
+      pdf.setFontSize(8);
+      pdf.setTextColor(107, 111, 123);  // muted #6B6F7B
+      pdf.text(`${p} / ${totalPages}`, pageWidth / 2, pageHeight - 5, { align: "center" });
+    }
+
+    const blob = pdf.output("blob");
+    console.info("[ecSendAnalysisEmail] PDF blob:", blob.size, "bytes,", "canvas:", canvas.width + "×" + canvas.height, "pages:", totalPages);
+
+    const pdfBase64 = await ecBlobToBase64(blob);
+
+    // Display fields the server template needs for the email body.
+    const planName = t(rec.plan.nameKey);
+    const entityName = t(rec.entity.nameKey);
+    const personaIndustries = ["saas", "apps", "games", "edtech", "affiliate", "creator", "crypto"];
+    const personaLine = rec.ind && personaIndustries.includes(rec.ind.value)
+      ? t("ec.r.persona." + rec.ind.value + ".line")
+      : "";
+    const sessionToken = (Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4)).toLowerCase();
+    const sessionLink = "https://altery.com/setup/" + sessionToken;
+
+    // Resolve every localized string the email body needs, on the
+    // client where the i18n dictionary already lives. The server
+    // never needs to know about translations — it just slots these
+    // strings into its template. Keeps i18n logic in one place and
+    // keeps the API function tiny.
+    const emailStrings = {
+      subject:        t("ec.email.subject",   { plan: planName }),
+      preheader:      t("ec.email.preheader", { plan: planName, entity: entityName }),
+      eyebrow:        t("ec.email.eyebrow"),
+      titleMid:       t("ec.r.title.middle"),
+      titleEnd:       t("ec.r.title.after"),
+      lead:           t("ec.email.lead"),
+      pillActive:     t("ec.email.pillActive"),
+      cta:            t("ec.email.cta"),
+      tail1:          t("ec.email.tail1"),
+      tail2:          t("ec.email.tail2"),
+      calendlyCta:    t("ec.email.calendlyCta"),
+      footerTagline:  t("ec.pdf.footer.tagline"),
+      footerEntities: t("ec.pdf.footer.entities"),
+    };
+
+    const apiRes = await fetch("/api/send-analysis", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email,
+        pdfBase64,
+        filename,
+        planName,
+        entityName,
+        personaLine,
+        sessionLink,
+        langCode,
+        calendlyURL: EC_CALENDLY_URL,
+        emailStrings,
+      }),
+    });
+
+    if (!apiRes.ok) {
+      // Try to read the structured error from the function. The API
+      // sends { error, code, ... } on non-2xx so the client can
+      // surface specific failures (no_api_key, bad_email, etc.).
+      let detail = "";
+      try {
+        const j = await apiRes.json();
+        detail = j?.error || j?.code || "";
+        console.error("[ecSendAnalysisEmail] API error:", apiRes.status, j);
+      } catch (_) {
+        detail = "HTTP " + apiRes.status;
+      }
+      throw new Error("Email send failed: " + detail);
+    }
+
+    const okJson = await apiRes.json().catch(() => ({}));
+    return { ok: true, id: okJson?.id || null };
+  } finally {
+    // Always clean up the offscreen wrapper so subsequent runs and
+    // the accessibility tree stay tidy.
+    document.body.removeChild(wrapper);
+  }
 }
 
 Object.assign(window, {
-  ecLoadStripe, ecWaitForPdfLibs,
-  ecLoadInterFont, ecBuildNativePdf, ecSendAnalysisEmail,
+  ecLoadStripe, ecWaitForPdfLibs, ecBuildAnalysisHTML, ecSendAnalysisEmail,
 });
