@@ -378,6 +378,19 @@
     .ec-value__title { font-size: 14px; font-weight: 600; color: var(--c-ink); margin-bottom: 2px; }
     .ec-value__body { font-size: 13px; line-height: 18px; color: var(--c-muted); }
 
+    /* Small regulated-EMI footer line under the intro CTA. Plain muted
+       text; the bullet dots break up the regulator list without needing
+       any pill or background. Sits a touch tighter against the CTA than
+       a paragraph would. */
+    .ec-intro__trust {
+      margin-top: 14px;
+      text-align: center;
+      font-size: 12px;
+      line-height: 17px;
+      color: var(--c-muted);
+      letter-spacing: 0.005em;
+    }
+
     .ec-slider { display: flex; flex-direction: column; gap: 10px; }
     .ec-slider__head {
       display: flex; justify-content: space-between; align-items: baseline;

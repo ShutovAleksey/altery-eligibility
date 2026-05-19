@@ -25,16 +25,17 @@
     "common.contactTeam": "Contact our team",
 
     // Intro screen
-    "ec.intro.eyebrow": "Eligibility check",
-    "ec.intro.title": "Will Altery work for your business?",
-    "ec.intro.lead": "Answer {total} questions about your business. We'll show you the entity that would issue your account (UK, EU or MENA), the currencies and payment rails we support for you, and the plan that fits your volume — all in 90 seconds. No application, no signup, no credit check.",
-    "ec.intro.value1.title": "No \"wrong entity\" restart",
-    "ec.intro.value1.body": "Altery operates three regulated entities — UK, EU, and MENA — each with different IBANs and supported currencies. We match yours before you start onboarding, not after you've uploaded company docs.",
-    "ec.intro.value2.title": "Caveats now, not after KYB",
-    "ec.intro.value2.body": "Some payment rails depend on our partner network. Some entities are still in early access. Some industries trigger manual review. Whatever applies to your business shows up on the result page — before you commit to KYB.",
-    "ec.intro.value3.title": "Fast no's, not slow no's",
-    "ec.intro.value3.body": "Altery can't onboard businesses in gambling, adult content, weapons, or unregulated lending. If yours is one, you'll know in 60 seconds — not after a week of document uploads.",
+    "ec.intro.eyebrow": "Eligibility check · 90 seconds",
+    "ec.intro.title": "Find the Altery plan that fits — and what you'd save",
+    "ec.intro.lead": "{total} questions about your business. You'll see the entity (UK, EU or MENA), the plan that matches your volume, and a concrete projection of what you'd pay on Altery vs a typical business bank. Built for digital-native teams banks turn away. No signup, no credit check.",
+    "ec.intro.value1.title": "A plan and entity matched to your business",
+    "ec.intro.value1.body": "We route you to the regulated entity that fits — FCA-licensed UK, Central Bank of Cyprus EU, or DFSA-regulated MENA — plus the rails and currencies we actually support for your flows.",
+    "ec.intro.value2.title": "A real cost projection, not a quote",
+    "ec.intro.value2.body": "Most providers list fees in a table. We compute what you'd actually pay on Altery versus a typical business bank — for your FX volumes and your SWIFT and SEPA mix. Savings show up in euros per month.",
+    "ec.intro.value3.title": "A shareable PDF for your team",
+    "ec.intro.value3.body": "B2B decisions touch about 13 stakeholders. You'll get a PDF with the entity, plan, projected savings and your setup link — easy to forward to your CFO or co-founder.",
     "ec.intro.cta": "Start the check",
+    "ec.intro.trust": "Regulated EMI · FCA (UK) · Central Bank of Cyprus (EU) · DFSA (MENA)",
 
     // Question header
     "ec.q.eyebrow": "of {total} questions",
