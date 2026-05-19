@@ -716,52 +716,52 @@
   Object.assign(D.en, {
     "ec.account.swiftGroupHead": "Also available via SWIFT",
     "ec.support.questionsPrefix": "Questions about this recommendation? Email",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
   Object.assign(D.es, {
     "ec.account.swiftGroupHead": "También disponible vía SWIFT",
     "ec.support.questionsPrefix": "¿Preguntas sobre esta recomendación? Escríbenos a",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
   Object.assign(D.fr, {
     "ec.account.swiftGroupHead": "Disponible aussi via SWIFT",
     "ec.support.questionsPrefix": "Des questions sur cette recommandation ? Écrivez à",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
   Object.assign(D.pt, {
     "ec.account.swiftGroupHead": "Também disponível via SWIFT",
     "ec.support.questionsPrefix": "Dúvidas sobre esta recomendação? Escreva para",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
   Object.assign(D.ru, {
     "ec.account.swiftGroupHead": "Также доступно через SWIFT",
     "ec.support.questionsPrefix": "Вопросы по рекомендации? Напишите на",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
   Object.assign(D.de, {
     "ec.account.swiftGroupHead": "Auch via SWIFT verfügbar",
     "ec.support.questionsPrefix": "Fragen zu dieser Empfehlung? Schreiben Sie an",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
   Object.assign(D.it, {
     "ec.account.swiftGroupHead": "Disponibile anche via SWIFT",
     "ec.support.questionsPrefix": "Domande sulla raccomandazione? Scrivici a",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
   Object.assign(D.tr, {
     "ec.account.swiftGroupHead": "SWIFT üzerinden de mevcut",
     "ec.support.questionsPrefix": "Bu öneri hakkında sorularınız mı var? E-posta:",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
   Object.assign(D.pl, {
     "ec.account.swiftGroupHead": "Dostępne także przez SWIFT",
     "ec.support.questionsPrefix": "Masz pytania o rekomendację? Napisz na",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
   Object.assign(D.nl, {
     "ec.account.swiftGroupHead": "Ook beschikbaar via SWIFT",
     "ec.support.questionsPrefix": "Vragen over deze aanbeveling? E-mail naar",
-    "ec.support.email": "welcome@altery.com",
+    "ec.support.email": "sales@altery.com",
   });
 
   // ─────────── "Built to back your business" perks slider ──────
