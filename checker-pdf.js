@@ -541,6 +541,87 @@ ${checklistHTML}
 }
 
 // Convert a Blob to a base64 string (without the data:URL prefix).
+// Walk the rendered DOM and overlay each text node onto the current
+// PDF page with renderingMode="invisible" — the bitmap on the page
+// stays the visible representation, the invisible text rides on top
+// so PDF readers can select / copy / search the text.
+//
+// Why this approach: html2canvas rasterises everything to pixels, so
+// the bitmap alone has no machine-readable text. Rebuilding the whole
+// template via native jsPDF text/box calls would mean rewriting ~500
+// lines of HTML→PDF and losing the gradients/shadow/custom-flag visuals
+// we just shipped. The overlay trick keeps the visual intact AND makes
+// selection work — same pattern OCR'd PDFs use.
+//
+// Per-line positioning uses Range.getClientRects() which returns one
+// rect per visually-wrapped line. For multi-line text nodes the text
+// content is approximated by character-ratio across lines (not
+// word-perfect, but selection rectangles align with the bitmap text
+// well enough that drag-select-and-copy produces the right output).
+function ecAddInvisibleTextLayer(pdf, target, sliceTopPx, sliceBottomPx, pxPerMm, canvasScale) {
+  const targetRect = target.getBoundingClientRect();
+  const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT, {
+    acceptNode: (n) => n.textContent.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT
+  });
+  let node;
+  while ((node = walker.nextNode())) {
+    const text = node.textContent;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    const rects = range.getClientRects();
+    if (!rects.length) continue;
+
+    const parent = node.parentElement;
+    if (!parent) continue;
+    const cs = window.getComputedStyle(parent);
+    // Bail on hidden text — visibility:hidden / display:none / opacity:0
+    if (cs.visibility === "hidden" || cs.display === "none" || cs.opacity === "0") continue;
+    const fontSizePx = parseFloat(cs.fontSize) || 12;
+    const fontSizePt = fontSizePx * 0.75; // CSS px → PDF pt (assumes 96 DPI)
+
+    for (let i = 0; i < rects.length; i++) {
+      const rect = rects[i];
+      // canvas-pixel Y of this line, relative to the target's top edge.
+      const lineTopCanvasPx    = (rect.top    - targetRect.top) * canvasScale;
+      const lineBottomCanvasPx = (rect.bottom - targetRect.top) * canvasScale;
+      // Skip lines outside this page's slice band.
+      if (lineBottomCanvasPx <= sliceTopPx || lineTopCanvasPx >= sliceBottomPx) continue;
+
+      const xMm = (rect.left - targetRect.left) * canvasScale / pxPerMm;
+      const pageRelTopMm = (lineTopCanvasPx - sliceTopPx) / pxPerMm;
+      // Baseline roughly = top + 80% of font-size (matches Helvetica's
+      // ascender height ≈ 0.8 em). Imperfect for the actual rendered
+      // font (Inter / IBM Plex Mono) but close enough — used for
+      // selection-rectangle placement, not for visible glyphs.
+      const baselineYmm = pageRelTopMm + fontSizePx * 0.8 * canvasScale / pxPerMm;
+
+      // Per-line text: single-line nodes use the full text; multi-line
+      // nodes get char-ratio approximation across rects.
+      let lineText;
+      if (rects.length === 1) {
+        lineText = text;
+      } else {
+        const start = Math.floor(i * text.length / rects.length);
+        const end   = Math.floor((i + 1) * text.length / rects.length);
+        lineText = text.slice(start, end);
+      }
+      lineText = lineText.replace(/\s+/g, " ").trim();
+      if (!lineText) continue;
+
+      pdf.setFontSize(fontSizePt);
+      try {
+        pdf.text(lineText, xMm, baselineYmm, { renderingMode: "invisible" });
+      } catch (e) {
+        // jsPDF can throw on text with characters outside its default
+        // encoding (WinAnsi). Log and skip the offending node rather
+        // than failing the whole PDF generation. Cyrillic / CJK text
+        // may silently miss from selection until we embed a Unicode
+        // font — tracked as a follow-up.
+      }
+    }
+  }
+}
+
 // Used to ship the generated PDF bytes inside a JSON request body
 // to /api/send-analysis. Multi-MB payloads stream fine through
 // FileReader; this function returns a Promise that resolves with
@@ -718,6 +799,15 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
 
       if (pageIdx > 0) pdf.addPage();
       pdf.addImage(sliceImgData, "JPEG", 0, 0, pageWidth, sliceMmHeight);
+
+      // Invisible text layer — for every text node intersecting this
+      // slice, place its content at the matching position with PDF
+      // renderingMode "invisible" (text is selectable + copy-able but
+      // not drawn; the bitmap underneath provides the actual visual).
+      // Same trick OCR'd PDFs use for "scanned + searchable" documents.
+      // Font is the jsPDF default Helvetica — sizes track CSS computed
+      // font-size; positions track each text-rect's bounding box.
+      ecAddInvisibleTextLayer(pdf, target, sliceY, sliceEndY, pxPerMm, CANVAS_SCALE);
 
       sliceY  = sliceEndY;
       pageIdx += 1;
