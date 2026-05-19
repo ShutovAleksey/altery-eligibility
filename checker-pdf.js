@@ -617,8 +617,26 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
     // are read from the element's own border box, ignoring the 0×0
     // wrapper clip.
     const target = inner.firstElementChild;
+
+    // Before rendering, collect Y positions of every element in the
+    // target's DOM — these become candidate page-break points so the
+    // slicing step never cuts through the middle of a card / table row /
+    // heading. Y is in CSS pixels relative to the target's top edge.
+    // canvas is rendered at scale=2 so canvas-pixel Y = CSS Y * 2.
+    const CANVAS_SCALE = 2;
+    const targetRect = target.getBoundingClientRect();
+    const breakCandidates = new Set([0]);
+    const collectBreaks = (el) => {
+      if (!el || el.nodeType !== 1) return;
+      const r = el.getBoundingClientRect();
+      const localY = Math.round((r.top - targetRect.top) * CANVAS_SCALE);
+      if (localY > 0) breakCandidates.add(localY);
+      for (const child of el.children) collectBreaks(child);
+    };
+    collectBreaks(target);
+
     const canvas = await window.html2canvas(target, {
-      scale: 2,
+      scale: CANVAS_SCALE,
       useCORS: true,
       allowTaint: true,         // lets the inline base64 PNG render even on strict origins
       logging: false,
@@ -629,6 +647,11 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
       foreignObjectRendering: false,
       imageTimeout: 3000,
     });
+
+    // Add the canvas tail as a final candidate (so the last page can
+    // slice cleanly to the very bottom).
+    breakCandidates.add(canvas.height);
+    const breakYs = [...breakCandidates].sort((a, b) => a - b);
 
     // Sanity check — empty canvas means html2canvas silently failed.
     // Throwing here is better than shipping a blank PDF.
@@ -660,10 +683,26 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
     const pxPerMm         = canvas.width / pageWidth;
     const slicePxHeight   = Math.floor(contentHeight * pxPerMm);
 
+    // Smart slicing — for each page, find the largest pre-collected
+    // element-top Y that fits within (sliceY, sliceY + maxSlicePx]. That
+    // becomes the slice end, so the cut lands BETWEEN elements instead of
+    // through the middle of one. Fallback to a strict max-height slice
+    // only when no candidate fits (i.e. a single element is taller than
+    // a page — unavoidable mid-element cut in that case).
     let sliceY = 0;
     let pageIdx = 0;
     while (sliceY < canvas.height) {
-      const thisSlicePx = Math.min(slicePxHeight, canvas.height - sliceY);
+      const maxEndY = Math.min(sliceY + slicePxHeight, canvas.height);
+      // Largest candidate Y that's strictly > sliceY and ≤ maxEndY
+      let sliceEndY = -1;
+      for (const y of breakYs) {
+        if (y > sliceY && y <= maxEndY) sliceEndY = y;
+      }
+      // Fallback when nothing fits (single element bigger than one page,
+      // or final tail that doesn't reach any candidate)
+      if (sliceEndY === -1) sliceEndY = maxEndY;
+
+      const thisSlicePx = sliceEndY - sliceY;
 
       // Draw the slice into a throwaway canvas at full resolution,
       // export as JPEG, and place on the page.
@@ -680,7 +719,7 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
       if (pageIdx > 0) pdf.addPage();
       pdf.addImage(sliceImgData, "JPEG", 0, 0, pageWidth, sliceMmHeight);
 
-      sliceY  += slicePxHeight;
+      sliceY  = sliceEndY;
       pageIdx += 1;
     }
 
