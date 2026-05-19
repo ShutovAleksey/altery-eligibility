@@ -219,12 +219,12 @@ export default async function handler(req, res) {
       : "https://altery.com";
     const safePersona = typeof personaLine === "string" ? String(personaLine).slice(0, 120) : "";
 
-    // Only accept Calendly URL if it's https. Defensive — anyone with
-    // access to the client could POST a different URL claiming to be
-    // a booking page, but defaulting to a hardcoded fallback keeps
-    // user-clickable links pointing at trusted destinations.
+    // Only accept booking URLs from trusted scheduling hosts. Defensive —
+    // anyone with access to the client could POST a different URL claiming
+    // to be a booking page, but the allow-list keeps user-clickable links
+    // pointing at trusted destinations.
     const safeCalendly = (typeof calendlyURL === "string"
-      && /^https:\/\/(calendly\.com|cal\.com)\//.test(calendlyURL))
+      && /^https:\/\/(calendly\.com|cal\.com|calendar\.app\.google|calendar\.google\.com)\//.test(calendlyURL))
       ? calendlyURL
       : "";
 
