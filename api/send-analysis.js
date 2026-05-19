@@ -15,7 +15,7 @@
 //   3. For the `from` address: either use the sandbox
 //      "onboarding@resend.dev" (anyone receives, but Reply-To looks
 //      odd) OR verify altery.com at resend.com/domains and use
-//      "Altery <hello@altery.com>" — strongly preferred for deliverability
+//      "Altery <sales@altery.com>" — strongly preferred for deliverability
 //
 // The function uses raw fetch rather than the `resend` npm package
 // to avoid adding a dependency for a single HTTP call.
@@ -23,7 +23,7 @@
 const RESEND_API = "https://api.resend.com/emails";
 
 // Sender. In production, set FROM_EMAIL in env to your verified domain
-// address (e.g. "Altery <hello@altery.com>"). The sandbox default works
+// address (e.g. "Altery <sales@altery.com>"). The sandbox default works
 // without domain verification but ships from a generic resend.dev address.
 const FROM_DEFAULT = "Altery <onboarding@resend.dev>";
 
@@ -147,7 +147,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
             ${s.tail1 || "Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off."}
           </p>
           <p style="font-size:13px;line-height:20px;color:${C.muted};margin:0;">
-            ${s.tail2 || `Questions? Just reply to this email or write to <a href="mailto:hello@altery.com" style="color:${C.primary};text-decoration:underline;">hello@altery.com</a> — we're here to help.`}
+            ${s.tail2 || `Questions? Just reply to this email or write to <a href="mailto:sales@altery.com" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a> — we're here to help.`}
           </p>
         </td></tr>
 
@@ -289,7 +289,7 @@ export default async function handler(req, res) {
         // Reply-To routes user replies to the sales inbox instead of
         // the (potentially generic) sender address. Especially useful
         // when sending from `onboarding@resend.dev` sandbox.
-        reply_to: process.env.REPLY_TO || "hello@altery.com",
+        reply_to: process.env.REPLY_TO || "sales@altery.com",
         attachments: [{ filename: safeFilename, content: pdfBase64 }],
         tags: [
           { name: "source", value: "eligibility-checker" },

@@ -337,7 +337,7 @@
     "ec.pdf.steps.4.title": "Cards & API access",
     "ec.pdf.steps.4.body": "Cards delivered within 5 business days; API keys available immediately.",
     "ec.pdf.team.head": "Your account team",
-    "ec.pdf.team.body": "Reach us at hello@altery.com. Available Mon–Fri, 9:00–18:00 GMT. We respond within 4 working hours.",
+    "ec.pdf.team.body": "Reach us at sales@altery.com. Available Mon–Fri, 9:00–18:00 GMT. We respond within 4 working hours.",
     "ec.pdf.costMath.head": "Your monthly cost — side by side",
     "ec.pdf.costMath.altery": "Altery",
     "ec.pdf.costMath.bank": "Typical business bank",
@@ -420,7 +420,7 @@
     "ec.email.pillActive": "Active",
     "ec.email.cta": "Continue to setup",
     "ec.email.tail1": "Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off.",
-    "ec.email.tail2": "Questions? Just reply to this email or write to <a href=\"mailto:hello@altery.com\" style=\"color:#002780;text-decoration:underline;\">hello@altery.com</a> — we're here to help.",
+    "ec.email.tail2": "Questions? Just reply to this email or write to <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> — we're here to help.",
     "ec.email.calendlyCta": "Or schedule a 15-min intro call",
     "ec.pdf.footer.entities": "Altery Ltd (UK · FCA-licensed EMI) · Altery EU (CY · Central Bank of Cyprus EMI) · Altery MENA (DIFC · DFSA)",
 
