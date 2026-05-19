@@ -883,9 +883,11 @@ function EcResultApproved({ rec, onBack, onReset }) {
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [feesOpen, setFeesOpen] = useState(false);
 
-  // Handoff modal — bridge between anonymous result and committed
-  // onboarding. Captures email + reassurance summary before user
-  // proceeds to Stripe payment setup. See EcHandoffModal docblock.
+  // Handoff modal — used now only for the "Email this proposal as PDF"
+  // path on the result page (mounts directly at the email stage).
+  // The primary "Continue to setup" CTA goes straight to onboarding —
+  // no commit-stage interstitial. See goToOnboarding below + the modal's
+  // initialStage prop in EcHandoffModal.
   const [handoffOpen, setHandoffOpen] = useState(false);
 
   // Payment modal — opens on "Set up this account" CTA. Hosts the Stripe
@@ -902,6 +904,22 @@ function EcResultApproved({ rec, onBack, onReset }) {
   const activePlan = selectedPlanId ? EC_PLANS[selectedPlanId] : recommendedPlan;
   const isOnRecommended = !selectedPlanId || selectedPlanId === recommendedPlan.id;
   const planName = t(activePlan.nameKey);
+
+  // Onboarding redirect — used by both the primary CTA (direct) and the
+  // handoff modal's email-stage "Send & continue" CTA. Centralised so the
+  // URL-params construction stays in one place. Currency hint follows
+  // the entity: GBP for UK, EUR for EU/MENA (improvement tracked in I-004
+  // for proper MENA USD handling).
+  const goToOnboarding = () => {
+    const params = new URLSearchParams({
+      token:    ecGenProposalRef(),
+      plan:     activePlan.id,
+      entity:   rec.entity.id,
+      currency: rec.entity.id === "uk" ? "GBP" : "EUR",
+      volume:   String(rec.monthlyVolume || ""),
+    });
+    window.location.href = "/setup?" + params.toString();
+  };
 
   const entityName = t(entity.nameKey);
   const entityLicence = t(entity.licenceKey);
@@ -1100,20 +1118,17 @@ function EcResultApproved({ rec, onBack, onReset }) {
           </section>
         )}
 
-        {/* ───── Action bar — primary CTA + secondary email link +
-            footer reset + support contact. Primary CTA opens the existing
-            EcHandoffModal which captures email + confirms before chaining
-            to onboarding. Secondary button also opens the modal (user
-            navigates to email stage inside) — keeps the existing real
-            Resend-backed send path; the design's inline state machine
-            was a mock with setTimeout. */}
+        {/* ───── Action bar — primary CTA goes DIRECTLY to onboarding
+            (no commit-stage interstitial modal). Secondary button opens
+            EcHandoffModal at the email stage for the "Get your full
+            proposal" PDF capture flow. */}
         <section className="ec-r__action">
           <div className="ec-r__action__primary">
             <Button
               variant="primary"
               size="xl"
               iconRight="arrowRight"
-              onClick={() => setHandoffOpen(true)}
+              onClick={goToOnboarding}
             >
               {t("ec.r.cta.continue")}
             </Button>
@@ -1166,18 +1181,9 @@ function EcResultApproved({ rec, onBack, onReset }) {
       {handoffOpen && (
         <EcHandoffModal
           rec={rec}
+          initialStage="email"
           onClose={() => setHandoffOpen(false)}
-          onContinueToSetup={() => {
-            setHandoffOpen(false);
-            const params = new URLSearchParams({
-              token:    ecGenProposalRef(),
-              plan:     activePlan.id,
-              entity:   rec.entity.id,
-              currency: rec.entity.id === "uk" ? "GBP" : "EUR",
-              volume:   String(rec.monthlyVolume || ""),
-            });
-            window.location.href = "/setup?" + params.toString();
-          }}
+          onContinueToSetup={() => { setHandoffOpen(false); goToOnboarding(); }}
         />
       )}
 

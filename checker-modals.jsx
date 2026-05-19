@@ -426,11 +426,14 @@ function EcPlanCompareCard({ plan, onSelect }) {
   );
 }
 
-function EcHandoffModal({ rec, onClose, onContinueToSetup }) {
+function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
   const t = useT();
   // Three-state machine, not a boolean — keeps the JSX readable and
   // makes adding future states (e.g. "loading", "error-retry") trivial.
-  const [stage, setStage] = useState("commit");
+  // Stages: "commit" (default — "Ready to set up your X account" with two
+  // CTAs), "email" (proposal email capture), "sent" (success). Callers
+  // that want to jump straight to email capture pass initialStage="email".
+  const [stage, setStage] = useState(initialStage || "commit");
   const [email, setEmail] = useState("");
   const [touched, setTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
