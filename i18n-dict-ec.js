@@ -279,12 +279,6 @@
     "ec.cav.performance.text": "Performance marketing businesses ({industry}) need clearer traffic and payout evidence. We'll ask how you verify advertisers, publishers and payout rules — structured review, not a black box.",
 
     // Bank rejection history — optional inline question on result page
-    "ec.r.bankHistory.title": "Have you been declined or restricted by another bank or EMI before?",
-    "ec.r.bankHistory.lead": "Optional — helps us route to the right specialist if so.",
-    "ec.r.bankHistory.yes": "Yes",
-    "ec.r.bankHistory.no": "No",
-    "ec.r.bankHistory.prefer": "Prefer not to say",
-    "ec.r.bankHistory.skip": "Skip",
 
     // Common
     "common.close": "Close",

@@ -184,12 +184,6 @@
     "ec.cav.performance.tag": "Revisione specialistica",
     "ec.cav.performance.text": "Le aziende di performance marketing ({industry}) richiedono prove più chiare sulla qualità del traffico e sui modelli di pagamento. Chiederemo come verifichi inserzionisti, publisher e regole di pagamento — revisione strutturata, non una scatola nera.",
 
-    "ec.r.bankHistory.title": "Sei stato rifiutato o limitato da un'altra banca o EMI?",
-    "ec.r.bankHistory.lead": "Opzionale — ci aiuta a indirizzarti allo specialista giusto se sì.",
-    "ec.r.bankHistory.yes": "Sì",
-    "ec.r.bankHistory.no": "No",
-    "ec.r.bankHistory.prefer": "Preferisco non dirlo",
-    "ec.r.bankHistory.skip": "Salta",
 
     "common.close": "Chiudi",
 
@@ -560,12 +554,6 @@
     "ec.cav.performance.tag": "Revisión especializada",
     "ec.cav.performance.text": "Las empresas de performance marketing ({industry}) necesitan pruebas más claras de calidad del tráfico y patrones de pago. Preguntaremos cómo verificas anunciantes, publishers y reglas de pago — revisión estructurada, no una caja negra.",
 
-    "ec.r.bankHistory.title": "¿Has sido rechazado o restringido por otro banco o EMI antes?",
-    "ec.r.bankHistory.lead": "Opcional — nos ayuda a dirigirte al especialista adecuado si es así.",
-    "ec.r.bankHistory.yes": "Sí",
-    "ec.r.bankHistory.no": "No",
-    "ec.r.bankHistory.prefer": "Prefiero no decirlo",
-    "ec.r.bankHistory.skip": "Omitir",
 
     "common.close": "Cerrar",
 

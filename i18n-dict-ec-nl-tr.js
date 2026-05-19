@@ -184,12 +184,6 @@
     "ec.cav.performance.tag": "Gespecialiseerde beoordeling",
     "ec.cav.performance.text": "Performance-marketingbedrijven ({industry}) hebben duidelijker bewijs nodig van verkeerskwaliteit en uitbetalingspatronen. We vragen hoe u adverteerders, publishers en uitbetalingsregels verifieert — gestructureerde beoordeling, geen black box.",
 
-    "ec.r.bankHistory.title": "Bent u eerder afgewezen of beperkt door een bank of EMI?",
-    "ec.r.bankHistory.lead": "Optioneel — helpt ons u naar de juiste specialist te leiden.",
-    "ec.r.bankHistory.yes": "Ja",
-    "ec.r.bankHistory.no": "Nee",
-    "ec.r.bankHistory.prefer": "Liever niet zeggen",
-    "ec.r.bankHistory.skip": "Overslaan",
 
     "common.close": "Sluiten",
 
@@ -560,12 +554,6 @@
     "ec.cav.performance.tag": "Uzman incelemesi",
     "ec.cav.performance.text": "Performans pazarlama şirketleri ({industry}) trafik kalitesi ve ödeme kalıpları konusunda daha net kanıt gerektirir. Reklamverenleri, yayıncıları ve ödeme kurallarını nasıl doğruladığınızı soracağız — yapılandırılmış inceleme, kara kutu değil.",
 
-    "ec.r.bankHistory.title": "Daha önce başka bir banka veya EMI tarafından reddedildiniz veya kısıtlandınız mı?",
-    "ec.r.bankHistory.lead": "İsteğe bağlı — eğer öyleyse doğru uzmana yönlendirmemize yardımcı olur.",
-    "ec.r.bankHistory.yes": "Evet",
-    "ec.r.bankHistory.no": "Hayır",
-    "ec.r.bankHistory.prefer": "Söylememeyi tercih ederim",
-    "ec.r.bankHistory.skip": "Geç",
 
     "common.close": "Kapat",
 

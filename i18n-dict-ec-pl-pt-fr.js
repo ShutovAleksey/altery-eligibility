@@ -185,12 +185,6 @@
     "ec.cav.performance.tag": "Przegląd specjalistyczny",
     "ec.cav.performance.text": "Firmy performance marketingu ({industry}) wymagają jaśniejszych dowodów jakości ruchu i wzorców wypłat. Zapytamy, jak weryfikujesz reklamodawców, wydawców i reguły wypłat — przegląd strukturalny, nie czarna skrzynka.",
 
-    "ec.r.bankHistory.title": "Czy zostałeś odrzucony lub ograniczony przez inny bank lub EMI?",
-    "ec.r.bankHistory.lead": "Opcjonalnie — pomaga nam skierować Cię do odpowiedniego specjalisty, jeśli tak.",
-    "ec.r.bankHistory.yes": "Tak",
-    "ec.r.bankHistory.no": "Nie",
-    "ec.r.bankHistory.prefer": "Wolę nie mówić",
-    "ec.r.bankHistory.skip": "Pomiń",
 
     "common.close": "Zamknij",
 
@@ -561,12 +555,6 @@
     "ec.cav.performance.tag": "Análise especializada",
     "ec.cav.performance.text": "Empresas de performance marketing ({industry}) precisam de evidências mais claras de qualidade de tráfego e padrões de pagamento. Vamos perguntar como verifica anunciantes, publishers e regras de pagamento — análise estruturada, não uma caixa preta.",
 
-    "ec.r.bankHistory.title": "Foi rejeitado ou restringido por outro banco ou EMI antes?",
-    "ec.r.bankHistory.lead": "Opcional — ajuda-nos a encaminhar para o especialista certo se sim.",
-    "ec.r.bankHistory.yes": "Sim",
-    "ec.r.bankHistory.no": "Não",
-    "ec.r.bankHistory.prefer": "Prefiro não dizer",
-    "ec.r.bankHistory.skip": "Ignorar",
 
     "common.close": "Fechar",
 
@@ -935,12 +923,6 @@
     "ec.cav.performance.tag": "Examen spécialisé",
     "ec.cav.performance.text": "Les entreprises de marketing à la performance ({industry}) nécessitent des preuves plus claires de qualité du trafic et de schémas de paiement. Nous demanderons comment vous vérifiez annonceurs, éditeurs et règles de paiement — examen structuré, pas une boîte noire.",
 
-    "ec.r.bankHistory.title": "Avez-vous été refusé ou restreint par une autre banque ou EMI auparavant ?",
-    "ec.r.bankHistory.lead": "Optionnel — nous aide à vous orienter vers le bon spécialiste si oui.",
-    "ec.r.bankHistory.yes": "Oui",
-    "ec.r.bankHistory.no": "Non",
-    "ec.r.bankHistory.prefer": "Préfère ne pas dire",
-    "ec.r.bankHistory.skip": "Passer",
 
     "common.close": "Fermer",
 

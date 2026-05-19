@@ -188,12 +188,6 @@
     "ec.cav.performance.tag": "Spezialprüfung",
     "ec.cav.performance.text": "Performance-Marketing-Unternehmen ({industry}) brauchen klare Nachweise zu Traffic-Qualität und Auszahlungsmustern. Wir fragen, wie Sie Werbetreibende, Publisher und Auszahlungsregeln verifizieren — strukturierte Prüfung, keine Blackbox.",
 
-    "ec.r.bankHistory.title": "Wurden Sie zuvor von einer Bank oder einem EMI abgelehnt oder eingeschränkt?",
-    "ec.r.bankHistory.lead": "Optional — hilft uns, Sie zum richtigen Spezialisten zu leiten.",
-    "ec.r.bankHistory.yes": "Ja",
-    "ec.r.bankHistory.no": "Nein",
-    "ec.r.bankHistory.prefer": "Möchte nicht sagen",
-    "ec.r.bankHistory.skip": "Überspringen",
 
     "common.close": "Schließen",
 
@@ -564,12 +558,6 @@
     "ec.cav.performance.tag": "Специальная проверка",
     "ec.cav.performance.text": "Performance-маркетинговые бизнесы ({industry}) требуют чёткого подтверждения качества трафика и схем выплат. Мы спросим, как вы верифицируете рекламодателей, паблишеров и правила выплат — структурированная проверка, не чёрный ящик.",
 
-    "ec.r.bankHistory.title": "Вам отказывали или ограничивали в другом банке или EMI?",
-    "ec.r.bankHistory.lead": "Опционально — поможет направить к нужному специалисту, если да.",
-    "ec.r.bankHistory.yes": "Да",
-    "ec.r.bankHistory.no": "Нет",
-    "ec.r.bankHistory.prefer": "Предпочитаю не отвечать",
-    "ec.r.bankHistory.skip": "Пропустить",
 
     "common.close": "Закрыть",
 

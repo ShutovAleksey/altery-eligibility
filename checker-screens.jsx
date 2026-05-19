@@ -171,26 +171,20 @@ function EcApp() {
   const [volumeIdx, setVolumeIdx] = useState(2);
   const [corridors, setCorridors] = useState(new Set());
   const [txCount, setTxCount] = useState("med");
-  // bankHistory — optional follow-up Q after Corridors. null = unanswered
-  // or explicitly skipped; "yes" | "no" | "prefer" = recorded answer.
-  // Sales signal only — doesn't change ecRecommend's routing, just rides
-  // along on rec.bankHistory for the PDF/email payload.
-  const [bankHistory, setBankHistory] = useState(null);
-
   const totalSteps = TOTAL_STEPS;
   const monthlyVolume = EC_VOLUME_BANDS[volumeIdx]?.value || 0;
   const recommendation = useMemo(() =>
-    ecRecommend({ countryCode: country, industry, businessType, monthlyVolume, corridors: [...corridors], txCount, services: [...services], bankHistory }),
-  [country, industry, businessType, monthlyVolume, corridors, txCount, services, bankHistory]);
+    ecRecommend({ countryCode: country, industry, businessType, monthlyVolume, corridors: [...corridors], txCount, services: [...services] }),
+  [country, industry, businessType, monthlyVolume, corridors, txCount, services]);
 
   // Step navigation. Steps:
-  //   0 intro · 1 industry · 2 country · 3 services · 4 volume · 5 corridors
-  //   6 bank-history (OPTIONAL — not counted in TOTAL_STEPS) · 7 result
-  // The old "Q6 crypto" exposure step was removed because asking again
-  // after the user declared their industry + services felt redundant
-  // in both directions.
+  //   0 intro · 1 industry · 2 country · 3 services · 4 volume · 5 corridors · 6 result
+  // Older flows had a "Q6 crypto" and "Q7 bank-history (optional)" step;
+  // both were removed — the first felt redundant after Q1 industry + Q3
+  // services already declared crypto, the second never produced any value
+  // beyond a local UI state because no downstream consumer read it.
   const back  = () => { setDirection("back");    setStep((s) => Math.max(0, s - 1)); };
-  const next  = () => { setDirection("forward"); setStep((s) => Math.min(totalSteps + 2, s + 1)); };
+  const next  = () => { setDirection("forward"); setStep((s) => Math.min(totalSteps + 1, s + 1)); };
   const reset = () => { setDirection("back");    setStep(0); };
 
   return (
@@ -226,8 +220,7 @@ function EcApp() {
         {step === 3 && <EcServices services={services} setServices={setServices} onBack={back} onNext={next} />}
         {step === 4 && <EcVolume volumeIdx={volumeIdx} setVolumeIdx={setVolumeIdx} txCount={txCount} setTxCount={setTxCount} onBack={back} onNext={next} />}
         {step === 5 && <EcCorridors corridors={corridors} setCorridors={setCorridors} onBack={back} onNext={next} />}
-        {step === 6 && <EcBankHistoryStep bankHistory={bankHistory} setBankHistory={setBankHistory} onBack={back} onNext={next} />}
-        {step === 7 && <EcResult rec={recommendation} onBack={back} onReset={reset} />}
+        {step === 6 && <EcResult rec={recommendation} onBack={back} onReset={reset} />}
       </main>
     </div>
   );
@@ -793,71 +786,6 @@ function EcResult({ rec, onBack, onReset }) {
   return <EcResultApproved rec={rec} onBack={onBack} onReset={onReset} />;
 }
 
-// ──────────────────── EcBankHistoryStep ────────────────────
-// Optional Q between Corridors (Q5) and the Result screen. Asks whether
-// the user has been declined or restricted by another bank/EMI before —
-// a high-value sales signal because ICP context confirms a large share of
-// Altery's target audience are exactly those founders who got bounced by
-// traditional banks and Revolut Business. The answer rides along on the
-// recommendation object (rec.bankHistory) so the PDF/email payload can
-// surface it to sales without changing the routing algorithm itself.
-//
-// Deliberately NOT counted in TOTAL_STEPS — the Q-number eyebrow is
-// omitted so it reads as "one more thing, optional" rather than another
-// gate. Three answer buttons advance immediately; a quieter "Skip" link
-// lets the user bypass without leaving any signal.
-function EcBankHistoryStep({ bankHistory, setBankHistory, onBack, onNext }) {
-  const t = useT();
-  const choose = (answer) => { setBankHistory(answer); onNext(); };
-  const skip   = () => { setBankHistory(null); onNext(); };
-  return (
-    <div className="ec-content fade-in">
-      <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
-        <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
-      </button>
-      <Title title={t("ec.r.bankHistory.title")} lead={t("ec.r.bankHistory.lead")} />
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, paddingTop: 8 }}>
-        <SelectableListItem
-          title={t("ec.r.bankHistory.yes")}
-          selected={bankHistory === "yes"}
-          onClick={() => choose("yes")}
-        />
-        <SelectableListItem
-          title={t("ec.r.bankHistory.no")}
-          selected={bankHistory === "no"}
-          onClick={() => choose("no")}
-        />
-        <SelectableListItem
-          title={t("ec.r.bankHistory.prefer")}
-          selected={bankHistory === "prefer"}
-          onClick={() => choose("prefer")}
-        />
-      </div>
-
-      <div className="ob-actions" style={{ justifyContent: "center" }}>
-        <button
-          type="button"
-          onClick={skip}
-          style={{
-            background: "none",
-            border: 0,
-            color: "var(--c-muted)",
-            fontSize: 14,
-            padding: "12px 16px",
-            cursor: "pointer",
-            fontFamily: "inherit",
-            textDecoration: "underline",
-            textUnderlineOffset: 4,
-          }}
-        >
-          {t("ec.r.bankHistory.skip")}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 // ──────────────────── Account preview ────────────────────
 // Renders a stack of currency cards showing what the user's actual
 // account identifiers will look like after onboarding. For currencies
@@ -1314,7 +1242,6 @@ Object.assign(window, {
   EcIco,
   EcIntro, EcQuestionHeader,
   EcCountry, EcIndustry, EcServices, EcVolume, EcCorridors, EcCrypto,
-  EcBankHistoryStep,
   EcResult, EcAccountPreview, EcAccountCard,
   EcResultApproved, EcResultBlocked,
 });
