@@ -5,7 +5,7 @@
 
   // ─────────────────────────── ITALIANO (IT) ───────────────────────────
   Object.assign(D.it, {
-    "ec.header.eyebrow": "Verifica idoneità · 2 min",
+    "ec.header.eyebrow": "Verifica idoneità · 90 sec",
 
     "common.continue": "Continua",
     "common.back": "Indietro",
@@ -377,7 +377,7 @@
 
   // ─────────────────────────── ESPAÑOL (ES) ───────────────────────────
   Object.assign(D.es, {
-    "ec.header.eyebrow": "Comprobación de idoneidad · 2 min",
+    "ec.header.eyebrow": "Comprobación de idoneidad · 90 seg",
 
     "common.continue": "Continuar",
     "common.back": "Atrás",

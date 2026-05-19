@@ -6,7 +6,7 @@
 
   // ─────────────────────────── POLSKI (PL) ───────────────────────────
   Object.assign(D.pl, {
-    "ec.header.eyebrow": "Sprawdzenie kwalifikacji · 2 min",
+    "ec.header.eyebrow": "Sprawdzenie kwalifikacji · 90 sek",
 
     "common.continue": "Dalej",
     "common.back": "Wstecz",
@@ -378,7 +378,7 @@
 
   // ─────────────────────────── PORTUGUÊS (PT) ───────────────────────────
   Object.assign(D.pt, {
-    "ec.header.eyebrow": "Verificação de elegibilidade · 2 min",
+    "ec.header.eyebrow": "Verificação de elegibilidade · 90 seg",
 
     "common.continue": "Continuar",
     "common.back": "Voltar",
@@ -752,7 +752,7 @@
 
   // ─────────────────────────── FRANÇAIS (FR) ───────────────────────────
   Object.assign(D.fr, {
-    "ec.header.eyebrow": "Test d'éligibilité · 2 min",
+    "ec.header.eyebrow": "Test d'éligibilité · 90 sec",
 
     "common.continue": "Continuer",
     "common.back": "Retour",

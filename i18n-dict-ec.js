@@ -9,7 +9,7 @@
   // ─────────────────────────── ENGLISH (source) ───────────────────────────
   Object.assign(D.en, {
     // Header
-    "ec.header.eyebrow": "Eligibility check · 2 min",
+    "ec.header.eyebrow": "Eligibility check · 90 seconds",
 
     // Common buttons
     "common.continue": "Continue",

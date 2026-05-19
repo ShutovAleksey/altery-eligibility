@@ -5,7 +5,7 @@
 
   // ─────────────────────────── NEDERLANDS (NL) ───────────────────────────
   Object.assign(D.nl, {
-    "ec.header.eyebrow": "Geschiktheidscheck · 2 min",
+    "ec.header.eyebrow": "Geschiktheidscheck · 90 sec",
 
     "common.continue": "Doorgaan",
     "common.back": "Terug",
@@ -377,7 +377,7 @@
 
   // ─────────────────────────── TÜRKÇE (TR) ───────────────────────────
   Object.assign(D.tr, {
-    "ec.header.eyebrow": "Uygunluk kontrolü · 2 dk",
+    "ec.header.eyebrow": "Uygunluk kontrolü · 90 sn",
 
     "common.continue": "Devam",
     "common.back": "Geri",
