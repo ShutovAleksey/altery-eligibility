@@ -236,8 +236,13 @@ function EcIntro({ onStart }) {
         lead={t("ec.intro.lead", { total: TOTAL_STEPS })} />
 
       <div className="ec-value">
-        {/* Row 1 — entity + plan match. Blue (default). The "route"
-            icon visualises being directed to the right regulated entity. */}
+        {/* Sales-led ordering — three claims, narrowing from setup to
+            wallet: (1) we tailor a plan to you, (2) here is what we
+            would open and which products you'd get, (3) here is the
+            monthly cost. The user does not care which entity issues
+            the account; they care whether it opens and what it costs.
+            Row 3 (cost) carries the success-green accent because
+            that's the line that closes the sale. */}
         <div className="ec-value__row">
           <span className="ec-value__icon"><EcIco.route style={{ width: 18, height: 18 }} /></span>
           <div>
@@ -245,20 +250,15 @@ function EcIntro({ onStart }) {
             <div className="ec-value__body">{t("ec.intro.value1.body")}</div>
           </div>
         </div>
-        {/* Row 2 — cost projection vs typical bank. Hero differentiator:
-            no major EMI does this on entry (per primary research review).
-            Banknote icon + success-green to anchor the savings frame. */}
         <div className="ec-value__row">
-          <span className="ec-value__icon" style={{ background: "var(--c-success-soft)", color: "var(--c-success)" }}><EcIco.banknote style={{ width: 18, height: 18 }} /></span>
+          <span className="ec-value__icon" style={{ background: "var(--c-warning-soft)", color: "var(--c-warning)" }}><EcIco.bolt style={{ width: 18, height: 18 }} /></span>
           <div>
             <div className="ec-value__title">{t("ec.intro.value2.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value2.body")}</div>
           </div>
         </div>
-        {/* Row 3 — shareable PDF. Speaks to Forrester's 13-stakeholder
-            average — the artifact-for-the-buying-committee angle. */}
         <div className="ec-value__row">
-          <span className="ec-value__icon"><EcIco.copy style={{ width: 18, height: 18 }} /></span>
+          <span className="ec-value__icon" style={{ background: "var(--c-success-soft)", color: "var(--c-success)" }}><EcIco.banknote style={{ width: 18, height: 18 }} /></span>
           <div>
             <div className="ec-value__title">{t("ec.intro.value3.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value3.body")}</div>
@@ -272,10 +272,10 @@ function EcIntro({ onStart }) {
         </Button>
       </div>
 
-      {/* Regulated-EMI trust strip — directly addresses the "rejected by
-          traditional banks" ICP frame. Reads as a small footnote below the
-          CTA: regulator names rather than logos because logo usage requires
-          explicit consent from each regulator. */}
+      {/* Quiet trust footnote below the CTA — three commitments that
+          remove friction from clicking the button ("nothing to sign up",
+          "no credit hit"), backed by a small regulator stamp at the end.
+          Subdued styling on purpose: this is reassurance, not branding. */}
       <div className="ec-intro__trust">{t("ec.intro.trust")}</div>
     </div>
   );

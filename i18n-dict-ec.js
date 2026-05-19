@@ -25,17 +25,17 @@
     "common.contactTeam": "Contact our team",
 
     // Intro screen
-    "ec.intro.eyebrow": "Eligibility check · 90 seconds",
-    "ec.intro.title": "Find the Altery plan that fits — and what you'd save",
-    "ec.intro.lead": "{total} questions about your business. You'll see the entity (UK, EU or MENA), the plan that matches your volume, and a concrete projection of what you'd pay on Altery vs a typical business bank. Built for digital-native teams banks turn away. No signup, no credit check.",
-    "ec.intro.value1.title": "A plan and entity matched to your business",
-    "ec.intro.value1.body": "We route you to the regulated entity that fits — FCA-licensed UK, Central Bank of Cyprus EU, or DFSA-regulated MENA — plus the rails and currencies we actually support for your flows.",
-    "ec.intro.value2.title": "A real cost projection, not a quote",
-    "ec.intro.value2.body": "Most providers list fees in a table. We compute what you'd actually pay on Altery versus a typical business bank — for your FX volumes and your SWIFT and SEPA mix. Savings show up in euros per month.",
-    "ec.intro.value3.title": "A shareable PDF for your team",
-    "ec.intro.value3.body": "B2B decisions touch about 13 stakeholders. You'll get a PDF with the entity, plan, projected savings and your setup link — easy to forward to your CFO or co-founder.",
-    "ec.intro.cta": "Start the check",
-    "ec.intro.trust": "Regulated EMI · FCA (UK) · Central Bank of Cyprus (EU) · DFSA (MENA)",
+    "ec.intro.eyebrow": "Personalised plan · 90 seconds",
+    "ec.intro.title": "Your Altery plan, built around your business",
+    "ec.intro.lead": "Tell us {total} things about how your business moves money. We'll come back with a plan built for you — the products you'd actually use, the monthly cost you'd actually pay, and the savings versus what a typical business bank charges. Made for digital-first businesses other banks don't quite know what to do with.",
+    "ec.intro.value1.title": "A plan tailored to your business",
+    "ec.intro.value1.body": "Not a tier from a public pricing page. We look at your industry, volume, payment corridors and currencies — then assemble the products that actually fit how you operate.",
+    "ec.intro.value2.title": "Every product we'd open for you",
+    "ec.intro.value2.body": "Multi-currency accounts, FX corridors, mass payouts, business cards, crypto-friendly rails where they apply. You'll see the exact mix on offer — before you upload a single document.",
+    "ec.intro.value3.title": "What you'd actually pay each month",
+    "ec.intro.value3.body": "Your monthly fee, your FX cost, your SWIFT and SEPA cost — and the savings versus what a typical business bank would charge you for the same flows. In euros, not percentages.",
+    "ec.intro.cta": "Build my plan",
+    "ec.intro.trust": "No signup · No credit check · Licensed EMI (FCA · CBC · DFSA)",
 
     // Question header
     "ec.q.eyebrow": "of {total} questions",
