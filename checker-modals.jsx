@@ -450,6 +450,13 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
   const [colleagueSent, setColleagueSent] = useState(false);
   const [colleagueError, setColleagueError] = useState(null);
 
+  // Engagement signals for the next-steps checklist on the sent stage.
+  // colleagueSent → step 2 ("Forward to your CFO or co-founder") flips done.
+  // scheduleClicked → step 3 ("Schedule a 15-min intro call") flips done.
+  // Both are write-once locally — there's no value in toggling back, and
+  // refreshing the modal regenerates state from scratch.
+  const [scheduleClicked, setScheduleClicked] = useState(false);
+
   // ESC close + body scroll lock
   useEffect(() => {
     const onKey = (e) => { if (e.key === "Escape") onClose(); };
@@ -496,10 +503,18 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
     setColleagueSubmitting(true);
     setColleagueError(null);
     try {
-      // Reuses the same end-to-end pipeline as the primary send.
-      // Cheaper to regenerate the PDF than to thread cached bytes
-      // through state — 2s of compute against vastly simpler code.
-      await ecSendAnalysisEmail({ rec, email: colleagueEmail.trim(), t });
+      // Reuses the same end-to-end pipeline as the primary send. The
+      // colleague copy is delivered with a forwarder banner so the
+      // recipient immediately sees who shared it — turns a cold send
+      // into a contextual one and aligns two stakeholders on the same
+      // artifact. Cheaper to regenerate the PDF than to thread cached
+      // bytes through state — 2s of compute against vastly simpler code.
+      await ecSendAnalysisEmail({
+        rec,
+        email: colleagueEmail.trim(),
+        t,
+        forwardedBy: email.trim(),
+      });
       setColleagueSent(true);
     } catch (err) {
       console.error("[EcHandoffModal] colleague copy failed:", err);
@@ -674,19 +689,25 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                     <div className="ec-handoff__nextSteps__body">{t("ec.handoff.sent.step1.body", { email })}</div>
                   </div>
                 </li>
-                <li className="ec-handoff__nextSteps__item">
-                  <span className="ec-handoff__nextSteps__num" aria-hidden="true">2</span>
+                <li className={"ec-handoff__nextSteps__item" + (colleagueSent ? " is-done" : "")}>
+                  <span className="ec-handoff__nextSteps__num" aria-hidden="true">{colleagueSent ? "✓" : "2"}</span>
                   <div>
                     <div className="ec-handoff__nextSteps__title">{t("ec.handoff.sent.step2.title")}</div>
                     <div className="ec-handoff__nextSteps__body">{t("ec.handoff.sent.step2.body")}</div>
                   </div>
                 </li>
-                <li className="ec-handoff__nextSteps__item">
-                  <span className="ec-handoff__nextSteps__num" aria-hidden="true">3</span>
+                <li className={"ec-handoff__nextSteps__item" + (scheduleClicked ? " is-done" : "")}>
+                  <span className="ec-handoff__nextSteps__num" aria-hidden="true">{scheduleClicked ? "✓" : "3"}</span>
                   <div>
                     <div className="ec-handoff__nextSteps__title">{t("ec.handoff.sent.step3.title")}</div>
                     <div className="ec-handoff__nextSteps__body">
-                      <a href={EC_CALENDLY_URL} target="_blank" rel="noopener noreferrer" className="ec-handoff__nextSteps__link">
+                      <a
+                        href={EC_CALENDLY_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ec-handoff__nextSteps__link"
+                        onClick={() => setScheduleClicked(true)}
+                      >
                         {t("ec.handoff.sent.step3.link")} →
                       </a>
                     </div>

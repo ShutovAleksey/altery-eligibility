@@ -697,7 +697,7 @@ function ecBlobToBase64(blob) {
 // fast, and avoids per-invocation CPU cost on the email path.
 // Trade-off: a few extra MB on the user's browser bundle (the
 // html2pdf script, which we load async).
-async function ecSendAnalysisEmail({ rec, email, t }) {
+async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
   await ecWaitForPdfLibs();
 
   const langCode = (window.__I18N && typeof window.__I18N.getLang === "function")
@@ -897,9 +897,28 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
     // never needs to know about translations — it just slots these
     // strings into its template. Keeps i18n logic in one place and
     // keeps the API function tiny.
+    // Forwarded-copy mode: when an existing recipient shares the PDF
+    // with a colleague, we surface that context inline so the new
+    // reader sees who sent it and why. Localized client-side; server
+    // just slots the string into a banner above the hero. Empty
+    // string when this is the primary send (no banner rendered).
+    const safeForwarder = (typeof forwardedBy === "string" && forwardedBy.includes("@"))
+      ? forwardedBy.trim()
+      : "";
+    const forwardedByBanner = safeForwarder
+      ? t("ec.email.forwarded.banner", { forwarder: safeForwarder })
+      : "";
+    const forwardedByLabel = safeForwarder
+      ? t("ec.email.forwarded.label")
+      : "";
+
     const emailStrings = {
-      subject:        t("ec.email.subject",   { plan: planName }),
-      preheader:      t("ec.email.preheader", { plan: planName, entity: entityName }),
+      subject:        safeForwarder
+        ? t("ec.email.forwarded.subject", { forwarder: safeForwarder, plan: planName })
+        : t("ec.email.subject", { plan: planName }),
+      preheader:      safeForwarder
+        ? t("ec.email.forwarded.preheader", { forwarder: safeForwarder, plan: planName })
+        : t("ec.email.preheader", { plan: planName, entity: entityName }),
       eyebrow:        t("ec.email.eyebrow"),
       titleMid:       t("ec.r.title.middle"),
       titleEnd:       t("ec.r.title.after"),
@@ -911,6 +930,8 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
       calendlyCta:    t("ec.email.calendlyCta"),
       footerTagline:  t("ec.pdf.footer.tagline"),
       footerEntities: t("ec.pdf.footer.entities"),
+      forwardedByBanner,
+      forwardedByLabel,
     };
 
     const apiRes = await fetch("/api/send-analysis", {
@@ -927,6 +948,7 @@ async function ecSendAnalysisEmail({ rec, email, t }) {
         langCode,
         calendlyURL: EC_CALENDLY_URL,
         emailStrings,
+        forwardedBy: safeForwarder,
       }),
     });
 

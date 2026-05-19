@@ -324,6 +324,10 @@
     "ec.email.tail1": "Konfiguracja zajmuje około 10 minut i zapisuje się na bieżąco. Twoje odpowiedzi z testu kwalifikowalności są wstępnie wypełnione — onboarding kontynuuje od miejsca, w którym skończyła się ta analiza.",
     "ec.email.tail2": "Pytania? Po prostu odpowiedz na ten e-mail lub napisz na <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> — chętnie pomożemy.",
     "ec.email.calendlyCta": "Lub umów 15-min rozmowę wprowadzającą",
+    "ec.email.forwarded.label": "Udostępnione tobie",
+    "ec.email.forwarded.banner": "<strong>{forwarder}</strong> udostępnił(a) ci tę analizę Altery Business banking — rozważają plan {plan} i pomyśleli, że ty też powinieneś to zobaczyć.",
+    "ec.email.forwarded.subject": "{forwarder} udostępnił(a) ci propozycję Altery {plan}",
+    "ec.email.forwarded.preheader": "Propozycja Altery {plan}, którą {forwarder} chciał(a) ci pokazać — PDF w załączniku.",
     "ec.pdf.footer.entities": "Altery Ltd (UK · FCA-licencjonowany EMI) · Altery EU (CY · Centralny Bank Cypru EMI) · Altery MENA (DIFC · DFSA)",
 
     "ec.r.reasoning.head": "Dlaczego polecamy {plan}",
@@ -694,6 +698,10 @@
     "ec.email.tail1": "A configuração demora cerca de 10 minutos e guarda à medida que avança. As suas respostas do teste de elegibilidade estão pré-preenchidas — o onboarding continua de onde esta análise parou.",
     "ec.email.tail2": "Dúvidas? Responda a este email ou escreva para <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> — estamos cá para ajudar.",
     "ec.email.calendlyCta": "Ou marcar uma call introdutória de 15 min",
+    "ec.email.forwarded.label": "Partilhado contigo",
+    "ec.email.forwarded.banner": "<strong>{forwarder}</strong> partilhou contigo esta análise da Altery Business banking — estão a considerar o plano {plan} e pensaram que também devias vê-la.",
+    "ec.email.forwarded.subject": "{forwarder} partilhou contigo uma proposta Altery {plan}",
+    "ec.email.forwarded.preheader": "Uma proposta Altery {plan} que {forwarder} achou que devias ver — PDF em anexo.",
     "ec.pdf.footer.entities": "Altery Ltd (UK · EMI licenciada pela FCA) · Altery EU (CY · Banco Central de Chipre EMI) · Altery MENA (DIFC · DFSA)",
 
     "ec.r.reasoning.head": "Porque recomendamos {plan}",
@@ -1062,6 +1070,10 @@
     "ec.email.tail1": "La configuration prend environ 10 minutes et se sauvegarde au fur et à mesure. Vos réponses du check d'éligibilité sont pré-remplies — l'onboarding reprend là où cette analyse s'arrête.",
     "ec.email.tail2": "Des questions ? Répondez simplement à cet email ou écrivez à <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> — nous sommes là pour aider.",
     "ec.email.calendlyCta": "Ou planifier un appel d'intro de 15 min",
+    "ec.email.forwarded.label": "Partagé avec vous",
+    "ec.email.forwarded.banner": "<strong>{forwarder}</strong> a partagé avec vous cette analyse Altery Business banking — ils envisagent le plan {plan} et ont pensé que vous deviez la voir aussi.",
+    "ec.email.forwarded.subject": "{forwarder} vous a partagé une proposition Altery {plan}",
+    "ec.email.forwarded.preheader": "Une proposition Altery {plan} que {forwarder} a souhaité partager avec vous — PDF en pièce jointe.",
     "ec.pdf.footer.entities": "Altery Ltd (UK · EMI agréée FCA) · Altery EU (CY · Banque centrale de Chypre EMI) · Altery MENA (DIFC · DFSA)",
 
     "ec.r.reasoning.head": "Pourquoi nous recommandons {plan}",

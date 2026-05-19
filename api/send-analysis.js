@@ -42,7 +42,7 @@ const EMAIL_RE      = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // persona eyebrow → entity-and-plan title with light-blue accents →
 // muted lead → beige entity pill with success dot → CTA. Recipients
 // who saw the result page should feel they're reading the same artifact.
-function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoURL, calendlyURL, strings, langCode }) {
+function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoURL, calendlyURL, strings, langCode, forwardedBy }) {
   const C = {
     primary:      "#002780",
     headerBg:     "#000537",  // Midnight navy — same as on-screen .ec-header
@@ -76,6 +76,25 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
           <a href="${calendlyURL}" style="display:inline-block;font-size:13px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${s.calendlyCta || "Schedule a 15-min intro call"} →</a>
         </td></tr>` : "";
 
+  // Forwarder banner — rendered only when this email is a forwarded copy
+  // (i.e. the original recipient shared with a colleague). Sits in the
+  // first body row above the hero to give the new reader immediate context
+  // about who shared the analysis and why. Uses the soft beige surface so
+  // it reads as a system note, not promotional copy.
+  const forwarderBlock = forwardedBy ? `
+        <tr><td style="padding:24px 24px 0;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;">
+            <tr><td style="padding:14px 18px;">
+              <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">
+                ${s.forwardedByLabel || "Shared with you"}
+              </div>
+              <div style="font-size:13px;line-height:19px;color:${C.ink};">
+                ${s.forwardedByBanner || `<strong>${forwardedBy}</strong> shared this Altery Business banking analysis with you — they're exploring an account and thought you should see it too.`}
+              </div>
+            </td></tr>
+          </table>
+        </td></tr>` : "";
+
   return `<!doctype html>
 <html lang="${lang}">
 <head>
@@ -104,6 +123,8 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
             </tr>
           </table>
         </td></tr>
+
+        ${forwarderBlock}
 
         <!-- Hero — eyebrow + persona + title-with-accents + lead + pill -->
         <tr><td style="padding:32px 36px 4px;">
@@ -194,6 +215,7 @@ export default async function handler(req, res) {
       email, pdfBase64, filename,
       planName, entityName, sessionLink, personaLine,
       langCode, calendlyURL, emailStrings,
+      forwardedBy,
     } = body;
 
     // Input validation — server-side, never trust the client.
@@ -237,6 +259,16 @@ export default async function handler(req, res) {
     // missing keys fall through to English defaults inside the builder.
     const safeStrings = (emailStrings && typeof emailStrings === "object") ? emailStrings : {};
 
+    // forwardedBy — the original recipient's email when this send is a
+    // colleague forward. Validated as an email (same regex as recipient)
+    // and capped at 80 chars so an attacker can't inject markup or a
+    // payload disguised as the sender label. Empty string ⇒ no banner.
+    const safeForwardedBy = (typeof forwardedBy === "string"
+      && EMAIL_RE.test(forwardedBy.trim())
+      && forwardedBy.trim().length <= 80)
+      ? forwardedBy.trim()
+      : "";
+
     // Subject — localized client-side (already plan-interpolated).
     // Fall back to a constructed English subject if the client didn't
     // send one (older client cached in browser).
@@ -259,6 +291,7 @@ export default async function handler(req, res) {
       calendlyURL: safeCalendly,
       strings:     safeStrings,
       langCode:    safeLang,
+      forwardedBy: safeForwardedBy,
     });
 
     const safeFilename = (typeof filename === "string" && /^[A-Za-z0-9_\-.]+\.pdf$/.test(filename))

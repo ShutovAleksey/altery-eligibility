@@ -422,6 +422,10 @@
     "ec.email.tail1": "Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off.",
     "ec.email.tail2": "Questions? Just reply to this email or write to <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> — we're here to help.",
     "ec.email.calendlyCta": "Or schedule a 15-min intro call",
+    "ec.email.forwarded.label": "Shared with you",
+    "ec.email.forwarded.banner": "<strong>{forwarder}</strong> shared this Altery Business banking analysis with you — they're exploring the {plan} plan and thought you should see it too.",
+    "ec.email.forwarded.subject": "{forwarder} shared an Altery {plan} proposal with you",
+    "ec.email.forwarded.preheader": "An Altery {plan} proposal {forwarder} thought you should see — PDF attached.",
     "ec.pdf.footer.entities": "Altery Ltd (UK · FCA-licensed EMI) · Altery EU (CY · Central Bank of Cyprus EMI) · Altery MENA (DIFC · DFSA)",
 
     // Reasoning — "Why we recommend X plan"

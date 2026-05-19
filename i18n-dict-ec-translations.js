@@ -327,6 +327,10 @@
     "ec.email.tail1": "Setup dauert etwa 10 Minuten und speichert laufend. Ihre Antworten aus der Eignungsprüfung sind vorausgefüllt — das Onboarding macht dort weiter, wo diese Analyse aufhört.",
     "ec.email.tail2": "Fragen? Antworten Sie einfach auf diese E-Mail oder schreiben Sie an <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> — wir helfen gerne.",
     "ec.email.calendlyCta": "Oder 15-Min-Erstgespräch buchen",
+    "ec.email.forwarded.label": "Mit dir geteilt",
+    "ec.email.forwarded.banner": "<strong>{forwarder}</strong> hat diese Altery-Business-Banking-Analyse mit dir geteilt — sie prüfen den {plan}-Tarif und meinten, du solltest es auch sehen.",
+    "ec.email.forwarded.subject": "{forwarder} hat dir einen Altery-{plan}-Vorschlag weitergeleitet",
+    "ec.email.forwarded.preheader": "Ein Altery-{plan}-Vorschlag, den {forwarder} mit dir teilen wollte — PDF angehängt.",
     "ec.pdf.footer.entities": "Altery Ltd (UK · FCA-lizenzierte EMI) · Altery EU (CY · Zentralbank Zypern EMI) · Altery MENA (DIFC · DFSA)",
 
     "ec.r.reasoning.head": "Warum wir {plan} empfehlen",
@@ -697,6 +701,10 @@
     "ec.email.tail1": "Настройка занимает около 10 минут и сохраняется автоматически. Ответы из проверки уже заполнены — онбординг продолжится с того места, где закончился этот анализ.",
     "ec.email.tail2": "Вопросы? Просто ответьте на это письмо или напишите на <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> — мы поможем.",
     "ec.email.calendlyCta": "Или записаться на 15-минутный звонок",
+    "ec.email.forwarded.label": "Поделились с вами",
+    "ec.email.forwarded.banner": "<strong>{forwarder}</strong> поделился(-лась) с вами анализом бизнес-банкинга от Altery — они рассматривают тариф {plan} и решили, что вам стоит это увидеть.",
+    "ec.email.forwarded.subject": "{forwarder} переслал(а) вам предложение Altery {plan}",
+    "ec.email.forwarded.preheader": "Предложение Altery {plan}, которым {forwarder} решил(а) поделиться с вами — PDF во вложении.",
     "ec.pdf.footer.entities": "Altery Ltd (UK · FCA EMI) · Altery EU (CY · Центральный банк Кипра EMI) · Altery MENA (DIFC · DFSA)",
 
     "ec.r.reasoning.head": "Почему мы рекомендуем {plan}",

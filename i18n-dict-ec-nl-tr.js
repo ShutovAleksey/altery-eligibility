@@ -323,6 +323,10 @@
     "ec.email.tail1": "Setup duurt ongeveer 10 minuten en bewaart onderweg. Uw antwoorden uit de geschiktheidscheck zijn vooraf ingevuld — onboarding gaat verder waar deze analyse stopte.",
     "ec.email.tail2": "Vragen? Antwoord gewoon op deze e-mail of schrijf naar <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> — we helpen graag.",
     "ec.email.calendlyCta": "Of plan een 15-min intro-gesprek",
+    "ec.email.forwarded.label": "Met jou gedeeld",
+    "ec.email.forwarded.banner": "<strong>{forwarder}</strong> heeft deze Altery Business banking-analyse met je gedeeld — ze overwegen het {plan}-pakket en vonden dat jij het ook moest zien.",
+    "ec.email.forwarded.subject": "{forwarder} deelt een Altery {plan}-voorstel met je",
+    "ec.email.forwarded.preheader": "Een Altery {plan}-voorstel dat {forwarder} met je wilde delen — PDF bijgevoegd.",
     "ec.pdf.footer.entities": "Altery Ltd (UK · FCA-EMI) · Altery EU (CY · Centrale Bank van Cyprus EMI) · Altery MENA (DIFC · DFSA)",
 
     "ec.r.reasoning.head": "Waarom we {plan} aanbevelen",
@@ -693,6 +697,10 @@
     "ec.email.tail1": "Kurulum yaklaşık 10 dakika sürer ve ilerleme kaydedilir. Uygunluk testindeki cevaplarınız önceden doldurulmuş — onboarding bu analizin bittiği yerden devam eder.",
     "ec.email.tail2": "Sorularınız mı var? Bu e-postaya yanıt verin veya <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> adresine yazın — yardımcı olalım.",
     "ec.email.calendlyCta": "Veya 15 dakikalık tanışma görüşmesi planla",
+    "ec.email.forwarded.label": "Sizinle paylaşıldı",
+    "ec.email.forwarded.banner": "<strong>{forwarder}</strong> bu Altery işletme bankacılığı analizini sizinle paylaştı — {plan} planını değerlendiriyorlar ve sizin de görmenizi istediler.",
+    "ec.email.forwarded.subject": "{forwarder} sizinle bir Altery {plan} teklifi paylaştı",
+    "ec.email.forwarded.preheader": "{forwarder}'in sizinle paylaşmak istediği bir Altery {plan} teklifi — PDF eklidir.",
     "ec.pdf.footer.entities": "Altery Ltd (UK · FCA lisanslı EMI) · Altery EU (CY · Kıbrıs Merkez Bankası EMI) · Altery MENA (DIFC · DFSA)",
 
     "ec.r.reasoning.head": "{plan} planını neden öneriyoruz",
