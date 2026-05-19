@@ -961,7 +961,18 @@ function EcResultApproved({ rec, onBack, onReset }) {
   // the PDF, so on-screen numbers match the email proposal exactly.
   // Returns null when the volume is too small for a meaningful projection;
   // we hide the whole savings card in that case (grid collapses to plan-only).
-  const cost = ecComputeCostBreakdown(rec);
+  //
+  // We compute against a virtual rec that swaps in activePlan, so when the
+  // user picks a different plan from the comparison modal the savings card
+  // (and any downstream views built from `cost`) recompute live against the
+  // new subscription. Only `rec.plan` changes inside the override — every
+  // other input (volume, services, corridors) stays the user's actual
+  // answers, so the projection still reflects how they operate.
+  const activeRec = useMemo(
+    () => ({ ...rec, plan: activePlan }),
+    [rec, activePlan]
+  );
+  const cost = useMemo(() => ecComputeCostBreakdown(activeRec), [activeRec]);
 
   // Narrow no-break space (U+202F) as the thousands separator —
   // "€9 500" instead of "€9,500". European convention used across the
@@ -1078,6 +1089,34 @@ function EcResultApproved({ rec, onBack, onReset }) {
                 <span className="ec-r__planPrice__cycle">{t(activePlan.cycleKey)}</span>
               </div>
             </div>
+            {/* Soft notice — shown only when the user has switched away
+                from the algorithm's recommendation via the comparison
+                modal. Contextual ("this plan you're reading is not the
+                best fit"), reassuring tone (info icon, not warning),
+                with a one-click revert to the originally recommended
+                plan. The savings card above and the perks list below
+                are already recalculated against the active plan, so
+                the user can compare apples-to-apples before deciding. */}
+            {!isOnRecommended && (
+              <div className="ec-r__planAlt" role="status">
+                <span className="ec-r__planAlt__icon" aria-hidden="true">
+                  <EcIco.info style={{ width: 14, height: 14 }} />
+                </span>
+                <div className="ec-r__planAlt__body">
+                  <div className="ec-r__planAlt__title">
+                    {t("ec.r.plan.notRecommended.title", { recommended: t(recommendedPlan.nameKey) })}
+                  </div>
+                  <div className="ec-r__planAlt__text">{t("ec.r.plan.notRecommended.body")}</div>
+                </div>
+                <button
+                  type="button"
+                  className="ec-r__planAlt__switch"
+                  onClick={() => setSelectedPlanId(null)}
+                >
+                  {t("ec.r.plan.notRecommended.switchBack", { recommended: t(recommendedPlan.nameKey) })}
+                </button>
+              </div>
+            )}
             <ul className="ec-r__perks">
               {activePlan.perkKeys.slice(0, 5).map((k, i) => (
                 <li className="ec-r__perk" key={i}>

@@ -146,6 +146,9 @@
     "ec.r.plan.fit": "Adatto al tuo volume",
     "ec.r.plan.switch": "Puoi cambiare piano in qualsiasi momento dalla dashboard.",
     "ec.r.plan.compareAll": "Confronta tutti i piani →",
+    "ec.r.plan.notRecommended.title": "{recommended} è più adatto alla tua attività",
+    "ec.r.plan.notRecommended.body": "In base alle tue risposte, il piano consigliato copre di più di ciò che useresti davvero. Puoi comunque proseguire con questo — i numeri sopra sono ricalcolati per il piano scelto.",
+    "ec.r.plan.notRecommended.switchBack": "Torna a {recommended}",
     "ec.r.caveats.head": "Da sapere prima di candidarti",
     "ec.r.cta.continue": "Vai alla richiesta — ≈ 17 min",
 
@@ -521,6 +524,9 @@
     "ec.r.plan.fit": "Adecuado para tu volumen",
     "ec.r.plan.switch": "Puedes cambiar de plan cuando quieras desde el panel.",
     "ec.r.plan.compareAll": "Comparar todos los planes →",
+    "ec.r.plan.notRecommended.title": "{recommended} encaja mejor con tu negocio",
+    "ec.r.plan.notRecommended.body": "Según tus respuestas, el plan recomendado cubre más de lo que realmente usarías. Puedes seguir con este — las cifras de arriba están recalculadas para el plan seleccionado.",
+    "ec.r.plan.notRecommended.switchBack": "Volver a {recommended}",
     "ec.r.caveats.head": "Conviene saber antes de solicitar",
     "ec.r.cta.continue": "Continuar a la solicitud — ≈ 17 min",
 

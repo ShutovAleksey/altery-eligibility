@@ -147,6 +147,9 @@
     "ec.r.plan.fit": "Dopasowane do wolumenu",
     "ec.r.plan.switch": "Plan można zmienić w każdej chwili z panelu.",
     "ec.r.plan.compareAll": "Porównaj wszystkie plany →",
+    "ec.r.plan.notRecommended.title": "{recommended} lepiej pasuje do Twojej firmy",
+    "ec.r.plan.notRecommended.body": "Na podstawie Twoich odpowiedzi sugerowany plan obejmuje więcej tego, czego faktycznie byś używał. Możesz nadal kontynuować z tym — liczby powyżej zostały przeliczone dla wybranego planu.",
+    "ec.r.plan.notRecommended.switchBack": "Wróć do {recommended}",
     "ec.r.caveats.head": "Warto wiedzieć przed wnioskiem",
     "ec.r.cta.continue": "Przejdź do wniosku — ok. 17 min",
 
@@ -522,6 +525,9 @@
     "ec.r.plan.fit": "Adequado ao seu volume",
     "ec.r.plan.switch": "Pode mudar de plano a qualquer momento no painel.",
     "ec.r.plan.compareAll": "Comparar todos os planos →",
+    "ec.r.plan.notRecommended.title": "{recommended} é melhor para o seu negócio",
+    "ec.r.plan.notRecommended.body": "Com base nas suas respostas, o plano sugerido cobre mais do que realmente usaria. Pode continuar com este — os números acima estão recalculados para o plano escolhido.",
+    "ec.r.plan.notRecommended.switchBack": "Voltar a {recommended}",
     "ec.r.caveats.head": "Bom saber antes de submeter",
     "ec.r.cta.continue": "Continuar para o pedido — ≈ 17 min",
 
@@ -895,6 +901,9 @@
     "ec.r.plan.fit": "Adapté à votre volume",
     "ec.r.plan.switch": "Vous pouvez changer de plan à tout moment depuis le tableau de bord.",
     "ec.r.plan.compareAll": "Comparer tous les plans →",
+    "ec.r.plan.notRecommended.title": "{recommended} correspond mieux à votre activité",
+    "ec.r.plan.notRecommended.body": "Selon vos réponses, le plan recommandé couvre davantage ce que vous utiliseriez vraiment. Vous pouvez quand même continuer avec celui-ci — les chiffres ci-dessus sont recalculés pour le plan choisi.",
+    "ec.r.plan.notRecommended.switchBack": "Revenir à {recommended}",
     "ec.r.caveats.head": "Bon à savoir avant de soumettre",
     "ec.r.cta.continue": "Continuer vers la demande — ≈ 17 min",
 

@@ -146,6 +146,9 @@
     "ec.r.plan.fit": "Passend bij jouw volume",
     "ec.r.plan.switch": "Je kunt het plan altijd wisselen vanuit het dashboard.",
     "ec.r.plan.compareAll": "Alle plannen vergelijken →",
+    "ec.r.plan.notRecommended.title": "{recommended} past beter bij jouw bedrijf",
+    "ec.r.plan.notRecommended.body": "Op basis van je antwoorden dekt het aanbevolen plan meer van wat je daadwerkelijk zou gebruiken. Je kunt nog steeds met dit plan verder — je cijfers hierboven zijn ervoor opnieuw berekend.",
+    "ec.r.plan.notRecommended.switchBack": "Terug naar {recommended}",
     "ec.r.caveats.head": "Goed om te weten vóór je aanvraagt",
     "ec.r.cta.continue": "Door naar de aanvraag — ca. 17 min",
 
@@ -521,6 +524,9 @@
     "ec.r.plan.fit": "Hacminize uygun",
     "ec.r.plan.switch": "Planı dilediğiniz an dashboard'dan değiştirebilirsiniz.",
     "ec.r.plan.compareAll": "Tüm planları karşılaştır →",
+    "ec.r.plan.notRecommended.title": "{recommended} işletmenize daha iyi uyuyor",
+    "ec.r.plan.notRecommended.body": "Yanıtlarınıza göre önerdiğimiz plan gerçekten kullanacaklarınızı daha fazla karşılıyor. Yine de bu planla devam edebilirsiniz — yukarıdaki rakamlarınız buna göre yeniden hesaplandı.",
+    "ec.r.plan.notRecommended.switchBack": "{recommended} planına geri dön",
     "ec.r.caveats.head": "Başvurmadan önce bilmekte fayda var",
     "ec.r.cta.continue": "Başvuruya geç — yaklaşık 17 dakika",
 

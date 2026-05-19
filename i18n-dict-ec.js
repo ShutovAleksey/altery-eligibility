@@ -234,6 +234,9 @@
         "ec.r.plan.fit": "Best fit for your volume",
         "ec.r.plan.switch": "You can switch plans any time from the dashboard.",
         "ec.r.plan.compareAll": "Compare all plans →",
+        "ec.r.plan.notRecommended.title": "{recommended} is the better fit for your business",
+        "ec.r.plan.notRecommended.body": "Based on your answers, our suggested plan covers more of what you'd actually use. You can still continue with this one — your numbers above are recalculated for it.",
+        "ec.r.plan.notRecommended.switchBack": "Switch back to {recommended}",
         "ec.r.caveats.head": "Worth knowing before you apply",
         "ec.r.cta.continue": "Set up this account",
 

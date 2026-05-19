@@ -2493,6 +2493,49 @@
       font-size: 12px; color: var(--c-muted);
       font-weight: 500;
     }
+    /* Soft notice shown inside the plan card when the user has switched
+       away from the recommended plan via the comparison modal. Sits
+       between the plan head and the perks list, so the cost/perks the
+       user is reading get framed as "fine, but not optimal" with a
+       one-click revert. Amber-soft background reads as advisory, not
+       alarming. The Switch back button is a tertiary text-button that
+       wraps below on narrow viewports. */
+    .ec-r__planAlt {
+      display: flex; align-items: flex-start; gap: 10px;
+      margin-top: 14px;
+      padding: 12px 14px;
+      background: var(--c-warning-soft);
+      border-radius: 12px;
+      flex-wrap: wrap;
+    }
+    .ec-r__planAlt__icon {
+      flex: 0 0 22px; width: 22px; height: 22px; border-radius: 999px;
+      background: #fff;
+      color: var(--c-warning);
+      display: inline-flex; align-items: center; justify-content: center;
+      margin-top: 1px;
+    }
+    .ec-r__planAlt__body { flex: 1 1 240px; min-width: 0; }
+    .ec-r__planAlt__title {
+      font-size: 13px; font-weight: 600; color: var(--c-ink);
+      line-height: 18px; margin-bottom: 2px;
+    }
+    .ec-r__planAlt__text {
+      font-size: 12px; line-height: 17px; color: var(--c-muted);
+    }
+    .ec-r__planAlt__switch {
+      flex: 0 0 auto;
+      appearance: none; border: 0; background: transparent;
+      padding: 0;
+      font: inherit;
+      font-size: 12px; font-weight: 600; line-height: 18px;
+      color: var(--c-primary);
+      cursor: pointer;
+      align-self: center;
+      letter-spacing: 0.005em;
+    }
+    .ec-r__planAlt__switch:hover { text-decoration: underline; }
+
     .ec-r__perks {
       list-style: none; margin: 0; padding: 16px 0;
       display: flex; flex-direction: column; gap: 10px;

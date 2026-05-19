@@ -150,6 +150,9 @@
     "ec.r.plan.fit": "Passend für Ihr Volumen",
     "ec.r.plan.switch": "Sie können den Tarif jederzeit im Dashboard wechseln.",
     "ec.r.plan.compareAll": "Alle Tarife vergleichen →",
+    "ec.r.plan.notRecommended.title": "{recommended} passt besser zu Ihrem Unternehmen",
+    "ec.r.plan.notRecommended.body": "Basierend auf Ihren Antworten deckt der empfohlene Tarif mehr von dem ab, was Sie tatsächlich nutzen würden. Sie können trotzdem mit diesem weitermachen — Ihre Zahlen oben sind dafür neu berechnet.",
+    "ec.r.plan.notRecommended.switchBack": "Zurück zu {recommended}",
     "ec.r.caveats.head": "Wichtig vor dem Antrag",
     "ec.r.cta.continue": "Weiter zum Antrag — ca. 17 Min.",
 
@@ -525,6 +528,9 @@
     "ec.r.plan.fit": "Подходит под ваш объём",
     "ec.r.plan.switch": "План можно сменить в любой момент в дашборде.",
     "ec.r.plan.compareAll": "Сравнить все планы →",
+    "ec.r.plan.notRecommended.title": "{recommended} подходит вашему бизнесу лучше",
+    "ec.r.plan.notRecommended.body": "По вашим ответам рекомендованный план покрывает больше того, чем вы реально будете пользоваться. Вы всё равно можете продолжить с этим — цифры выше пересчитаны под него.",
+    "ec.r.plan.notRecommended.switchBack": "Вернуться к {recommended}",
     "ec.r.caveats.head": "Что важно знать до подачи",
     "ec.r.cta.continue": "Перейти к заявке — около 17 минут",
 
