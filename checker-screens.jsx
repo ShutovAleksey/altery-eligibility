@@ -930,6 +930,22 @@ function EcResultApproved({ rec, onBack, onReset }) {
   const isOnRecommended = !selectedPlanId || selectedPlanId === recommendedPlan.id;
   const planName = t(activePlan.nameKey);
 
+  // Direction of the override relative to the recommended plan.
+  // "up"   = user picked a higher-tier plan than recommended (e.g. Pro→Ultra)
+  // "down" = user picked a lower-tier plan than recommended  (e.g. Pro→Starter)
+  // We surface a tier-specific explanation in the not-recommended notice
+  // because the trade-off is different in each direction:
+  //   up   → lower per-tx fees but capacity/features they may not need
+  //   down → looks cheaper on paper but caps below their volume or
+  //          misses services they said they need
+  // Without this, the projection in the savings card can read as if the
+  // higher tier is always the better deal — which is misleading when the
+  // recommendation is calibrated to actual usage rather than raw cost.
+  const PLAN_TIER = { starter: 0, pro: 1, ultra: 2 };
+  const altDirection = (PLAN_TIER[activePlan.id] ?? 0) > (PLAN_TIER[recommendedPlan.id] ?? 0)
+    ? "up"
+    : "down";
+
   // Onboarding redirect — used by both the primary CTA (direct) and the
   // handoff modal's email-stage "Send & continue" CTA. Centralised so the
   // URL-params construction stays in one place. Currency hint follows
@@ -1104,9 +1120,17 @@ function EcResultApproved({ rec, onBack, onReset }) {
                 </span>
                 <div className="ec-r__planAlt__body">
                   <div className="ec-r__planAlt__title">
-                    {t("ec.r.plan.notRecommended.title", { recommended: t(recommendedPlan.nameKey) })}
+                    {t("ec.r.plan.notRecommended." + altDirection + ".title", {
+                      recommended: t(recommendedPlan.nameKey),
+                      selected:    planName,
+                    })}
                   </div>
-                  <div className="ec-r__planAlt__text">{t("ec.r.plan.notRecommended.body")}</div>
+                  <div className="ec-r__planAlt__text">
+                    {t("ec.r.plan.notRecommended." + altDirection + ".body", {
+                      recommended: t(recommendedPlan.nameKey),
+                      selected:    planName,
+                    })}
+                  </div>
                 </div>
                 <button
                   type="button"
