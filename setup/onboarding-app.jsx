@@ -182,15 +182,31 @@ function hydrateFormState(checkerParams) {
         // Per-slice deep-merge so newly-added fields inside an existing slice
         // (e.g. extending uboDraft from {role} → {role, firstName, …}) show up
         // even when the saved payload predates them. Arrays replace as-is.
+        // Saved state wins over checkerParams here on purpose — if the user
+        // already started onboarding and edited their answers, a stale link
+        // re-opened later must not overwrite their work.
         return mergeFormState(INITIAL_FORM_STATE, parsed);
       }
     }
   } catch (e) { /* storage unavailable / parse error → fall through to seed */ }
+
+  // Cherry-pick what we can confidently prefill from the checker payload.
+  // Rule of thumb: only seed a screen-visible field when the source and
+  // target vocabularies are 1:1 unambiguous. country code → country code is
+  // safe. Industry / channels mappings between checker and KYB vocabularies
+  // are lossy (checker has 10+ digital-business segments; KYB business-info
+  // dropdown has 6 broad categories), so those go into meta.checkerHints
+  // where downstream screens can opt in to use them as suggestions rather
+  // than forcing a possibly-wrong default into a form field.
   return {
     ...INITIAL_FORM_STATE,
     auth: {
       ...INITIAL_FORM_STATE.auth,
       email: checkerParams.email || "",
+    },
+    contact: {
+      ...INITIAL_FORM_STATE.contact,
+      country: checkerParams.country || null,
     },
     plan: {
       selectedPlanId: checkerParams.plan || null,
@@ -200,6 +216,16 @@ function hydrateFormState(checkerParams) {
       ...INITIAL_FORM_STATE.meta,
       token: checkerParams.token || null,
       startedAt: new Date().toISOString(),
+      // Non-form hints — preserved for screens that want to suggest a
+      // default without overwriting user-visible fields. Never read
+      // these as authoritative; they're advisory.
+      checkerHints: {
+        volume:       checkerParams.volume || null,
+        industry:     checkerParams.industry || null,
+        services:     checkerParams.services || [],
+        corridors:    checkerParams.corridors || [],
+        cryptoActive: !!checkerParams.cryptoActive,
+      },
     },
   };
 }
@@ -422,6 +448,10 @@ function App() {
             entity:       (payload.entity || "uk").toLowerCase(),
             token:        payload.ref || null,
             email:        null,
+            // ISO alpha-2; uppercased to match how the country screen
+            // stores its selection internally (e.g. "DE", "GB"). null
+            // when the checker didn't capture one (older payloads).
+            country:      payload.country ? String(payload.country).toUpperCase() : null,
             volume:       payload.volume ? String(payload.volume) : null,
             currency:     (payload.currency || "GBP").toUpperCase(),
             industry:     payload.industry || null,

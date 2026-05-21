@@ -426,6 +426,11 @@ function ecBuildHandoffPayload(rec, plan) {
     ref:          ecGenProposalRef(),
     plan:         active.id || "pro",
     entity:       rec?.entity?.id || "uk",
+    // ISO-3166 alpha-2 country code (e.g. "DE", "GB", "FR"). The
+    // onboarding country screen uses the same vocabulary, so this
+    // pre-fills the selection with no mapping needed. Falls back to
+    // null when the checker didn't capture one (older clients).
+    country:      rec?.country?.code || null,
     currency:     rec?.entity?.id === "uk" ? "GBP" : "EUR",
     volume:       rec?.monthlyVolume || null,
     industry:     rec?.ind?.value || null,
