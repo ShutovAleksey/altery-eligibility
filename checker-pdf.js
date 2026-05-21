@@ -425,7 +425,11 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       </div>
     </div>`).join("");
 
-  const sessionToken = (Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4)).toLowerCase();
+  // Self-contained handoff URL — all checker answers travel inside the
+  // ?p=<base64url> payload, so this PDF link works for the original
+  // recipient, anyone they forward it to, and across device switches.
+  // See ecBuildHandoffURL in checker-helpers.js.
+  const handoffURL = ecBuildHandoffURL(rec, rec.plan, "https://altery.com");
 
   // ─── Full document ───────────────────────────────────────────
   return `
@@ -510,11 +514,15 @@ ${checklistHTML}
 </div>
 <div style="margin-bottom:26px;">${stepsHTML}</div>
 
-<!-- Setup CTA block — navy, prominent. Mono-spaced URL for legibility -->
-<div style="background:${C.primary};border-radius:12px;padding:16px 20px;color:${C.white};margin-bottom:20px;">
+<!-- Setup CTA block — navy, prominent. Visible text shows a clean
+     altery.com/setup · proposalRef pairing; the underlying <a href>
+     points to the full ?p=<payload> URL so a click pre-fills every
+     onboarding field the checker collected. The link annotation is
+     wired via ecAddLinkAnnotations during PDF assembly. -->
+<a href="${handoffURL}" style="display:block;text-decoration:none;background:${C.primary};border-radius:12px;padding:16px 20px;color:${C.white};margin-bottom:20px;">
   <div style="font-size:10.5px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">${t("ec.pdf.continueSetup")}</div>
-  <div style="font-size:14px;color:${C.white};font-family:${FF_MONO};letter-spacing:-0.005em;">altery.com/setup/${sessionToken}</div>
-</div>
+  <div style="font-size:14px;color:${C.white};font-family:${FF_MONO};letter-spacing:-0.005em;">altery.com/setup · ${proposalRef}</div>
+</a>
 
 <!-- Account team — humanises the proposal. Validity notice gives
      it the legal-document weight of a real commercial proposal. -->
@@ -900,8 +908,12 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
     const personaLine = rec.ind && personaIndustries.includes(rec.ind.value)
       ? t("ec.r.persona." + rec.ind.value + ".line")
       : "";
-    const sessionToken = (Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4)).toLowerCase();
-    const sessionLink = "https://altery.com/setup/" + sessionToken;
+    // Email CTA destination — same self-contained handoff URL the PDF
+    // uses internally. One ?p=<base64url> payload pre-fills the entire
+    // onboarding from the original checker answers, so a colleague who
+    // gets the email forwarded picks up exactly where the original
+    // recipient left off.
+    const sessionLink = ecBuildHandoffURL(rec, rec.plan, "https://altery.com");
 
     // Resolve every localized string the email body needs, on the
     // client where the i18n dictionary already lives. The server

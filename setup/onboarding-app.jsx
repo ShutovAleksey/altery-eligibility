@@ -385,14 +385,58 @@ function App() {
   // (after checkerParams is computed, since the seed depends on URL params).
 
   // ── Eligibility-checker handoff ───────────────────────────────
-  // When the user arrives from altery.com (eligibility checker → "Start
-  // setup"), the checker passes their recommended plan, entity, session
-  // token and email through URL params so we can skip the prep screen
-  // and pre-fill what we already know. Defaults are safe if the user
-  // lands here directly (e.g. via help-centre deep link).
+  // Two URL shapes are accepted, in priority order:
+  //
+  //   1. ?p=<base64url-JSON> — current shape. One self-contained payload
+  //      carrying every checker answer (plan, entity, volume, industry,
+  //      services, corridors, cryptoActive, ref). Works across device
+  //      switches, email forwards to colleagues, and "I'll come back
+  //      later" because the link IS the state.
+  //
+  //   2. ?token=&plan=&entity=&currency=&volume= — legacy individual
+  //      params. Kept as a fallback so emails/PDFs already in the wild,
+  //      bookmarked URLs, and direct deep-links from older clients keep
+  //      working with no breakage.
+  //
+  // Defaults are safe if the user lands on /setup with neither shape —
+  // the prep checklist runs first and they pick everything by hand.
   const checkerParams = _useMemo(() => {
     if (typeof window === "undefined") return {};
     const sp = new URLSearchParams(window.location.search);
+
+    // Path 1 — single base64url payload.
+    const p = sp.get("p");
+    if (p) {
+      try {
+        // base64url → base64 (atob accepts unpadded but standard libs differ;
+        // re-add the "=" padding to be belt-and-braces). escape(atob(...))
+        // pairs with the encoder's unescape(encodeURIComponent(...)) so UTF-8
+        // round-trips cleanly.
+        const pad = (4 - (p.length % 4)) % 4;
+        const b64 = p.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat(pad);
+        const json = decodeURIComponent(escape(atob(b64)));
+        const payload = JSON.parse(json);
+        if (payload && payload.v === 1) {
+          return {
+            plan:         (payload.plan || "pro").toLowerCase(),
+            entity:       (payload.entity || "uk").toLowerCase(),
+            token:        payload.ref || null,
+            email:        null,
+            volume:       payload.volume ? String(payload.volume) : null,
+            currency:     (payload.currency || "GBP").toUpperCase(),
+            industry:     payload.industry || null,
+            services:     Array.isArray(payload.services)  ? payload.services  : [],
+            corridors:    Array.isArray(payload.corridors) ? payload.corridors : [],
+            cryptoActive: !!payload.cryptoActive,
+          };
+        }
+      } catch (e) {
+        // Malformed payload — fall through to legacy parsing below.
+        if (typeof console !== "undefined") console.warn("[handoff] failed to decode ?p=", e);
+      }
+    }
+
+    // Path 2 — legacy individual params (back-compat).
     return {
       plan:    (sp.get("plan") || "pro").toLowerCase(),       // starter | pro | ultra
       entity:  (sp.get("entity") || "uk").toLowerCase(),      // uk | eu | mena

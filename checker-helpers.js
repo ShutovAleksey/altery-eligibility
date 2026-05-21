@@ -400,8 +400,63 @@ function ecGenProposalRef() {
   return `EL-${year}-${tail.padEnd(4, "0")}`;
 }
 
+// ── Handoff payload ─────────────────────────────────────────────
+// One base64url-encoded JSON blob in the URL carries every checker
+// answer to the onboarding flow. Self-contained → works across device
+// switches, email forwards, and "I'll come back later" without any
+// backend state. No HMAC or expiry — the data is not security-sensitive
+// (the user can still lie during KYB, so signing the URL adds zero
+// defence and lots of friction).
+//
+// Shape (v=1):
+//   { v, ref, plan, entity, currency, volume, industry,
+//     services[], corridors[], cryptoActive, ts }
+//
+// Onboarding's URL parser reads ?p=<base64url>, decodes, and pre-fills
+// formState. If parsing fails the parser silently falls back to the
+// legacy individual params (token/plan/entity/...) — old emails and
+// bookmarks keep working.
+function ecBuildHandoffPayload(rec, plan) {
+  // `plan` lets the caller pin the link to a specific tier (e.g. when
+  // the user switched plans via the comparison modal). Defaults to the
+  // algorithm's recommendation.
+  const active = plan || rec?.plan || {};
+  return {
+    v:            1,
+    ref:          ecGenProposalRef(),
+    plan:         active.id || "pro",
+    entity:       rec?.entity?.id || "uk",
+    currency:     rec?.entity?.id === "uk" ? "GBP" : "EUR",
+    volume:       rec?.monthlyVolume || null,
+    industry:     rec?.ind?.value || null,
+    services:     Array.isArray(rec?.services) ? rec.services : [],
+    corridors:    Array.isArray(rec?.corridors) ? rec.corridors : [],
+    cryptoActive: !!rec?.cryptoActive,
+    ts:           Date.now(),
+  };
+}
+
+function ecEncodeHandoffP(payload) {
+  // JSON → UTF-8 → base64 → base64url. The unescape(encodeURIComponent)
+  // dance preserves Unicode (Cyrillic industry labels, etc.) which raw
+  // btoa() would corrupt. Strip trailing "=" padding because URLs are
+  // happier without it and atob accepts unpadded input fine.
+  const json = JSON.stringify(payload || {});
+  const b64  = btoa(unescape(encodeURIComponent(json)));
+  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// Convenience — full URL string used by goToOnboarding AND by the
+// PDF/email CTA. One call site, one shape, impossible to forget a field.
+function ecBuildHandoffURL(rec, plan, origin) {
+  const base = origin || (typeof window !== "undefined" ? window.location.origin : "https://altery.com");
+  const p    = ecEncodeHandoffP(ecBuildHandoffPayload(rec, plan));
+  return `${base}/setup?p=${p}`;
+}
+
 Object.assign(window, {
   ecCurrencyFlag, ecCurrencyName, ecRecommend,
   ecEstimateTxCount, ecComputeCostBreakdown, ecOutcomesForSavings,
   ecVolumeHintKey, ecFormatVolume, ecEstimateSavings, ecGenProposalRef,
+  ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
 });

@@ -947,19 +947,13 @@ function EcResultApproved({ rec, onBack, onReset }) {
     : "down";
 
   // Onboarding redirect — used by both the primary CTA (direct) and the
-  // handoff modal's email-stage "Send & continue" CTA. Centralised so the
-  // URL-params construction stays in one place. Currency hint follows
-  // the entity: GBP for UK, EUR for EU/MENA (improvement tracked in I-004
-  // for proper MENA USD handling).
+  // handoff modal's email-stage "Send & continue" CTA. One base64url
+  // payload in ?p= carries every checker answer (plan, entity, volume,
+  // industry, services, corridors, cryptoActive, ref). The same URL
+  // shape powers email forwards and device hops — see ecBuildHandoffURL
+  // in checker-helpers.js for the payload schema.
   const goToOnboarding = () => {
-    const params = new URLSearchParams({
-      token:    ecGenProposalRef(),
-      plan:     activePlan.id,
-      entity:   rec.entity.id,
-      currency: rec.entity.id === "uk" ? "GBP" : "EUR",
-      volume:   String(rec.monthlyVolume || ""),
-    });
-    window.location.href = "/setup?" + params.toString();
+    window.location.href = ecBuildHandoffURL(rec, activePlan);
   };
 
   const entityName = t(entity.nameKey);
