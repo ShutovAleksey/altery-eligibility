@@ -428,8 +428,15 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // Self-contained handoff URL — all checker answers travel inside the
   // ?p=<base64url> payload, so this PDF link works for the original
   // recipient, anyone they forward it to, and across device switches.
-  // See ecBuildHandoffURL in checker-helpers.js.
-  const handoffURL = ecBuildHandoffURL(rec, rec.plan, "https://altery.com");
+  // See ecBuildHandoffURL in checker-helpers.js. Origin defaults to
+  // wherever the app is actually deployed (Vercel preview, production
+  // domain when it lands, etc.) — never to a hardcoded altery.com that
+  // does not host this app today.
+  const handoffOrigin = (typeof window !== "undefined" && window.location && window.location.origin)
+    ? window.location.origin
+    : "https://altery-eligibility.vercel.app";
+  const handoffURL = ecBuildHandoffURL(rec, rec.plan, handoffOrigin);
+  const handoffDisplay = handoffOrigin.replace(/^https?:\/\//, "") + "/setup";
 
   // ─── Full document ───────────────────────────────────────────
   return `
@@ -521,7 +528,7 @@ ${checklistHTML}
      wired via ecAddLinkAnnotations during PDF assembly. -->
 <a href="${handoffURL}" style="display:block;text-decoration:none;background:${C.primary};border-radius:12px;padding:16px 20px;color:${C.white};margin-bottom:20px;">
   <div style="font-size:10.5px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">${t("ec.pdf.continueSetup")}</div>
-  <div style="font-size:14px;color:${C.white};font-family:${FF_MONO};letter-spacing:-0.005em;">altery.com/setup · ${proposalRef}</div>
+  <div style="font-size:14px;color:${C.white};font-family:${FF_MONO};letter-spacing:-0.005em;">${handoffDisplay} · ${proposalRef}</div>
 </a>
 
 <!-- Account team — humanises the proposal. Validity notice gives
@@ -912,8 +919,13 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
     // uses internally. One ?p=<base64url> payload pre-fills the entire
     // onboarding from the original checker answers, so a colleague who
     // gets the email forwarded picks up exactly where the original
-    // recipient left off.
-    const sessionLink = ecBuildHandoffURL(rec, rec.plan, "https://altery.com");
+    // recipient left off. Origin must point at the actual deployment
+    // (Vercel preview, future altery.com when it routes to this app),
+    // never at a hardcoded altery.com that doesn't host the setup flow.
+    const emailOrigin = (typeof window !== "undefined" && window.location && window.location.origin)
+      ? window.location.origin
+      : "https://altery-eligibility.vercel.app";
+    const sessionLink = ecBuildHandoffURL(rec, rec.plan, emailOrigin);
 
     // Resolve every localized string the email body needs, on the
     // client where the i18n dictionary already lives. The server
