@@ -200,6 +200,43 @@ const CHECKER_INDUSTRY_TO_OB = {
   other:       null,
 };
 
+// Derive the set of payment channels the user likely needs from their
+// checker answers. The activity screen lets the user toggle these
+// individually — we just want a sensible preselection.
+//
+// Mapping:
+//   entity=uk    → fps  (Faster Payments Service is the UK domestic rail)
+//   entity=eu    → sepa (Eurozone domestic rail)
+//   any corridor outside the user's home region    → swift
+//   services includes "cards"                       → cards
+//   cryptoActive=true                                → crypto
+//
+// Same channels are pre-toggled for BOTH inbound and outbound because
+// payment rails are bidirectional — if you receive SEPA, you also send
+// SEPA. User can correct asymmetric flows on the screen.
+function deriveChannelsFromChecker(checkerParams) {
+  const channels = new Set();
+  const entity = (checkerParams.entity || "").toLowerCase();
+  const corridors = checkerParams.corridors || [];
+  const services  = checkerParams.services  || [];
+
+  if (entity === "uk") channels.add("fps");
+  if (entity === "eu") channels.add("sepa");
+
+  // Any corridor that isn't the user's own home region implies SWIFT.
+  // Codes like "GB" / "EU" / region tags like "APAC" / "AFRICA" appear
+  // in the checker corridors list.
+  const homeRegion = entity === "uk" ? "GB"
+                   : entity === "eu" ? "EU"
+                   : null;
+  if (corridors.some((c) => c !== homeRegion)) channels.add("swift");
+
+  if (services.includes("cards"))     channels.add("cards");
+  if (checkerParams.cryptoActive)     channels.add("crypto");
+
+  return [...channels];
+}
+
 function hydrateFormState(checkerParams) {
   try {
     const raw = window.localStorage.getItem(FORM_STORAGE_KEY);
@@ -240,6 +277,14 @@ function hydrateFormState(checkerParams) {
     business: {
       ...INITIAL_FORM_STATE.business,
       industry: (checkerParams.industry && CHECKER_INDUSTRY_TO_OB[checkerParams.industry]) || "",
+    },
+    activity: {
+      ...INITIAL_FORM_STATE.activity,
+      // Pre-toggle the payment rails the checker answers imply.
+      // Both directions get the same set (rails are bidirectional);
+      // user can untoggle asymmetric flows on the activity screen.
+      inboundChannels:  deriveChannelsFromChecker(checkerParams),
+      outboundChannels: deriveChannelsFromChecker(checkerParams),
     },
     plan: {
       selectedPlanId: checkerParams.plan || null,
