@@ -20,7 +20,10 @@
 //   FROM_EMAIL      — verified sender (e.g. "Altery <hello@send.altery.com>")
 //                     Falls back to the Resend sandbox sender.
 
-import { createHmac } from "node:crypto";
+// Drop the "node:" prefix on the crypto import — Vercel's serverless
+// runtime fails module load on some Node revisions when the prefix is
+// present, and there's no benefit to the prefix in our usage.
+import { createHmac } from "crypto";
 
 const RESEND_API = "https://api.resend.com/emails";
 const FROM_DEFAULT = "Altery <onboarding@resend.dev>";

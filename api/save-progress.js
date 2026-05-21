@@ -15,7 +15,8 @@
 // device, never expires their data prematurely, and survives without
 // any infrastructure beyond a serverless function.
 
-import { createHmac } from "node:crypto";
+// Drop the "node:" prefix — see send-verify-code.js for rationale.
+import { createHmac } from "crypto";
 
 const RESEND_API = "https://api.resend.com/emails";
 const FROM_DEFAULT = "Altery <onboarding@resend.dev>";
@@ -50,6 +51,8 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST")    return res.status(405).json({ error: "Method not allowed" });
+
+  try {
 
   if (!process.env.RESEND_API_KEY) {
     return res.status(500).json({ error: "RESEND_API_KEY not set", code: "no_api_key" });
@@ -143,8 +146,18 @@ export default async function handler(req, res) {
       });
     }
     return res.status(200).json({ ok: true, sentTo: emailRaw, expiresAt: exp });
-  } catch (err) {
-    console.error("[save-progress] unexpected error:", err);
-    return res.status(500).json({ error: err.message || "Internal server error", code: "internal" });
+  } catch (resendErr) {
+    console.error("[save-progress] resend fetch error:", resendErr);
+    return res.status(500).json({ error: resendErr.message || "Email service request failed", code: "resend_throw" });
+  }
+
+  } catch (outerErr) {
+    // Outer catch — anything that goes wrong before/around the Resend
+    // call (HMAC compute, JSON.stringify size blowup, header parsing,
+    // unexpected runtime quirks) still returns structured JSON so the
+    // client error-mapping can do its job rather than seeing a generic
+    // Vercel 500.
+    console.error("[save-progress] outer error:", outerErr && outerErr.stack || outerErr);
+    return res.status(500).json({ error: (outerErr && outerErr.message) || "Internal server error", code: "internal" });
   }
 }

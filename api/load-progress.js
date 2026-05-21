@@ -11,7 +11,8 @@
 //
 // Required env: VERIFY_SECRET (same as send/verify-code endpoints).
 
-import { createHmac, timingSafeEqual } from "node:crypto";
+// Drop the "node:" prefix — see send-verify-code.js for rationale.
+import { createHmac, timingSafeEqual } from "crypto";
 
 function b64urlDecode(s) {
   const pad = (4 - (s.length % 4)) % 4;
