@@ -416,10 +416,15 @@ function ecGenProposalRef() {
 // formState. If parsing fails the parser silently falls back to the
 // legacy individual params (token/plan/entity/...) — old emails and
 // bookmarks keep working.
-function ecBuildHandoffPayload(rec, plan) {
+function ecBuildHandoffPayload(rec, plan, opts) {
   // `plan` lets the caller pin the link to a specific tier (e.g. when
   // the user switched plans via the comparison modal). Defaults to the
   // algorithm's recommendation.
+  // `opts.email` lets the caller embed the recipient email — used by
+  // the email-this-proposal flow so the onboarding welcome screen can
+  // prefill the same address the PDF was sent to. Not included on the
+  // result-page CTA path (we don't have an email yet) — that's fine,
+  // the field is optional in the decoder.
   const active = plan || rec?.plan || {};
   return {
     v:            1,
@@ -437,6 +442,7 @@ function ecBuildHandoffPayload(rec, plan) {
     services:     Array.isArray(rec?.services) ? rec.services : [],
     corridors:    Array.isArray(rec?.corridors) ? rec.corridors : [],
     cryptoActive: !!rec?.cryptoActive,
+    email:        (opts && typeof opts.email === "string" && opts.email.includes("@")) ? opts.email : null,
     ts:           Date.now(),
   };
 }
@@ -453,9 +459,11 @@ function ecEncodeHandoffP(payload) {
 
 // Convenience — full URL string used by goToOnboarding AND by the
 // PDF/email CTA. One call site, one shape, impossible to forget a field.
-function ecBuildHandoffURL(rec, plan, origin) {
+// `opts` forwards into the payload builder so callers can embed extras
+// like the recipient email without touching the payload schema directly.
+function ecBuildHandoffURL(rec, plan, origin, opts) {
   const base = origin || (typeof window !== "undefined" ? window.location.origin : "https://altery.com");
-  const p    = ecEncodeHandoffP(ecBuildHandoffPayload(rec, plan));
+  const p    = ecEncodeHandoffP(ecBuildHandoffPayload(rec, plan, opts));
   return `${base}/setup?p=${p}`;
 }
 

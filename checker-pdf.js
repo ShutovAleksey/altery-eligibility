@@ -925,7 +925,12 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
     const emailOrigin = (typeof window !== "undefined" && window.location && window.location.origin)
       ? window.location.origin
       : "https://altery-eligibility.vercel.app";
-    const sessionLink = ecBuildHandoffURL(rec, rec.plan, emailOrigin);
+    // Embed the recipient email in the payload so when they click the
+    // link from their inbox (or forward it to a colleague), the
+    // onboarding welcome screen pre-fills the same address. Recipient
+    // is the canonical "this is the founder" email; forwards can still
+    // override on the welcome screen.
+    const sessionLink = ecBuildHandoffURL(rec, rec.plan, emailOrigin, { email });
 
     // Resolve every localized string the email body needs, on the
     // client where the i18n dictionary already lives. The server

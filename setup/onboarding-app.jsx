@@ -447,7 +447,12 @@ function App() {
             plan:         (payload.plan || "pro").toLowerCase(),
             entity:       (payload.entity || "uk").toLowerCase(),
             token:        payload.ref || null,
-            email:        null,
+            // Email is only embedded when the link came from the
+            // email-this-proposal flow (the user typed it into the
+            // handoff modal). Forwarded copies carry the original
+            // recipient's address, which is the right default; the
+            // colleague can edit on the welcome screen if needed.
+            email:        (payload.email && /\S+@\S+\.\S+/.test(payload.email)) ? payload.email : null,
             // ISO alpha-2; uppercased to match how the country screen
             // stores its selection internally (e.g. "DE", "GB"). null
             // when the checker didn't capture one (older payloads).
