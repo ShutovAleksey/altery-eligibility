@@ -1,31 +1,24 @@
 // Vercel serverless function: sends the analysis PDF to the user's
-// email via Resend. The client (EcHandoffModal) generates the PDF
+// email via Brevo. The client (EcHandoffModal) generates the PDF
 // locally via html2pdf and POSTs the bytes here as base64.
 //
-// Why Resend: cleanest DX, native attachment support, free tier of
-// 3,000 emails/month is plenty for an eligibility checker. Mailgun /
-// SendGrid would work too — only the fetch URL + auth header would
-// change. The API contract used here (from, to, subject, html,
-// attachments[{filename, content}]) is portable.
+// Why Brevo: chosen as the post-Vercel-migration provider (founder
+// preference, 2026-05-20). Brevo's transactional API supports
+// attachments and gives 300 emails/day on the free tier — sufficient
+// for the eligibility checker's drip rate. All provider-specific
+// shape lives in lib/email.js so this file stays focused on payload
+// validation + HTML composition.
 //
 // Setup required before this works in production:
-//   1. Sign up at resend.com, create an API key
+//   1. Sign up at brevo.com, generate an API key (SMTP & API → API Keys)
 //   2. In Vercel: Project Settings → Environment Variables → add
-//      RESEND_API_KEY (and redeploy)
-//   3. For the `from` address: either use the sandbox
-//      "onboarding@resend.dev" (anyone receives, but Reply-To looks
-//      odd) OR verify altery.com at resend.com/domains and use
-//      "Altery <sales@altery.com>" — strongly preferred for deliverability
-//
-// The function uses raw fetch rather than the `resend` npm package
-// to avoid adding a dependency for a single HTTP call.
+//      BREVO_API_KEY (and redeploy)
+//   3. Verify the sending domain in Brevo (Senders & IP → Domains →
+//      Add → set up SPF/DKIM on send.altery.com). Without verification
+//      Brevo only delivers to the account-owner address.
+//   4. Set FROM_EMAIL to "Altery <hello@send.altery.com>" or similar.
 
-const RESEND_API = "https://api.resend.com/emails";
-
-// Sender. In production, set FROM_EMAIL in env to your verified domain
-// address (e.g. "Altery <sales@altery.com>"). The sandbox default works
-// without domain verification but ships from a generic resend.dev address.
-const FROM_DEFAULT = "Altery <onboarding@resend.dev>";
+import { sendEmail } from "../lib/email.js";
 
 // Abuse limits — the endpoint is unauthenticated, so we cap input size
 // and validate format. A determined attacker can still send spam through
@@ -197,17 +190,9 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST")    return res.status(405).json({ error: "Method not allowed" });
 
-  // Hard requirement — refuse to attempt the send without the key,
-  // and explain how to set it. A 500 with a clear message is more
-  // useful than a silent failure during deploy.
-  if (!process.env.RESEND_API_KEY) {
-    return res.status(500).json({
-      error: "RESEND_API_KEY environment variable not set. Sign up at " +
-             "resend.com, generate a key, add it in Vercel Dashboard → " +
-             "Project Settings → Environment Variables, then redeploy.",
-      code:  "no_api_key",
-    });
-  }
+  // BREVO_API_KEY presence is checked inside sendEmail(); we let the
+  // helper surface the no_api_key code rather than duplicating the
+  // check here. Lets us swap providers without touching this file.
 
   try {
     const body = req.body || {};
@@ -298,61 +283,34 @@ export default async function handler(req, res) {
       ? filename
       : "altery-analysis.pdf";
 
-    // Resend API call. The `attachments` array takes either a `path`
-    // (URL or local file) or `content` (base64 string). We send the
-    // base64 we received from the client directly.
-    // Compute the actual `from` address being sent so we can echo it back
-    // on a failure. Common debugging case: domain verified in Resend but
-    // FROM_EMAIL env var still empty (falls back to sandbox sender), or
-    // value points at the wrong sub/parent domain.
-    const fromAddress = process.env.FROM_EMAIL || FROM_DEFAULT;
-    const fromEnvSet  = Boolean(process.env.FROM_EMAIL);
+    // Reply-To routes user replies to the sales inbox instead of the
+    // sender address (which lives on send.altery.com or similar
+    // sub-domain). Especially useful when sending from a sandbox.
+    const replyTo = process.env.REPLY_TO || "sales@altery.com";
 
-    const resendRes = await fetch(RESEND_API, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type":  "application/json",
-      },
-      body: JSON.stringify({
-        from:    fromAddress,
-        to:      [cleanEmail],
-        subject,
-        html,
-        // Reply-To routes user replies to the sales inbox instead of
-        // the (potentially generic) sender address. Especially useful
-        // when sending from `onboarding@resend.dev` sandbox.
-        reply_to: process.env.REPLY_TO || "sales@altery.com",
-        attachments: [{ filename: safeFilename, content: pdfBase64 }],
-        tags: [
-          { name: "source", value: "eligibility-checker" },
-          { name: "plan",   value: safePlan.toLowerCase() },
-        ],
-      }),
+    const sendResult = await sendEmail({
+      to:          cleanEmail,
+      subject,
+      html,
+      attachments: [{ filename: safeFilename, content: pdfBase64 }],
+      replyTo,
+      tags:        ["eligibility-checker", `plan:${safePlan.toLowerCase()}`],
     });
 
-    // Resend returns 200 with { id } on success; non-2xx with { message }
-    // on error (invalid API key, sender domain unverified, malformed
-    // recipient, etc.). Bubble the message up to the client for visibility.
-    if (!resendRes.ok) {
-      const errBody = await resendRes.text();
-      console.error("[send-analysis] Resend error:", resendRes.status, errBody, "from=", fromAddress, "fromEnvSet=", fromEnvSet);
-      return res.status(502).json({
-        error: "Email service rejected the send",
-        code:  "resend_error",
-        upstream_status: resendRes.status,
-        upstream_body:   errBody.slice(0, 500),
-        // Diagnostic echo — helps debug FROM_EMAIL env var mismatches
-        // (the single most common cause of upstream rejection after
-        // domain verification). Safe to expose: this is the public
-        // sender address, not a secret.
-        sender_used:     fromAddress,
-        sender_from_env: fromEnvSet,
+    if (!sendResult.ok) {
+      // Surface upstream details (status, body excerpt, sender used) so
+      // the client can show actionable errors. sender_used in particular
+      // is the most common diagnosis — wrong FROM_EMAIL, unverified
+      // domain, etc.
+      return res.status(sendResult.status || 502).json({
+        error: sendResult.error || "Email service rejected the send",
+        code:  sendResult.code  || "brevo_error",
+        upstream_status: sendResult.upstream_status,
+        upstream_body:   sendResult.upstream_body,
+        sender_used:     sendResult.sender_used,
       });
     }
-
-    const data = await resendRes.json();
-    return res.status(200).json({ ok: true, id: data?.id || null });
+    return res.status(200).json({ ok: true, id: sendResult.messageId || null });
 
   } catch (err) {
     console.error("[send-analysis] unexpected error:", err);

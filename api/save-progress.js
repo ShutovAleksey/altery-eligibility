@@ -17,9 +17,8 @@
 
 // Drop the "node:" prefix — see send-verify-code.js for rationale.
 import { createHmac } from "crypto";
+import { sendEmail } from "../lib/email.js";
 
-const RESEND_API = "https://api.resend.com/emails";
-const FROM_DEFAULT = "Altery <onboarding@resend.dev>";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // 14 days — matches the "The link works for 14 days" copy already in
@@ -54,9 +53,8 @@ export default async function handler(req, res) {
 
   try {
 
-  if (!process.env.RESEND_API_KEY) {
-    return res.status(500).json({ error: "RESEND_API_KEY not set", code: "no_api_key" });
-  }
+  // BREVO_API_KEY presence is checked inside sendEmail(); we surface
+  // its no_api_key code below if the helper rejects.
   const secret = process.env.VERIFY_SECRET;
   if (!secret) {
     return res.status(500).json({ error: "VERIFY_SECRET not set", code: "no_verify_secret" });
@@ -103,8 +101,6 @@ export default async function handler(req, res) {
   const host  = (req.headers["x-forwarded-host"] || req.headers.host || "altery-eligibility.vercel.app").split(",")[0].trim();
   const resumeURL = `${proto}://${host}/setup?resume=${token}`;
 
-  const fromAddress = process.env.FROM_EMAIL || FROM_DEFAULT;
-
   const html = `<!doctype html><html><head><meta charset="utf-8"></head>
 <body style="margin:0;padding:24px;background:#F8F7F4;font-family:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;color:#14171F;">
   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;padding:32px 28px;box-shadow:0 8px 28px rgba(0,6,57,0.08);">
@@ -119,41 +115,27 @@ export default async function handler(req, res) {
   </table>
 </body></html>`;
 
-  try {
-    const resendRes = await fetch(RESEND_API, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type":  "application/json",
-      },
-      body: JSON.stringify({
-        from:    fromAddress,
-        to:      [emailRaw],
-        subject: "Your saved Altery application — continue when you're ready",
-        html,
-        tags: [{ name: "source", value: "save-progress" }],
-      }),
-    });
+  const sendResult = await sendEmail({
+    to:      emailRaw,
+    subject: "Your saved Altery application — continue when you're ready",
+    html,
+    tags:    ["save-progress"],
+  });
 
-    if (!resendRes.ok) {
-      const errBody = await resendRes.text();
-      console.error("[save-progress] Resend error:", resendRes.status, errBody);
-      return res.status(502).json({
-        error: "Email service rejected the send",
-        code:  "resend_error",
-        upstream_status: resendRes.status,
-        upstream_body:   errBody.slice(0, 300),
-      });
-    }
-    return res.status(200).json({ ok: true, sentTo: emailRaw, expiresAt: exp });
-  } catch (resendErr) {
-    console.error("[save-progress] resend fetch error:", resendErr);
-    return res.status(500).json({ error: resendErr.message || "Email service request failed", code: "resend_throw" });
+  if (!sendResult.ok) {
+    return res.status(sendResult.status || 502).json({
+      error: sendResult.error || "Email service rejected the send",
+      code:  sendResult.code  || "brevo_error",
+      upstream_status: sendResult.upstream_status,
+      upstream_body:   sendResult.upstream_body,
+      sender_used:     sendResult.sender_used,
+    });
   }
+  return res.status(200).json({ ok: true, sentTo: emailRaw, expiresAt: exp });
 
   } catch (outerErr) {
-    // Outer catch — anything that goes wrong before/around the Resend
-    // call (HMAC compute, JSON.stringify size blowup, header parsing,
+    // Outer catch — anything that goes wrong before/around the email
+    // send call (HMAC compute, JSON.stringify size blowup, header parsing,
     // unexpected runtime quirks) still returns structured JSON so the
     // client error-mapping can do its job rather than seeing a generic
     // Vercel 500.

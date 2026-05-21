@@ -1,5 +1,5 @@
 // Vercel serverless function: generates a 6-digit email-verification
-// code, ships it to the supplied address via Resend, and returns a
+// code, ships it to the supplied address via Brevo, and returns a
 // stateless HMAC-signed token that the /api/verify-code endpoint can
 // later validate against the user-supplied code.
 //
@@ -11,22 +11,18 @@
 // of the code can't forge a token (no secret).
 //
 // Required env:
-//   RESEND_API_KEY  — for the actual email send
+//   BREVO_API_KEY   — for the actual email send (sendEmail helper)
 //   VERIFY_SECRET   — random string used to sign tokens. Set in Vercel
-//                     Project Settings → Environment Variables. Falls
-//                     back to a dev-only value with a console warning
-//                     so local dev still works without setup, but the
-//                     warning is loud and obvious.
+//                     Project Settings → Environment Variables.
 //   FROM_EMAIL      — verified sender (e.g. "Altery <hello@send.altery.com>")
-//                     Falls back to the Resend sandbox sender.
+//                     Falls back to the Brevo sandbox sender.
 
 // Drop the "node:" prefix on the crypto import — Vercel's serverless
 // runtime fails module load on some Node revisions when the prefix is
 // present, and there's no benefit to the prefix in our usage.
 import { createHmac } from "crypto";
+import { sendEmail } from "../lib/email.js";
 
-const RESEND_API = "https://api.resend.com/emails";
-const FROM_DEFAULT = "Altery <onboarding@resend.dev>";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const CODE_TTL_MS = 10 * 60 * 1000;  // 10 minutes — long enough to switch tabs, short enough to limit brute force
 
@@ -46,12 +42,8 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST")    return res.status(405).json({ error: "Method not allowed" });
 
-  if (!process.env.RESEND_API_KEY) {
-    return res.status(500).json({
-      error: "RESEND_API_KEY not set in env. See api/send-analysis.js for setup notes.",
-      code:  "no_api_key",
-    });
-  }
+  // BREVO_API_KEY presence is checked inside sendEmail(); we surface
+  // its no_api_key code below if the helper rejects.
 
   const secret = process.env.VERIFY_SECRET;
   if (!secret) {
@@ -80,8 +72,6 @@ export default async function handler(req, res) {
   const sig  = sign(`${emailRaw}:${code}:${exp}`, secret);
   const token = b64url(JSON.stringify({ email: emailRaw, exp, sig }));
 
-  const fromAddress = process.env.FROM_EMAIL || FROM_DEFAULT;
-
   // Plain transactional email — single big code, expiry note, and a
   // tail line clarifying who sent it. Deliberately minimal styling so
   // it lands cleanly in every inbox client; the surface area for spam
@@ -101,30 +91,20 @@ export default async function handler(req, res) {
 </body></html>`;
 
   try {
-    const resendRes = await fetch(RESEND_API, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.RESEND_API_KEY}`,
-        "Content-Type":  "application/json",
-      },
-      body: JSON.stringify({
-        from: fromAddress,
-        to:   [emailRaw],
-        subject: `${code} is your Altery verification code`,
-        html,
-        tags: [{ name: "source", value: "verify-code" }],
-      }),
+    const sendResult = await sendEmail({
+      to:      emailRaw,
+      subject: `${code} is your Altery verification code`,
+      html,
+      tags:    ["verify-code"],
     });
 
-    if (!resendRes.ok) {
-      const errBody = await resendRes.text();
-      console.error("[send-verify-code] Resend error:", resendRes.status, errBody);
-      return res.status(502).json({
-        error: "Email service rejected the send",
-        code:  "resend_error",
-        upstream_status: resendRes.status,
-        upstream_body:   errBody.slice(0, 300),
-        sender_used:     fromAddress,
+    if (!sendResult.ok) {
+      return res.status(sendResult.status || 502).json({
+        error: sendResult.error || "Email service rejected the send",
+        code:  sendResult.code  || "brevo_error",
+        upstream_status: sendResult.upstream_status,
+        upstream_body:   sendResult.upstream_body,
+        sender_used:     sendResult.sender_used,
       });
     }
 
