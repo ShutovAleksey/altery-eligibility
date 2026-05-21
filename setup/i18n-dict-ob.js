@@ -55,9 +55,16 @@
     "ob.resume.placeholder": "you@yourcompany.com",
     "ob.resume.keep": "Keep working",
     "ob.resume.send": "Send link",
+    "ob.resume.sending": "Sending…",
+    "ob.resume.gotIt": "Got it",
+    "ob.resume.justNow": "just now",
     "ob.resume.savedAt": "Saved automatically · {time}",
     "ob.resume.sentTitle": "Link sent to {email}",
     "ob.resume.sentBody": "The link works for 14 days. You can also log back in any time — your application will be waiting on the dashboard.",
+    "ob.resume.err.email": "Please enter a valid email address.",
+    "ob.resume.err.tooLarge": "Your progress is too big to send by link right now. Try saving a few screens earlier, or finish this application in one session.",
+    "ob.resume.err.network": "Network error — please try again in a moment.",
+    "ob.resume.err.generic": "We couldn't send the link. Please try again.",
 
     // ── Prep ──
     "ob.prep.title": "Let's open your business account",

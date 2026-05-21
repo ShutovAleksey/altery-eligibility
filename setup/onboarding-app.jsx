@@ -330,6 +330,10 @@ const ACT = Object.freeze({
   UBO_DRAFT_SEED_AUTH: "uboDraft/seedFromAuth",
   UBO_DRAFT_COMMIT:    "ubos/commitDraft",
   UBOS_CONFIRM_SOLE:   "ubos/confirmSole",
+  // Bulk replace — used by the resume-link flow to hydrate the full
+  // form state from a server-validated payload. Action payload IS the
+  // new state (already shape-checked by /api/load-progress).
+  REPLACE_STATE:       "_internal/replaceState",
 });
 
 /**
@@ -398,6 +402,13 @@ function formReducer(state, action) {
         }],
         uboDraft: INITIAL_UBO_DRAFT,
       };
+    }
+    case ACT.REPLACE_STATE: {
+      // Merge the resumed payload over INITIAL_FORM_STATE so any fields
+      // the saved snapshot predated (newly-added slices in a later
+      // release) get sensible defaults instead of undefined. Then force
+      // a fresh _v so the persistence layer's version check accepts it.
+      return mergeFormState(INITIAL_FORM_STATE, { ...action.payload, _v: INITIAL_FORM_STATE._v });
     }
     default:
       return state;
@@ -584,6 +595,50 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── Resume from emailed magic link (T7b save-and-continue) ──────
+  // The save-progress endpoint emails a URL of the shape
+  // /setup?resume=<base64url-payload>.<sig>. On boot we hand the token
+  // to /api/load-progress, which validates the HMAC + exp and returns
+  // the decoded {email, step, state}. Success → REPLACE_STATE +
+  // setStep; failure → silently clear the param (don't trash the
+  // visitor's existing localStorage progress, just fall through to
+  // whatever they had locally).
+  //
+  // History.replaceState scrubs the long token from the URL bar after
+  // a successful load so the user doesn't share a copy of their KYB
+  // state by accident.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const resumeToken = sp.get("resume");
+    if (!resumeToken) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/load-progress?token=" + encodeURIComponent(resumeToken));
+        const data = await res.json().catch(() => ({}));
+        if (cancelled) return;
+        if (res.ok && data && data.state && data.step) {
+          dispatch({ type: ACT.REPLACE_STATE, payload: data.state });
+          setStep(data.step);
+        } else {
+          console.warn("[resume] token rejected:", data?.code || res.status);
+        }
+      } catch (err) {
+        if (!cancelled) console.warn("[resume] load failed:", err);
+      } finally {
+        if (!cancelled) {
+          sp.delete("resume");
+          const newQs = sp.toString();
+          const cleanURL = window.location.pathname + (newQs ? "?" + newQs : "") + window.location.hash;
+          window.history.replaceState({}, "", cleanURL);
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Effective step list — same as ALL_STEPS but with screens skipped
   // when the checker has already answered them. Filtering at runtime
   // keeps prev/next navigation linear; the omitted screens behave as
@@ -702,6 +757,8 @@ function App() {
         <ResumeModal
           email={formState.auth.email || ""}
           lastSavedAt={formState.meta.lastSavedAt}
+          formState={formState}
+          step={step}
           onClose={() => setShowSaveModal(false)}
         />
       )}
@@ -710,45 +767,76 @@ function App() {
 }
 
 // ──────────────────── ResumeModal — "Save and continue later" ────────────────────
-function ResumeModal({ email, lastSavedAt, onClose }) {
+function ResumeModal({ email, lastSavedAt, formState, step, onClose }) {
+  const t = useT();
   const [emailVal, setEmailVal] = useState(email || "");
   const [sent, setSent] = useState(false);
-  // Show the wall-clock time the last persist actually happened (from the
-  // useFormState effect that writes to localStorage) — falling back to "just
-  // now" if the modal opened before any save has been logged. Previously
-  // this called `new Date()` and so always read as the moment the modal
-  // opened, which made the "Saved automatically" line meaningless.
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const savedLabel = lastSavedAt
     ? new Date(lastSavedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    : "just now";
+    : t("ob.resume.justNow");
+  const emailValid = /\S+@\S+\.\S+/.test(emailVal);
+
+  const handleSend = async () => {
+    if (!emailValid || submitting) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      // Strip transient/sensitive fields before serialising. uboDraft
+      // is in-flight UI state and shouldn't survive a resume; documents
+      // are File objects that don't JSON-serialise anyway and live in
+      // App-level state per the existing comment in onboarding-app.jsx.
+      const cleanState = { ...formState, uboDraft: INITIAL_UBO_DRAFT };
+      const res = await fetch("/api/save-progress", {
+        method:  "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ email: emailVal.trim(), state: cleanState, step }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const key = data?.code === "payload_too_large" ? "ob.resume.err.tooLarge"
+                  : data?.code === "bad_email"         ? "ob.resume.err.email"
+                  :                                       "ob.resume.err.generic";
+        setError(t(key));
+      } else {
+        setSent(true);
+      }
+    } catch (err) {
+      setError(t("ob.resume.err.network"));
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="ob-modal-overlay" onClick={onClose}>
       <div className="ob-modal" onClick={(e) => e.stopPropagation()} style={{ position: "relative" }}>
-        <button className="ob-modal__close" onClick={onClose} aria-label="Close">
+        <button className="ob-modal__close" onClick={onClose} aria-label={t("common.close") || "Close"}>
           <svg viewBox="0 0 16 16" width="16" height="16" fill="none"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
         </button>
         {!sent ? (
           <React.Fragment>
-            <h3>Take a break — your progress is safe</h3>
-            <p>Everything you've entered is already saved on your account. We'll send a link to pick up exactly where you left off.</p>
+            <h3>{t("ob.resume.title")}</h3>
+            <p>{t("ob.resume.body")}</p>
             <Input
-              label="Send the resume link to"
+              label={t("ob.resume.label")}
               type="email"
               value={emailVal}
-              onChange={(e) => setEmailVal(e.target.value)}
-              placeholder="you@yourcompany.com"
+              onChange={(e) => { setEmailVal(e.target.value); setError(null); }}
+              placeholder={t("ob.resume.placeholder")}
+              error={error || undefined}
+              autoComplete="email"
             />
-            {/* Stacked primary-on-top, ghost-below — same shape as the
-                checker's handoff modal ("Start setup" full-width primary +
-                "Or send me the full proposal" as a secondary link beneath).
-                Matches the AlteryPay DS mobile "Stacked actions" pattern. */}
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 20 }}>
-              <Button variant="primary" size="lg" onClick={() => setSent(true)} iconRight="arrowRight" full>Send link</Button>
-              <Button variant="ghost" size="lg" onClick={onClose} full>Keep working</Button>
+              <Button variant="primary" size="lg" onClick={handleSend} iconRight="arrowRight" full disabled={!emailValid || submitting}>
+                {submitting ? t("ob.resume.sending") : t("ob.resume.send")}
+              </Button>
+              <Button variant="ghost" size="lg" onClick={onClose} full>{t("ob.resume.keep")}</Button>
             </div>
             <div style={{ marginTop: 16, fontSize: 12, color: "var(--c-muted)", display: "flex", alignItems: "center", gap: 6, justifyContent: "center" }}>
               <span style={{ width: 6, height: 6, borderRadius: 999, background: "var(--c-success)", boxShadow: "0 0 0 4px rgba(10,159,82,.12)" }}/>
-              Saved automatically · {savedLabel}
+              {t("ob.resume.savedAt", { time: savedLabel })}
             </div>
           </React.Fragment>
         ) : (
@@ -761,10 +849,10 @@ function ResumeModal({ email, lastSavedAt, onClose }) {
             }}>
               <svg viewBox="0 0 24 24" width="28" height="28" fill="none"><path d="m6 12 4 4 8-9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
-            <h3>Link sent to {emailVal}</h3>
-            <p>The link works for 14 days. You can also log back in any time — your application will be waiting on the dashboard.</p>
+            <h3>{t("ob.resume.sentTitle", { email: emailVal })}</h3>
+            <p>{t("ob.resume.sentBody")}</p>
             <div style={{ marginTop: 8 }}>
-              <Button variant="primary" size="lg" onClick={onClose} full>Got it</Button>
+              <Button variant="primary" size="lg" onClick={onClose} full>{t("ob.resume.gotIt")}</Button>
             </div>
           </React.Fragment>
         )}
