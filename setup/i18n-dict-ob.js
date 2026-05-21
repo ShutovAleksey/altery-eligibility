@@ -121,6 +121,13 @@
     "ob.verify.didnt": "Didn't get the code?",
     "ob.verify.resend": "Resend code",
     "ob.verify.resendIn": "Resend in {time}",
+    "ob.verify.sending": "Sending code…",
+    "ob.verify.verifying": "Verifying…",
+    "ob.verify.err.send": "Could not send the code. Try again in a moment.",
+    "ob.verify.err.network": "Network error — check your connection and try again.",
+    "ob.verify.err.expired": "This code has expired. Tap Resend to get a new one.",
+    "ob.verify.err.mismatch": "That code doesn't match. Double-check and try again.",
+    "ob.verify.err.generic": "We couldn't verify that code. Try again or resend.",
 
     // ── Phone ──
     "ob.phone.title": "Add your mobile number",

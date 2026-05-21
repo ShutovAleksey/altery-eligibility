@@ -151,22 +151,95 @@ function PasswordChecklist({ rules }) {
 // ── Step 3: Email verification ──────────────────
 // The verification code is one-time material — never persisted. It exists
 // only in this screen's local state; reloading the page wipes it.
+// Server pairing: /api/send-verify-code issues an HMAC-signed token; we
+// hold it in state and post {token, code} to /api/verify-code to confirm.
+// No DB anywhere — the token IS the receipt.
 const RESEND_COOLDOWN_S = 60;
 function ScreenVerify({ next, back, email }) {
   const t = useT();
   const [code, setCode] = useState("");
-  // Mounting this screen implies a code was just sent (either by the previous
-  // step or by a prior resend). Start the cooldown at the full window so the
-  // user doesn't spam-click during the first minute.
   const [secondsLeft, setSecondsLeft] = useState(RESEND_COOLDOWN_S);
+  // Token issued by send-verify-code. Held in component state only —
+  // page reload requires a fresh send (intentional, prevents stale tokens).
+  const [token, setToken] = useState(null);
+  const [sending, setSending] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [sendError, setSendError] = useState(null);
+  const [verifyError, setVerifyError] = useState(null);
+
+  // Resend cooldown countdown.
   useEffect(() => {
     if (secondsLeft <= 0) return;
     const id = setTimeout(() => setSecondsLeft((s) => s - 1), 1000);
     return () => clearTimeout(id);
   }, [secondsLeft]);
 
-  const canContinue = code.length === 6;
-  const canResend = secondsLeft <= 0;
+  const requestCode = async () => {
+    if (!email) return;
+    setSending(true);
+    setSendError(null);
+    setCode("");
+    setVerifyError(null);
+    try {
+      const res = await fetch("/api/send-verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setSendError(data?.error || t("ob.verify.err.send"));
+        setToken(null);
+      } else {
+        setToken(data.token || null);
+        setSecondsLeft(RESEND_COOLDOWN_S);
+      }
+    } catch (err) {
+      setSendError(t("ob.verify.err.network"));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  // Send the first code on mount. If the screen ever remounts (e.g. user
+  // navigates back then forward), a fresh code is dispatched — that's the
+  // right UX, codes are short-lived and we shouldn't trust a stale one.
+  useEffect(() => {
+    if (email) requestCode();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleVerify = async () => {
+    if (code.length !== 6 || !token) return;
+    setVerifying(true);
+    setVerifyError(null);
+    try {
+      const res = await fetch("/api/verify-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, code }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        // Server-side returns code: "expired" / "mismatch" / etc.
+        // Map to specific localised strings; fall back to generic on the
+        // off-chance the server returns a code we don't recognise.
+        const errKey = data?.code === "expired"  ? "ob.verify.err.expired"
+                     : data?.code === "mismatch" ? "ob.verify.err.mismatch"
+                     : "ob.verify.err.generic";
+        setVerifyError(t(errKey));
+      } else {
+        next();
+      }
+    } catch (err) {
+      setVerifyError(t("ob.verify.err.network"));
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const canContinue = code.length === 6 && !!token && !verifying;
+  const canResend = secondsLeft <= 0 && !sending;
   const formatMMSS = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
 
   return (
@@ -174,21 +247,33 @@ function ScreenVerify({ next, back, email }) {
       <TopRow onBack={back} />
       <Title illu={<Ico.shield />} title={t("ob.verify.title")} lead={<>{t("ob.verify.leadPre")}<strong>{email || "your email"}</strong>{t("ob.verify.leadPost")}</>} />
       <div>
-        <CodeInput length={6} value={code} onChange={setCode} />
+        <CodeInput length={6} value={code} onChange={(v) => { setCode(v); setVerifyError(null); }} error={verifyError || undefined} />
+        {verifyError && (
+          <div style={{ marginTop: 8, fontSize: 13, color: "var(--c-danger)" }} role="alert">
+            {verifyError}
+          </div>
+        )}
+        {sendError && !verifyError && (
+          <div style={{ marginTop: 8, fontSize: 13, color: "var(--c-danger)" }} role="alert">
+            {sendError}
+          </div>
+        )}
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, color: "var(--c-muted)" }}>
-        <span>{t("ob.verify.didnt")}</span>
+        <span>{sending ? t("ob.verify.sending") : t("ob.verify.didnt")}</span>
         <Button
           variant="link" size="sm"
           style={{ color: canResend ? "var(--c-accent)" : "var(--c-muted)" }}
           disabled={!canResend}
-          onClick={() => { /* TODO Phase 3: call /api/auth/resend-verification */ setSecondsLeft(RESEND_COOLDOWN_S); }}
+          onClick={requestCode}
         >
           {canResend ? t("ob.verify.resend") : t("ob.verify.resendIn", { time: formatMMSS(secondsLeft) })}
         </Button>
       </div>
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!canContinue}>{t("ob.common.continue")}</Button>
+        <Button variant="primary" size="xl" onClick={handleVerify} iconRight="arrowRight" disabled={!canContinue}>
+          {verifying ? t("ob.verify.verifying") : t("ob.common.continue")}
+        </Button>
       </div>
     </div>);
 }
