@@ -387,6 +387,7 @@ function ScreenPlanDetails({ next, back, planId, setPlanId, currency, setCurrenc
 // Shown when the application is approved — the FIRST money-movement step.
 // Mirrors Altery rules: amount + currency + fee + recipient + method + ETA + confirmation.
 function ScreenActivation({ planId, currency, mode, next, back }) {
+  const t = useT();
   const cur = currency || "GBP";
   const sym = CURRENCIES[cur].sym;
   const plan = PLANS.find((p) => p.id === planId) || PLANS[1];
@@ -513,24 +514,16 @@ function ScreenActivation({ planId, currency, mode, next, back }) {
     setState("success");
   };
 
-  // On successful pre-submit payment, transition to the submit screen.
-  // useEffect rather than a setTimeout-in-render so the side effect
-  // fires AFTER the render commits, avoiding React's "update during
-  // render" warning. The 600ms delay gives the success-tick a moment
-  // to register visually before the screen swaps — feels intentional
-  // rather than glitchy.
-  React.useEffect(() => {
-    if (state === "success" && isPresubmit) {
-      const t = setTimeout(() => next(), 600);
-      return () => clearTimeout(t);
-    }
-  }, [state, isPresubmit]);
+  // Pre-submit success previously auto-advanced after 600ms — too fast
+  // to read what had happened. The user is at the most important moment
+  // in the funnel (KYB just submitted) and deserves an explicit landing
+  // screen: payment authorised AND verification has started. The new
+  // screen below stays mounted until the user clicks "View application
+  // status", which navigates to ScreenSubmit's detailed timeline.
 
   if (state === "success") {
     if (isPresubmit) {
-      // Brief celebration tile — visible for ~600ms while useEffect
-      // schedules the screen transition. Cleaner than returning null
-      // and flashing blank between screens.
+      const amountStr = formatPrice(price, sym);
       return (
         <div className="ob-content fade-in">
           <div className="pp-success">
@@ -539,11 +532,55 @@ function ScreenActivation({ planId, currency, mode, next, back }) {
                 <path d="m6 12 4 4 8-9" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </div>
-            <div className="t-overline" style={{color:"var(--c-success)", marginBottom:8}}>Authorisation captured</div>
-            <h1 className="pp-success__title">Submitting your application…</h1>
+            <div className="t-overline" style={{color:"var(--c-success)", marginBottom:8}}>
+              {t("ob.pay.success.eyebrow")}
+            </div>
+            <h1 className="pp-success__title">{t("ob.pay.success.title")}</h1>
             <p className="pp-success__lead">
-              Your card has been authorised for {formatPrice(price, sym)}. We'll capture the fee only when KYB approves your account.
+              {t("ob.pay.success.lead", { amount: amountStr, plan: plan.name })}
             </p>
+          </div>
+
+          {/* Explicit "what just happened + what's next" checklist —
+              two done states (payment + verification kick-off) and one
+              active state (decision window). Reuses the existing
+              pp-success__timeline / step / step-dot styles. */}
+          <div className="pp-success__timeline">
+            <div className="pp-success__step is-done">
+              <span className="pp-success__step-dot is-done" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
+                  <path d="m3.5 8 3 3 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+              <div>
+                <div className="pp-success__step-title">{t("ob.pay.success.step1.title")}</div>
+                <div className="pp-success__step-sub">{t("ob.pay.success.step1.sub", { amount: amountStr })}</div>
+              </div>
+            </div>
+            <div className="pp-success__step is-done">
+              <span className="pp-success__step-dot is-done" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
+                  <path d="m3.5 8 3 3 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </span>
+              <div>
+                <div className="pp-success__step-title">{t("ob.pay.success.step2.title")}</div>
+                <div className="pp-success__step-sub">{t("ob.pay.success.step2.sub")}</div>
+              </div>
+            </div>
+            <div className="pp-success__step is-active">
+              <span className="pp-success__step-dot is-active" aria-hidden="true" />
+              <div>
+                <div className="pp-success__step-title">{t("ob.pay.success.step3.title")}</div>
+                <div className="pp-success__step-sub">{t("ob.pay.success.step3.sub")}</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="ob-actions">
+            <Button variant="primary" size="xl" onClick={() => next()} iconRight="arrowRight">
+              {t("ob.pay.success.cta")}
+            </Button>
           </div>
         </div>
       );

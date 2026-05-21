@@ -293,6 +293,18 @@
     "ob.rv.viewFees": "View fees",
     "ob.rv.submit": "Submit for review",
 
+    // ── Payment success (post-Stripe, pre-submit) ──
+    "ob.pay.success.eyebrow": "Payment authorised",
+    "ob.pay.success.title": "Your application is on its way",
+    "ob.pay.success.lead": "We've authorised {amount} on your card — it will only be captured if and when we approve your {plan} account. Verification has started; you'll hear from us within 48 working hours.",
+    "ob.pay.success.step1.title": "Payment authorised",
+    "ob.pay.success.step1.sub": "{amount} held on your card · no charge until approval",
+    "ob.pay.success.step2.title": "Verification started",
+    "ob.pay.success.step2.sub": "We're reviewing your company details and shareholder documents",
+    "ob.pay.success.step3.title": "Decision within 48 working hours",
+    "ob.pay.success.step3.sub": "We'll email you the outcome — approved, or with any follow-up questions",
+    "ob.pay.success.cta": "View application status",
+
     // ── Submit / status ──
     "ob.sub.title": "Company details completed",
     "ob.sub.leadPre": "We'll process your company information and contact your shareholders at ",
