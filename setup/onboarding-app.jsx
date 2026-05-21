@@ -121,6 +121,15 @@ const { useMemo: _useMemo, useCallback: _useCallback, useReducer: _useReducer } 
 // anything from an older version and the user will start fresh.
 const FORM_STORAGE_KEY = "altery:ob:formState:v2";
 
+// Master toggle for localStorage persistence. Turned OFF for now — we
+// observed phantom-data confusion ("the form opens with data I never
+// entered") because the localStorage payload survives across tests,
+// reloads, and accidental returns to /setup. Save-and-continue still
+// works via the emailed magic link (T7b) — that uses a server-signed
+// HMAC token, not localStorage. Flip this back to true to re-enable
+// auto-save on every formState change.
+const PERSIST_TO_LOCALSTORAGE = false;
+
 /** @type {UboDraft} */
 const INITIAL_UBO_DRAFT = {
   editingId: null,
@@ -222,21 +231,23 @@ function deriveChannelsFromChecker(checkerParams) {
 }
 
 function hydrateFormState(checkerParams) {
-  try {
-    const raw = window.localStorage.getItem(FORM_STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (parsed && parsed._v === INITIAL_FORM_STATE._v) {
-        // Per-slice deep-merge so newly-added fields inside an existing slice
-        // (e.g. extending uboDraft from {role} → {role, firstName, …}) show up
-        // even when the saved payload predates them. Arrays replace as-is.
-        // Saved state wins over checkerParams here on purpose — if the user
-        // already started onboarding and edited their answers, a stale link
-        // re-opened later must not overwrite their work.
-        return mergeFormState(INITIAL_FORM_STATE, parsed);
+  if (PERSIST_TO_LOCALSTORAGE) {
+    try {
+      const raw = window.localStorage.getItem(FORM_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && parsed._v === INITIAL_FORM_STATE._v) {
+          // Per-slice deep-merge so newly-added fields inside an existing slice
+          // (e.g. extending uboDraft from {role} → {role, firstName, …}) show up
+          // even when the saved payload predates them. Arrays replace as-is.
+          // Saved state wins over checkerParams here on purpose — if the user
+          // already started onboarding and edited their answers, a stale link
+          // re-opened later must not overwrite their work.
+          return mergeFormState(INITIAL_FORM_STATE, parsed);
+        }
       }
-    }
-  } catch (e) { /* storage unavailable / parse error → fall through to seed */ }
+    } catch (e) { /* storage unavailable / parse error → fall through to seed */ }
+  }
 
   // Cherry-pick what we can confidently prefill from the checker payload.
   // Rule of thumb: only seed a screen-visible field when the source and
@@ -427,7 +438,17 @@ function formReducer(state, action) {
  */
 function useFormState(checkerParams) {
   const [formState, dispatch] = _useReducer(formReducer, checkerParams, hydrateFormState);
+
+  // When persistence is off, also actively wipe any leftover entry on
+  // boot so stale data from before the toggle was flipped doesn't sit
+  // around in browsers that already had it. One-shot per mount.
   useEffect(() => {
+    if (PERSIST_TO_LOCALSTORAGE) return;
+    try { window.localStorage.removeItem(FORM_STORAGE_KEY); } catch (e) {}
+  }, []);
+
+  useEffect(() => {
+    if (!PERSIST_TO_LOCALSTORAGE) return;
     try {
       window.localStorage.setItem(
         FORM_STORAGE_KEY,
