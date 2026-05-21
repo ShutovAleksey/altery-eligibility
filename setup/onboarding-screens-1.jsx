@@ -283,20 +283,35 @@ function ScreenPhone({ next, back, phone, updateAuth }) {
   const t = useT();
   // PhoneInput is uncontrolled (it parses `value` once on mount and manages
   // its own internal state thereafter). We seed it from formState.auth.phone
-  // and write back the E.164 string on every change.
-  const hasPhone = (phone || "").replace(/\D/g, "").length >= 7;
+  // and write back the E.164 string on every change. Validity comes from
+  // the PhoneInput itself — it knows the country's format mask and reports
+  // isValid + expectedDigits in the onChange payload.
+  const [phoneMeta, setPhoneMeta] = useState({ isValid: false, digits: "", expectedDigits: 0 });
+  // Show the inline error only after the user has stopped typing into a
+  // non-empty-but-invalid number. Avoids shouting at the user before they
+  // finish entering digits.
+  const [touched, setTouched] = useState(false);
+  const isValid = phoneMeta.isValid;
+  const showError = touched && phoneMeta.digits.length > 0 && !isValid;
+  const errorText = showError
+    ? t("ob.phone.err.length", { n: phoneMeta.expectedDigits || 7 })
+    : undefined;
   return (
     <div className="ob-content fade-in">
       <TopRow onBack={back} />
       <Title title={t("ob.phone.title")} lead={t("ob.phone.lead")} />
-      <div className="ob-fields">
+      <div className="ob-fields" onBlur={() => setTouched(true)}>
         <PhoneInput label={t("ob.phone.label")} defaultCountry="GB"
           value={phone || ""}
-          onChange={(v) => updateAuth({ phone: v.e164 || "" })} />
+          error={errorText}
+          onChange={(v) => {
+            updateAuth({ phone: v.e164 || "" });
+            setPhoneMeta(v);
+          }} />
       </div>
       <WhyWeAsk>{t("ob.phone.why")}</WhyWeAsk>
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!hasPhone}>{t("ob.phone.send")}</Button>
+        <Button variant="primary" size="xl" onClick={next} iconRight="arrowRight" disabled={!isValid}>{t("ob.phone.send")}</Button>
       </div>
     </div>);
 }

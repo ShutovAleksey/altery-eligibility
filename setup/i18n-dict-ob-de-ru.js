@@ -128,6 +128,7 @@
     "ob.phone.label": "Mobilnummer",
     "ob.phone.send": "Bestätigungscode senden",
     "ob.phone.why": "Ihre Nummer bleibt privat. Wir geben sie nie an Dritte weiter und senden Codes nur, wenn Sie sich anmelden oder sensible Aktionen freigeben — größere Überweisungen, neue Empfänger, Änderungen an Team-Berechtigungen.",
+    "ob.phone.err.length": "Bitte vollständige Nummer eingeben — {n} Ziffern für das gewählte Land erwartet.",
 
     "ob.country.eyebrow": "Ihr Unternehmen",
     "ob.country.title": "Wo ist Ihr Unternehmen registriert?",
@@ -461,6 +462,7 @@
     "ob.phone.label": "Мобильный номер",
     "ob.phone.send": "Отправить код подтверждения",
     "ob.phone.why": "Ваш номер остаётся приватным. Мы не передаём его третьим лицам и отправляем коды только при входе или одобрении важных действий — крупные переводы, новые получатели, изменения прав команды.",
+    "ob.phone.err.length": "Введите полный номер — для выбранной страны ожидается {n} цифр.",
 
     "ob.country.eyebrow": "Ваша компания",
     "ob.country.title": "Где зарегистрирована ваша компания?",

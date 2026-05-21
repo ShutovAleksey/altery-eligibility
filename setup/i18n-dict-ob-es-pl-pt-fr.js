@@ -125,6 +125,7 @@
     "ob.phone.label": "Número de móvil",
     "ob.phone.send": "Enviar código de verificación",
     "ob.phone.why": "Tu número es privado. No lo compartimos con terceros y solo enviamos códigos cuando inicias sesión o apruebas acciones sensibles — transferencias importantes, nuevos beneficiarios, cambios en permisos del equipo.",
+    "ob.phone.err.length": "Introduce el número completo — se esperan {n} dígitos para el país seleccionado.",
 
     "ob.country.eyebrow": "Tu empresa",
     "ob.country.title": "¿Dónde está registrada tu empresa?",
@@ -458,6 +459,7 @@
     "ob.phone.label": "Numer telefonu",
     "ob.phone.send": "Wyślij kod weryfikacyjny",
     "ob.phone.why": "Twój numer pozostaje prywatny. Nie udostępniamy go stronom trzecim — kody wysyłamy tylko przy logowaniu lub zatwierdzaniu wrażliwych operacji: większe przelewy, nowi odbiorcy, zmiany uprawnień zespołu.",
+    "ob.phone.err.length": "Wpisz pełny numer — dla wybranego kraju oczekiwane {n} cyfr.",
 
     "ob.country.eyebrow": "Twoja firma",
     "ob.country.title": "Gdzie jest zarejestrowana Twoja firma?",
@@ -791,6 +793,7 @@
     "ob.phone.label": "Número de telemóvel",
     "ob.phone.send": "Enviar código de verificação",
     "ob.phone.why": "O seu número fica privado. Não o partilhamos com terceiros e só enviamos códigos quando inicia sessão ou aprova ações sensíveis — transferências maiores, novos beneficiários, alterações de permissões da equipa.",
+    "ob.phone.err.length": "Introduza o número completo — esperam-se {n} dígitos para o país selecionado.",
 
     "ob.country.eyebrow": "A sua empresa",
     "ob.country.title": "Onde está registada a sua empresa?",
@@ -1124,6 +1127,7 @@
     "ob.phone.label": "Numéro de mobile",
     "ob.phone.send": "Envoyer le code de vérification",
     "ob.phone.why": "Votre numéro reste privé. Nous ne le partageons jamais avec des tiers et n'envoyons des codes que lorsque vous vous connectez ou approuvez des actions sensibles — virements importants, nouveaux bénéficiaires, modifications des droits de l'équipe.",
+    "ob.phone.err.length": "Saisissez le numéro complet — {n} chiffres attendus pour le pays sélectionné.",
 
     "ob.country.eyebrow": "Votre entreprise",
     "ob.country.title": "Où votre entreprise est-elle immatriculée ?",

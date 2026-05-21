@@ -142,6 +142,7 @@
     "ob.phone.label": "Mobile number",
     "ob.phone.send": "Send verification code",
     "ob.phone.why": "Your number stays private. We never share it with third parties and only send codes when you sign in or approve sensitive actions — large transfers, new recipients, team-permission changes.",
+    "ob.phone.err.length": "Enter the full number — {n} digits expected for the selected country.",
 
     // ── Country ──
     "ob.country.eyebrow": "Your company",

@@ -125,6 +125,7 @@
     "ob.phone.label": "Mobiel nummer",
     "ob.phone.send": "Bevestigingscode versturen",
     "ob.phone.why": "Uw nummer blijft privé. We delen het nooit met derden en sturen alleen codes als u inlogt of gevoelige acties goedkeurt — grotere overschrijvingen, nieuwe begunstigden, wijzigingen in teamrechten.",
+    "ob.phone.err.length": "Voer het volledige nummer in — {n} cijfers verwacht voor het gekozen land.",
 
     "ob.country.eyebrow": "Uw bedrijf",
     "ob.country.title": "Waar is uw bedrijf geregistreerd?",
@@ -458,6 +459,7 @@
     "ob.phone.label": "Mobil numara",
     "ob.phone.send": "Doğrulama kodu gönder",
     "ob.phone.why": "Numaranız özel kalır. Üçüncü taraflarla paylaşmayız ve yalnızca giriş yaparken veya hassas işlemleri onaylarken kod göndeririz — büyük transferler, yeni alıcılar, ekip izin değişiklikleri.",
+    "ob.phone.err.length": "Tam numarayı girin — seçilen ülke için {n} hane bekleniyor.",
 
     "ob.country.eyebrow": "Şirketiniz",
     "ob.country.title": "Şirketiniz nerede kayıtlı?",
@@ -791,6 +793,7 @@
     "ob.phone.label": "Numero di cellulare",
     "ob.phone.send": "Invia codice di verifica",
     "ob.phone.why": "Il tuo numero resta privato. Non lo condividiamo con terzi e inviamo codici solo quando accedi o approvi azioni sensibili — bonifici importanti, nuovi beneficiari, modifiche ai permessi del team.",
+    "ob.phone.err.length": "Inserisci il numero completo — sono attese {n} cifre per il paese selezionato.",
 
     "ob.country.eyebrow": "La tua azienda",
     "ob.country.title": "Dove è registrata la tua azienda?",

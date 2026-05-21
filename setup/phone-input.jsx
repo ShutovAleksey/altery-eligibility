@@ -92,9 +92,22 @@
     const heights = { sm: 36, md: 44, lg: 52 };
     const h = heights[size];
 
+    // Expected digit count = number of X placeholders in the country's
+    // format mask. This is the same number the formatter writes to, so
+    // it's our single source of truth for "is this number complete".
+    // ±1 tolerance accommodates countries with slight length variance
+    // (e.g. Germany mobile 10-11 digits; the fmt is the longest case).
+    const expectedDigits = (c.fmt.match(/X/g) || []).length;
+    const isValid = digits.length === expectedDigits || digits.length === expectedDigits - 1;
+
     // Notify parent
     useEffect(() => {
-      onChange?.({ country, dial: c.dial, digits, formatted, e164: digits ? `+${c.dial}${digits}` : "" });
+      onChange?.({
+        country, dial: c.dial, digits, formatted,
+        e164: digits ? `+${c.dial}${digits}` : "",
+        isValid,
+        expectedDigits,
+      });
     }, [country, digits]);
 
     // Close on outside click
