@@ -312,14 +312,26 @@ function ScreenBusinessInfo({ next, back, business, updateBusiness }) {
         <Select label={t("ob.bi.industry")}
           value={business.industry} onChange={(v) => updateBusiness({ industry: v })}
           placeholder={t("ob.bi.industryPh")}
+          // Mirrors the eligibility-checker industry list 1:1 (values
+          // saas / apps / games / edtech / marketplace / ecom / prof /
+          // creator / affiliate / crypto / other). Same vocabulary on
+          // both surfaces lets us prefill from checker handoff without
+          // any mapping table, and gives the digital-business ICP a
+          // self-recognising default ("SaaS, software & AI tools" reads
+          // truer than the previous generic "AI / Software").
           options={[
-            { value: "tech", label: t("ob.bi.ind.tech") },
-            { value: "fin", label: t("ob.bi.ind.fin") },
-            { value: "ret", label: t("ob.bi.ind.ret") },
-            { value: "prof", label: t("ob.bi.ind.prof") },
-            { value: "mfg", label: t("ob.bi.ind.mfg") },
-            { value: "med", label: t("ob.bi.ind.med") }]
-          } />
+            { value: "saas",        label: t("ob.bi.ind.saas") },
+            { value: "apps",        label: t("ob.bi.ind.apps") },
+            { value: "games",       label: t("ob.bi.ind.games") },
+            { value: "edtech",      label: t("ob.bi.ind.edtech") },
+            { value: "marketplace", label: t("ob.bi.ind.marketplace") },
+            { value: "ecom",        label: t("ob.bi.ind.ecom") },
+            { value: "prof",        label: t("ob.bi.ind.prof") },
+            { value: "creator",     label: t("ob.bi.ind.creator") },
+            { value: "affiliate",   label: t("ob.bi.ind.affiliate") },
+            { value: "crypto",      label: t("ob.bi.ind.crypto") },
+            { value: "other",       label: t("ob.bi.ind.other") },
+          ]} />
         <Input label={t("ob.bi.website")} placeholder={t("ob.bi.websitePh")}
           value={business.website} onChange={(e) => updateBusiness({ website: e.target.value })} />
       </div>

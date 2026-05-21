@@ -173,32 +173,16 @@ function mergeFormState(defaults, saved) {
  * @param {CheckerParams} checkerParams
  * @returns {FormState}
  */
-// Checker industry vocabulary (10+ digital-business segments) → KYB
-// business-info dropdown vocabulary (6 broad categories). The mapping
-// is intentionally lossy: it picks the closest match so the user sees
-// a sensible default they can correct on the business-info screen.
-// Anything not in this table falls back to leaving the field blank.
-//
-// Coverage rationale:
-//   saas/apps/games/edtech → tech    (all software products)
-//   marketplace/ecom       → ret     (commerce platforms)
-//   prof                   → prof    (direct match)
-//   creator/affiliate      → med     (media/marketing companies)
-//   crypto                 → fin     (regulated financial flows)
-//   other                  → null    (no opinion → user picks)
-const CHECKER_INDUSTRY_TO_OB = {
-  saas:        "tech",
-  apps:        "tech",
-  games:       "tech",
-  edtech:      "tech",
-  marketplace: "ret",
-  ecom:        "ret",
-  prof:        "prof",
-  creator:     "med",
-  affiliate:   "med",
-  crypto:      "fin",
-  other:       null,
-};
+// Checker industry vocabulary and KYB business-info dropdown vocabulary
+// are now identical (saas / apps / games / edtech / marketplace / ecom /
+// prof / creator / affiliate / crypto / other). Prefill is therefore a
+// straight pass-through — no mapping table needed. The whitelist below
+// is a defensive sanity check so an unexpected value (older payload,
+// future segment, typo) doesn't leak into the dropdown's value slot.
+const OB_INDUSTRY_VALUES = new Set([
+  "saas", "apps", "games", "edtech", "marketplace",
+  "ecom", "prof", "creator", "affiliate", "crypto", "other",
+]);
 
 // Derive the set of payment channels the user likely needs from their
 // checker answers. The activity screen lets the user toggle these
@@ -276,7 +260,9 @@ function hydrateFormState(checkerParams) {
     },
     business: {
       ...INITIAL_FORM_STATE.business,
-      industry: (checkerParams.industry && CHECKER_INDUSTRY_TO_OB[checkerParams.industry]) || "",
+      industry: (checkerParams.industry && OB_INDUSTRY_VALUES.has(checkerParams.industry))
+        ? checkerParams.industry
+        : "",
     },
     activity: {
       ...INITIAL_FORM_STATE.activity,
