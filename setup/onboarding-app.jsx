@@ -520,9 +520,34 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const idx = ALL_STEPS.indexOf(step);
-  const next = () => setStep(ALL_STEPS[Math.min(ALL_STEPS.length - 1, idx + 1)]);
-  const back = () => setStep(ALL_STEPS[Math.max(0, idx - 1)]);
+  // Effective step list — same as ALL_STEPS but with screens skipped
+  // when the checker has already answered them. Filtering at runtime
+  // keeps prev/next navigation linear; the omitted screens behave as
+  // if they don't exist from a UX perspective. Today only "country"
+  // gets skipped (when the checker captured an ISO country code that
+  // already populated formState.contact.country during hydration).
+  // Add more entries here as future screens become pre-answerable.
+  const effectiveSteps = _useMemo(() => {
+    return ALL_STEPS.filter((s) => {
+      if (s === "country" && checkerParams.country) return false;
+      return true;
+    });
+  }, [checkerParams.country]);
+
+  // If the user lands directly on a step we've now filtered out
+  // (e.g. /setup?step=country with country present in the payload),
+  // bounce them forward to the next unfiltered step.
+  useEffect(() => {
+    if (!effectiveSteps.includes(step)) {
+      const allIdx = ALL_STEPS.indexOf(step);
+      const next = ALL_STEPS.slice(allIdx + 1).find((s) => effectiveSteps.includes(s));
+      if (next) setStep(next);
+    }
+  }, [effectiveSteps, step]);
+
+  const idx = effectiveSteps.indexOf(step);
+  const next = () => setStep(effectiveSteps[Math.min(effectiveSteps.length - 1, idx + 1)]);
+  const back = () => setStep(effectiveSteps[Math.max(0, idx - 1)]);
 
   const renderStep = () => {
     const s = TWEAKS.stateVariant;
