@@ -173,6 +173,33 @@ function mergeFormState(defaults, saved) {
  * @param {CheckerParams} checkerParams
  * @returns {FormState}
  */
+// Checker industry vocabulary (10+ digital-business segments) → KYB
+// business-info dropdown vocabulary (6 broad categories). The mapping
+// is intentionally lossy: it picks the closest match so the user sees
+// a sensible default they can correct on the business-info screen.
+// Anything not in this table falls back to leaving the field blank.
+//
+// Coverage rationale:
+//   saas/apps/games/edtech → tech    (all software products)
+//   marketplace/ecom       → ret     (commerce platforms)
+//   prof                   → prof    (direct match)
+//   creator/affiliate      → med     (media/marketing companies)
+//   crypto                 → fin     (regulated financial flows)
+//   other                  → null    (no opinion → user picks)
+const CHECKER_INDUSTRY_TO_OB = {
+  saas:        "tech",
+  apps:        "tech",
+  games:       "tech",
+  edtech:      "tech",
+  marketplace: "ret",
+  ecom:        "ret",
+  prof:        "prof",
+  creator:     "med",
+  affiliate:   "med",
+  crypto:      "fin",
+  other:       null,
+};
+
 function hydrateFormState(checkerParams) {
   try {
     const raw = window.localStorage.getItem(FORM_STORAGE_KEY);
@@ -192,12 +219,14 @@ function hydrateFormState(checkerParams) {
 
   // Cherry-pick what we can confidently prefill from the checker payload.
   // Rule of thumb: only seed a screen-visible field when the source and
-  // target vocabularies are 1:1 unambiguous. country code → country code is
-  // safe. Industry / channels mappings between checker and KYB vocabularies
-  // are lossy (checker has 10+ digital-business segments; KYB business-info
-  // dropdown has 6 broad categories), so those go into meta.checkerHints
-  // where downstream screens can opt in to use them as suggestions rather
-  // than forcing a possibly-wrong default into a form field.
+  // target vocabularies map cleanly (1:1) or when a lossy mapping still
+  // produces a sensible default the user can verify on the screen.
+  //   - country code → country code: 1:1, direct prefill
+  //   - industry: lossy mapping via CHECKER_INDUSTRY_TO_OB, but the
+  //     business-info screen surfaces the dropdown so user can correct
+  //   - services / corridors / volume / cryptoActive: parked in
+  //     meta.checkerHints; downstream screens can opt in to use them
+  //     as suggestions, never forced.
   return {
     ...INITIAL_FORM_STATE,
     auth: {
@@ -207,6 +236,10 @@ function hydrateFormState(checkerParams) {
     contact: {
       ...INITIAL_FORM_STATE.contact,
       country: checkerParams.country || null,
+    },
+    business: {
+      ...INITIAL_FORM_STATE.business,
+      industry: (checkerParams.industry && CHECKER_INDUSTRY_TO_OB[checkerParams.industry]) || "",
     },
     plan: {
       selectedPlanId: checkerParams.plan || null,
@@ -220,11 +253,11 @@ function hydrateFormState(checkerParams) {
       // default without overwriting user-visible fields. Never read
       // these as authoritative; they're advisory.
       checkerHints: {
-        volume:       checkerParams.volume || null,
-        industry:     checkerParams.industry || null,
-        services:     checkerParams.services || [],
-        corridors:    checkerParams.corridors || [],
-        cryptoActive: !!checkerParams.cryptoActive,
+        volume:           checkerParams.volume || null,
+        industry:         checkerParams.industry || null,  // raw checker value (saas/apps/...)
+        services:         checkerParams.services || [],
+        corridors:        checkerParams.corridors || [],
+        cryptoActive:     !!checkerParams.cryptoActive,
       },
     },
   };
