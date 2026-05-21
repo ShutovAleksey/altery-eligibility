@@ -623,28 +623,35 @@ function ScreenActivation({ planId, currency, mode, next, back }) {
   }
 
   // Pre-submit and post-approval share the same form (card / Apple
-  // Pay / Google Pay / SEPA) but differ in eyebrow, title, lead, CTA
-  // copy, and the trust line beneath the form. All copy diffs are
-  // gated through `isPresubmit` so the post-approval flow is untouched.
+  // Pay / Google Pay / SEPA / iDEAL / Bancontact / Klarna / ...) but
+  // differ in eyebrow, title, lead, CTA copy, and the trust line
+  // beneath the form. All copy diffs are gated through `isPresubmit`
+  // so the post-approval flow is untouched.
+  //
+  // The presubmit flow charges immediately and refunds in full if KYB
+  // can't onboard the applicant — this is the same model 3S Money,
+  // Wise and Revolut Business use, and is what unlocks the full set
+  // of local payment methods (manual capture would have restricted us
+  // to card-only).
   const eyebrowText = isPresubmit
-    ? "Activation fee · Authorise to submit"
+    ? "Activation fee · Pay to submit"
     : "Approved · Ready to activate";
   const eyebrowColor = isPresubmit ? "var(--c-muted)" : "var(--c-success)";
   const titleText = isPresubmit
-    ? `Authorise ${formatPrice(price, sym)} to submit your ${plan.name} application.`
+    ? `Pay ${formatPrice(price, sym)} to submit your ${plan.name} application.`
     : `Pay ${formatPrice(price, sym)} to activate your ${plan.name} account.`;
   const leadText = isPresubmit
-    ? `This authorisation travels with your KYB submission. We'll capture the ${formatPrice(price, sym)} fee only after your application is approved (typically within 48 working hours). If we cannot onboard you, no charge is made.`
+    ? `This payment travels with your KYB submission. If we can't onboard you, we refund the ${formatPrice(price, sym)} fee in full within 5 business days. KYB typically completes within 48 working hours.`
     : `Your KYB review is complete and your account is approved. This one-off charge unlocks your accounts, cards, and ${plan.name.toLowerCase()} fee schedule for 12 months. Refunded in full within 5 business days if you cancel.`;
   const ctaText = isPresubmit
-    ? `Authorise & submit · ${formatPrice(price, sym)}`
+    ? `Pay & submit · ${formatPrice(price, sym)}`
     : `Activate account · Pay ${formatPrice(price, sym)}`;
   const legalText = isPresubmit
-    ? `Recipient: Altery EMI Ltd · FCA #901037. You authorise Altery to capture the ${formatPrice(price, sym)} ${plan.name} activation fee from your card after your KYB application is approved. No charge before approval.`
+    ? `Recipient: Altery EMI Ltd · FCA #901037. You authorise Altery to charge ${formatPrice(price, sym)} now for the ${plan.name} activation fee. If KYB cannot onboard your business, the full amount is refunded within 5 business days.`
     : `Recipient: Altery EMI Ltd · FCA #901037. You authorise Altery to charge your card now for the ${formatPrice(price, sym)} ${plan.name} activation fee.`;
-  const summaryRowLabel = isPresubmit ? "Authorised today" : "Charged today";
+  const summaryRowLabel = "Charged today";
   const summaryMetaLine = isPresubmit
-    ? "Charged on approval · Refunded in full on rejection"
+    ? "Full refund within 5 business days if we can't onboard you"
     : "14-day cooling-off period · Cancel any time";
 
   return (

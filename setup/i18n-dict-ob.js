@@ -313,11 +313,11 @@
     "ob.rv.submit": "Submit for review",
 
     // ── Payment success (post-Stripe, pre-submit) ──
-    "ob.pay.success.eyebrow": "Payment authorised",
+    "ob.pay.success.eyebrow": "Payment received",
     "ob.pay.success.title": "Your application is on its way",
-    "ob.pay.success.lead": "We've authorised {amount} on your card — it will only be captured if and when we approve your {plan} account. Verification has started; you'll hear from us within 48 working hours.",
-    "ob.pay.success.step1.title": "Payment authorised",
-    "ob.pay.success.step1.sub": "{amount} held on your card · no charge until approval",
+    "ob.pay.success.lead": "We've charged {amount} for your {plan} activation fee. Verification has started; you'll hear from us within 48 working hours. If we can't onboard you, we refund the full amount within 5 business days.",
+    "ob.pay.success.step1.title": "Payment received",
+    "ob.pay.success.step1.sub": "{amount} charged · full refund if we can't onboard you",
     "ob.pay.success.step2.title": "Verification started",
     "ob.pay.success.step2.sub": "We're reviewing your company details and shareholder documents",
     "ob.pay.success.step3.title": "Decision within 48 working hours",

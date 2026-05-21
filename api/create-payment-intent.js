@@ -69,11 +69,15 @@ export default async function handler(req, res) {
     const annualMajor = table[planId] || table.pro;
     const amount = annualMajor * 100; // major → pence / cents
 
-    // Pre-submit mode authorises now and captures later (on KYB approval)
-    // — manual capture matches the on-screen legal copy "we'll capture
-    // the fee only after your application is approved". Live mode (post-
-    // approval activation) charges immediately with automatic capture.
-    const captureMethod = mode === "presubmit" ? "manual" : "automatic";
+    // Capture method — automatic for BOTH presubmit and live modes.
+    // Manual capture (the previous presubmit behaviour) restricted the
+    // Payment Element to card-only because most LPM rails (SEPA, iDEAL,
+    // Bancontact, Giropay, Klarna, etc.) don't support auth-without-capture.
+    // The product trade-off is intentional: presubmit charges the
+    // activation fee now and we refund in full if KYB can't onboard the
+    // applicant — matching how 3S Money, Wise, and Revolut Business
+    // handle the same flow. The legal copy on screen reflects this.
+    const captureMethod = "automatic";
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
@@ -81,7 +85,8 @@ export default async function handler(req, res) {
       capture_method: captureMethod,
       // Let Stripe auto-enable all eligible payment methods based on
       // the account's dashboard configuration + customer location.
-      // Card, Apple/Google Pay, Link, SEPA, iDEAL, Bancontact, EPS,
+      // Now that we're on automatic capture, the full set is available:
+      // card, Apple/Google Pay, Link, SEPA, iDEAL, Bancontact, EPS,
       // P24, Giropay, Sofort, Klarna, Afterpay, BLIK, Multibanco,
       // bank transfer — depending on what's enabled in the account.
       automatic_payment_methods: { enabled: true },
