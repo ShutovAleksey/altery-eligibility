@@ -55,14 +55,25 @@ function ScreenWelcome({ next, auth, updateAuth }) {
     <div className="ob-content fade-in">
       <Title display illu={<Ico.rocket />} title={t("ob.welcome.title")} lead={t("ob.welcome.lead")} />
       <div className="ob-fields">
+        {/* autoComplete="new-password" on text inputs is the canonical
+            trick to defeat browser saved-profile autofill across Chrome,
+            Safari and Firefox. Without it, browsers happily inject the
+            user's saved given/family name from their browser profile
+            into a blank form — which is exactly what the user reported
+            seeing. We do let email use the standard "email" token so
+            address managers still help on that field, where autofill is
+            actually desirable. */}
         <div className="ob-fields row">
           <Input label={t("ob.welcome.firstName")} placeholder="Anna"
-            value={auth.firstName} onChange={(e) => updateAuth({ firstName: e.target.value })} />
+            value={auth.firstName} onChange={(e) => updateAuth({ firstName: e.target.value })}
+            autoComplete="new-password" name="founder-given-name" />
           <Input label={t("ob.welcome.lastName")} placeholder="Petrenko"
-            value={auth.lastName} onChange={(e) => updateAuth({ lastName: e.target.value })} />
+            value={auth.lastName} onChange={(e) => updateAuth({ lastName: e.target.value })}
+            autoComplete="new-password" name="founder-family-name" />
         </div>
         <Input label={t("ob.welcome.email")} type="email" placeholder="anna@yourcompany.com"
-          value={auth.email} onChange={(e) => updateAuth({ email: e.target.value })} />
+          value={auth.email} onChange={(e) => updateAuth({ email: e.target.value })}
+          autoComplete="email" name="founder-email" />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <Checkbox checked={auth.tosAccepted} onChange={(checked) => updateAuth({ tosAccepted: checked })} label={
