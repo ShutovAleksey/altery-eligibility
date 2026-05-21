@@ -1238,6 +1238,19 @@ const CodeInput = ({ length = 6, value = "", onChange, error, style, ariaLabel =
     next[i] = ch;
     onChange?.(next.join(""));
   };
+  // Distribute a multi-character string (typically from paste) across the
+  // input cells starting at `start`. Strips non-digits, truncates to fit
+  // remaining slots, fills sequentially, then focuses the cell after the
+  // last filled one (or the final cell if we wrote to the end).
+  const fillFrom = (start, raw) => {
+    const digits = String(raw || "").replace(/\D/g, "").slice(0, length - start);
+    if (!digits.length) return;
+    const next = chars.slice();
+    for (let j = 0; j < digits.length; j++) next[start + j] = digits[j];
+    onChange?.(next.join(""));
+    const lastIdx = Math.min(start + digits.length, length - 1);
+    requestAnimationFrame(() => refs.current[lastIdx]?.focus());
+  };
   return (
     <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: "var(--s-2)", ...style }}>
       {chars.map((c, i) =>
@@ -1251,9 +1264,30 @@ const CodeInput = ({ length = 6, value = "", onChange, error, style, ariaLabel =
         aria-label={`Digit ${i + 1} of ${length}`}
         aria-invalid={!!error || undefined}
         onChange={(e) => {
-          const v = e.target.value.replace(/\D/g, "").slice(-1);
+          // If the input fired with more than one char (autofill / paste
+          // bypass / mobile keyboard), distribute across the remaining
+          // cells starting at the current index. Otherwise single-digit
+          // path stays identical to the original behaviour.
+          const incoming = e.target.value.replace(/\D/g, "");
+          if (incoming.length > 1) {
+            fillFrom(i, incoming);
+            return;
+          }
+          const v = incoming.slice(-1);
           setAt(i, v);
           if (v && refs.current[i + 1]) refs.current[i + 1].focus();
+        }}
+        onPaste={(e) => {
+          // Capture paste explicitly — most browsers fire onChange too,
+          // but preventing default here ensures the input doesn't first
+          // overwrite cell i with the entire pasted string before we
+          // can redistribute it. Reads the clipboard once, strips
+          // non-digits, then writes via fillFrom.
+          const text = (e.clipboardData || window.clipboardData)?.getData("text") || "";
+          const digits = text.replace(/\D/g, "");
+          if (!digits) return;
+          e.preventDefault();
+          fillFrom(i, digits);
         }}
         onKeyDown={(e) => {
           if (e.key === "Backspace" && !c && refs.current[i - 1]) {
