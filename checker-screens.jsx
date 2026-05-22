@@ -1341,8 +1341,12 @@ function EcResultBlocked({ rec, onBack, onReset }) {
         </div>
         <div className="ec-actions">
           <Button variant="primary" size="xl" onClick={onReset}>{t("ec.b.cta")}</Button>
+          {/* Soft-decline cohort: open the team's Google Calendar booking
+              page so the visitor can request a conversation rather than
+              composing a mailto thread. Same booking link the PDF/email
+              flow points at, so the team operates one calendar surface. */}
           <Button variant="outline" size="xl"
-                  onClick={() => window.open("mailto:business@altery.com", "_blank")}>
+                  onClick={() => window.open(EC_CALENDLY_URL, "_blank", "noopener,noreferrer")}>
             {t("common.contactTeam")}
           </Button>
         </div>
