@@ -4,7 +4,7 @@
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,
           ecOutcomesForSavings, ecGenProposalRef, ecLoadStripe,
           ecBuildAnalysisHTML, ecSendAnalysisEmail, ecWaitForPdfLibs,
-          EcIco, EcAccountPreview, EC_CALENDLY_URL */
+          EcIco, EcAccountPreview, EC_BOOKING_URL */
 // checker-modals.jsx — all the modal/handoff/payment overlays the result
 // page can open.
 //
@@ -702,7 +702,7 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                     <div className="ec-handoff__nextSteps__title">{t("ec.handoff.sent.step3.title")}</div>
                     <div className="ec-handoff__nextSteps__body">
                       <a
-                        href={EC_CALENDLY_URL}
+                        href={EC_BOOKING_URL}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="ec-handoff__nextSteps__link"

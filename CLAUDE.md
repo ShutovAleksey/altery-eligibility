@@ -51,7 +51,7 @@ altery-eligibility/                       ← GitHub repo, deployed to Vercel
 │
 ├── checker-data.js                       ← EC_COUNTRIES, EC_PLANS, EC_ENTITIES (13 constants)
 ├── checker-helpers.js                    ← ecRecommend, ecComputeCostBreakdown, ecFormatVolume, …
-├── checker-pdf-assets.js                 ← EC_ALTERY_LOGO_B64 + EC_CALENDLY_URL
+├── checker-pdf-assets.js                 ← EC_ALTERY_LOGO_B64 + EC_BOOKING_URL
 ├── checker-pdf.js                        ← ecLoadStripe, ecWaitForPdfLibs, ecBuildAnalysisHTML, ecSendAnalysisEmail
 │
 ├── inline-flags.js                       ← 247 country flag SVGs as base64 data URIs (window.__FLAGS)

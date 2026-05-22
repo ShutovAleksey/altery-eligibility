@@ -9,7 +9,7 @@
 //   ecSendAnalysisEmail  — composes the email body + posts to /api/send-analysis
 //                          with the html2canvas/jsPDF-rendered PDF attached
 //
-// References data constants (EC_PLANS, EC_ENTITIES, EC_CALENDLY_URL,
+// References data constants (EC_PLANS, EC_ENTITIES, EC_BOOKING_URL,
 // EC_ALTERY_LOGO_B64, STRIPE_PUBLISHABLE_KEY, …) and helper functions
 // (ecComputeCostBreakdown, ecOutcomesForSavings, ecGenProposalRef, …)
 // via Global Lexical Declarations across classic scripts.
@@ -158,7 +158,7 @@ function ecWaitForPdfLibs(timeoutMs = 10000) {
   });
 }
 
-// EC_ALTERY_LOGO_B64 + EC_CALENDLY_URL → moved to /checker-pdf-assets.js
+// EC_ALTERY_LOGO_B64 + EC_BOOKING_URL → moved to /checker-pdf-assets.js
 // (loaded as classic <script> in <head>, on window via Object.assign).
 
 // Build the analysis HTML string. Pure function — takes the
@@ -537,7 +537,7 @@ ${checklistHTML}
   <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">${t("ec.pdf.team.head")}</div>
   <div style="font-size:13px;line-height:19px;color:${C.ink};margin-bottom:10px;">${t("ec.pdf.signature.body")}</div>
   <div style="font-size:12.5px;line-height:18px;color:${C.inkSoft};margin-bottom:12px;">${t("ec.pdf.team.body")}</div>
-  <a href="${EC_CALENDLY_URL}" style="display:inline-block;font-size:12.5px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.team.calendly")} →</a>
+  <a href="${EC_BOOKING_URL}" style="display:inline-block;font-size:12.5px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.team.booking")} →</a>
 </div>
 
 <!-- Validity notice — soft urgency, commercial-proposal convention -->
@@ -967,7 +967,7 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       cta:            t("ec.email.cta"),
       tail1:          t("ec.email.tail1"),
       tail2:          t("ec.email.tail2"),
-      calendlyCta:    t("ec.email.calendlyCta"),
+      bookingCta:    t("ec.email.bookingCta"),
       footerTagline:  t("ec.pdf.footer.tagline"),
       footerEntities: t("ec.pdf.footer.entities"),
       forwardedByBanner,
@@ -986,7 +986,7 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
         personaLine,
         sessionLink,
         langCode,
-        calendlyURL: EC_CALENDLY_URL,
+        bookingURL: EC_BOOKING_URL,
         emailStrings,
         forwardedBy: safeForwarder,
       }),

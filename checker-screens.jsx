@@ -1346,7 +1346,7 @@ function EcResultBlocked({ rec, onBack, onReset }) {
               composing a mailto thread. Same booking link the PDF/email
               flow points at, so the team operates one calendar surface. */}
           <Button variant="outline" size="xl"
-                  onClick={() => window.open(EC_CALENDLY_URL, "_blank", "noopener,noreferrer")}>
+                  onClick={() => window.open(EC_BOOKING_URL, "_blank", "noopener,noreferrer")}>
             {t("common.contactTeam")}
           </Button>
         </div>

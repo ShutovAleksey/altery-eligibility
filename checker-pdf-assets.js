@@ -16,12 +16,10 @@ const EC_ALTERY_LOGO_B64 = "iVBORw0KGgoAAAANSUhEUgAAARwAAABgCAYAAADPY83uAAAACXBI
 
 // Booking URL — used in both the PDF account-team block and the email
 // body's CTA stack. Currently points at a Google Calendar appointment
-// schedule (Google's free Calendly-equivalent product, launched 2024).
-// Auto-creates Google Meet links, sends calendar invites, handles
-// timezones. The variable name (and corresponding `calendlyURL`
-// payload field on the server, plus the i18n key suffixes) keep the
-// historical "calendly" prefix — purely cosmetic legacy. If we ever
-// move provider again, only the URL value below needs to change.
-const EC_CALENDLY_URL = "https://calendar.app.google/ZGe1TQ1wjE2zB1co8";
+// schedule (Google's free booking product, launched 2024). Auto-creates
+// Google Meet links, sends calendar invites, handles timezones. If we
+// ever move provider again (HubSpot Meetings, Cal.com, etc.) only the
+// URL value below needs to change — the variable name is provider-agnostic.
+const EC_BOOKING_URL = "https://calendar.app.google/ZGe1TQ1wjE2zB1co8";
 
-Object.assign(window, { EC_ALTERY_LOGO_B64, EC_CALENDLY_URL });
+Object.assign(window, { EC_ALTERY_LOGO_B64, EC_BOOKING_URL });

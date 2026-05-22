@@ -35,7 +35,7 @@ const EMAIL_RE      = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // persona eyebrow → entity-and-plan title with light-blue accents →
 // muted lead → beige entity pill with success dot → CTA. Recipients
 // who saw the result page should feel they're reading the same artifact.
-function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoURL, calendlyURL, strings, langCode, forwardedBy }) {
+function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoURL, bookingURL, strings, langCode, forwardedBy }) {
   const C = {
     primary:      "#002780",
     headerBg:     "#000537",  // Midnight navy — same as on-screen .ec-header
@@ -60,13 +60,13 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
   // ships across every major email client.
   const logoImg = logoURL ? `<img src="${logoURL}" alt="Altery" width="71" height="24" style="display:block;border:0;" />` : `<div style="font-size:22px;font-weight:700;color:${C.white};letter-spacing:-0.01em;line-height:1;">altery</div>`;
 
-  // Calendly secondary CTA — only rendered when a URL was provided
+  // Booking secondary CTA — only rendered when a URL was provided
   // (it's optional). Slim underlined link beneath the primary setup
   // button to give the "I'd rather talk to a human" cohort an easy
   // path without competing with the self-serve CTA visually.
-  const calendlyBlock = calendlyURL ? `
+  const bookingBlock = bookingURL ? `
         <tr><td style="padding:14px 36px 0;">
-          <a href="${calendlyURL}" style="display:inline-block;font-size:13px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${s.calendlyCta || "Schedule a 15-min intro call"} →</a>
+          <a href="${bookingURL}" style="display:inline-block;font-size:13px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${s.bookingCta || "Schedule a 15-min intro call"} →</a>
         </td></tr>` : "";
 
   // Forwarder banner — rendered only when this email is a forwarded copy
@@ -153,7 +153,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
           </a>
         </td></tr>
 
-        ${calendlyBlock}
+        ${bookingBlock}
 
         <!-- Tail copy -->
         <tr><td style="padding:24px 36px 32px;">
@@ -199,7 +199,7 @@ export default async function handler(req, res) {
     const {
       email, pdfBase64, filename,
       planName, entityName, sessionLink, personaLine,
-      langCode, calendlyURL, emailStrings,
+      langCode, bookingURL, emailStrings,
       forwardedBy,
     } = body;
 
@@ -229,10 +229,11 @@ export default async function handler(req, res) {
     // Only accept booking URLs from trusted scheduling hosts. Defensive —
     // anyone with access to the client could POST a different URL claiming
     // to be a booking page, but the allow-list keeps user-clickable links
-    // pointing at trusted destinations.
-    const safeCalendly = (typeof calendlyURL === "string"
-      && /^https:\/\/(calendly\.com|cal\.com|calendar\.app\.google|calendar\.google\.com)\//.test(calendlyURL))
-      ? calendlyURL
+    // pointing at trusted destinations. Trimmed to the Google Calendar
+    // hosts we actually use; add more if/when the provider changes.
+    const safeBooking = (typeof bookingURL === "string"
+      && /^https:\/\/(calendar\.app\.google|calendar\.google\.com)\//.test(bookingURL))
+      ? bookingURL
       : "";
 
     const safeLang = (typeof langCode === "string" && /^[a-z]{2,5}$/i.test(langCode))
@@ -273,7 +274,7 @@ export default async function handler(req, res) {
       sessionLink: safeLink,
       personaLine: safePersona,
       logoURL,
-      calendlyURL: safeCalendly,
+      bookingURL: safeBooking,
       strings:     safeStrings,
       langCode:    safeLang,
       forwardedBy: safeForwardedBy,
