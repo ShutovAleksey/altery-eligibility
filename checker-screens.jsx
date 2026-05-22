@@ -302,6 +302,16 @@ function EcIntro({ onStart }) {
         </div>
       </div>
 
+      {/* Product showcase slider — previously surfaced only on the
+          result page. Moved here as a "here's the actual product on
+          the other side of the quiz" teaser between the personalisation
+          pitch (value rows) and the CTA. No services context yet, so
+          EcPerks renders in its natural EC_PERKS order. The horizontal
+          scroll-snap UI breaks up the otherwise text-heavy intro and
+          gives the visitor a tangible sense of breadth before they
+          commit 90 seconds. */}
+      <EcPerks services={[]} />
+
       <div className="ob-actions">
         <Button variant="primary" size="xl" onClick={onStart} iconRight="arrowRight">
           {t("ec.intro.cta")}
@@ -1187,12 +1197,13 @@ function EcResultApproved({ rec, onBack, onReset }) {
           </section>
         </div>
 
-        {/* ───── EcPerks slider — kept from prior design per user
-            request. Horizontal scroll-snap of Altery product capabilities
-            (Multi-entity / Multi-user / API / Cards / Mass payments)
-            with cover images. Sits between the grid (savings + plan)
-            and the coverage strip. */}
-        <EcPerks services={rec.services} />
+        {/* The product-showcase slider that used to sit here moved to
+            the intro screen (EcIntro) — it serves as a pre-quiz teaser
+            of what Altery covers, more useful before the visitor invests
+            90 seconds in answering than as a re-recap after they already
+            saw the savings number. The result page now reads as a
+            transactional decision surface (hero → savings → plan →
+            coverage → caveats → action), uninterrupted by promo cards. */}
 
         {/* ───── Coverage strip ─────────────────────────────────── */}
         <section className="ec-r__coverage">
