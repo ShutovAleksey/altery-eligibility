@@ -2053,12 +2053,12 @@
       overflow: hidden;
       background: var(--c-ink-2, #1a1d2e);
       cursor: default;
-      transition: transform .3s ease;
       isolation: isolate;
     }
-    .ec-perks__card:hover {
-      transform: translateY(-3px);
-    }
+    /* No card-level translate on hover — the user explicitly asked
+       for the lift to be removed while keeping the image zoom below.
+       The image scale(1.04) on .ec-perks__card:hover .ec-perks__card__media img
+       still fires because :hover targets the card; only the lift moved away. */
     .ec-perks__card__media {
       position: absolute;
       inset: 0;
