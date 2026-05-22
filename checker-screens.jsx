@@ -186,9 +186,26 @@ function EcApp() {
   // both were removed — the first felt redundant after Q1 industry + Q3
   // services already declared crypto, the second never produced any value
   // beyond a local UI state because no downstream consumer read it.
-  const back  = () => { setDirection("back");    setStep((s) => Math.max(0, s - 1)); };
+  const back  = () => {
+    setDirection("back");
+    // From a blocked-industry result, back jumps straight to the
+    // industry question — the user never visited Q2..Q5 because of the
+    // short-circuit in EcIndustry's onBlocked handler, so stepping back
+    // through ghost screens would be disorienting.
+    if (step === 6 && recommendation.kind === "blocked") {
+      setStep(1);
+      return;
+    }
+    setStep((s) => Math.max(0, s - 1));
+  };
   const next  = () => { setDirection("forward"); setStep((s) => Math.min(totalSteps + 1, s + 1)); };
   const reset = () => { setDirection("back");    setStep(0); };
+  // Short-circuit handler used by EcIndustry when the picked industry
+  // is one we can't onboard (gambling/adult/weapons/lending). Jumps
+  // straight to step 6 (result); ecRecommend returns kind:"blocked"
+  // regardless of the unanswered later questions, so EcResultBlocked
+  // renders cleanly with just the industry context.
+  const jumpToResult = () => { setDirection("forward"); setStep(6); };
 
   return (
     <div className="ec-app">
@@ -218,7 +235,7 @@ function EcApp() {
       </header>
       <main className="ec-main" data-direction={direction}>
         {step === 0 && <EcIntro onStart={next} />}
-        {step === 1 && <EcIndustry industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} />}
+        {step === 1 && <EcIndustry industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}
         {step === 2 && <EcCountry value={country} onChange={setCountry} onBack={back} onNext={next} />}
         {step === 3 && <EcServices services={services} setServices={setServices} onBack={back} onNext={next} />}
         {step === 4 && <EcVolume volumeIdx={volumeIdx} setVolumeIdx={setVolumeIdx} txCount={txCount} setTxCount={setTxCount} onBack={back} onNext={next} />}
@@ -453,9 +470,18 @@ function EcCountry({ value, onChange, onBack, onNext }) {
   );
 }
 
-function EcIndustry({ industry, setIndustry, businessType, setBusinessType, onBack, onNext }) {
+function EcIndustry({ industry, setIndustry, businessType, setBusinessType, onBack, onNext, onBlocked }) {
   const t = useT();
   const ind = EC_INDUSTRIES.find((i) => i.value === industry);
+  // If the user picks an industry we can't onboard (gambling, adult,
+  // weapons, unregulated lending) there is no point asking the next four
+  // questions — country/services/volume/corridors won't change the
+  // outcome. We short-circuit straight to EcResultBlocked, which the
+  // soft-decline result screen handles end-to-end. The earlier inline
+  // danger Alert is gone too: showing it AND letting the user continue
+  // through the remaining questions was a worse UX than just landing
+  // them on the explanation page immediately.
+  const isBlocked = ind?.risk === "blocked";
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -480,11 +506,6 @@ function EcIndustry({ industry, setIndustry, businessType, setBusinessType, onBa
         />
       </div>
 
-      {ind?.risk === "blocked" && (
-        <Alert tone="danger" title={t("ec.q1.alert.blocked.title")}>
-          {t("ec.q1.alert.blocked.body", { industry: t(ind.labelKey).toLowerCase() })}
-        </Alert>
-      )}
       {/* Crypto-native welcome — replaces the old orange "individual
           review" warning. Crypto-native businesses are a core target
           segment, not an exception we tolerate. Tone is info (blue,
@@ -499,8 +520,13 @@ function EcIndustry({ industry, setIndustry, businessType, setBusinessType, onBa
       )}
 
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={onNext} iconRight="arrowRight"
-                disabled={!industry || !businessType}>
+        <Button
+          variant="primary"
+          size="xl"
+          onClick={isBlocked ? onBlocked : onNext}
+          iconRight="arrowRight"
+          disabled={!industry || !businessType}
+        >
           {t("common.continue")}
         </Button>
       </div>
