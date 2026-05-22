@@ -456,7 +456,7 @@
     "ec.b.lead": "None of our entities (UK, EEA, DIFC) currently support this industry. We'd rather tell you here than after you've uploaded company documents.",
     "ec.b.head": "If your business is more nuanced than the dropdown",
     "ec.b.row1.tag": "Talk to us",
-    "ec.b.row1.text": "Some industries are case-by-case. If you operate adjacent to one of these (e.g. compliance tooling for the gambling industry), we'd still like to hear from you. Email business@altery.com with a 2-line description.",
+    "ec.b.row1.text": "Some industries are case-by-case. If you operate adjacent to one of these (e.g. compliance tooling for the gambling industry), we'd still like to hear from you. Email sales@altery.com with a 2-line description.",
     "ec.b.row2.tag": "Updated quarterly",
     "ec.b.row2.text": "Our supported-industries list expands as new licences come online. We'll keep this page accurate.",
     "ec.b.cta": "Try a different industry",
