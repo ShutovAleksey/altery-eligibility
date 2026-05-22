@@ -152,7 +152,7 @@ const INITIAL_FORM_STATE = {
   ubos:     [],
   uboDraft: INITIAL_UBO_DRAFT,
   plan:     { selectedPlanId: null, billingCurrency: null },
-  meta:     { token: null, startedAt: null, lastSavedAt: null },
+  meta:     { token: null, startedAt: null, lastSavedAt: null, utm: null, checkerHints: null },
 };
 
 // Per-slice deep-merge so additive shape changes (new fields inside an
@@ -291,6 +291,16 @@ function hydrateFormState(checkerParams) {
       ...INITIAL_FORM_STATE.meta,
       token: checkerParams.token || null,
       startedAt: new Date().toISOString(),
+      // Marketing attribution. Priority order:
+      //   1. UTMs embedded in the handoff payload (?p=) — carry the
+      //      original first-touch from the checker landing, survive
+      //      email forwards.
+      //   2. UTMs captured directly on /setup (from a campaign that
+      //      links here instead of the checker root).
+      //   3. null when no UTMs were ever captured.
+      utm: (checkerParams.utm && typeof checkerParams.utm === "object")
+        ? checkerParams.utm
+        : obGetStoredUtms(),
       // Non-form hints — preserved for screens that want to suggest a
       // default without overwriting user-visible fields. Never read
       // these as authoritative; they're advisory.
@@ -498,9 +508,62 @@ const TWEAKS = Object.freeze({
   submitState: "pending",
 });
 
+// First-touch UTM capture, inline copy of the checker-side helpers from
+// checker-helpers.js. The setup app doesn't load checker-helpers.js so
+// we keep a tiny local copy. Both surfaces write to the same
+// sessionStorage key "altery:utm:v1" so a visitor who arrived on
+// /?utm_source=... and then navigates to /setup keeps their first-touch
+// record. If they land directly on /setup?utm_source=..., this captures
+// from there.
+const _UTM_FIELDS_OB  = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+const _UTM_STORAGE_OB = "altery:utm:v1";
+
+function obCaptureAndStoreUtms() {
+  if (typeof window === "undefined") return null;
+  let existing = null;
+  try {
+    const raw = window.sessionStorage.getItem(_UTM_STORAGE_OB);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && _UTM_FIELDS_OB.some((f) => parsed[f])) existing = parsed;
+    }
+  } catch (e) {}
+  if (existing) return existing;
+
+  const sp = new URLSearchParams(window.location.search);
+  const out = {};
+  let any = false;
+  for (const k of _UTM_FIELDS_OB) {
+    const v = sp.get(k);
+    if (v) { out[k] = v.slice(0, 200); any = true; }
+  }
+  if (!any) return null;
+  out.referrer = (document.referrer || "").slice(0, 500) || null;
+  out.landedAt = new Date().toISOString();
+  try { window.sessionStorage.setItem(_UTM_STORAGE_OB, JSON.stringify(out)); } catch (e) {}
+  return out;
+}
+
+function obGetStoredUtms() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(_UTM_STORAGE_OB);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && _UTM_FIELDS_OB.some((f) => parsed[f])) return parsed;
+  } catch (e) {}
+  return null;
+}
+
 function App() {
   const [step, setStep] = useState("prep");
   const [showSaveModal, setShowSaveModal] = useState(false);
+
+  // Capture first-touch UTMs as early as possible on mount. The helper
+  // is a no-op when nothing's in the URL AND nothing's already stored.
+  // Result is read again at handoff time from sessionStorage; no need
+  // to thread through component state.
+  useEffect(() => { obCaptureAndStoreUtms(); }, []);
 
   // formState — single source of truth for user-entered data, persisted to
   // localStorage so a reload mid-flow doesn't lose progress. Initialised below
@@ -559,6 +622,9 @@ function App() {
             services:     Array.isArray(payload.services)  ? payload.services  : [],
             corridors:    Array.isArray(payload.corridors) ? payload.corridors : [],
             cryptoActive: !!payload.cryptoActive,
+            // Marketing attribution carried from the checker (or older
+            // forwarded copies). null when no UTMs were captured upstream.
+            utm:          (payload.utm && typeof payload.utm === "object") ? payload.utm : null,
           };
         }
       } catch (e) {

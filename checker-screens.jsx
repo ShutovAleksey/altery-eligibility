@@ -159,6 +159,13 @@ function EcApp() {
   const t = useT();
   const [step, setStep] = useState(0);
   const [direction, setDirection] = useState("forward");
+  // First-touch UTM capture — runs once on mount. The helper is a
+  // no-op if there's nothing in the URL AND nothing in sessionStorage,
+  // so it's safe to call unconditionally. Once stored, every downstream
+  // handoff (PDF/email link, /setup redirect) embeds these in the
+  // payload. Stored value is read again at email/handoff time so we
+  // don't need to thread it through component state.
+  useEffect(() => { ecCaptureAndStoreUtms(); }, []);
   const [country, setCountry] = useState(null);
   const [industry, setIndustry] = useState("");
   const [businessType, setBusinessType] = useState("");

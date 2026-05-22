@@ -425,7 +425,14 @@ function ecBuildHandoffPayload(rec, plan, opts) {
   // prefill the same address the PDF was sent to. Not included on the
   // result-page CTA path (we don't have an email yet) — that's fine,
   // the field is optional in the decoder.
+  //
+  // UTMs are read from sessionStorage (first-touch captured on landing)
+  // and embedded so the entire handoff — checker→/setup, PDF/email
+  // magic link, forwarded copies — carries original marketing
+  // attribution all the way to onboarding's meta.utm and onward to
+  // HubSpot leads.
   const active = plan || rec?.plan || {};
+  const utm    = (typeof ecGetStoredUtms === "function") ? ecGetStoredUtms() : null;
   return {
     v:            1,
     ref:          ecGenProposalRef(),
@@ -443,6 +450,7 @@ function ecBuildHandoffPayload(rec, plan, opts) {
     corridors:    Array.isArray(rec?.corridors) ? rec.corridors : [],
     cryptoActive: !!rec?.cryptoActive,
     email:        (opts && typeof opts.email === "string" && opts.email.includes("@")) ? opts.email : null,
+    utm,          // null when no UTMs captured; object {utm_source, ...} otherwise
     ts:           Date.now(),
   };
 }
@@ -467,9 +475,96 @@ function ecBuildHandoffURL(rec, plan, origin, opts) {
   return `${base}/setup?p=${p}`;
 }
 
+// ── UTM attribution (first-touch, session-scoped) ──────────────────
+// Marketing attribution flow:
+//   1. Visitor lands on / or /setup with ?utm_source=...&utm_medium=...
+//   2. ecCaptureAndStoreUtms() runs on app mount, persists to sessionStorage
+//      under "altery:utm:v1" with FIRST-TOUCH semantics — once a non-empty
+//      payload is stored, subsequent captures inside the same tab can't
+//      overwrite it. Tab close clears the storage.
+//   3. ecBuildHandoffPayload embeds the stored UTMs in ?p=, so the
+//      checker→onboarding handoff (and any forwarded email link) carries
+//      original attribution.
+//   4. Onboarding hydrateFormState reads utms from the payload, parks them
+//      in formState.meta.utm — available for HubSpot lead-attribution
+//      properties and any future analytics fire-and-forget.
+//
+// Why first-touch (not last-touch): we want to remember the campaign that
+// initially captured the lead, not whatever URL they last clicked from.
+// Last-touch would overwrite "google ads" with "direct" the next time
+// they paste the link from a Slack message — losing the real source.
+const UTM_FIELDS   = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+const UTM_STORAGE  = "altery:utm:v1";
+
+function ecCaptureUtmsFromURL() {
+  if (typeof window === "undefined") return null;
+  const sp = new URLSearchParams(window.location.search);
+  const out = {};
+  let any = false;
+  for (const k of UTM_FIELDS) {
+    const v = sp.get(k);
+    if (v) { out[k] = v.slice(0, 200); any = true; }
+  }
+  if (!any) return null;
+  out.referrer = (typeof document !== "undefined" && document.referrer) ? document.referrer.slice(0, 500) : null;
+  out.landedAt = new Date().toISOString();
+  return out;
+}
+
+function ecGetStoredUtms() {
+  if (typeof window === "undefined" || !window.sessionStorage) return null;
+  try {
+    const raw = sessionStorage.getItem(UTM_STORAGE);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Treat the record as present only if it has at least one utm_*; old
+    // "all-null" stubs from a previous version should not block a real
+    // first-touch capture later in the session.
+    if (parsed && UTM_FIELDS.some((f) => parsed[f])) return parsed;
+    return null;
+  } catch (e) { return null; }
+}
+
+function ecStoreUtmsFirstTouch(utms) {
+  if (!utms || typeof window === "undefined" || !window.sessionStorage) return null;
+  const existing = ecGetStoredUtms();
+  if (existing) return existing;  // first-touch wins, no overwrite
+  try { sessionStorage.setItem(UTM_STORAGE, JSON.stringify(utms)); } catch (e) { /* quota / private mode */ }
+  return utms;
+}
+
+// Top-level orchestrator — call once on app mount on each entry point
+// (checker EcApp + onboarding App). Reads the current URL, decides
+// whether to commit a first-touch record, returns the effective set
+// the caller can stash in component state.
+function ecCaptureAndStoreUtms() {
+  const fromUrl  = ecCaptureUtmsFromURL();
+  const existing = ecGetStoredUtms();
+  if (existing) return existing;                  // sessionStorage wins
+  if (fromUrl)  return ecStoreUtmsFirstTouch(fromUrl);
+  return null;
+}
+
+// Helper for any external redirect we ever wire (e.g. app.altery.com/...) —
+// appends every utm_* the current session knows about to the URL's query
+// string without trampling existing params already on the URL.
+function ecAppendUtmsToURL(url, utms) {
+  const u = utms || ecGetStoredUtms();
+  if (!u || !url) return url;
+  try {
+    const parsed = new URL(url, typeof window !== "undefined" ? window.location.origin : "https://altery.com");
+    for (const k of UTM_FIELDS) {
+      if (u[k] && !parsed.searchParams.has(k)) parsed.searchParams.set(k, u[k]);
+    }
+    return parsed.toString();
+  } catch (e) { return url; }
+}
+
 Object.assign(window, {
   ecCurrencyFlag, ecCurrencyName, ecRecommend,
   ecEstimateTxCount, ecComputeCostBreakdown, ecOutcomesForSavings,
   ecVolumeHintKey, ecFormatVolume, ecEstimateSavings, ecGenProposalRef,
   ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
+  ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,
+  ecCaptureAndStoreUtms, ecAppendUtmsToURL,
 });
