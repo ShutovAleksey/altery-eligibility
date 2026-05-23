@@ -280,12 +280,12 @@ function EcApp() {
   // also lets the user feel "this is for them" before any commitment.
   const back  = () => {
     setDirection("back");
-    // From a blocked-industry result, back jumps straight to the
-    // industry question — the user never visited Q3..Q5 because of the
-    // short-circuit in EcIndustry's onBlocked handler, so stepping back
-    // through ghost screens would be disorienting.
+    // From a blocked result, back jumps to whichever question caused
+    // the block (country=1 / industry=2). The user never visited the
+    // remaining questions because of the short-circuit, so stepping
+    // back through ghost screens would be disorienting.
     if (step === 6 && recommendation.kind === "blocked") {
-      setStep(2);
+      setStep(recommendation.reason === "country" ? 1 : 2);
       return;
     }
     setStep((s) => Math.max(0, s - 1));
@@ -304,7 +304,7 @@ function EcApp() {
       <EcSidebar step={step} totalSteps={totalSteps} />
       <main className="ec-main" data-direction={direction}>
         {step === 0 && <EcIntro onStart={next} />}
-        {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} />}
+        {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}
         {step === 2 && <EcIndustry industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={back} onNext={next} onBlocked={jumpToResult} />}
         {step === 3 && <EcServices services={services} setServices={setServices} onBack={back} onNext={next} />}
         {step === 4 && <EcVolume volumeIdx={volumeIdx} setVolumeIdx={setVolumeIdx} txCount={txCount} setTxCount={setTxCount} onBack={back} onNext={next} />}
@@ -619,7 +619,7 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
   );
 }
 
-function EcCountry({ value, onChange, onBack, onNext }) {
+function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
   const t = useT();
   // t() falls back to the raw ISO code when no `ec.country.XX` key
   // exists in either the current language or the EN dict. For new
@@ -642,9 +642,16 @@ function EcCountry({ value, onChange, onBack, onNext }) {
   // Auto-advance: picking a country sets the value AND moves on. React
   // 18 batches both updates in the same render so the recommendation
   // memo sees the new country before Q2 mounts.
+  //
+  // Short-circuit if the picked jurisdiction is on the blocked list
+  // (sanctions / FATF / scope). Mirrors EcIndustry's onBlocked path —
+  // straight to the soft-decline result, no point asking the remaining
+  // four questions when the answer is already "no".
   const handleSelect = (code) => {
+    const c = EC_COUNTRIES.find((x) => x.code === code);
     onChange(code);
-    onNext();
+    if (c?.risk === "blocked") onBlocked();
+    else onNext();
   };
 
   return (
@@ -1502,11 +1509,30 @@ function EcResultApproved({ rec, onBack, onReset }) {
 }
 function EcResultBlocked({ rec, onBack, onReset }) {
   const t = useT();
-  // Industry name is interpolated as lowercase to read naturally inside
-  // the sentence ("…can't open accounts for gambling right now"). Uses
-  // toLocaleLowerCase to handle non-Latin scripts safely (Turkish "İ"→"i"
-  // edge case especially).
-  const industryLabel = t(rec.reasonKey).toLocaleLowerCase(window.__I18N.getLang());
+  const lang = window.__I18N.getLang();
+  // Two block reasons share the same screen scaffolding; only the
+  // accent token, title fragments and lead copy differ.
+  const isCountry = rec.reason === "country";
+  let accent, titleA, titleB, lead;
+  if (isCountry) {
+    // Country names stay in title-case ("Russia", "Iran" — proper nouns)
+    // so we don't toLocaleLowerCase them; the rest is taken straight from
+    // the ec.country.XX dict (with c.name fallback for un-translated codes).
+    const c = rec.country;
+    const localized = t("ec.country." + c.code);
+    accent = localized === c.code ? c.name : localized;
+    titleA = t("ec.b.country.title.a");
+    titleB = t("ec.b.title.b");
+    lead = t("ec.b.country.lead");
+  } else {
+    // Industry name lowercased so it reads naturally inside the sentence
+    // ("…can't open accounts for gambling right now"). toLocaleLowerCase
+    // handles non-Latin scripts safely (Turkish "İ"→"i" edge case).
+    accent = t(rec.reasonKey).toLocaleLowerCase(lang);
+    titleA = t("ec.b.title.a");
+    titleB = t("ec.b.title.b");
+    lead = t("ec.b.lead");
+  }
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -1516,11 +1542,11 @@ function EcResultBlocked({ rec, onBack, onReset }) {
         <div className="ec-result__hero">
           <div className="ec-result__heroEyebrow">{t("ec.b.eyebrow")}</div>
           <h1 className="ec-result__heroTitle">
-            {t("ec.b.title.a")}{" "}
-            <span className="ec-result__hero__accent">{industryLabel}</span>{" "}
-            {t("ec.b.title.b")}
+            {titleA}{" "}
+            <span className="ec-result__hero__accent">{accent}</span>{" "}
+            {titleB}
           </h1>
-          <p className="ec-result__heroLead">{t("ec.b.lead")}</p>
+          <p className="ec-result__heroLead">{lead}</p>
         </div>
         <div className="ec-caveats">
           <div className="ec-caveats__head">{t("ec.b.head")}</div>

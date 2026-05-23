@@ -36,8 +36,15 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
   const country = EC_COUNTRIES.find((c) => c.code === countryCode);
   const ind = EC_INDUSTRIES.find((i) => i.value === industry);
 
+  // Country sanctions check runs before the industry check: a sanctioned
+  // jurisdiction blocks regardless of what the business does. The
+  // `reason` discriminator lets EcResultBlocked switch its copy
+  // (country-specific lead vs industry-specific lead).
+  if (country && country.risk === "blocked") {
+    return { kind: "blocked", reason: "country", country };
+  }
   if (ind && ind.risk === "blocked") {
-    return { kind: "blocked", reasonKey: ind.labelKey };
+    return { kind: "blocked", reason: "industry", reasonKey: ind.labelKey };
   }
 
   let entity;
