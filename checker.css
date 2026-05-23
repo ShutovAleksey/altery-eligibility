@@ -891,12 +891,6 @@
        quiz step (EcBankHistoryStep) styled with the standard SelectableListItem +
        back/skip controls used by every other Q screen. */
 
-    .ec-country-footnote {
-      font-size: 12px; line-height: 18px;
-      color: var(--c-muted);
-      padding-top: 12px;
-    }
-
     /* Country list — proper list, not card-grid. Border-bottom between rows,
        hover via background only, selected state via 2px left accent strip
        (Linear/Notion pattern). 48px row height — denser, more list-y feel. */
@@ -932,11 +926,6 @@
       width: 2px; background: var(--c-primary);
     }
     .ec-country-row__name { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; }
-    .ec-country-row__meta {
-      font-size: 12px; color: var(--c-muted);
-      font-variant-numeric: tabular-nums;
-    }
-    .ec-country-row[aria-selected="true"] .ec-country-row__meta { color: var(--c-primary); opacity: 0.7; }
 
     .ec-country-empty {
       display: flex; gap: 12px; padding: 16px;

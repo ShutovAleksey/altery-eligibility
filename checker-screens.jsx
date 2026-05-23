@@ -400,12 +400,6 @@ function EcCountry({ value, onChange, onBack, onNext }) {
     );
   };
 
-  // Only Corporate-only countries get a right-side tag now. The previous
-  // entity-routing tags (FCA · Altery Ltd / CBC · Altery EU / DFSA · Altery
-  // MENA / Manual review) leaked internal entity structure into a question
-  // where the user just picks a country — routing is our concern, not theirs.
-  const metaFor = (c) => c.corporate ? t("ec.q2.tag.corporate") : null;
-
   const nameOf = (c) => t("ec.country." + c.code);
   const collator = useMemo(() => new Intl.Collator(undefined, { sensitivity: "base" }), []);
 
@@ -444,32 +438,19 @@ function EcCountry({ value, onChange, onBack, onNext }) {
     onNext();
   };
 
-  // Corporate-only footnote shows when at least one currently-visible
-  // country is corporate-only. In grouped mode that's always true
-  // (there are corporate-only countries in Asia & Americas regions).
-  // In search mode it depends on whether matches include any. Hiding
-  // the footnote when no corporate countries are on screen prevents
-  // a caveat about info the user can't see.
-  const visible = isSearching ? searchResults : EC_COUNTRIES;
-  const showCorporateNote = visible.some((c) => c.corporate);
-
-  const renderRow = (c) => {
-    const meta = metaFor(c);
-    return (
-      <button
-        key={c.code}
-        type="button"
-        role="option"
-        aria-selected={value === c.code}
-        className="ec-country-row"
-        onClick={() => handleSelect(c.code)}
-      >
-        <Flag code={c.code} size={24} />
-        <span className="ec-country-row__name">{nameOf(c)}</span>
-        {meta && <span className="ec-country-row__meta">{meta}</span>}
-      </button>
-    );
-  };
+  const renderRow = (c) => (
+    <button
+      key={c.code}
+      type="button"
+      role="option"
+      aria-selected={value === c.code}
+      className="ec-country-row"
+      onClick={() => handleSelect(c.code)}
+    >
+      <Flag code={c.code} size={24} />
+      <span className="ec-country-row__name">{nameOf(c)}</span>
+    </button>
+  );
 
   return (
     <div className="ec-content fade-in">
@@ -513,12 +494,6 @@ function EcCountry({ value, onChange, onBack, onNext }) {
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {showCorporateNote && (
-        <div className="ec-country-footnote">
-          {t("ec.q2.footnote.corporate")}
         </div>
       )}
 
