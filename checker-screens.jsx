@@ -463,9 +463,9 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
           {selected
             ? <Flag code={selected.code} size={22} />
             : (
-              <svg viewBox="0 0 22 22" width="22" height="22" className="ec-country-select__leading-ph">
-                <rect x="0.5" y="0.5" width="21" height="21" rx="6" fill="#E6E9EE" stroke="#D7DAE0"/>
-                <path d="M7 5v12M7 5l8 2-1 4 1 4-8-2" stroke="#9097A3" strokeWidth="1.4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg width="22" height="22" viewBox="0 0 20 20" fill="none" className="ec-country-select__leading-ph">
+                <path d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20Z" fill="white"/>
+                <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM16 13H11L10 11H7.5V16H6V5H12L13 7H16V13Z" fill="#B7BDC6"/>
               </svg>
             )}
         </span>
