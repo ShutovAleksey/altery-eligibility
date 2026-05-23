@@ -403,7 +403,7 @@
         position: absolute;
         right: -60px;
         bottom: -80px;
-        width: 320px;
+        width: 280px;
         height: auto;
         pointer-events: none;
         user-select: none;
@@ -452,19 +452,17 @@
            pinned to the bottom via margin-top:auto. */
         flex-direction: column;
         align-items: stretch;
-        gap: 32px;
+        gap: 48px;
       }
       .ec-sidebar__top {
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
       }
-      /* +15% logo on desktop only — at sidebar 320-480px width the
-         24px native height feels timid; 28px gives the brand presence
-         the wider column deserves. Mobile pill keeps 22-24px so the
-         lang switcher still fits horizontally on small screens. */
+      /* Desktop logo: 40px tall, width auto. Mobile pill keeps 22-24px
+         so the lang switcher still fits horizontally on small screens. */
       .ec-sidebar__logo svg {
-        height: 28px;
+        height: 40px;
         width: auto;
       }
       .ec-sidebar__label {
