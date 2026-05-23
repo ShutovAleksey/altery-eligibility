@@ -392,6 +392,26 @@
     .ec-sidebar__lang {
       margin-left: auto;
     }
+    /* Decorative currency stack — only visible on desktop, where the
+       sidebar has enough vertical real estate to host an illustration
+       in the bottom-right without crowding the lang switcher. */
+    .ec-sidebar__deco { display: none; }
+    @media (min-width: 900px) {
+      .ec-sidebar__deco {
+        display: block;
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        /* Width sized to ~30-35% of the narrowest sidebar (320px at
+           floor of the clamp) so it never crowds the lang switcher in
+           the bottom-left. At larger sidebar widths it stays the same
+           size, just with more breathing room around it. */
+        width: 140px;
+        height: auto;
+        pointer-events: none;
+        user-select: none;
+      }
+    }
 
     @media (min-width: 900px) {
       .ec-app {

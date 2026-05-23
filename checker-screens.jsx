@@ -209,6 +209,19 @@ function EcSidebar({ step, totalSteps }) {
       <div className="ec-sidebar__lang">
         <LangSwitcher onDark={true} anchorRight={false} dropUp={true} />
       </div>
+
+      {/* Decorative currency stack — visually anchors the "GBP, EUR
+          and USD accounts from day one" claim from intro value-row 2.
+          Position: absolute bottom-right on desktop; hidden on mobile
+          where the sidebar collapses to a 56px top-pill that can't
+          host an illustration. aria-hidden + alt="" because purely
+          decorative — screen readers should ignore. */}
+      <img
+        className="ec-sidebar__deco"
+        src="/images/sidebar-currencies.png"
+        alt=""
+        aria-hidden="true"
+      />
     </aside>
   );
 }
