@@ -394,22 +394,22 @@
     }
     /* Decorative currency stack — only visible on desktop, where the
        sidebar has enough vertical real estate to host an illustration
-       in the bottom-right without crowding the lang switcher. */
+       in the bottom-right. Positioned with NEGATIVE offsets so the
+       stack visibly bleeds past the sidebar's rounded bottom-right
+       corner (reference: coins overflow the panel ~25% of their
+       diameter). Requires .ec-sidebar overflow: visible to render. */
     .ec-sidebar__deco { display: none; }
     @media (min-width: 900px) {
       .ec-sidebar__deco {
         display: block;
         position: absolute;
-        right: 20px;
-        bottom: 20px;
-        /* Width sized to ~30-35% of the narrowest sidebar (320px at
-           floor of the clamp) so it never crowds the lang switcher in
-           the bottom-left. At larger sidebar widths it stays the same
-           size, just with more breathing room around it. */
-        width: 140px;
+        right: -48px;
+        bottom: -56px;
+        width: 260px;
         height: auto;
         pointer-events: none;
         user-select: none;
+        filter: drop-shadow(0 18px 40px rgba(0, 6, 57, .35));
       }
     }
 
@@ -443,7 +443,10 @@
            scroll inside the sidebar instead of clipping content. */
         height: calc(100vh - 40px);
         align-self: start;
-        overflow-y: auto;
+        /* overflow: visible (default) lets .ec-sidebar__deco bleed past
+           the rounded bottom-right corner. Content (logo + 5 steps +
+           lang switcher) fits inside 100vh-40px on any 900px+ viewport,
+           so we don't need an internal scrollbar. */
         position: sticky;
         top: 20px;
         /* Vertical stacking: top group, steps in the middle, lang
