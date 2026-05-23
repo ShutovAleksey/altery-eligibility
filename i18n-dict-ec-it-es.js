@@ -42,9 +42,6 @@
     "ec.q2.lead": "Seleziona il paese indicato sul certificato di registrazione. Al resto pensiamo noi.",
     "ec.q2.input.label": "Paese di costituzione",
     "ec.q2.input.placeholder": "Cerca paese",
-    "ec.q2.input.hintMatch": "{n} di {total} paesi corrispondono",
-    "ec.q2.input.hintTotal": "{n} paesi supportati",
-    "ec.q2.selected": "Selezionato:",
     "ec.q2.empty.title": "Nessun paese trovato",
     "ec.q2.empty.lead": "Prova il nome in inglese o contatta il nostro team.",
 
@@ -423,9 +420,6 @@
     "ec.q2.lead": "Elige el país que aparece en tu certificado de registro. Nosotros nos encargamos del resto.",
     "ec.q2.input.label": "País de constitución",
     "ec.q2.input.placeholder": "Buscar país",
-    "ec.q2.input.hintMatch": "{n} de {total} países coinciden",
-    "ec.q2.input.hintTotal": "{n} países admitidos",
-    "ec.q2.selected": "Seleccionado:",
     "ec.q2.empty.title": "Sin resultados",
     "ec.q2.empty.lead": "Prueba el nombre en inglés o contacta con nuestro equipo.",
 

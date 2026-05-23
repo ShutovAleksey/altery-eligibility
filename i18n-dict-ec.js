@@ -53,9 +53,6 @@
     "ec.q2.lead": "Pick the country shown on your registration certificate. We'll route the application from there.",
     "ec.q2.input.label": "Country of incorporation",
     "ec.q2.input.placeholder": "Search country",
-    "ec.q2.input.hintMatch": "{n} of {total} countries match",
-    "ec.q2.input.hintTotal": "{n} countries supported",
-    "ec.q2.selected": "Selected:",
     "ec.q2.empty.title": "No countries match your search",
     "ec.q2.empty.lead": "Try the country's name in English, or contact our team if you can't find yours.",
 

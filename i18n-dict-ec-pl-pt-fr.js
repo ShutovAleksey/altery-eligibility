@@ -43,9 +43,6 @@
     "ec.q2.lead": "Wybierz kraj wskazany w odpisie z rejestru spółek. Resztą zajmiemy się my.",
     "ec.q2.input.label": "Kraj rejestracji",
     "ec.q2.input.placeholder": "Szukaj kraju",
-    "ec.q2.input.hintMatch": "{n} z {total} krajów pasuje",
-    "ec.q2.input.hintTotal": "Obsługiwanych krajów: {n}",
-    "ec.q2.selected": "Wybrano:",
     "ec.q2.empty.title": "Brak wyników",
     "ec.q2.empty.lead": "Spróbuj nazwy po angielsku lub skontaktuj się z nami.",
 
@@ -424,9 +421,6 @@
     "ec.q2.lead": "Selecione o país indicado no certificado de registo. Cuidamos do resto.",
     "ec.q2.input.label": "País de constituição",
     "ec.q2.input.placeholder": "Procurar país",
-    "ec.q2.input.hintMatch": "{n} de {total} países correspondem",
-    "ec.q2.input.hintTotal": "{n} países suportados",
-    "ec.q2.selected": "Selecionado:",
     "ec.q2.empty.title": "Sem resultados",
     "ec.q2.empty.lead": "Tente o nome em inglês ou contacte a nossa equipa.",
 
@@ -807,9 +801,6 @@
     "ec.q2.lead": "Sélectionnez le pays figurant sur votre certificat d'immatriculation. Nous nous occupons du reste.",
     "ec.q2.input.label": "Pays d'immatriculation",
     "ec.q2.input.placeholder": "Rechercher un pays",
-    "ec.q2.input.hintMatch": "{n} pays sur {total} correspondent",
-    "ec.q2.input.hintTotal": "{n} pays pris en charge",
-    "ec.q2.selected": "Sélectionné :",
     "ec.q2.empty.title": "Aucun pays trouvé",
     "ec.q2.empty.lead": "Essayez le nom en anglais ou contactez notre équipe.",
 

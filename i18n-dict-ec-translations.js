@@ -46,9 +46,6 @@
     "ec.q2.lead": "Wählen Sie das Land, das auf Ihrer Handelsregisterurkunde steht. Den Rest übernehmen wir.",
     "ec.q2.input.label": "Land der Eintragung",
     "ec.q2.input.placeholder": "Land suchen",
-    "ec.q2.input.hintMatch": "{n} von {total} Ländern passen",
-    "ec.q2.input.hintTotal": "{n} Länder unterstützt",
-    "ec.q2.selected": "Ausgewählt:",
     "ec.q2.empty.title": "Keine Treffer für Ihre Suche",
     "ec.q2.empty.lead": "Versuchen Sie den Namen auf Englisch, oder kontaktieren Sie uns.",
 
@@ -427,9 +424,6 @@
     "ec.q2.lead": "Укажите страну из вашего свидетельства о регистрации — дальше мы всё настроим.",
     "ec.q2.input.label": "Страна регистрации",
     "ec.q2.input.placeholder": "Поиск страны",
-    "ec.q2.input.hintMatch": "Совпадений: {n} из {total}",
-    "ec.q2.input.hintTotal": "Поддерживается стран: {n}",
-    "ec.q2.selected": "Выбрано:",
     "ec.q2.empty.title": "Совпадений не найдено",
     "ec.q2.empty.lead": "Попробуйте ввести название по-английски или свяжитесь с нами.",
 

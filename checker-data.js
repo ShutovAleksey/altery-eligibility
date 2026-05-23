@@ -238,28 +238,6 @@ const EC_SERVICES = [
 // removing a question = bump this number; no string edits needed.
 const TOTAL_STEPS = 5;
 
-// Region grouping for the Q1 country picker. Replaces an earlier
-// "popular countries" heuristic that implied traffic data we don't
-// actually have. Groups chunk the 97-country list by geography so
-// users find their region first, then the country within it —
-// matches the Q4 corridor-group pattern (visual + label consistency)
-// and reuses ec.corridor.group.* translations.
-//
-// Order rationale: not based on assumed user volumes (don't have the
-// data), but on Altery's licensing footprint. Europe first because it
-// contains all three EU-passport markets plus UK·FCA. MEA next
-// because it holds Altery's UAE·DFSA entity. Asia & Americas after —
-// those are served via UK passport for corporate structures only.
-// EC_COUNTRIES.group values: "europe" | "mea" | "asia" | "americas".
-// We map "mea" → "mena" label and "asia" → "apac" label since the
-// corridor-group translations use those names.
-const COUNTRY_REGION_GROUPS = [
-  { groupKey: "europe",   labelKey: "ec.corridor.group.europe"   },
-  { groupKey: "mea",      labelKey: "ec.corridor.group.mena"     },
-  { groupKey: "asia",     labelKey: "ec.corridor.group.apac"     },
-  { groupKey: "americas", labelKey: "ec.corridor.group.americas" },
-];
-
 const EC_VOLUME_BANDS = [
   { idx: 0, value: 5000 }, { idx: 1, value: 30000 },
   { idx: 2, value: 75000 }, { idx: 3, value: 175000 },
@@ -600,6 +578,6 @@ const EC_ENTITIES = {
 // unqualified.
 Object.assign(window, {
   EC_COUNTRIES, EC_CORRIDOR_GROUPS, EC_CORRIDORS, EC_INDUSTRIES,
-  EC_BUSINESS_TYPES, EC_SERVICES, TOTAL_STEPS, COUNTRY_REGION_GROUPS,
+  EC_BUSINESS_TYPES, EC_SERVICES, TOTAL_STEPS,
   EC_VOLUME_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_PERKS, EC_ENTITIES,
 });

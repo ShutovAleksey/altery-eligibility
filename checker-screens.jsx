@@ -2,7 +2,7 @@
           Icon, Flag, Title, Field, WhyWeAsk,
           EC_COUNTRIES, EC_INDUSTRIES, EC_BUSINESS_TYPES, EC_SERVICES,
           EC_VOLUME_BANDS, EC_CORRIDOR_GROUPS, EC_CORRIDORS, EC_PERKS,
-          EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS, COUNTRY_REGION_GROUPS,
+          EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
           EcFeesModal, EcBankHistory, EcPerks, EcPlanComparisonModal, EcHandoffModal,
@@ -384,73 +384,152 @@ function EcQuestionHeader({ num, title, lead }) {
   );
 }
 
-function EcCountry({ value, onChange, onBack, onNext }) {
+// Combobox dedicated to Q1. Trigger looks like a DS Select; opening it
+// reveals an in-panel search input + a filtered virtualised-friendly
+// listbox of all 200+ countries. Auto-advance happens in EcCountry's
+// handleSelect — this component only reports the picked code.
+function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder }) {
   const t = useT();
-  const [q, setQ] = useState("");
-  const ql = q.trim().toLowerCase();
-  const isSearching = ql !== "";
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [activeIdx, setActiveIdx] = useState(0);
+  const wrapRef = useRef(null);
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
 
-  const matches = (c) => {
-    if (!ql) return true;
-    const localized = t("ec.country." + c.code);
-    return (
-      localized.toLowerCase().includes(ql) ||
+  const filtered = useMemo(() => {
+    const ql = query.trim().toLowerCase();
+    if (!ql) return options;
+    return options.filter((c) =>
+      nameOf(c).toLowerCase().includes(ql) ||
       c.name.toLowerCase().includes(ql) ||
-      c.code.toLowerCase().includes(ql)
+      c.code.toLowerCase().includes(ql),
     );
+  }, [options, query, nameOf]);
+
+  // Reset transient state on close so reopening always starts clean.
+  useEffect(() => { if (!open) { setQuery(""); setActiveIdx(0); } }, [open]);
+  // Focus the search field on open — typing should "just work".
+  useEffect(() => { if (open) inputRef.current?.focus(); }, [open]);
+  // Outside click closes.
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+  // Keep keyboard-active item visible in the scroll viewport.
+  useEffect(() => {
+    if (!open || !listRef.current) return;
+    const node = listRef.current.querySelector(`[data-idx="${activeIdx}"]`);
+    if (node) node.scrollIntoView({ block: "nearest" });
+  }, [open, activeIdx]);
+
+  const selected = options.find((c) => c.code === value);
+
+  const onKey = (e) => {
+    if (e.key === "Escape") { setOpen(false); return; }
+    if (e.key === "ArrowDown") { e.preventDefault(); setActiveIdx((i) => Math.min(filtered.length - 1, i + 1)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActiveIdx((i) => Math.max(0, i - 1)); }
+    else if (e.key === "Enter") {
+      e.preventDefault();
+      const c = filtered[activeIdx];
+      if (c) onChange(c.code);
+    }
   };
 
+  return (
+    <div className="ec-country-select" ref={wrapRef}>
+      {label && <div className="ec-country-select__label">{label}</div>}
+      <button
+        type="button"
+        className={"ec-country-select__trigger" + (open ? " is-open" : "")}
+        onClick={() => setOpen((v) => !v)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        {selected
+          ? <Flag code={selected.code} size={22} />
+          : <EcIco.globe style={{ width: 22, height: 22, color: "var(--c-muted)" }} aria-hidden="true" />}
+        <span className={"ec-country-select__value" + (selected ? "" : " is-placeholder")}>
+          {selected ? nameOf(selected) : (placeholder || t("ec.q2.input.placeholder"))}
+        </span>
+        <svg
+          className="ec-country-select__caret"
+          viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"
+          style={{ transform: open ? "rotate(180deg)" : "none" }}
+        >
+          <path d="m4 6 4 4 4-4" stroke="currentColor" strokeWidth="1.6" fill="none"
+                strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      {open && (
+        <div className="ec-country-select__panel">
+          <div className="ec-country-select__search">
+            <EcIco.search style={{ width: 16, height: 16, color: "var(--c-muted)", flex: "0 0 auto" }} aria-hidden="true" />
+            <input
+              ref={inputRef}
+              type="text"
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setActiveIdx(0); }}
+              onKeyDown={onKey}
+              placeholder={t("ec.q2.input.placeholder")}
+              autoComplete="off"
+              spellCheck="false"
+            />
+          </div>
+          {filtered.length === 0 ? (
+            <div className="ec-country-select__empty">
+              <div className="ec-country-select__empty-title">{t("ec.q2.empty.title")}</div>
+              <div className="ec-country-select__empty-lead">{t("ec.q2.empty.lead")}</div>
+            </div>
+          ) : (
+            <ul ref={listRef} className="ec-country-select__list" role="listbox">
+              {filtered.map((c, i) => (
+                <li
+                  key={c.code}
+                  data-idx={i}
+                  role="option"
+                  aria-selected={value === c.code}
+                  className={
+                    "ec-country-select__item"
+                    + (i === activeIdx ? " is-active" : "")
+                    + (value === c.code ? " is-selected" : "")
+                  }
+                  onMouseEnter={() => setActiveIdx(i)}
+                  onClick={() => onChange(c.code)}
+                >
+                  <Flag code={c.code} size={20} />
+                  <span>{nameOf(c)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EcCountry({ value, onChange, onBack, onNext }) {
+  const t = useT();
   const nameOf = (c) => t("ec.country." + c.code);
   const collator = useMemo(() => new Intl.Collator(undefined, { sensitivity: "base" }), []);
+  // Sort once per language switch — the combobox keeps countries in a
+  // single A→Z list (region grouping is gone), so the Collator handles
+  // diacritics correctly for whatever locale the user has active.
+  const options = useMemo(
+    () => EC_COUNTRIES.slice().sort((a, b) => collator.compare(nameOf(a), nameOf(b))),
+    [collator, t], // t identity changes per language → re-sort
+  );
 
-  // Two view modes:
-  //   "search"  — q is non-empty: flat alphabetised list of matches
-  //   "grouped" — q is empty: countries split into 4 region sections
-  // No "popular" mode and no "Show all" toggle — both relied on
-  // assumed data we don't have. The region grouping is purely
-  // geographic and matches the corridor-group structure used on Q4.
-  const searchResults = isSearching
-    ? EC_COUNTRIES.filter(matches).slice().sort((a, b) => collator.compare(nameOf(a), nameOf(b)))
-    : null;
-
-  const groupedSections = !isSearching
-    ? COUNTRY_REGION_GROUPS
-        .map((g) => ({
-          ...g,
-          countries: EC_COUNTRIES
-            .filter((c) => c.group === g.groupKey)
-            .sort((a, b) => collator.compare(nameOf(a), nameOf(b))),
-        }))
-        .filter((g) => g.countries.length > 0)
-    : null;
-
-  const totalCount = EC_COUNTRIES.length;
-  const matchCount = isSearching ? searchResults.length : totalCount;
-
-  // Auto-advance: clicking a country sets the value AND moves to the
-  // next step in one motion. This is the headline UX win for Q1 —
-  // the country row IS the submit button. React 18 batches the
-  // onChange/onNext state updates in the same render so the
-  // recommendation memo sees the new country before Q2 renders. No
-  // separate Continue button on this screen — would be vestigial.
+  // Auto-advance: picking a country sets the value AND moves on. React
+  // 18 batches both updates in the same render so the recommendation
+  // memo sees the new country before Q2 mounts.
   const handleSelect = (code) => {
     onChange(code);
     onNext();
   };
-
-  const renderRow = (c) => (
-    <button
-      key={c.code}
-      type="button"
-      role="option"
-      aria-selected={value === c.code}
-      className="ec-country-row"
-      onClick={() => handleSelect(c.code)}
-    >
-      <Flag code={c.code} size={24} />
-      <span className="ec-country-row__name">{nameOf(c)}</span>
-    </button>
-  );
 
   return (
     <div className="ec-content fade-in">
@@ -459,49 +538,13 @@ function EcCountry({ value, onChange, onBack, onNext }) {
       </button>
       <EcQuestionHeader num="1" title={t("ec.q2.title")} lead={t("ec.q2.lead")} />
 
-      <Input
+      <EcCountrySelect
         label={t("ec.q2.input.label")}
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder={t("ec.q2.input.placeholder")}
-        icon="search"
-        hint={isSearching
-          ? t("ec.q2.input.hintMatch", { n: matchCount, total: totalCount })
-          : t("ec.q2.input.hintTotal", { n: totalCount })}
+        value={value}
+        onChange={handleSelect}
+        options={options}
+        nameOf={nameOf}
       />
-
-      {isSearching ? (
-        searchResults.length === 0 ? (
-          <div className="ec-country-empty">
-            <EcIco.search style={{ width: 18, height: 18, marginTop: 2 }} />
-            <div>
-              <div className="ec-country-empty__title">{t("ec.q2.empty.title")}</div>
-              <div className="ec-country-empty__lead">{t("ec.q2.empty.lead")}</div>
-            </div>
-          </div>
-        ) : (
-          <div className="ec-country-list" role="listbox" aria-label={t("ec.q2.input.label")}>
-            {searchResults.map(renderRow)}
-          </div>
-        )
-      ) : (
-        <div className="ec-country-groups">
-          {groupedSections.map((g) => (
-            <div key={g.groupKey} className="ec-country-group">
-              <div className="ec-country-section-head">{t(g.labelKey)}</div>
-              <div className="ec-country-list" role="listbox" aria-label={t(g.labelKey)}>
-                {g.countries.map(renderRow)}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* No Continue button on Q1 — every country row is itself a
-          submit-and-advance control via handleSelect. Adding a "Next"
-          that requires a separate tap after selection would be
-          vestigial. Returning from Q2 with a country still selected:
-          user taps it again (idempotent) → re-advances. */}
     </div>
   );
 }

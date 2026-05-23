@@ -891,74 +891,97 @@
        quiz step (EcBankHistoryStep) styled with the standard SelectableListItem +
        back/skip controls used by every other Q screen. */
 
-    /* Country list — proper list, not card-grid. Border-bottom between rows,
-       hover via background only, selected state via 2px left accent strip
-       (Linear/Notion pattern). 48px row height — denser, more list-y feel. */
-    .ec-country-list {
-      display: flex; flex-direction: column;
-      border: 1px solid var(--c-border);
-      border-radius: 12px;
-      overflow: hidden;
-      background: var(--c-surface);
-    }
-    .ec-country-row {
+    /* ─── Q1 country combobox ─────────────────────────────────────────
+       Single-line trigger styled like a DS Select; clicking opens an
+       absolutely-positioned panel with a search input + filtered listbox.
+       Region grouping was retired because the search field handles the
+       "I know my country" case faster than scanning a 4-region wall. */
+    .ec-country-select {
       position: relative;
-      display: flex; align-items: center; gap: 12px;
-      height: 52px; padding: 0 16px;
-      cursor: pointer;
-      background: var(--c-surface);
-      border: 0;
-      border-bottom: 1px solid var(--c-border-soft);
-      width: 100%; text-align: left;
-      font: inherit; color: var(--c-ink);
-      transition: background .12s ease;
+      display: flex; flex-direction: column;
+      gap: 6px;
     }
-    .ec-country-row:last-child { border-bottom: none; }
-    .ec-country-row:hover { background: var(--c-surface-hover); }
-    .ec-country-row[aria-selected="true"] {
+    .ec-country-select__label {
+      font-size: 13px; font-weight: 500;
+      color: var(--c-ink-2);
+    }
+    .ec-country-select__trigger {
+      display: flex; align-items: center; gap: 12px;
+      width: 100%; height: 52px;
+      padding: 0 14px;
+      border: 1px solid var(--c-border);
+      border-radius: var(--r-md);
+      background: var(--c-surface);
+      cursor: pointer;
+      font: inherit; color: var(--c-ink);
+      text-align: left;
+      transition: border-color .12s ease, box-shadow .12s ease;
+    }
+    .ec-country-select__trigger:hover { border-color: var(--c-muted-2); }
+    .ec-country-select__trigger.is-open {
+      border-color: var(--c-accent);
+      box-shadow: var(--sh-focus);
+    }
+    .ec-country-select__value {
+      flex: 1; min-width: 0;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-size: 15px; font-weight: 500;
+    }
+    .ec-country-select__value.is-placeholder {
+      color: var(--c-muted);
+      font-weight: 400;
+    }
+    .ec-country-select__caret {
+      color: var(--c-muted);
+      transition: transform .15s ease;
+      flex: 0 0 auto;
+    }
+    .ec-country-select__panel {
+      position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 40;
+      display: flex; flex-direction: column;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border-soft);
+      border-radius: var(--r-md);
+      box-shadow: var(--sh-3);
+      max-height: 360px;
+      overflow: hidden;
+    }
+    .ec-country-select__search {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--c-border-soft);
+    }
+    .ec-country-select__search input {
+      flex: 1; min-width: 0;
+      border: 0; outline: none; background: transparent;
+      font: inherit; color: var(--c-ink);
+      font-size: 14px;
+    }
+    .ec-country-select__search input::placeholder { color: var(--c-muted); }
+    .ec-country-select__list {
+      list-style: none; margin: 0; padding: 6px;
+      overflow-y: auto;
+    }
+    .ec-country-select__item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px;
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      font-size: 14px;
+      color: var(--c-ink);
+    }
+    .ec-country-select__item.is-active { background: var(--c-surface-hover); }
+    .ec-country-select__item.is-selected {
       background: var(--c-accent-soft);
       color: var(--c-primary);
+      font-weight: 500;
     }
-    /* Selected: thin 2px accent strip on left, no full border */
-    .ec-country-row[aria-selected="true"]::before {
-      content: "";
-      position: absolute; left: 0; top: 0; bottom: 0;
-      width: 2px; background: var(--c-primary);
-    }
-    .ec-country-row__name { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; }
-
-    .ec-country-empty {
-      display: flex; gap: 12px; padding: 16px;
-      border: 1px dashed var(--c-border);
-      border-radius: 12px;
+    .ec-country-select__empty {
+      padding: 16px;
       color: var(--c-muted);
-      align-items: flex-start;
     }
-    .ec-country-empty__title { font-weight: 600; color: var(--c-ink); margin-bottom: 2px; }
-
-    /* ─── Q1: Region-grouped country list ─────────────────────────────
-       The 97 countries are split into 4 geographic sections (Europe / MEA
-       / Asia & Pacific / Americas) with the same small-caps header style
-       as Q4 corridor groups, for cross-screen visual consistency. Sections
-       stacked vertically; 18px gap so the headers breathe and you can
-       quickly scroll past regions that aren't yours. Each country row is
-       itself a submit-and-advance button (handleSelect on click), so
-       there's no Continue button on this screen — would be vestigial. */
-    .ec-country-section-head {
-      font-size: 11px; font-weight: 600;
-      color: var(--c-muted);
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      padding: 4px 2px 6px;
-    }
-    .ec-country-groups {
-      display: flex; flex-direction: column;
-      gap: 18px;
-    }
-    .ec-country-group {
-      display: flex; flex-direction: column;
-    }
-    .ec-country-empty__lead { font-size: 13px; }
+    .ec-country-select__empty-title { font-weight: 600; color: var(--c-ink); margin-bottom: 2px; }
+    .ec-country-select__empty-lead { font-size: 13px; }
 
     /* ─────── Result screen ─────── */
     .ec-result { display: flex; flex-direction: column; gap: 16px; }

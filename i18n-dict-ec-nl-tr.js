@@ -42,9 +42,6 @@
     "ec.q2.lead": "Kies het land dat op je registratiebewijs staat. De rest regelen wij.",
     "ec.q2.input.label": "Land van vestiging",
     "ec.q2.input.placeholder": "Zoek land",
-    "ec.q2.input.hintMatch": "{n} van {total} landen komen overeen",
-    "ec.q2.input.hintTotal": "{n} landen ondersteund",
-    "ec.q2.selected": "Geselecteerd:",
     "ec.q2.empty.title": "Geen landen gevonden",
     "ec.q2.empty.lead": "Probeer de naam in het Engels of neem contact met ons op.",
 
@@ -423,9 +420,6 @@
     "ec.q2.lead": "Tescil belgenizdeki ülkeyi seçin. Gerisini biz hallederiz.",
     "ec.q2.input.label": "Tescil ülkesi",
     "ec.q2.input.placeholder": "Ülke ara",
-    "ec.q2.input.hintMatch": "{n}/{total} ülke eşleşti",
-    "ec.q2.input.hintTotal": "{n} ülke destekleniyor",
-    "ec.q2.selected": "Seçili:",
     "ec.q2.empty.title": "Aramanızla eşleşen ülke yok",
     "ec.q2.empty.lead": "Ülke adını İngilizce deneyin veya ekibimizle iletişime geçin.",
 
