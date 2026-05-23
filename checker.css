@@ -380,7 +380,18 @@
     @media (min-width: 900px) {
       .ec-app {
         display: grid;
-        grid-template-columns: 320px 1fr;
+        /* Sidebar width = clamp(floor, preferred, ceiling):
+             floor     320px → never narrower than a comfortable nav column
+             preferred 33%   → near-but-below-golden-ratio (38.2%), gives
+                               a brand-canvas feel without crushing content
+             ceiling   480px → on 4K+ viewports, stop growing — past this
+                               the sidebar becomes wasted real estate.
+           At 1440px viewport sidebar = 475px (33%); content area = 945px,
+           enough for the 880px max-width result page with 65px on margins.
+           At 1280px sidebar = 422px; result page sits at 838px (slightly
+           narrower than ideal max but still readable). At 1920px sidebar
+           caps at 480px and content stays generous. */
+        grid-template-columns: clamp(320px, 33%, 480px) 1fr;
         align-items: stretch;
       }
       .ec-sidebar {
