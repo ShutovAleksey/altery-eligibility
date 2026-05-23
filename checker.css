@@ -386,8 +386,17 @@
       .ec-sidebar {
         margin: 20px 0 20px 20px;
         padding: 36px 32px;
-        height: auto;
-        min-height: calc(100vh - 40px);
+        /* Lock the sidebar to viewport height minus the 20px top/bottom
+           margins. Without this, the grid row stretches to whatever the
+           main content needs (result page can be 2000px+), and
+           align-items: stretch makes the sidebar grow with it — exactly
+           the "uhodit vniz za predely" overflow the user reported.
+           Combined with align-self: start so the grid stretch doesn't
+           override, and overflow-y: auto so very short viewports can
+           scroll inside the sidebar instead of clipping content. */
+        height: calc(100vh - 40px);
+        align-self: start;
+        overflow-y: auto;
         position: sticky;
         top: 20px;
         /* Vertical stacking: top group, steps in the middle, lang
