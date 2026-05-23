@@ -380,26 +380,26 @@
     @media (min-width: 900px) {
       .ec-app {
         display: grid;
-        grid-template-columns: 256px 1fr;
+        grid-template-columns: 320px 1fr;
         align-items: stretch;
       }
       .ec-sidebar {
-        margin: 16px 0 16px 16px;
-        padding: 24px;
+        margin: 20px 0 20px 20px;
+        padding: 36px 32px;
         height: auto;
-        min-height: calc(100vh - 32px);
+        min-height: calc(100vh - 40px);
         position: sticky;
-        top: 16px;
+        top: 20px;
         /* Vertical stacking: top group, steps in the middle, lang
            pinned to the bottom via margin-top:auto. */
         flex-direction: column;
         align-items: stretch;
-        gap: 20px;
+        gap: 32px;
       }
       .ec-sidebar__top {
         flex-direction: column;
         align-items: flex-start;
-        gap: 14px;
+        gap: 20px;
       }
       .ec-sidebar__label {
         padding-left: 0;
@@ -413,29 +413,29 @@
       .ec-sidebar__steps {
         display: flex;
         flex-direction: column;
-        gap: 12px;
+        gap: 18px;
         list-style: none;
         margin: 0;
         padding: 0;
-        margin-top: 8px;
+        margin-top: 12px;
       }
       .ec-sidebar__step {
         display: flex;
         align-items: center;
-        gap: 12px;
-        font-size: 13px;
+        gap: 14px;
+        font-size: 14px;
         color: rgba(255,255,255,.5);
         transition: color .15s ease;
       }
       .ec-sidebar__step.is-done    { color: rgba(255,255,255,.75); }
       .ec-sidebar__step.is-current { color: #fff; font-weight: 600; }
       .ec-sidebar__step__num {
-        width: 24px; height: 24px;
+        width: 28px; height: 28px;
         border-radius: 999px;
         border: 1.5px solid rgba(255,255,255,.18);
         background: transparent;
         display: inline-flex; align-items: center; justify-content: center;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 600;
         font-variant-numeric: tabular-nums;
         color: rgba(255,255,255,.55);
