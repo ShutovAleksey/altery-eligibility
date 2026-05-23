@@ -384,20 +384,22 @@ function EcQuestionHeader({ num, title, lead }) {
   );
 }
 
-// Combobox dedicated to Q1. Visually matches the design-system <Select>
-// (BEM .select__trigger / __value / __caret / __menu / __option tokens
-// mirrored as .ec-country-select__*), but the trigger is an <input> not
-// a <button>: typing filters the listbox in place — the field IS the
-// search. ChevronUpDownIcon at the right (DS Input.jsx) signals
-// "selectable + editable" the way react-select / headlessui combobox
-// do. Auto-advance still happens in EcCountry's handleSelect.
+// Q1 country picker. Renders exactly like the DS <Select> used in
+// EcIndustry (button trigger + chevron-down caret + drop-down listbox
+// with accent-soft selection state + check icon on the right) plus two
+// additions on top: a search input at the top of the menu, and a Flag
+// in every row. Same tokens, same hover, same keyboard model — the
+// only thing this component does on its own is filter the option list
+// against `query`. Auto-advance stays in EcCountry's handleSelect.
 function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder }) {
   const t = useT();
   const [open, setOpen] = useState(false);
+  const [hover, setHover] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIdx, setActiveIdx] = useState(0);
   const wrapRef = useRef(null);
-  const inputRef = useRef(null);
+  const triggerRef = useRef(null);
+  const searchRef = useRef(null);
   const listRef = useRef(null);
 
   const selected = options.find((c) => c.code === value);
@@ -412,12 +414,7 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
     );
   }, [options, query, nameOf]);
 
-  // The input's displayed text. When the menu is open we surface the
-  // typed query verbatim; when closed we fall back to the selected
-  // country's name so the field reads like a regular Select trigger.
-  const displayValue = open ? query : (selected ? nameOf(selected) : "");
-
-  // Outside click closes (and commits whatever query state existed).
+  // Outside click closes.
   useEffect(() => {
     if (!open) return;
     const onDoc = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
@@ -425,25 +422,35 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
     return () => document.removeEventListener("mousedown", onDoc);
   }, [open]);
 
-  // Reset transient state every time we close so re-opening starts
-  // fresh (query "", first row highlighted).
+  // Reset transient state on close.
   useEffect(() => { if (!open) { setQuery(""); setActiveIdx(0); } }, [open]);
 
-  // Keep the keyboard-active option scrolled into view.
+  // Focus the search field on open so typing-to-filter just works.
+  useEffect(() => { if (open) searchRef.current?.focus(); }, [open]);
+
+  // When `query` shrinks the filtered list past the previous activeIdx
+  // we'd otherwise highlight nothing; clamp back to a valid row.
+  useEffect(() => {
+    if (activeIdx >= filtered.length) setActiveIdx(Math.max(0, filtered.length - 1));
+  }, [filtered.length, activeIdx]);
+
+  // Keep keyboard-active option scrolled into view.
   useEffect(() => {
     if (!open || !listRef.current) return;
     const node = listRef.current.querySelector(`[data-idx="${activeIdx}"]`);
     if (node) node.scrollIntoView({ block: "nearest" });
   }, [open, activeIdx]);
 
-  const handlePick = (code) => {
-    onChange(code);
-    setOpen(false);
-  };
+  const handlePick = (code) => { onChange(code); setOpen(false); };
 
-  const onKey = (e) => {
-    if (e.key === "Escape") { setOpen(false); inputRef.current?.blur(); return; }
-    if (!open && (e.key === "ArrowDown" || e.key === "Enter")) { setOpen(true); return; }
+  const onTriggerKey = (e) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      setOpen(true);
+    }
+  };
+  const onSearchKey = (e) => {
+    if (e.key === "Escape") { setOpen(false); triggerRef.current?.focus(); return; }
     if (e.key === "ArrowDown") { e.preventDefault(); setActiveIdx((i) => Math.min(filtered.length - 1, i + 1)); }
     else if (e.key === "ArrowUp")   { e.preventDefault(); setActiveIdx((i) => Math.max(0, i - 1)); }
     else if (e.key === "Home")      { e.preventDefault(); setActiveIdx(0); }
@@ -455,77 +462,143 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
     }
   };
 
+  // Trigger border colour mirrors DS Select exactly:
+  //   open    → accent
+  //   hover   → muted-2
+  //   default → border
+  const triggerBorder = open ? "var(--c-accent)" : hover ? "var(--c-muted-2)" : "var(--c-border)";
+
   return (
-    <div className="ec-country-select" ref={wrapRef}>
-      {label && <label className="ec-country-select__label" htmlFor="ec-country-input">{label}</label>}
-      <div className={"ec-country-select__field" + (open ? " is-open" : "")}>
-        <span className="ec-country-select__leading" aria-hidden="true">
+    <div ref={wrapRef} style={{ display: "flex", flexDirection: "column", gap: "var(--s-1)", position: "relative" }}>
+      {label && (
+        <label htmlFor="ec-country-trigger"
+          style={{ fontSize: 13, fontWeight: "var(--fw-medium)", color: "var(--c-ink-2)" }}>
+          {label}
+        </label>
+      )}
+      <button
+        ref={triggerRef}
+        id="ec-country-trigger"
+        type="button"
+        role="combobox"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-controls={open ? "ec-country-menu" : undefined}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        onClick={() => setOpen((o) => !o)}
+        onKeyDown={onTriggerKey}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          height: 44, padding: "0 14px", borderRadius: "var(--r-md)",
+          border: `1px solid ${triggerBorder}`,
+          background: "var(--c-surface)",
+          cursor: "pointer", width: "100%",
+          color: "var(--c-ink)",
+          boxShadow: open ? "var(--sh-focus)" : "none",
+          transition: "all var(--motion-fast)", textAlign: "left",
+        }}
+      >
+        <span style={{
+          display: "inline-flex", alignItems: "center", gap: "var(--s-2)",
+          color: selected ? "var(--c-ink)" : "var(--c-muted)",
+          fontSize: "var(--fs-body)", minWidth: 0,
+        }}>
           {selected
-            ? <Flag code={selected.code} size={22} />
+            ? <Flag code={selected.code} size={20} />
             : (
-              <svg width="22" height="22" viewBox="0 0 20 20" fill="none" className="ec-country-select__leading-ph">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" style={{ flex: "0 0 auto" }}>
                 <path d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20Z" fill="white"/>
                 <path d="M10 0C4.48 0 0 4.48 0 10C0 15.52 4.48 20 10 20C15.52 20 20 15.52 20 10C20 4.48 15.52 0 10 0ZM16 13H11L10 11H7.5V16H6V5H12L13 7H16V13Z" fill="#B7BDC6"/>
               </svg>
             )}
+          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {selected ? nameOf(selected) : (placeholder || t("ec.q2.input.placeholder"))}
+          </span>
         </span>
-        <input
-          id="ec-country-input"
-          ref={inputRef}
-          className="ec-country-select__input"
-          type="text"
-          value={displayValue}
-          onChange={(e) => { setOpen(true); setQuery(e.target.value); setActiveIdx(0); }}
-          onFocus={() => setOpen(true)}
-          onClick={() => setOpen(true)}
-          onKeyDown={onKey}
-          placeholder={placeholder || ""}
-          autoComplete="off"
-          spellCheck="false"
-          role="combobox"
-          aria-expanded={open}
-          aria-autocomplete="list"
-          aria-controls="ec-country-menu"
-        />
-        <button
-          type="button"
-          className="ec-country-select__caret"
-          onClick={() => { setOpen((v) => !v); inputRef.current?.focus(); }}
-          tabIndex={-1}
-          aria-label="Toggle country list"
-        >
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
-               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="m7 9 5-5 5 5M7 15l5 5 5-5"/>
-          </svg>
-        </button>
-      </div>
+        <Icon name="chevronDown" size={16} color="var(--c-muted)"
+          style={{ transition: "transform var(--motion-base)", transform: open ? "rotate(180deg)" : "none" }}
+          aria-hidden="true" />
+      </button>
+
       {open && (
-        <ul ref={listRef} id="ec-country-menu" className="ec-country-select__menu" role="listbox">
-          {filtered.length === 0 ? (
-            <li className="ec-country-select__empty">{t("ec.q2.empty.title")}</li>
-          ) : (
-            filtered.map((c, i) => (
-              <li
-                key={c.code}
-                data-idx={i}
-                role="option"
-                aria-selected={value === c.code}
-                className={
-                  "ec-country-select__option"
-                  + (i === activeIdx ? " is-active" : "")
-                  + (value === c.code ? " is-selected" : "")
-                }
-                onMouseEnter={() => setActiveIdx(i)}
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => handlePick(c.code)}
-              >
-                <Flag code={c.code} size={22} />
-                <span className="ec-country-select__option-label">{nameOf(c)}</span>
+        <div
+          id="ec-country-menu"
+          style={{
+            position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 40,
+            background: "var(--c-surface)", borderRadius: "var(--r-md)",
+            border: "1px solid var(--c-border-soft)",
+            boxShadow: "var(--sh-3)", padding: 4,
+            display: "flex", flexDirection: "column",
+            maxHeight: 360, overflow: "hidden",
+          }}
+        >
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8,
+            padding: "8px 10px",
+            borderBottom: "1px solid var(--c-border-soft)",
+            marginBottom: 4,
+          }}>
+            <EcIco.search style={{ width: 16, height: 16, color: "var(--c-muted)", flex: "0 0 auto" }} aria-hidden="true" />
+            <input
+              ref={searchRef}
+              type="text"
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setActiveIdx(0); }}
+              onKeyDown={onSearchKey}
+              placeholder={t("ec.q2.input.placeholder")}
+              autoComplete="off"
+              spellCheck="false"
+              aria-controls="ec-country-listbox"
+              style={{
+                flex: 1, minWidth: 0, border: 0, outline: "none",
+                background: "transparent", font: "inherit", color: "var(--c-ink)",
+                fontSize: "var(--fs-body)",
+              }}
+            />
+          </div>
+          <ul
+            ref={listRef}
+            id="ec-country-listbox"
+            role="listbox"
+            style={{ margin: 0, padding: 0, listStyle: "none", overflowY: "auto", flex: 1 }}
+          >
+            {filtered.length === 0 ? (
+              <li style={{ padding: "14px 12px", fontSize: 13, color: "var(--c-muted)", textAlign: "center" }}>
+                {t("ec.q2.empty.title")}
               </li>
-            ))
-          )}
-        </ul>
+            ) : (
+              filtered.map((c, i) => {
+                const on = value === c.code;
+                const active = i === activeIdx;
+                return (
+                  <li
+                    key={c.code}
+                    data-idx={i}
+                    role="option"
+                    aria-selected={on}
+                    onMouseEnter={() => setActiveIdx(i)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => handlePick(c.code)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 10, width: "100%",
+                      padding: "10px 12px",
+                      background: on ? "var(--c-accent-soft)" : active ? "var(--c-surface-hover)" : "transparent",
+                      color: "var(--c-ink)", fontSize: "var(--fs-body)",
+                      borderRadius: "var(--r-sm)", cursor: "pointer",
+                    }}
+                  >
+                    <Flag code={c.code} size={20} />
+                    <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {nameOf(c)}
+                    </span>
+                    {on && <Icon name="check" size={14} color="var(--c-accent)" aria-hidden="true" />}
+                  </li>
+                );
+              })
+            )}
+          </ul>
+        </div>
       )}
     </div>
   );
