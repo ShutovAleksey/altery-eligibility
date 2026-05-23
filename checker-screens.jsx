@@ -207,7 +207,7 @@ function EcSidebar({ step, totalSteps }) {
       </ol>
 
       <div className="ec-sidebar__lang">
-        <LangSwitcher onDark={true} anchorRight={false} />
+        <LangSwitcher onDark={true} anchorRight={false} dropUp={true} />
       </div>
     </aside>
   );

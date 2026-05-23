@@ -106,7 +106,7 @@ const Flag = ({ code, size = 20, style }) => {
 };
 
 // ──────────────────── LangSwitcher ────────────────────
-function LangSwitcher({ onDark = true, anchorRight = true }) {
+function LangSwitcher({ onDark = true, anchorRight = true, dropUp = false }) {
   useT();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -126,7 +126,7 @@ function LangSwitcher({ onDark = true, anchorRight = true }) {
   }, [open]);
 
   return (
-    <div className={"lang-switcher" + (anchorRight ? " is-right" : " is-left")} ref={ref}>
+    <div className={"lang-switcher" + (anchorRight ? " is-right" : " is-left") + (dropUp ? " is-up" : "")} ref={ref}>
       <button
         type="button"
         className={"lang-pill" + (onDark ? " is-dark" : " is-light")}

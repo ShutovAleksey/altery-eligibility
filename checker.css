@@ -269,6 +269,22 @@
       from { opacity: 0; transform: translateY(-4px); }
       to   { opacity: 1; transform: translateY(0); }
     }
+    /* Drop-up variant — used when the switcher sits at the bottom of a
+       container (e.g. the desktop sidebar). Only kicks in at ≥900px;
+       on mobile the lang switcher is in the top header pill, where
+       opening UP would push the menu off-screen, so the default
+       drop-down stays in effect there. */
+    @media (min-width: 900px) {
+      .lang-switcher.is-up .lang-menu {
+        top: auto;
+        bottom: calc(100% + 8px);
+        animation: lang-menu-in-up .12s ease both;
+      }
+    }
+    @keyframes lang-menu-in-up {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
     .lang-menu li { margin: 0; padding: 0; }
     .lang-menu__item {
       display: flex; align-items: center; gap: 12px;
@@ -420,6 +436,14 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 20px;
+      }
+      /* +15% logo on desktop only — at sidebar 320-480px width the
+         24px native height feels timid; 28px gives the brand presence
+         the wider column deserves. Mobile pill keeps 22-24px so the
+         lang switcher still fits horizontally on small screens. */
+      .ec-sidebar__logo svg {
+        height: 28px;
+        width: auto;
       }
       .ec-sidebar__label {
         padding-left: 0;
