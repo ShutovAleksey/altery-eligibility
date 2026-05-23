@@ -166,10 +166,18 @@ const EcIco = {
 //   - intro (step 0)            → all 5 dots in "todo" (preview of journey)
 //   - question N (step 1..5)    → dots <N done, dot N current, others todo
 //   - result (step 6)           → all 5 dots done
-function EcSidebar({ step, totalSteps }) {
+function EcSidebar({ step, totalSteps, blockedAt }) {
   const t = useT();
   const isQuestion = step >= 1 && step <= totalSteps;
-  const isDone     = step > totalSteps;
+  const onResult = step > totalSteps;
+  // Full-completion (all 5 steps as 'done') only when the user reached
+  // result via the approved path. A blocked result means they jumped
+  // straight from the question that triggered the block — anything
+  // after that question was never asked. `blockedAt` is only honoured
+  // when actually on the result screen; mid-flow back-navigation after
+  // a block still highlights the current question normally.
+  const isDone = onResult && !blockedAt;
+  const showBlocked = onResult && blockedAt;
   const stepLabels = [
     "ec.sidebar.step1", "ec.sidebar.step2", "ec.sidebar.step3",
     "ec.sidebar.step4", "ec.sidebar.step5",
@@ -193,7 +201,14 @@ function EcSidebar({ step, totalSteps }) {
       <ol className="ec-sidebar__steps">
         {stepLabels.map((labelKey, i) => {
           const n = i + 1;
-          const state = isDone                  ? "done"
+          // Blocked-result branch: mark only the question that triggered
+          // the block (and everything before it) as done. No 'current'
+          // — the user is parked on the soft-decline screen, not inside
+          // a question. Subsequent steps stay 'todo' because they were
+          // never asked.
+          const state = showBlocked
+                        ? (n <= blockedAt ? "done" : "todo")
+                      : isDone                  ? "done"
                       : isQuestion && n < step  ? "done"
                       : isQuestion && n === step ? "current"
                       :                           "todo";
@@ -299,9 +314,16 @@ function EcApp() {
   // renders cleanly with just the industry context.
   const jumpToResult = () => { setDirection("forward"); setStep(6); };
 
+  // Which question caused a soft-decline, if any. Used by EcSidebar to
+  // avoid marking all 5 steps as done when the user actually only
+  // completed up to question N before being short-circuited.
+  const blockedAt = recommendation.kind === "blocked"
+    ? (recommendation.reason === "country" ? 1 : 2)
+    : null;
+
   return (
     <div className="ec-app">
-      <EcSidebar step={step} totalSteps={totalSteps} />
+      <EcSidebar step={step} totalSteps={totalSteps} blockedAt={blockedAt} />
       <main className="ec-main" data-direction={direction}>
         {step === 0 && <EcIntro onStart={next} />}
         {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}
