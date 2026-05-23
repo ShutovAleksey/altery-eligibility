@@ -337,16 +337,6 @@ function EcIntro({ onStart }) {
         </div>
       </div>
 
-      {/* Product showcase slider — previously surfaced only on the
-          result page. Moved here as a "here's the actual product on
-          the other side of the quiz" teaser between the personalisation
-          pitch (value rows) and the CTA. No services context yet, so
-          EcPerks renders in its natural EC_PERKS order. The horizontal
-          scroll-snap UI breaks up the otherwise text-heavy intro and
-          gives the visitor a tangible sense of breadth before they
-          commit 90 seconds. */}
-      <EcPerks services={[]} />
-
       <div className="ob-actions">
         <Button variant="primary" size="xl" onClick={onStart} iconRight="arrowRight">
           {t("ec.intro.cta")}
@@ -358,6 +348,15 @@ function EcIntro({ onStart }) {
           "no credit hit"), backed by a small regulator stamp at the end.
           Subdued styling on purpose: this is reassurance, not branding. */}
       <div className="ec-intro__trust">{t("ec.intro.trust")}</div>
+
+      {/* Product showcase slider — sits BELOW the CTA so visitors who
+          are convinced by the value rows can act immediately; the
+          carousel serves as additional context for the second-look /
+          scroll-further cohort. Earlier placement (between value rows
+          and CTA) interrupted the click path and read as "more reading
+          before you can act". No services context yet, so EcPerks
+          renders in its natural EC_PERKS order. */}
+      <EcPerks services={[]} />
     </div>
   );
 }
