@@ -259,19 +259,18 @@ function EcApp() {
   [country, industry, businessType, monthlyVolume, corridors, txCount, services]);
 
   // Step navigation. Steps:
-  //   0 intro · 1 industry · 2 country · 3 services · 4 volume · 5 corridors · 6 result
-  // Older flows had a "Q6 crypto" and "Q7 bank-history (optional)" step;
-  // both were removed — the first felt redundant after Q1 industry + Q3
-  // services already declared crypto, the second never produced any value
-  // beyond a local UI state because no downstream consumer read it.
+  //   0 intro · 1 country · 2 industry · 3 services · 4 volume · 5 corridors · 6 result
+  // Country leads because regulatory entity routing is the single
+  // strongest predictor of the rest of the experience; asking it first
+  // also lets the user feel "this is for them" before any commitment.
   const back  = () => {
     setDirection("back");
     // From a blocked-industry result, back jumps straight to the
-    // industry question — the user never visited Q2..Q5 because of the
+    // industry question — the user never visited Q3..Q5 because of the
     // short-circuit in EcIndustry's onBlocked handler, so stepping back
     // through ghost screens would be disorienting.
     if (step === 6 && recommendation.kind === "blocked") {
-      setStep(1);
+      setStep(2);
       return;
     }
     setStep((s) => Math.max(0, s - 1));
@@ -290,8 +289,8 @@ function EcApp() {
       <EcSidebar step={step} totalSteps={totalSteps} />
       <main className="ec-main" data-direction={direction}>
         {step === 0 && <EcIntro onStart={next} />}
-        {step === 1 && <EcIndustry industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}
-        {step === 2 && <EcCountry value={country} onChange={setCountry} onBack={back} onNext={next} />}
+        {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} />}
+        {step === 2 && <EcIndustry industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={back} onNext={next} onBlocked={jumpToResult} />}
         {step === 3 && <EcServices services={services} setServices={setServices} onBack={back} onNext={next} />}
         {step === 4 && <EcVolume volumeIdx={volumeIdx} setVolumeIdx={setVolumeIdx} txCount={txCount} setTxCount={setTxCount} onBack={back} onNext={next} />}
         {step === 5 && <EcCorridors corridors={corridors} setCorridors={setCorridors} onBack={back} onNext={next} />}
@@ -477,7 +476,7 @@ function EcCountry({ value, onChange, onBack, onNext }) {
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
       </button>
-      <EcQuestionHeader num="2" title={t("ec.q2.title")} lead={t("ec.q2.lead")} />
+      <EcQuestionHeader num="1" title={t("ec.q2.title")} lead={t("ec.q2.lead")} />
 
       <Input
         label={t("ec.q2.input.label")}
@@ -549,7 +548,7 @@ function EcIndustry({ industry, setIndustry, businessType, setBusinessType, onBa
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
       </button>
-      <EcQuestionHeader num="1" title={t("ec.q1.title")} lead={t("ec.q1.lead")} />
+      <EcQuestionHeader num="2" title={t("ec.q1.title")} lead={t("ec.q1.lead")} />
 
       <div className="ec-twocol">
         <Select
