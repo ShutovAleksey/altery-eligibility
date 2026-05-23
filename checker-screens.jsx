@@ -343,20 +343,18 @@ function EcIntro({ onStart }) {
         </Button>
       </div>
 
-      {/* Quiet trust footnote below the CTA — three commitments that
-          remove friction from clicking the button ("nothing to sign up",
-          "no credit hit"), backed by a small regulator stamp at the end.
-          Subdued styling on purpose: this is reassurance, not branding. */}
-      <div className="ec-intro__trust">{t("ec.intro.trust")}</div>
-
-      {/* Product showcase slider — sits BELOW the CTA so visitors who
+      {/* Product showcase slider — sits below the CTA so visitors who
           are convinced by the value rows can act immediately; the
           carousel serves as additional context for the second-look /
-          scroll-further cohort. Earlier placement (between value rows
-          and CTA) interrupted the click path and read as "more reading
-          before you can act". No services context yet, so EcPerks
+          scroll-further cohort. No services context yet, so EcPerks
           renders in its natural EC_PERKS order. */}
       <EcPerks services={[]} />
+
+      {/* Quiet trust footnote at the very bottom — three commitments
+          (no signup / no credit check / licensed EMI). Lives below the
+          carousel so it reads as a closing reassurance rather than
+          gating the CTA above. */}
+      <div className="ec-intro__trust">{t("ec.intro.trust")}</div>
     </div>
   );
 }
