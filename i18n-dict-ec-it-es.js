@@ -35,6 +35,8 @@
     "ec.sidebar.step3": "Servizi",
     "ec.sidebar.step4": "Volume",
     "ec.sidebar.step5": "Corridoi",
+    "ec.sidebar.status.current": "In corso",
+    "ec.sidebar.status.done": "Completato",
 
     "ec.q.eyebrow": "di {total} domande",
 
@@ -410,6 +412,8 @@
     "ec.intro.trust": "Sin registro · Sin consulta de crédito · EMI con licencia (FCA · CBC · DFSA)",
     "ec.sidebar.step1": "País",
     "ec.sidebar.step2": "Sector",
+    "ec.sidebar.status.current": "En curso",
+    "ec.sidebar.status.done": "Completado",
     "ec.sidebar.step3": "Servicios",
     "ec.sidebar.step4": "Volumen",
     "ec.sidebar.step5": "Corredores",

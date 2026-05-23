@@ -36,6 +36,8 @@
     "ec.sidebar.step3": "Usługi",
     "ec.sidebar.step4": "Wolumen",
     "ec.sidebar.step5": "Korytarze",
+    "ec.sidebar.status.current": "W trakcie",
+    "ec.sidebar.status.done": "Ukończone",
 
     "ec.q.eyebrow": "z {total} pytań",
 
@@ -411,6 +413,8 @@
     "ec.intro.trust": "Sem registo · Sem consulta de crédito · EMI licenciado (FCA · CBC · DFSA)",
     "ec.sidebar.step1": "País",
     "ec.sidebar.step2": "Setor",
+    "ec.sidebar.status.current": "Em andamento",
+    "ec.sidebar.status.done": "Concluído",
     "ec.sidebar.step3": "Serviços",
     "ec.sidebar.step4": "Volume",
     "ec.sidebar.step5": "Corredores",
@@ -791,6 +795,8 @@
     "ec.intro.trust": "Sans inscription · Sans vérification de crédit · EMI agréé (FCA · CBC · DFSA)",
     "ec.sidebar.step1": "Pays",
     "ec.sidebar.step2": "Secteur",
+    "ec.sidebar.status.current": "En cours",
+    "ec.sidebar.status.done": "Terminé",
     "ec.sidebar.step3": "Services",
     "ec.sidebar.step4": "Volume",
     "ec.sidebar.step5": "Corridors",

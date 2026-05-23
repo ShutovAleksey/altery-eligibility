@@ -44,6 +44,8 @@
     "ec.sidebar.step3": "Services",
     "ec.sidebar.step4": "Volume",
     "ec.sidebar.step5": "Corridors",
+    "ec.sidebar.status.current": "In progress",
+    "ec.sidebar.status.done": "Completed",
 
     // Question header
     "ec.q.eyebrow": "of {total} questions",

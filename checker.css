@@ -489,16 +489,16 @@
         display: flex;
         align-items: center;
         gap: 14px;
-        font-size: 14px;
-        color: rgba(255,255,255,.5);
+        font-size: 15px;
+        color: rgba(255,255,255,.45);
         transition: color .15s ease;
       }
-      .ec-sidebar__step.is-done    { color: rgba(255,255,255,.75); }
+      .ec-sidebar__step.is-done,
       .ec-sidebar__step.is-current { color: #fff; font-weight: 600; }
       .ec-sidebar__step__num {
         width: 28px; height: 28px;
         border-radius: 999px;
-        border: 1.5px solid rgba(255,255,255,.18);
+        border: 1.5px solid rgba(255,255,255,.25);
         background: transparent;
         display: inline-flex; align-items: center; justify-content: center;
         font-size: 12px;
@@ -508,15 +508,33 @@
         flex-shrink: 0;
         transition: background-color .15s ease, border-color .15s ease, color .15s ease;
       }
-      .ec-sidebar__step.is-done .ec-sidebar__step__num {
-        background: rgba(255,255,255,.16);
-        border-color: rgba(255,255,255,.16);
+      .ec-sidebar__step.is-current .ec-sidebar__step__num {
+        border-color: rgba(255,255,255,.55);
         color: #fff;
       }
-      .ec-sidebar__step.is-current .ec-sidebar__step__num {
-        background: var(--c-accent);
-        border-color: var(--c-accent);
-        color: #fff;
+      /* Done: solid white disc with a navy check inside. Pulls the
+         finished steps forward visually while the current step stays
+         outline-only — exactly the "you are here / what's behind you"
+         hierarchy in the reference. */
+      .ec-sidebar__step.is-done .ec-sidebar__step__num {
+        background: #fff;
+        border-color: #fff;
+        color: var(--c-primary);
+      }
+      .ec-sidebar__step__body {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        min-width: 0;
+      }
+      .ec-sidebar__step__label {
+        white-space: nowrap;
+      }
+      .ec-sidebar__step__status {
+        font-size: 13px;
+        font-weight: 400;
+        color: rgba(255,255,255,.45);
+        white-space: nowrap;
       }
       .ec-sidebar__lang {
         margin-top: auto;

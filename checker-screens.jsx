@@ -193,14 +193,29 @@ function EcSidebar({ step, totalSteps }) {
       <ol className="ec-sidebar__steps">
         {stepLabels.map((labelKey, i) => {
           const n = i + 1;
-          const state = isDone               ? "done"
-                      : isQuestion && n < step ? "done"
+          const state = isDone                  ? "done"
+                      : isQuestion && n < step  ? "done"
                       : isQuestion && n === step ? "current"
-                      :                          "todo";
+                      :                           "todo";
+          const statusKey = state === "current" ? "ec.sidebar.status.current"
+                          : state === "done"    ? "ec.sidebar.status.done"
+                          : null;
           return (
             <li key={n} className={`ec-sidebar__step is-${state}`} aria-current={state === "current" ? "step" : undefined}>
-              <span className="ec-sidebar__step__num" aria-hidden="true">{n}</span>
-              <span className="ec-sidebar__step__label">{t(labelKey)}</span>
+              <span className="ec-sidebar__step__num" aria-hidden="true">
+                {state === "done"
+                  ? (
+                    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+                      <path d="M3.5 8.5 6.5 11.5 12.5 5.5" stroke="currentColor" strokeWidth="2"
+                            strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )
+                  : n}
+              </span>
+              <span className="ec-sidebar__step__body">
+                <span className="ec-sidebar__step__label">{t(labelKey)}</span>
+                {statusKey && <span className="ec-sidebar__step__status">{t(statusKey)}</span>}
+              </span>
             </li>
           );
         })}
