@@ -37,6 +37,14 @@
     "ec.intro.cta": "Build my plan",
     "ec.intro.trust": "No signup · No credit check · Licensed EMI (FCA · CBC · DFSA)",
 
+    // Sidebar step labels (desktop ≥900px). Kept to one word each
+    // so the 240px column doesn't need to wrap.
+    "ec.sidebar.step1": "Industry",
+    "ec.sidebar.step2": "Country",
+    "ec.sidebar.step3": "Services",
+    "ec.sidebar.step4": "Volume",
+    "ec.sidebar.step5": "Corridors",
+
     // Question header
     "ec.q.eyebrow": "of {total} questions",
 

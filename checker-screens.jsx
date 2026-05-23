@@ -155,6 +155,64 @@ const EcIco = {
 //  Screens
 // ════════════════════════════════════════════════════════════════════════
 
+// ── Sidebar (replaces the previous top header) ──────────────────
+// Layout: a 240px fixed-width left column on desktop, dark-navy
+// background, holds the brand, the section eyebrow, the 5 step
+// indicators and the language switcher. On screens below 900px the
+// sidebar collapses to a single-row top bar (CSS-driven) so mobile
+// doesn't lose 30% of horizontal real estate to chrome.
+//
+// Step states:
+//   - intro (step 0)            → all 5 dots in "todo" (preview of journey)
+//   - question N (step 1..5)    → dots <N done, dot N current, others todo
+//   - result (step 6)           → all 5 dots done
+function EcSidebar({ step, totalSteps }) {
+  const t = useT();
+  const isQuestion = step >= 1 && step <= totalSteps;
+  const isDone     = step > totalSteps;
+  const stepLabels = [
+    "ec.sidebar.step1", "ec.sidebar.step2", "ec.sidebar.step3",
+    "ec.sidebar.step4", "ec.sidebar.step5",
+  ];
+  return (
+    <aside className="ec-sidebar" aria-label="Eligibility checker navigation">
+      <div className="ec-sidebar__top">
+        <div className="ec-sidebar__logo">
+          <svg width="71" height="24" viewBox="0 0 71 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Altery">
+            <path d="M20.2378 0H17.5293V18.2069H20.2378V0Z" fill="#FFFFFF"/>
+            <path d="M36.4338 12.8929C36.6753 14.9064 38.3425 16.2271 40.764 16.2271C42.1093 16.2271 43.8027 15.7163 44.6091 14.8027L46.4113 16.5502C44.8916 18.0381 42.8366 18.8516 40.7096 18.8071C36.3511 18.8071 33.5547 16.0402 33.5547 11.7944C33.5547 7.54872 36.3787 4.89038 40.5204 4.89038C44.6621 4.89038 47.7015 7.49581 47.1916 12.8971L36.4338 12.8936V12.8929ZM44.5293 10.5542C44.3683 8.45952 42.8345 7.35823 40.6023 7.35823C38.6201 7.23477 36.8568 8.60486 36.4874 10.5542H44.5293Z" fill="#FFFFFF"/>
+            <path d="M29.4084 15.7785C28.287 15.782 27.7369 14.9618 27.7369 13.6756V7.66316H31.5212V5.34419H27.7631V1.50464H25.0514V5.34136H22.5703V7.65892H25.0514V13.6713C25.0514 16.6828 26.6339 18.2719 29.4106 18.2048H31.5233V15.7729L29.4091 15.7785H29.4084Z" fill="#FFFFFF"/>
+            <path d="M11.4503 5.38683V6.5041C8.48915 4.04329 4.087 4.44156 1.61866 7.39369C-0.849682 10.3458 -0.450194 14.7345 2.51097 17.1954C5.09951 19.3467 8.86106 19.3467 11.4496 17.1954V18.2125H14.1442V5.38683H11.4496H11.4503ZM6.9817 16.3044C4.51406 16.3044 2.51309 14.3095 2.51309 11.8494C2.51309 9.38927 4.51406 7.3944 6.9817 7.3944C9.44933 7.3944 11.4503 9.38927 11.4503 11.8494C11.4503 14.3095 9.44933 16.3044 6.9817 16.3044Z" fill="#FFFFFF"/>
+            <path d="M70.5706 5.1954L62.4684 23.9999H59.502L61.4874 19.4059C61.9172 18.4123 61.9299 17.2881 61.5227 16.2846L57.0283 5.19257H60.1535L62.3675 11.2594L63.647 14.9064L65.0282 11.3116L67.5796 5.19116L70.5706 5.1954Z" fill="#FFFFFF"/>
+            <path d="M55.3485 5.17542H55.3175C53.8946 5.17542 52.6666 5.70841 52.0741 6.94993V5.11597H49.5801V18.2821H52.2556V10.9583C52.2057 9.26237 53.4822 7.82196 55.1634 7.67898H56.276V5.17896L55.3485 5.17613V5.17542Z" fill="#FFFFFF"/>
+          </svg>
+        </div>
+        <div className="ec-sidebar__label">{t("ec.header.eyebrow")}</div>
+      </div>
+
+      <ol className="ec-sidebar__steps">
+        {stepLabels.map((labelKey, i) => {
+          const n = i + 1;
+          const state = isDone               ? "done"
+                      : isQuestion && n < step ? "done"
+                      : isQuestion && n === step ? "current"
+                      :                          "todo";
+          return (
+            <li key={n} className={`ec-sidebar__step is-${state}`} aria-current={state === "current" ? "step" : undefined}>
+              <span className="ec-sidebar__step__num" aria-hidden="true">{n}</span>
+              <span className="ec-sidebar__step__label">{t(labelKey)}</span>
+            </li>
+          );
+        })}
+      </ol>
+
+      <div className="ec-sidebar__lang">
+        <LangSwitcher onDark={true} anchorRight={false} />
+      </div>
+    </aside>
+  );
+}
+
 function EcApp() {
   const t = useT();
   const [step, setStep] = useState(0);
@@ -216,30 +274,7 @@ function EcApp() {
 
   return (
     <div className="ec-app">
-      <header className="ec-header">
-        <div className="ec-header__brand">
-          <svg width="71" height="24" viewBox="0 0 71 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Altery">
-            <path d="M20.2378 0H17.5293V18.2069H20.2378V0Z" fill="#FFFFFF"/>
-            <path d="M36.4338 12.8929C36.6753 14.9064 38.3425 16.2271 40.764 16.2271C42.1093 16.2271 43.8027 15.7163 44.6091 14.8027L46.4113 16.5502C44.8916 18.0381 42.8366 18.8516 40.7096 18.8071C36.3511 18.8071 33.5547 16.0402 33.5547 11.7944C33.5547 7.54872 36.3787 4.89038 40.5204 4.89038C44.6621 4.89038 47.7015 7.49581 47.1916 12.8971L36.4338 12.8936V12.8929ZM44.5293 10.5542C44.3683 8.45952 42.8345 7.35823 40.6023 7.35823C38.6201 7.23477 36.8568 8.60486 36.4874 10.5542H44.5293Z" fill="#FFFFFF"/>
-            <path d="M29.4084 15.7785C28.287 15.782 27.7369 14.9618 27.7369 13.6756V7.66316H31.5212V5.34419H27.7631V1.50464H25.0514V5.34136H22.5703V7.65892H25.0514V13.6713C25.0514 16.6828 26.6339 18.2719 29.4106 18.2048H31.5233V15.7729L29.4091 15.7785H29.4084Z" fill="#FFFFFF"/>
-            <path d="M11.4503 5.38683V6.5041C8.48915 4.04329 4.087 4.44156 1.61866 7.39369C-0.849682 10.3458 -0.450194 14.7345 2.51097 17.1954C5.09951 19.3467 8.86106 19.3467 11.4496 17.1954V18.2125H14.1442V5.38683H11.4496H11.4503ZM6.9817 16.3044C4.51406 16.3044 2.51309 14.3095 2.51309 11.8494C2.51309 9.38927 4.51406 7.3944 6.9817 7.3944C9.44933 7.3944 11.4503 9.38927 11.4503 11.8494C11.4503 14.3095 9.44933 16.3044 6.9817 16.3044Z" fill="#FFFFFF"/>
-            <path d="M70.5706 5.1954L62.4684 23.9999H59.502L61.4874 19.4059C61.9172 18.4123 61.9299 17.2881 61.5227 16.2846L57.0283 5.19257H60.1535L62.3675 11.2594L63.647 14.9064L65.0282 11.3116L67.5796 5.19116L70.5706 5.1954Z" fill="#FFFFFF"/>
-            <path d="M55.3485 5.17542H55.3175C53.8946 5.17542 52.6666 5.70841 52.0741 6.94993V5.11597H49.5801V18.2821H52.2556V10.9583C52.2057 9.26237 53.4822 7.82196 55.1634 7.67898H56.276V5.17896L55.3485 5.17613V5.17542Z" fill="#FFFFFF"/>
-          </svg>
-          <div className="ec-header__divider" />
-          <div className="ec-header__eyebrow">{t("ec.header.eyebrow")}</div>
-        </div>
-        <div className="ec-header__right">
-          {/* Step counter and "no signup yet" reassurance previously
-              lived here, but both were duplicates: the step number is
-              shown more prominently on each question's eyebrow, and the
-              no-signup reassurance is already covered by the intro
-              page's lead copy. Removing them frees up the header on
-              mobile (where space was already tight) and trusts each
-              surface to do its own job. */}
-          <LangSwitcher onDark={true} anchorRight={true} />
-        </div>
-      </header>
+      <EcSidebar step={step} totalSteps={totalSteps} />
       <main className="ec-main" data-direction={direction}>
         {step === 0 && <EcIntro onStart={next} />}
         {step === 1 && <EcIndustry industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}

@@ -31,6 +31,11 @@
     "ec.intro.value3.body": "Opłata miesięczna, FX, SWIFT, SEPA — i ile typowy bank pobrałby za te same przepływy. W euro, nie w procentach.",
     "ec.intro.cta": "Zbuduj mój plan",
     "ec.intro.trust": "Bez rejestracji · Bez sprawdzania kredytu · Licencjonowane EMI (FCA · CBC · DFSA)",
+    "ec.sidebar.step1": "Branża",
+    "ec.sidebar.step2": "Kraj",
+    "ec.sidebar.step3": "Usługi",
+    "ec.sidebar.step4": "Wolumen",
+    "ec.sidebar.step5": "Korytarze",
 
     "ec.q.eyebrow": "z {total} pytań",
 
@@ -409,6 +414,11 @@
     "ec.intro.value3.body": "Mensalidade, FX, SWIFT, SEPA — e quanto um banco típico cobraria pelos mesmos fluxos. Em euros, não em percentagens.",
     "ec.intro.cta": "Criar o meu plano",
     "ec.intro.trust": "Sem registo · Sem consulta de crédito · EMI licenciado (FCA · CBC · DFSA)",
+    "ec.sidebar.step1": "Setor",
+    "ec.sidebar.step2": "País",
+    "ec.sidebar.step3": "Serviços",
+    "ec.sidebar.step4": "Volume",
+    "ec.sidebar.step5": "Corredores",
 
     "ec.q.eyebrow": "de {total} perguntas",
 
@@ -789,6 +799,11 @@
     "ec.intro.value3.body": "Frais mensuels, FX, SWIFT, SEPA — et ce qu'une banque classique facturerait pour les mêmes flux. En euros, pas en pourcentages.",
     "ec.intro.cta": "Créer mon plan",
     "ec.intro.trust": "Sans inscription · Sans vérification de crédit · EMI agréé (FCA · CBC · DFSA)",
+    "ec.sidebar.step1": "Secteur",
+    "ec.sidebar.step2": "Pays",
+    "ec.sidebar.step3": "Services",
+    "ec.sidebar.step4": "Volume",
+    "ec.sidebar.step5": "Corridors",
 
     "ec.q.eyebrow": "sur {total} questions",
 

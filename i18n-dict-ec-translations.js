@@ -34,6 +34,11 @@
     "ec.intro.value3.body": "Monatliche Gebühr, FX, SWIFT, SEPA — und was eine typische Bank für dieselben Flüsse berechnen würde. In Euro, nicht in Prozent.",
     "ec.intro.cta": "Plan erstellen",
     "ec.intro.trust": "Keine Registrierung · Keine Bonitätsprüfung · Lizenziertes EMI (FCA · CBC · DFSA)",
+    "ec.sidebar.step1": "Branche",
+    "ec.sidebar.step2": "Land",
+    "ec.sidebar.step3": "Dienste",
+    "ec.sidebar.step4": "Volumen",
+    "ec.sidebar.step5": "Korridore",
 
     "ec.q.eyebrow": "von {total} Fragen",
 
@@ -412,6 +417,11 @@
     "ec.intro.value3.body": "Месячная плата, FX, SWIFT, SEPA — и сколько обычный банк взял бы за те же потоки. В евро, а не в процентах.",
     "ec.intro.cta": "Собрать план",
     "ec.intro.trust": "Без регистрации · Без проверки кредита · Лицензированный EMI (FCA · CBC · DFSA)",
+    "ec.sidebar.step1": "Отрасль",
+    "ec.sidebar.step2": "Страна",
+    "ec.sidebar.step3": "Сервисы",
+    "ec.sidebar.step4": "Объём",
+    "ec.sidebar.step5": "Коридоры",
 
     "ec.q.eyebrow": "из {total} вопросов",
 

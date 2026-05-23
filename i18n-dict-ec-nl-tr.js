@@ -30,6 +30,11 @@
     "ec.intro.value3.body": "Maandkosten, FX, SWIFT, SEPA — en wat een typische bank zou rekenen voor dezelfde stromen. In euro's, niet in procenten.",
     "ec.intro.cta": "Mijn plan bouwen",
     "ec.intro.trust": "Geen registratie · Geen kredietcontrole · Vergund EMI (FCA · CBC · DFSA)",
+    "ec.sidebar.step1": "Sector",
+    "ec.sidebar.step2": "Land",
+    "ec.sidebar.step3": "Diensten",
+    "ec.sidebar.step4": "Volume",
+    "ec.sidebar.step5": "Corridors",
 
     "ec.q.eyebrow": "van {total} vragen",
 
@@ -408,6 +413,11 @@
     "ec.intro.value3.body": "Aylık ücret, FX, SWIFT, SEPA — ve tipik bir bankanın aynı akışlar için ne alacağı. Euro cinsinden, yüzde değil.",
     "ec.intro.cta": "Planımı oluştur",
     "ec.intro.trust": "Kayıt yok · Kredi kontrolü yok · Lisanslı EMI (FCA · CBC · DFSA)",
+    "ec.sidebar.step1": "Sektör",
+    "ec.sidebar.step2": "Ülke",
+    "ec.sidebar.step3": "Hizmetler",
+    "ec.sidebar.step4": "Hacim",
+    "ec.sidebar.step5": "Koridorlar",
 
     "ec.q.eyebrow": "/ {total}",
 
