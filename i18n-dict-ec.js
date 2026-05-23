@@ -27,13 +27,13 @@
     // Intro screen
     "ec.intro.eyebrow": "Personalised plan · 90 seconds",
     "ec.intro.title": "Your Altery plan, built around your business",
-    "ec.intro.lead": "Tell us {total} things about how your business moves money. We'll come back with a plan built for you — the products you'd actually use, the monthly cost you'd actually pay, and the savings versus what a typical business bank charges. Made for digital-first businesses other banks don't quite know what to do with.",
+    "ec.intro.lead": "{total} questions. We come back with your plan — products, cost, and how it compares to a typical bank. Built for digital businesses banks don't quite get.",
     "ec.intro.value1.title": "A plan tailored to your business",
-    "ec.intro.value1.body": "Not a tier from a public pricing page. We look at your industry, volume, payment corridors and currencies — then assemble the products that actually fit how you operate.",
+    "ec.intro.value1.body": "Not a tier from a public pricing page. Built from your industry, volume, corridors and currencies.",
     "ec.intro.value2.title": "Every product we'd open for you",
-    "ec.intro.value2.body": "Multi-currency accounts, FX corridors, mass payouts, business cards, crypto-friendly rails where they apply. You'll see the exact mix on offer — before you upload a single document.",
+    "ec.intro.value2.body": "GBP, EUR and USD accounts from day one. Plus FX corridors, mass payouts, business cards, and crypto rails where they apply.",
     "ec.intro.value3.title": "What you'd actually pay each month",
-    "ec.intro.value3.body": "Your monthly fee, your FX cost, your SWIFT and SEPA cost — and the savings versus what a typical business bank would charge you for the same flows. In euros, not percentages.",
+    "ec.intro.value3.body": "Monthly fee, FX, SWIFT, SEPA — and what a typical bank would charge for the same flows. In euros, not percentages.",
     "ec.intro.cta": "Build my plan",
     "ec.intro.trust": "No signup · No credit check · Licensed EMI (FCA · CBC · DFSA)",
 
