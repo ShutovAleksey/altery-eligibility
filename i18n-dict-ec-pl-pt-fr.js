@@ -29,7 +29,6 @@
     "ec.intro.value2.body": "Konta wielowalutowe, korytarze FX, masowe wypłaty, karty firmowe, crypto-friendly rails tam, gdzie to ma sens. Zobaczysz dokładny zestaw — zanim prześlesz pojedynczy dokument.",
     "ec.intro.value3.title": "Ile naprawdę zapłacisz co miesiąc",
     "ec.intro.value3.body": "Twoja opłata miesięczna, koszty FX, koszty SWIFT i SEPA — i oszczędności względem tego, co typowy bank firmowy pobrałby od Ciebie za te same przepływy. W euro, nie w procentach.",
-    "ec.intro.stepsHead": "Jak to działa",
     "ec.intro.cta": "Zbuduj mój plan",
     "ec.intro.trust": "Bez rejestracji · Bez sprawdzania kredytu · Licencjonowane EMI (FCA · CBC · DFSA)",
 
@@ -408,7 +407,6 @@
     "ec.intro.value2.body": "Contas multimoeda, corredores FX, pagamentos em massa, cartões de empresa, rails crypto-friendly quando aplicável. Verá a mistura exata — antes de carregar um único documento.",
     "ec.intro.value3.title": "Quanto realmente pagaria por mês",
     "ec.intro.value3.body": "A sua mensalidade, o seu custo de FX, o seu custo de SWIFT e SEPA — e a poupança face ao que um banco de empresas típico cobraria pelos mesmos fluxos. Em euros, não em percentagens.",
-    "ec.intro.stepsHead": "Como funciona",
     "ec.intro.cta": "Criar o meu plano",
     "ec.intro.trust": "Sem registo · Sem consulta de crédito · EMI licenciado (FCA · CBC · DFSA)",
 
@@ -789,7 +787,6 @@
     "ec.intro.value2.body": "Comptes multidevises, corridors FX, paiements de masse, cartes professionnelles, rails crypto-friendly là où c'est pertinent. Vous voyez le mix exact — avant de téléverser un seul document.",
     "ec.intro.value3.title": "Ce que vous paieriez vraiment chaque mois",
     "ec.intro.value3.body": "Vos frais mensuels, votre coût FX, votre coût SWIFT et SEPA — et l'économie face à ce qu'une banque d'entreprise classique vous facturerait pour les mêmes flux. En euros, pas en pourcentages.",
-    "ec.intro.stepsHead": "Comment ça marche",
     "ec.intro.cta": "Créer mon plan",
     "ec.intro.trust": "Sans inscription · Sans vérification de crédit · EMI agréé (FCA · CBC · DFSA)",
 

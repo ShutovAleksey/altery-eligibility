@@ -28,7 +28,6 @@
     "ec.intro.value2.body": "Conti multivaluta, corridoi FX, pagamenti di massa, carte business, rails crypto-friendly dove applicabile. Vedrai il mix esatto — prima di caricare un singolo documento.",
     "ec.intro.value3.title": "Quanto pagheresti davvero ogni mese",
     "ec.intro.value3.body": "La tua tariffa mensile, i tuoi costi FX, i tuoi costi SWIFT e SEPA — e il risparmio rispetto a ciò che una tipica banca aziendale ti farebbe pagare per gli stessi flussi. In euro, non in percentuali.",
-    "ec.intro.stepsHead": "Come funziona",
     "ec.intro.cta": "Crea il mio piano",
     "ec.intro.trust": "Niente registrazione · Nessun controllo del credito · EMI autorizzato (FCA · CBC · DFSA)",
 
@@ -407,7 +406,6 @@
     "ec.intro.value2.body": "Cuentas multidivisa, corredores FX, pagos masivos, tarjetas de empresa, rails crypto-friendly donde aplique. Verás la mezcla exacta — antes de subir un solo documento.",
     "ec.intro.value3.title": "Lo que realmente pagarías cada mes",
     "ec.intro.value3.body": "Tu cuota mensual, tu coste de FX, tu coste de SWIFT y SEPA — y el ahorro frente a lo que una banca de empresas típica te cobraría por los mismos flujos. En euros, no en porcentajes.",
-    "ec.intro.stepsHead": "Cómo funciona",
     "ec.intro.cta": "Crear mi plan",
     "ec.intro.trust": "Sin registro · Sin consulta de crédito · EMI con licencia (FCA · CBC · DFSA)",
 

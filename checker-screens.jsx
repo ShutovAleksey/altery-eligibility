@@ -271,39 +271,35 @@ function EcIntro({ onStart }) {
         title={t("ec.intro.title")}
         lead={t("ec.intro.lead", { total: TOTAL_STEPS })} />
 
-      {/* Numbered list, not card-rows. The previous card pattern
-          (white box + colored icon-square + title + body) was
-          visually identical to the multi-select service cards used
-          on Q3 — half the readers thought they were tappable. Cards
-          are this codebase's "select me" affordance, so we kill the
-          box and replace with numbered steps which read unambiguously
-          as informational sequence. Narrative still works: 1) we
-          tailor, 2) here is what we open, 3) here is what it costs. */}
-      <div className="ec-steps">
-        <div className="ec-steps__head">{t("ec.intro.stepsHead")}</div>
-        <ol className="ec-steps__list">
-          <li className="ec-steps__item">
-            <span className="ec-steps__num" aria-hidden="true">1</span>
-            <div className="ec-steps__text">
-              <div className="ec-steps__title">{t("ec.intro.value1.title")}</div>
-              <div className="ec-steps__body">{t("ec.intro.value1.body")}</div>
-            </div>
-          </li>
-          <li className="ec-steps__item">
-            <span className="ec-steps__num" aria-hidden="true">2</span>
-            <div className="ec-steps__text">
-              <div className="ec-steps__title">{t("ec.intro.value2.title")}</div>
-              <div className="ec-steps__body">{t("ec.intro.value2.body")}</div>
-            </div>
-          </li>
-          <li className="ec-steps__item">
-            <span className="ec-steps__num" aria-hidden="true">3</span>
-            <div className="ec-steps__text">
-              <div className="ec-steps__title">{t("ec.intro.value3.title")}</div>
-              <div className="ec-steps__body">{t("ec.intro.value3.body")}</div>
-            </div>
-          </li>
-        </ol>
+      <div className="ec-value">
+        {/* Sales-led ordering — three claims, narrowing from setup to
+            wallet: (1) we tailor a plan to you, (2) here is what we
+            would open and which products you'd get, (3) here is the
+            monthly cost. Row 3 (cost) carries the success-green
+            accent because that's the line that closes the sale.
+            Icons: target = calibrated to you, stack = kit of products,
+            banknote = money. */}
+        <div className="ec-value__row">
+          <span className="ec-value__icon"><EcIco.target style={{ width: 18, height: 18 }} /></span>
+          <div>
+            <div className="ec-value__title">{t("ec.intro.value1.title")}</div>
+            <div className="ec-value__body">{t("ec.intro.value1.body")}</div>
+          </div>
+        </div>
+        <div className="ec-value__row">
+          <span className="ec-value__icon" style={{ background: "var(--c-warning-soft)", color: "var(--c-warning)" }}><EcIco.stack style={{ width: 18, height: 18 }} /></span>
+          <div>
+            <div className="ec-value__title">{t("ec.intro.value2.title")}</div>
+            <div className="ec-value__body">{t("ec.intro.value2.body")}</div>
+          </div>
+        </div>
+        <div className="ec-value__row">
+          <span className="ec-value__icon" style={{ background: "var(--c-success-soft)", color: "var(--c-success)" }}><EcIco.banknote style={{ width: 18, height: 18 }} /></span>
+          <div>
+            <div className="ec-value__title">{t("ec.intro.value3.title")}</div>
+            <div className="ec-value__body">{t("ec.intro.value3.body")}</div>
+          </div>
+        </div>
       </div>
 
       {/* Product showcase slider — previously surfaced only on the

@@ -34,7 +34,6 @@
     "ec.intro.value2.body": "Multi-currency accounts, FX corridors, mass payouts, business cards, crypto-friendly rails where they apply. You'll see the exact mix on offer — before you upload a single document.",
     "ec.intro.value3.title": "What you'd actually pay each month",
     "ec.intro.value3.body": "Your monthly fee, your FX cost, your SWIFT and SEPA cost — and the savings versus what a typical business bank would charge you for the same flows. In euros, not percentages.",
-    "ec.intro.stepsHead": "How it works",
     "ec.intro.cta": "Build my plan",
     "ec.intro.trust": "No signup · No credit check · Licensed EMI (FCA · CBC · DFSA)",
 

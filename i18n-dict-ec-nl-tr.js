@@ -28,7 +28,6 @@
     "ec.intro.value2.body": "Multi-valuta rekeningen, FX-corridors, massabetalingen, zakelijke kaarten, crypto-friendly rails waar van toepassing. Je ziet de exacte mix — voordat je een enkel document uploadt.",
     "ec.intro.value3.title": "Wat je daadwerkelijk per maand zou betalen",
     "ec.intro.value3.body": "Je maandkosten, je FX-kosten, je SWIFT- en SEPA-kosten — en de besparing ten opzichte van wat een typische zakelijke bank zou rekenen voor dezelfde stromen. In euro's, niet in procenten.",
-    "ec.intro.stepsHead": "Zo werkt het",
     "ec.intro.cta": "Mijn plan bouwen",
     "ec.intro.trust": "Geen registratie · Geen kredietcontrole · Vergund EMI (FCA · CBC · DFSA)",
 
@@ -407,7 +406,6 @@
     "ec.intro.value2.body": "Çok para birimli hesaplar, FX koridorları, toplu ödemeler, işletme kartları, uygun olduğunda kripto-dostu raylar. Tek bir belge yüklemeden önce karşınızda tam karışım görünür.",
     "ec.intro.value3.title": "Her ay gerçekten ne ödeyeceksiniz",
     "ec.intro.value3.body": "Aylık ücretiniz, FX maliyetiniz, SWIFT ve SEPA maliyetiniz — ve tipik bir işletme bankasının aynı akışlar için sizden alacağı tutara göre tasarrufunuz. Euro cinsinden, yüzde olarak değil.",
-    "ec.intro.stepsHead": "Nasıl çalışır",
     "ec.intro.cta": "Planımı oluştur",
     "ec.intro.trust": "Kayıt yok · Kredi kontrolü yok · Lisanslı EMI (FCA · CBC · DFSA)",
 
