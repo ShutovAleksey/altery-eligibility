@@ -32,6 +32,7 @@
     "ec.intro.value2.body": "Multiwährungskonten, FX-Korridore, Massenauszahlungen, Geschäftskarten, krypto-freundliche Rails wo passend. Sie sehen den genauen Produktmix — bevor Sie ein einziges Dokument hochladen.",
     "ec.intro.value3.title": "Was Sie tatsächlich pro Monat zahlen würden",
     "ec.intro.value3.body": "Ihre monatliche Gebühr, Ihre FX-Kosten, Ihre SWIFT- und SEPA-Kosten — und die Ersparnis gegenüber dem, was Ihnen eine typische Geschäftsbank für dieselben Flüsse berechnen würde. In Euro, nicht in Prozent.",
+    "ec.intro.stepsHead": "So funktioniert's",
     "ec.intro.cta": "Plan erstellen",
     "ec.intro.trust": "Keine Registrierung · Keine Bonitätsprüfung · Lizenziertes EMI (FCA · CBC · DFSA)",
 
@@ -410,6 +411,7 @@
     "ec.intro.value2.body": "Мультивалютные счета, FX-коридоры, массовые выплаты, бизнес-карты, крипто-friendly рельсы где это применимо. Вы увидите точный набор — до того, как загрузите хоть один документ.",
     "ec.intro.value3.title": "Сколько вы реально будете платить в месяц",
     "ec.intro.value3.body": "Ваша месячная плата, FX-стоимость, стоимость SWIFT и SEPA — и экономия относительно того, сколько обычный бизнес-банк взял бы с вас за те же потоки. В евро, а не в процентах.",
+    "ec.intro.stepsHead": "Как это работает",
     "ec.intro.cta": "Собрать план",
     "ec.intro.trust": "Без регистрации · Без проверки кредита · Лицензированный EMI (FCA · CBC · DFSA)",
 
