@@ -621,7 +621,15 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
 
 function EcCountry({ value, onChange, onBack, onNext }) {
   const t = useT();
-  const nameOf = (c) => t("ec.country." + c.code);
+  // t() falls back to the raw ISO code when no `ec.country.XX` key
+  // exists in either the current language or the EN dict. For new
+  // ISO 3166-1 entries that we haven't localized yet, surface the
+  // canonical English name from EC_COUNTRIES instead of the bare code
+  // so the picker reads "Afghanistan" rather than "AF".
+  const nameOf = (c) => {
+    const localized = t("ec.country." + c.code);
+    return localized === c.code ? c.name : localized;
+  };
   const collator = useMemo(() => new Intl.Collator(undefined, { sensitivity: "base" }), []);
   // Sort once per language switch — the combobox keeps countries in a
   // single A→Z list (region grouping is gone), so the Collator handles
