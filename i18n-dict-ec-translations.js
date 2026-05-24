@@ -116,6 +116,9 @@
 
     "ec.q5.title": "Woher kommt das Geld und wohin geht es?",
     "ec.q5.lead": "Markieren Sie jede Region, mit der Sie arbeiten — eingehend und ausgehend. Wir ordnen Ihnen die Niederlassung mit der besten Korridor-Abdeckung zu.",
+    "ec.b.corridor.title.a": "Wir bearbeiten keine Zahlungen nach oder aus",
+    "ec.q5.selected_count": "{n} ausgewählt",
+    "ec.q5.placeholder": "Länder auswählen",
     "ec.region.africa": "Afrika",
     "ec.region.americas": "Amerika",
     "ec.region.apac_me": "Asien-Pazifik & Naher Osten",
@@ -490,6 +493,9 @@
 
     "ec.q5.title": "Woher kommen Gelder und wohin gehen sie?",
     "ec.q5.lead": "Отметьте все регионы, с которыми работаете — на вход и на выход. Подберём подразделение с лучшим покрытием по коридорам.",
+    "ec.b.corridor.title.a": "Мы не обрабатываем платежи в/из",
+    "ec.q5.selected_count": "Выбрано: {n}",
+    "ec.q5.placeholder": "Выберите страны",
     "ec.region.africa": "Африка",
     "ec.region.americas": "Америка",
     "ec.region.apac_me": "Азия-Тихоокеанский регион и Ближний Восток",

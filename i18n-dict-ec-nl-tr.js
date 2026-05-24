@@ -112,6 +112,9 @@
 
     "ec.q5.title": "Waar komt geld vandaan en waar gaat het heen?",
     "ec.q5.lead": "Selecteer elke regio waarmee je werkt — inkomend en uitgaand. We koppelen je aan de entiteit met de beste corridordekking.",
+    "ec.b.corridor.title.a": "We verwerken geen betalingen naar of vanuit",
+    "ec.q5.selected_count": "{n} geselecteerd",
+    "ec.q5.placeholder": "Selecteer landen",
     "ec.region.africa": "Afrika",
     "ec.region.americas": "Amerika",
     "ec.region.apac_me": "Azië-Pacific & Midden-Oosten",
@@ -486,6 +489,9 @@
 
     "ec.q5.title": "Waar komt geld vandaan en waar gaat het heen?",
     "ec.q5.lead": "Çalıştığınız tüm bölgeleri işaretleyin — gelen ve giden. Sizi koridor kapsamı en geniş olan birime yönlendireceğiz.",
+    "ec.b.corridor.title.a": "Şu ülkeye veya ülkeden ödeme işleyemiyoruz:",
+    "ec.q5.selected_count": "{n} seçildi",
+    "ec.q5.placeholder": "Ülkeleri seçin",
     "ec.region.africa": "Afrika",
     "ec.region.americas": "Amerika",
     "ec.region.apac_me": "Asya-Pasifik ve Orta Doğu",

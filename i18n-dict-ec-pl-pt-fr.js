@@ -113,6 +113,9 @@
 
     "ec.q5.title": "Skąd przychodzą i dokąd wychodzą środki?",
     "ec.q5.lead": "Zaznacz każdy region, z którym pracujesz — przychodzące i wychodzące. Dopasujemy Cię do podmiotu z najlepszym pokryciem korytarzy.",
+    "ec.b.corridor.title.a": "Nie przetwarzamy płatności do ani z",
+    "ec.q5.selected_count": "Wybrano: {n}",
+    "ec.q5.placeholder": "Wybierz kraje",
     "ec.region.africa": "Afryka",
     "ec.region.americas": "Ameryki",
     "ec.region.apac_me": "Azja i Pacyfik oraz Bliski Wschód",
@@ -487,6 +490,9 @@
 
     "ec.q5.title": "Skąd przychodzą i dokąd idą środki?",
     "ec.q5.lead": "Marque cada região com a qual trabalha — entrada e saída. Vamos associá-lo à entidade com a melhor cobertura de corredores.",
+    "ec.b.corridor.title.a": "Não processamos pagamentos para ou de",
+    "ec.q5.selected_count": "{n} selecionados",
+    "ec.q5.placeholder": "Selecione países",
     "ec.region.africa": "África",
     "ec.region.americas": "Américas",
     "ec.region.apac_me": "Ásia-Pacífico e Médio Oriente",
@@ -859,6 +865,9 @@
 
     "ec.q5.title": "De onde vêm e para onde vão os fundos?",
     "ec.q5.lead": "Sélectionnez chaque région avec laquelle vous travaillez — entrée et sortie. Nous vous attribuerons l'entité avec la meilleure couverture des corridors.",
+    "ec.b.corridor.title.a": "Nous ne traitons pas les paiements vers ou depuis",
+    "ec.q5.selected_count": "{n} sélectionnés",
+    "ec.q5.placeholder": "Sélectionnez des pays",
     "ec.region.africa": "Afrique",
     "ec.region.americas": "Amériques",
     "ec.region.apac_me": "Asie-Pacifique et Moyen-Orient",

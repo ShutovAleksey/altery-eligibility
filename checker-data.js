@@ -262,18 +262,56 @@ const EC_COUNTRIES = [
   { code: "ZW", name: "Zimbabwe", region: "row" },
 ];
 
-// Q5 regions — matches the public-facing geographic taxonomy on
-// altery.com (Europe / Asia-Pacific & Middle East / Americas / Africa).
-// The previous 6-bucket scheme with country-level chips diverged from
-// the brand vocabulary AND over-promised country-level routing
-// granularity that entity selection never actually uses — Altery's
-// licensed entities route at the regional level.
-const EC_REGIONS = [
-  { id: "europe",   labelKey: "ec.region.europe" },   // EU/EEA + UK + Switzerland — SEPA + Faster Payments rails
-  { id: "apac_me",  labelKey: "ec.region.apac_me" }, // APAC + MENA combined, matching altery.com
-  { id: "americas", labelKey: "ec.region.americas" }, // SWIFT, USD-primary
-  { id: "africa",   labelKey: "ec.region.africa" },  // SWIFT, USD-primary
-];
+// Q5 transactional corridors — country-level multi-select per direction.
+// Grouped at display time into 4 buckets matching altery.com's public
+// geographic taxonomy (Europe / Asia-Pacific & Middle East / Americas
+// / Africa) so the picker doesn't dump 249 flat entries on the user.
+//
+// Per UN geoscheme; full ISO 3166-1 alpha-2 coverage. Antarctica /
+// British Indian Ocean Territory bucketed into apac_me, US Minor
+// Outlying Islands into americas — practical, not contentious.
+const EC_DISPLAY_REGIONS = {
+  europe: [
+    "AD", "AL", "AT", "AX", "BA", "BE", "BG", "BY", "CH", "CY", "CZ", "DE",
+    "DK", "EE", "ES", "FI", "FO", "FR", "GB", "GG", "GI", "GR", "HR", "HU",
+    "IE", "IM", "IS", "IT", "JE", "LI", "LT", "LU", "LV", "MC", "MD", "ME",
+    "MK", "MT", "NL", "NO", "PL", "PT", "RO", "RS", "RU", "SE", "SI", "SJ",
+    "SK", "SM", "UA", "VA",
+  ],
+  apac_me: [
+    "AE", "AF", "AM", "AQ", "AS", "AU", "AZ", "BD", "BH", "BN", "BT", "CC",
+    "CK", "CN", "CX", "FJ", "FM", "GE", "GU", "HK", "HM", "ID", "IL", "IN",
+    "IO", "IQ", "IR", "JO", "JP", "KG", "KH", "KI", "KP", "KR", "KW", "KZ",
+    "LA", "LB", "LK", "MH", "MM", "MN", "MO", "MP", "MV", "MY", "NC", "NF",
+    "NP", "NR", "NU", "NZ", "OM", "PF", "PG", "PH", "PK", "PN", "PS", "PW",
+    "QA", "SA", "SB", "SG", "SY", "TH", "TJ", "TK", "TL", "TM", "TO", "TR",
+    "TV", "TW", "UZ", "VN", "VU", "WF", "WS", "YE",
+  ],
+  americas: [
+    "AG", "AI", "AR", "AW", "BB", "BL", "BM", "BO", "BQ", "BR", "BS", "BZ",
+    "CA", "CL", "CO", "CR", "CU", "CW", "DM", "DO", "EC", "FK", "GD", "GF",
+    "GL", "GP", "GS", "GT", "GY", "HN", "HT", "JM", "KN", "KY", "LC", "MF",
+    "MQ", "MS", "MX", "NI", "PA", "PE", "PM", "PR", "PY", "SR", "SV", "SX",
+    "TC", "TT", "UM", "US", "UY", "VC", "VE", "VG", "VI",
+  ],
+  africa: [
+    "AO", "BF", "BI", "BJ", "BV", "BW", "CD", "CF", "CG", "CI", "CM", "CV",
+    "DJ", "DZ", "EG", "EH", "ER", "ET", "GA", "GH", "GM", "GN", "GQ", "GW",
+    "KE", "KM", "LR", "LS", "LY", "MA", "MG", "ML", "MR", "MU", "MW", "MZ",
+    "NA", "NE", "NG", "RE", "RW", "SC", "SD", "SH", "SL", "SN", "SO", "SS",
+    "ST", "SZ", "TD", "TF", "TG", "TN", "TZ", "UG", "YT", "ZA", "ZM", "ZW",
+  ],
+};
+
+// Reverse lookup: ISO code → display region. Built once at load time.
+const EC_COUNTRY_TO_REGION = (() => {
+  const m = {};
+  for (const [r, list] of Object.entries(EC_DISPLAY_REGIONS)) for (const c of list) m[c] = r;
+  return m;
+})();
+
+// Display order for region sections inside the picker.
+const EC_REGION_ORDER = ["europe", "apac_me", "americas", "africa"];
 
 // ── Q2 industries ─────────────────────────────────────────────────
 // Categories Altery actually serves per altery.com/business — plus
@@ -729,7 +767,7 @@ const EC_ENTITIES = {
 // Export all 13 names to window so other scripts can reference them
 // unqualified.
 Object.assign(window, {
-  EC_COUNTRIES, EC_REGIONS, EC_INDUSTRIES,
+  EC_COUNTRIES, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_INDUSTRIES,
   EC_BUSINESS_TYPES, EC_SERVICES, TOTAL_STEPS,
   EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_PERKS, EC_ENTITIES,
 });

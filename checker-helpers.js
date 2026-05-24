@@ -49,6 +49,17 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
   if (country && country.risk === "blocked") {
     return { kind: "blocked", reason: "country", country };
   }
+  // Corridor sanctions: any transactional country with risk:"blocked"
+  // (RU, BY, IR, KP, SY, CU, MM, AF, SD) blocks. Closes the "Cyprus-LLC
+  // transacts with Russia" gap at eligibility stage rather than KYB.
+  const blockedCorridorCode = corridors.find((code) => {
+    const c = EC_COUNTRIES.find((x) => x.code === code);
+    return c && c.risk === "blocked";
+  });
+  if (blockedCorridorCode) {
+    const corridorCountry = EC_COUNTRIES.find((c) => c.code === blockedCorridorCode);
+    return { kind: "blocked", reason: "corridor", country: corridorCountry };
+  }
   if (ind && ind.risk === "blocked") {
     return { kind: "blocked", reason: "industry", reasonKey: ind.labelKey };
   }
@@ -87,9 +98,11 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
   const tierSignals = {
     volumePro:        monthlyVolume >= 100000,
     volumeUltra:      monthlyVolume >= 1000000,
-    // 4 region buckets total; ≥3 distinct regions across in+out reads
-    // as a multi-region business that benefits from Pro-tier rails.
-    corridorsBreadth: corridors.length >= 3,
+    // Now country-level (was region-level). ≥5 distinct countries
+    // across in+out reads as a multi-corridor business that benefits
+    // from Pro-tier rails — same intent as the prior 3-of-4-regions
+    // threshold, calibrated for the country granularity.
+    corridorsBreadth: corridors.length >= 5,
     // ≥300 monthly transactions = "high" — matches the prior "high" band
     // (101–500) lower-edge intent, expressed against the new in+out total.
     txHigh:           monthlyTx >= 300,

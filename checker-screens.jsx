@@ -1,7 +1,7 @@
 /* global React, useT, Button, Tag, Alert, SelectableListItem, Input, Select,
           Icon, Flag, Title, Field, WhyWeAsk,
           EC_COUNTRIES, EC_INDUSTRIES, EC_BUSINESS_TYPES, EC_SERVICES,
-          EC_VOLUME_BANDS, EC_TX_BANDS, EC_REGIONS, EC_PERKS,
+          EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_PERKS,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
@@ -310,7 +310,11 @@ function EcApp() {
     // remaining questions because of the short-circuit, so stepping
     // back through ghost screens would be disorienting.
     if (step === 6 && recommendation.kind === "blocked") {
-      setStep(recommendation.reason === "country" ? 1 : 2);
+      setStep(
+        recommendation.reason === "country"  ? 1
+      : recommendation.reason === "corridor" ? 5
+      :                                        2
+      );
       return;
     }
     setStep((s) => Math.max(0, s - 1));
@@ -328,7 +332,9 @@ function EcApp() {
   // avoid marking all 5 steps as done when the user actually only
   // completed up to question N before being short-circuited.
   const blockedAt = recommendation.kind === "blocked"
-    ? (recommendation.reason === "country" ? 1 : 2)
+    ? (recommendation.reason === "country"  ? 1
+     : recommendation.reason === "corridor" ? 5
+     :                                        2)
     : null;
 
   return (
@@ -348,7 +354,7 @@ function EcApp() {
         {step === 5 && <EcCorridors
           corridorsIn={corridorsIn} setCorridorsIn={setCorridorsIn}
           corridorsOut={corridorsOut} setCorridorsOut={setCorridorsOut}
-          onBack={back} onNext={next} />}
+          onBack={back} onNext={next} onBlocked={jumpToResult} />}
         {step === 6 && <EcResult rec={recommendation} onBack={back} onReset={reset} />}
       </main>
     </div>
@@ -934,24 +940,211 @@ function EcVolume({ volumeInIdx, setVolumeInIdx, volumeOutIdx, setVolumeOutIdx, 
   );
 }
 
-function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOut, onBack, onNext }) {
+// Country-level multi-select used twice on Q5 (incoming / outgoing).
+// Trigger reads as a Select; opening reveals a search input + countries
+// grouped by the 4-region display taxonomy. Selected countries surface
+// as removable pills under the trigger.
+function EcCountryMultiSelect({ value, onChange, label, placeholder }) {
   const t = useT();
-  const togIn  = (id) => { const n = new Set(corridorsIn);  n.has(id) ? n.delete(id) : n.add(id); setCorridorsIn(n);  };
-  const togOut = (id) => { const n = new Set(corridorsOut); n.has(id) ? n.delete(id) : n.add(id); setCorridorsOut(n); };
-  const canContinue = corridorsIn.size > 0 || corridorsOut.size > 0;
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const wrapRef = useRef(null);
+  const searchRef = useRef(null);
 
-  const renderChips = (selected, toggle, ariaLabel) => (
-    <div className="ec-chips" role="group" aria-label={ariaLabel}>
-      {EC_REGIONS.map((r) => (
-        <button key={r.id} type="button"
-                aria-pressed={selected.has(r.id)}
-                className={"ec-chip" + (selected.has(r.id) ? " is-on" : "")}
-                onClick={() => toggle(r.id)}>
-          {t(r.labelKey)}
-        </button>
-      ))}
+  const nameOf = (code) => {
+    const c = EC_COUNTRIES.find((x) => x.code === code);
+    if (!c) return code;
+    const localized = t("ec.country." + code);
+    return localized === code ? c.name : localized;
+  };
+
+  const collator = useMemo(() => new Intl.Collator(undefined, { sensitivity: "base" }), []);
+
+  // Grouped, filtered, alpha-sorted-per-language list.
+  const grouped = useMemo(() => {
+    const ql = query.trim().toLowerCase();
+    const out = [];
+    for (const region of EC_REGION_ORDER) {
+      const codes = EC_DISPLAY_REGIONS[region]
+        .filter((code) => {
+          const c = EC_COUNTRIES.find((x) => x.code === code);
+          if (!c) return false;
+          if (!ql) return true;
+          return nameOf(code).toLowerCase().includes(ql)
+              || c.name.toLowerCase().includes(ql)
+              || code.toLowerCase().includes(ql);
+        })
+        .sort((a, b) => collator.compare(nameOf(a), nameOf(b)));
+      if (codes.length) out.push({ region, codes });
+    }
+    return out;
+  }, [query, t, collator]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
+  useEffect(() => { if (open) searchRef.current?.focus(); }, [open]);
+  useEffect(() => { if (!open) setQuery(""); }, [open]);
+
+  const toggle = (code) => {
+    const next = new Set(value);
+    next.has(code) ? next.delete(code) : next.add(code);
+    onChange(next);
+  };
+  const removeOne = (code) => {
+    const next = new Set(value);
+    next.delete(code);
+    onChange(next);
+  };
+
+  const count = value.size;
+
+  return (
+    <div ref={wrapRef} style={{ display: "flex", flexDirection: "column", gap: "var(--s-1)", position: "relative" }}>
+      {label && <label style={{ fontSize: 13, fontWeight: "var(--fw-medium)", color: "var(--c-ink-2)" }}>{label}</label>}
+
+      <button
+        type="button" role="combobox" aria-haspopup="listbox" aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          height: 44, padding: "0 14px", borderRadius: "var(--r-md)",
+          border: `1px solid ${open ? "var(--c-accent)" : "var(--c-border)"}`,
+          background: "var(--c-surface)", cursor: "pointer", width: "100%",
+          color: "var(--c-ink)",
+          boxShadow: open ? "var(--sh-focus)" : "none",
+          transition: "all var(--motion-fast)", textAlign: "left",
+        }}>
+        <span style={{
+          color: count ? "var(--c-ink)" : "var(--c-muted)",
+          fontSize: "var(--fs-body)",
+        }}>
+          {count > 0
+            ? t("ec.q5.selected_count", { n: count })
+            : (placeholder || t("ec.q5.placeholder"))}
+        </span>
+        <Icon name="chevronDown" size={16} color="var(--c-muted)"
+          style={{ transition: "transform var(--motion-base)", transform: open ? "rotate(180deg)" : "none" }} aria-hidden="true" />
+      </button>
+
+      {count > 0 && (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
+          {[...value].map((code) => (
+            <span key={code} style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "4px 8px 4px 6px",
+              borderRadius: 999, background: "var(--c-accent-soft)",
+              fontSize: 12, fontWeight: 500, color: "var(--c-primary)",
+            }}>
+              <Flag code={code} size={14} />
+              <span>{nameOf(code)}</span>
+              <button type="button" onClick={() => removeOne(code)}
+                aria-label={`Remove ${nameOf(code)}`}
+                style={{ background: "transparent", border: 0, padding: 0, margin: 0, cursor: "pointer", color: "var(--c-primary)", display: "inline-flex" }}>
+                <EcIco.close style={{ width: 12, height: 12 }} />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, zIndex: 40,
+          background: "var(--c-surface)", borderRadius: "var(--r-md)",
+          border: "1px solid var(--c-border-soft)",
+          boxShadow: "var(--sh-3)", padding: 4,
+          display: "flex", flexDirection: "column",
+          maxHeight: 420, overflow: "hidden",
+        }}>
+          <div style={{
+            display: "flex", alignItems: "center", gap: 8,
+            padding: "8px 10px", borderBottom: "1px solid var(--c-border-soft)", marginBottom: 4,
+          }}>
+            <EcIco.search style={{ width: 16, height: 16, color: "var(--c-muted)", flex: "0 0 auto" }} aria-hidden="true" />
+            <input
+              ref={searchRef}
+              type="text" value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("ec.q2.input.placeholder")}
+              autoComplete="off" spellCheck="false"
+              className="input-bare"
+              style={{ flex: 1, minWidth: 0, background: "transparent", font: "inherit", color: "var(--c-ink)", fontSize: "var(--fs-body)" }}
+            />
+          </div>
+          <div style={{ overflowY: "auto", flex: 1 }}>
+            {grouped.length === 0 ? (
+              <div style={{ padding: "14px 12px", fontSize: 13, color: "var(--c-muted)", textAlign: "center" }}>
+                {t("ec.q2.empty.title")}
+              </div>
+            ) : (
+              grouped.map(({ region, codes }) => (
+                <div key={region}>
+                  <div style={{
+                    fontSize: 11, fontWeight: 600,
+                    color: "var(--c-muted)", textTransform: "uppercase",
+                    letterSpacing: ".04em",
+                    padding: "10px 12px 4px",
+                  }}>
+                    {t("ec.region." + region)}
+                  </div>
+                  <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                    {codes.map((code) => {
+                      const on = value.has(code);
+                      return (
+                        <li key={code}>
+                          <button
+                            type="button" role="option" aria-selected={on}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => toggle(code)}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 10,
+                              padding: "8px 12px",
+                              background: on ? "var(--c-accent-soft)" : "transparent",
+                              color: "var(--c-ink)", fontSize: "var(--fs-body)",
+                              borderRadius: "var(--r-sm)", cursor: "pointer",
+                              border: 0, textAlign: "left", margin: "2px 4px",
+                              width: "calc(100% - 8px)",
+                            }}>
+                            <Flag code={code} size={20} />
+                            <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {nameOf(code)}
+                            </span>
+                            {on && <Icon name="check" size={14} color="var(--c-accent)" aria-hidden="true" />}
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOut, onBack, onNext, onBlocked }) {
+  const t = useT();
+  const canContinue = corridorsIn.size > 0 || corridorsOut.size > 0;
+
+  // Selecting a sanctioned country (one with risk:"blocked" in EC_COUNTRIES)
+  // short-circuits to the soft-decline result via onBlocked. Mirrors Q1's
+  // EcCountrySelect behaviour — same compliance perimeter, same UX.
+  const checkBlocked = (newSet) => {
+    for (const code of newSet) {
+      const c = EC_COUNTRIES.find((x) => x.code === code);
+      if (c?.risk === "blocked") return true;
+    }
+    return false;
+  };
+  const handleInChange  = (newSet) => { setCorridorsIn(newSet);  if (checkBlocked(newSet)) onBlocked(); };
+  const handleOutChange = (newSet) => { setCorridorsOut(newSet); if (checkBlocked(newSet)) onBlocked(); };
 
   return (
     <div className="ec-content fade-in">
@@ -962,12 +1155,12 @@ function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOu
 
       <div className="ec-flow-section">
         <h3 className="ec-flow-section__head">{t("ec.q5.section.in")}</h3>
-        {renderChips(corridorsIn, togIn, t("ec.q5.section.in"))}
+        <EcCountryMultiSelect value={corridorsIn} onChange={handleInChange} />
       </div>
 
       <div className="ec-flow-section">
         <h3 className="ec-flow-section__head">{t("ec.q5.section.out")}</h3>
-        {renderChips(corridorsOut, togOut, t("ec.q5.section.out"))}
+        <EcCountryMultiSelect value={corridorsOut} onChange={handleOutChange} />
       </div>
 
       <div className="ob-actions">
@@ -1542,20 +1735,25 @@ function EcResultApproved({ rec, onBack, onReset }) {
 function EcResultBlocked({ rec, onBack, onReset }) {
   const t = useT();
   const lang = window.__I18N.getLang();
-  // Two block reasons share the same screen scaffolding; only the
-  // accent token, title fragments and lead copy differ.
-  const isCountry = rec.reason === "country";
+  // Three block reasons share the same screen scaffolding:
+  //   "country"   — sanctioned country of incorporation (Q1)
+  //   "corridor"  — sanctioned transactional corridor (Q5)
+  //   "industry"  — blocked industry (Q2)
+  // Only the title verb fragment and (for industry) the accent casing
+  // differ; the lead reuses the country-regulatory-perimeter copy for
+  // both country-side reasons since the underlying constraint is the
+  // same — Altery's licensed entities can't touch this jurisdiction.
   let accent, titleA, titleB, lead;
-  if (isCountry) {
-    // Country names stay in title-case ("Russia", "Iran" — proper nouns)
-    // so we don't toLocaleLowerCase them; the rest is taken straight from
-    // the ec.country.XX dict (with c.name fallback for un-translated codes).
+  if (rec.reason === "country" || rec.reason === "corridor") {
+    // Country names stay in title-case ("Russia", "Iran" — proper nouns).
     const c = rec.country;
     const localized = t("ec.country." + c.code);
     accent = localized === c.code ? c.name : localized;
-    titleA = t("ec.b.country.title.a");
+    titleA = rec.reason === "corridor"
+      ? t("ec.b.corridor.title.a")  // "We can't process payments to/from"
+      : t("ec.b.country.title.a");  // "We can't open accounts in"
     titleB = t("ec.b.title.b");
-    lead = t("ec.b.country.lead");
+    lead   = t("ec.b.country.lead");
   } else {
     // Industry name lowercased so it reads naturally inside the sentence
     // ("…can't open accounts for gambling right now"). toLocaleLowerCase
@@ -1563,7 +1761,7 @@ function EcResultBlocked({ rec, onBack, onReset }) {
     accent = t(rec.reasonKey).toLocaleLowerCase(lang);
     titleA = t("ec.b.title.a");
     titleB = t("ec.b.title.b");
-    lead = t("ec.b.lead");
+    lead   = t("ec.b.lead");
   }
   return (
     <div className="ec-content fade-in">
