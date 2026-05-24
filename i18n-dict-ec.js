@@ -17,10 +17,6 @@
     "common.startOver": "Start over",
     "common.clear": "Clear",
     "ob.common.whyWeAsk": "Why we ask",
-    "ec.group.europe": "Europe",
-    "ec.group.asia": "Asia & Pacific",
-    "ec.group.americas": "Americas",
-    "ec.group.mea": "Africa & Middle East",
     "common.editAnswers": "Edit my answers",
     "common.contactTeam": "Contact our team",
 
@@ -136,8 +132,14 @@
 
     // Q4 corridors
     "ec.q5.title": "Where does money come from and go to?",
-    "ec.q5.lead": "Pick every region you trade with — incoming or outgoing. We'll match your profile to the entity with the best corridor coverage.",
-    "ec.q5.field.label": "Trading corridors (choose all that apply)",
+    "ec.q5.lead": "Mark every region you work with — on inbound and outbound. We'll match you to the entity with the best corridor coverage.",
+    "ec.region.africa": "Africa",
+    "ec.region.americas": "Americas",
+    "ec.region.apac_me": "Asia-Pacific & Middle East",
+    "ec.region.europe": "Europe",
+    "ec.q5.section.out": "Where funds go",
+    "ec.q5.section.in": "Where funds come from",
+    "ec.q5.title": "Where do funds come from and go?",
     "ec.q6.cta": "See my recommendation",
 
         // Account preview — operational identifiers shown on result.

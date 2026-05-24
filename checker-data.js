@@ -262,28 +262,17 @@ const EC_COUNTRIES = [
   { code: "ZW", name: "Zimbabwe", region: "row" },
 ];
 
-const EC_CORRIDOR_GROUPS = [
-  { id: "europe",   labelKey: "ec.corridor.group.europe" },
-  { id: "apac",     labelKey: "ec.corridor.group.apac" },
-  { id: "mena",     labelKey: "ec.corridor.group.mena" },
-  { id: "americas", labelKey: "ec.corridor.group.americas" },
-  { id: "africa",   labelKey: "ec.corridor.group.africa" },
-  { id: "other",    labelKey: "ec.corridor.group.other" },
-];
-
-const EC_CORRIDORS = [
-  { code: "GB", group: "europe" }, { code: "EU", group: "europe" },
-  { code: "CH", group: "europe" }, { code: "TR", group: "europe" },
-  { code: "UA", group: "europe" },
-  { code: "HK", group: "apac" }, { code: "SG", group: "apac" },
-  { code: "CN", group: "apac" }, { code: "IN", group: "apac" },
-  { code: "JP", group: "apac" }, { code: "KR", group: "apac" },
-  { code: "AU", group: "apac" }, { code: "APAC", group: "apac" },
-  { code: "AE", group: "mena" }, { code: "SA", group: "mena" }, { code: "IL", group: "mena" },
-  { code: "US", group: "americas" }, { code: "CA", group: "americas" },
-  { code: "LATAM", group: "americas" },
-  { code: "ZA", group: "africa" }, { code: "AFRICA", group: "africa" },
-  { code: "ROW", group: "other" },
+// Q5 regions — matches the public-facing geographic taxonomy on
+// altery.com (Europe / Asia-Pacific & Middle East / Americas / Africa).
+// The previous 6-bucket scheme with country-level chips diverged from
+// the brand vocabulary AND over-promised country-level routing
+// granularity that entity selection never actually uses — Altery's
+// licensed entities route at the regional level.
+const EC_REGIONS = [
+  { id: "europe",   labelKey: "ec.region.europe" },   // EU/EEA + UK + Switzerland — SEPA + Faster Payments rails
+  { id: "apac_me",  labelKey: "ec.region.apac_me" }, // APAC + MENA combined, matching altery.com
+  { id: "americas", labelKey: "ec.region.americas" }, // SWIFT, USD-primary
+  { id: "africa",   labelKey: "ec.region.africa" },  // SWIFT, USD-primary
 ];
 
 // ── Q2 industries ─────────────────────────────────────────────────
@@ -740,7 +729,7 @@ const EC_ENTITIES = {
 // Export all 13 names to window so other scripts can reference them
 // unqualified.
 Object.assign(window, {
-  EC_COUNTRIES, EC_CORRIDOR_GROUPS, EC_CORRIDORS, EC_INDUSTRIES,
+  EC_COUNTRIES, EC_REGIONS, EC_INDUSTRIES,
   EC_BUSINESS_TYPES, EC_SERVICES, TOTAL_STEPS,
   EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_PERKS, EC_ENTITIES,
 });

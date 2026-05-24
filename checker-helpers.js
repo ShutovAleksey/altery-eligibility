@@ -32,7 +32,13 @@ Object.values(EC_ENTITIES).forEach((e) => {
 });
 
 // Pure routing function — answers → recommendation. Easy to test in isolation.
-function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corridors, monthlyTx, services }) {
+function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services }) {
+  // Union of regions hit on either direction = the actual corridor
+  // breadth of the business. Keep both directions on rec for the PDF
+  // and downstream consumers; expose the merged set as `corridors`.
+  const cIn  = Array.isArray(corridorsIn)  ? corridorsIn  : [];
+  const cOut = Array.isArray(corridorsOut) ? corridorsOut : [];
+  const corridors = Array.from(new Set([...cIn, ...cOut]));
   const country = EC_COUNTRIES.find((c) => c.code === countryCode);
   const ind = EC_INDUSTRIES.find((i) => i.value === industry);
 
@@ -81,7 +87,9 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
   const tierSignals = {
     volumePro:        monthlyVolume >= 100000,
     volumeUltra:      monthlyVolume >= 1000000,
-    corridorsBreadth: (corridors?.length || 0) >= 4,
+    // 4 region buckets total; ≥3 distinct regions across in+out reads
+    // as a multi-region business that benefits from Pro-tier rails.
+    corridorsBreadth: corridors.length >= 3,
     // ≥300 monthly transactions = "high" — matches the prior "high" band
     // (101–500) lower-edge intent, expressed against the new in+out total.
     txHigh:           monthlyTx >= 300,
@@ -187,7 +195,7 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
     .sort((a, b) => b.priority - a.priority)
     .slice(0, 3);
 
-  return { kind: "approved", entity, plan, caveats, country, ind, monthlyVolume, cryptoReroute, cryptoActive, services: svcs, tierSignals, reasoning: reasoningTop };
+  return { kind: "approved", entity, plan, caveats, country, ind, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoReroute, cryptoActive, services: svcs, tierSignals, reasoning: reasoningTop };
 }
 
 // Derive a transaction-count assumption from the monthly volume

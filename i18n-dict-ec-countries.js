@@ -81,25 +81,6 @@
     YE: "Yemen", YT: "Mayotte", ZA: "South Africa", ZM: "Zambia",
     ZW: "Zimbabwe",
   });
-  add("en", "ec.corridor.", {
-    // Europe
-    GB: "UK", EU: "EU / EEA", CH: "Switzerland", TR: "Türkiye", UA: "Ukraine",
-    // APAC
-    HK: "Hong Kong", SG: "Singapore", CN: "China", IN: "India",
-    JP: "Japan", KR: "South Korea", AU: "Australia", APAC: "Other Asia-Pacific",
-    // Middle East
-    AE: "UAE", SA: "Saudi Arabia", IL: "Israel",
-    // Americas
-    US: "USA", CA: "Canada", LATAM: "Latin America",
-    // Africa
-    ZA: "South Africa", AFRICA: "Other Africa",
-    // Other
-    ROW: "Other / rest of world",
-  });
-  add("en", "ec.corridor.group.", {
-    europe: "Europe", apac: "Asia & Pacific", mena: "Middle East",
-    americas: "Americas", africa: "Africa", other: "Other",
-  });
 
   // ─────────────── РУССКИЙ ──────────────────────────────────────────
   // Complete map — Russian is a primary locale for Altery.
@@ -168,21 +149,6 @@
     YE: "Йемен", YT: "Майотта", ZA: "Южно-Африканская Республика", ZM: "Замбия",
     ZW: "Зимбабве",
   });
-  add("ru", "ec.corridor.", {
-    GB: "Великобритания", EU: "ЕС / ЕЭП", CH: "Швейцария",
-    TR: "Турция", UA: "Украина",
-    HK: "Гонконг", SG: "Сингапур", CN: "Китай", IN: "Индия",
-    JP: "Япония", KR: "Южная Корея", AU: "Австралия",
-    APAC: "Другая часть Азии и Тихого океана",
-    AE: "ОАЭ", SA: "Саудовская Аравия", IL: "Израиль",
-    US: "США", CA: "Канада", LATAM: "Латинская Америка",
-    ZA: "ЮАР", AFRICA: "Другие страны Африки",
-    ROW: "Прочие страны",
-  });
-  add("ru", "ec.corridor.group.", {
-    europe: "Европа", apac: "Азия и Тихий океан", mena: "Ближний Восток",
-    americas: "Америка", africa: "Африка", other: "Другое",
-  });
 
   // ─────────────── DEUTSCH (top corridors only; long tail → EN) ─────
   add("de", "ec.country.", {
@@ -249,19 +215,6 @@
     VN: "Vietnam", VU: "Vanuatu", WF: "Wallis und Futuna", WS: "Samoa",
     YE: "Jemen", YT: "Mayotte", ZA: "Südafrika", ZM: "Sambia",
     ZW: "Simbabwe",
-  });
-  add("de", "ec.corridor.", {
-    GB: "UK", EU: "EU / EWR", CH: "Schweiz", TR: "Türkei", UA: "Ukraine",
-    HK: "Hongkong", SG: "Singapur", CN: "China", IN: "Indien",
-    JP: "Japan", KR: "Südkorea", AU: "Australien", APAC: "Übriger asiatisch-pazifischer Raum",
-    AE: "VAE", SA: "Saudi-Arabien", IL: "Israel",
-    US: "USA", CA: "Kanada", LATAM: "Lateinamerika",
-    ZA: "Südafrika", AFRICA: "Übriges Afrika",
-    ROW: "Sonstige Länder",
-  });
-  add("de", "ec.corridor.group.", {
-    europe: "Europa", apac: "Asien & Pazifik", mena: "Naher Osten",
-    americas: "Amerika", africa: "Afrika", other: "Sonstige",
   });
 
   // ─────────────── NEDERLANDS ───────────────────────────────────────
@@ -330,19 +283,6 @@
     YE: "Jemen", YT: "Mayotte", ZA: "Zuid-Afrika", ZM: "Zambia",
     ZW: "Zimbabwe",
   });
-  add("nl", "ec.corridor.", {
-    GB: "VK", EU: "EU / EER", CH: "Zwitserland", TR: "Turkije", UA: "Oekraïne",
-    HK: "Hongkong", SG: "Singapore", CN: "China", IN: "India",
-    JP: "Japan", KR: "Zuid-Korea", AU: "Australië", APAC: "Overig Azië-Pacific",
-    AE: "VAE", SA: "Saoedi-Arabië", IL: "Israël",
-    US: "VS", CA: "Canada", LATAM: "Latijns-Amerika",
-    ZA: "Zuid-Afrika", AFRICA: "Overig Afrika",
-    ROW: "Overige landen",
-  });
-  add("nl", "ec.corridor.group.", {
-    europe: "Europa", apac: "Azië & Pacific", mena: "Midden-Oosten",
-    americas: "Amerika", africa: "Afrika", other: "Overig",
-  });
 
   // ─────────────── TÜRKÇE ───────────────────────────────────────────
   add("tr", "ec.country.", {
@@ -409,21 +349,6 @@
     VN: "Vietnam", VU: "Vanuatu", WF: "Wallis ve Futuna", WS: "Samoa",
     YE: "Yemen", YT: "Mayotte", ZA: "Güney Afrika", ZM: "Zambiya",
     ZW: "Zimbabve",
-  });
-  add("tr", "ec.corridor.", {
-    GB: "Birleşik Krallık", EU: "AB / AEA", CH: "İsviçre",
-    TR: "Türkiye", UA: "Ukrayna",
-    HK: "Hong Kong", SG: "Singapur", CN: "Çin", IN: "Hindistan",
-    JP: "Japonya", KR: "Güney Kore", AU: "Avustralya",
-    APAC: "Diğer Asya-Pasifik",
-    AE: "BAE", SA: "Suudi Arabistan", IL: "İsrail",
-    US: "ABD", CA: "Kanada", LATAM: "Latin Amerika",
-    ZA: "Güney Afrika", AFRICA: "Diğer Afrika",
-    ROW: "Diğer / dünya geneli",
-  });
-  add("tr", "ec.corridor.group.", {
-    europe: "Avrupa", apac: "Asya & Pasifik", mena: "Orta Doğu",
-    americas: "Amerika", africa: "Afrika", other: "Diğer",
   });
 
   // ─────────────── ITALIANO ─────────────────────────────────────────
@@ -492,21 +417,6 @@
     YE: "Yemen", YT: "Mayotte", ZA: "Sudafrica", ZM: "Zambia",
     ZW: "Zimbabwe",
   });
-  add("it", "ec.corridor.", {
-    GB: "Regno Unito", EU: "UE / SEE", CH: "Svizzera",
-    TR: "Türkiye", UA: "Ucraina",
-    HK: "Hong Kong", SG: "Singapore", CN: "Cina", IN: "India",
-    JP: "Giappone", KR: "Corea del Sud", AU: "Australia",
-    APAC: "Altre aree Asia-Pacifico",
-    AE: "EAU", SA: "Arabia Saudita", IL: "Israele",
-    US: "USA", CA: "Canada", LATAM: "America Latina",
-    ZA: "Sudafrica", AFRICA: "Altre aree Africa",
-    ROW: "Altri paesi",
-  });
-  add("it", "ec.corridor.group.", {
-    europe: "Europa", apac: "Asia e Pacifico", mena: "Medio Oriente",
-    americas: "Americhe", africa: "Africa", other: "Altro",
-  });
 
   // ─────────────── ESPAÑOL ──────────────────────────────────────────
   add("es", "ec.country.", {
@@ -573,21 +483,6 @@
     VN: "Vietnam", VU: "Vanuatu", WF: "Wallis y Futuna", WS: "Samoa",
     YE: "Yemen", YT: "Mayotte", ZA: "Sudáfrica", ZM: "Zambia",
     ZW: "Zimbabue",
-  });
-  add("es", "ec.corridor.", {
-    GB: "Reino Unido", EU: "UE / EEE", CH: "Suiza",
-    TR: "Türkiye", UA: "Ucrania",
-    HK: "Hong Kong", SG: "Singapur", CN: "China", IN: "India",
-    JP: "Japón", KR: "Corea del Sur", AU: "Australia",
-    APAC: "Resto de Asia-Pacífico",
-    AE: "EAU", SA: "Arabia Saudita", IL: "Israel",
-    US: "EE. UU.", CA: "Canadá", LATAM: "América Latina",
-    ZA: "Sudáfrica", AFRICA: "Resto de África",
-    ROW: "Otros países",
-  });
-  add("es", "ec.corridor.group.", {
-    europe: "Europa", apac: "Asia y Pacífico", mena: "Oriente Medio",
-    americas: "América", africa: "África", other: "Otros",
   });
 
   // ─────────────── POLSKI ───────────────────────────────────────────
@@ -656,21 +551,6 @@
     YE: "Jemen", YT: "Majotta", ZA: "Republika Południowej Afryki", ZM: "Zambia",
     ZW: "Zimbabwe",
   });
-  add("pl", "ec.corridor.", {
-    GB: "Wielka Brytania", EU: "UE / EOG", CH: "Szwajcaria",
-    TR: "Türkiye", UA: "Ukraina",
-    HK: "Hongkong", SG: "Singapur", CN: "Chiny", IN: "Indie",
-    JP: "Japonia", KR: "Korea Południowa", AU: "Australia",
-    APAC: "Pozostała Azja i Pacyfik",
-    AE: "ZEA", SA: "Arabia Saudyjska", IL: "Izrael",
-    US: "USA", CA: "Kanada", LATAM: "Ameryka Łacińska",
-    ZA: "RPA", AFRICA: "Pozostała Afryka",
-    ROW: "Pozostałe kraje",
-  });
-  add("pl", "ec.corridor.group.", {
-    europe: "Europa", apac: "Azja i Pacyfik", mena: "Bliski Wschód",
-    americas: "Ameryki", africa: "Afryka", other: "Inne",
-  });
 
   // ─────────────── PORTUGUÊS ────────────────────────────────────────
   add("pt", "ec.country.", {
@@ -738,21 +618,6 @@
     YE: "Iêmen", YT: "Mayotte", ZA: "África do Sul", ZM: "Zâmbia",
     ZW: "Zimbábue",
   });
-  add("pt", "ec.corridor.", {
-    GB: "Reino Unido", EU: "UE / EEE", CH: "Suíça",
-    TR: "Türkiye", UA: "Ucrânia",
-    HK: "Hong Kong", SG: "Singapura", CN: "China", IN: "Índia",
-    JP: "Japão", KR: "Coreia do Sul", AU: "Austrália",
-    APAC: "Restante Ásia-Pacífico",
-    AE: "EAU", SA: "Arábia Saudita", IL: "Israel",
-    US: "EUA", CA: "Canadá", LATAM: "América Latina",
-    ZA: "África do Sul", AFRICA: "Restante África",
-    ROW: "Outros países",
-  });
-  add("pt", "ec.corridor.group.", {
-    europe: "Europa", apac: "Ásia e Pacífico", mena: "Médio Oriente",
-    americas: "Américas", africa: "África", other: "Outros",
-  });
 
   // ─────────────── FRANÇAIS ─────────────────────────────────────────
   add("fr", "ec.country.", {
@@ -819,21 +684,6 @@
     VN: "Viêt Nam", VU: "Vanuatu", WF: "Wallis-et-Futuna", WS: "Samoa",
     YE: "Yémen", YT: "Mayotte", ZA: "Afrique du Sud", ZM: "Zambie",
     ZW: "Zimbabwe",
-  });
-  add("fr", "ec.corridor.", {
-    GB: "Royaume-Uni", EU: "UE / EEE", CH: "Suisse",
-    TR: "Türkiye", UA: "Ukraine",
-    HK: "Hong Kong", SG: "Singapour", CN: "Chine", IN: "Inde",
-    JP: "Japon", KR: "Corée du Sud", AU: "Australie",
-    APAC: "Reste de l'Asie-Pacifique",
-    AE: "EAU", SA: "Arabie saoudite", IL: "Israël",
-    US: "États-Unis", CA: "Canada", LATAM: "Amérique latine",
-    ZA: "Afrique du Sud", AFRICA: "Reste de l'Afrique",
-    ROW: "Autres pays",
-  });
-  add("fr", "ec.corridor.group.", {
-    europe: "Europe", apac: "Asie et Pacifique", mena: "Moyen-Orient",
-    americas: "Amériques", africa: "Afrique", other: "Autres",
   });
 
   // ──────────────── Missing-country backfill ──────────────────────

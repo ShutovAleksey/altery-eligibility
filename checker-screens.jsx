@@ -1,7 +1,7 @@
 /* global React, useT, Button, Tag, Alert, SelectableListItem, Input, Select,
           Icon, Flag, Title, Field, WhyWeAsk,
           EC_COUNTRIES, EC_INDUSTRIES, EC_BUSINESS_TYPES, EC_SERVICES,
-          EC_VOLUME_BANDS, EC_TX_BANDS, EC_CORRIDOR_GROUPS, EC_CORRIDORS, EC_PERKS,
+          EC_VOLUME_BANDS, EC_TX_BANDS, EC_REGIONS, EC_PERKS,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
@@ -286,13 +286,17 @@ function EcApp() {
   const [volumeOutIdx, setVolumeOutIdx] = useState(1);
   const [txInIdx,      setTxInIdx]      = useState(1); // 20 – 100 default
   const [txOutIdx,     setTxOutIdx]     = useState(1);
-  const [corridors, setCorridors] = useState(new Set());
+  // Q5 — two parallel sets: regions where money comes in from, and
+  // regions it flows out to. Recommendation engine reads both and
+  // computes breadth from the union.
+  const [corridorsIn,  setCorridorsIn]  = useState(new Set());
+  const [corridorsOut, setCorridorsOut] = useState(new Set());
   const totalSteps = TOTAL_STEPS;
   const monthlyVolume = (EC_VOLUME_BANDS[volumeInIdx]?.value || 0) + (EC_VOLUME_BANDS[volumeOutIdx]?.value || 0);
   const monthlyTx     = (EC_TX_BANDS[txInIdx]?.value || 0) + (EC_TX_BANDS[txOutIdx]?.value || 0);
   const recommendation = useMemo(() =>
-    ecRecommend({ countryCode: country, industry, businessType, monthlyVolume, corridors: [...corridors], monthlyTx, services: [...services] }),
-  [country, industry, businessType, monthlyVolume, corridors, monthlyTx, services]);
+    ecRecommend({ countryCode: country, industry, businessType, monthlyVolume, corridorsIn: [...corridorsIn], corridorsOut: [...corridorsOut], monthlyTx, services: [...services] }),
+  [country, industry, businessType, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services]);
 
   // Step navigation. Steps:
   //   0 intro · 1 country · 2 industry · 3 services · 4 volume · 5 corridors · 6 result
@@ -341,7 +345,10 @@ function EcApp() {
           txInIdx={txInIdx} setTxInIdx={setTxInIdx}
           txOutIdx={txOutIdx} setTxOutIdx={setTxOutIdx}
           onBack={back} onNext={next} />}
-        {step === 5 && <EcCorridors corridors={corridors} setCorridors={setCorridors} onBack={back} onNext={next} />}
+        {step === 5 && <EcCorridors
+          corridorsIn={corridorsIn} setCorridorsIn={setCorridorsIn}
+          corridorsOut={corridorsOut} setCorridorsOut={setCorridorsOut}
+          onBack={back} onNext={next} />}
         {step === 6 && <EcResult rec={recommendation} onBack={back} onReset={reset} />}
       </main>
     </div>
@@ -927,13 +934,25 @@ function EcVolume({ volumeInIdx, setVolumeInIdx, volumeOutIdx, setVolumeOutIdx, 
   );
 }
 
-function EcCorridors({ corridors, setCorridors, onBack, onNext }) {
+function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOut, onBack, onNext }) {
   const t = useT();
-  const tog = (code) => {
-    const next = new Set(corridors);
-    next.has(code) ? next.delete(code) : next.add(code);
-    setCorridors(next);
-  };
+  const togIn  = (id) => { const n = new Set(corridorsIn);  n.has(id) ? n.delete(id) : n.add(id); setCorridorsIn(n);  };
+  const togOut = (id) => { const n = new Set(corridorsOut); n.has(id) ? n.delete(id) : n.add(id); setCorridorsOut(n); };
+  const canContinue = corridorsIn.size > 0 || corridorsOut.size > 0;
+
+  const renderChips = (selected, toggle, ariaLabel) => (
+    <div className="ec-chips" role="group" aria-label={ariaLabel}>
+      {EC_REGIONS.map((r) => (
+        <button key={r.id} type="button"
+                aria-pressed={selected.has(r.id)}
+                className={"ec-chip" + (selected.has(r.id) ? " is-on" : "")}
+                onClick={() => toggle(r.id)}>
+          {t(r.labelKey)}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -941,60 +960,19 @@ function EcCorridors({ corridors, setCorridors, onBack, onNext }) {
       </button>
       <EcQuestionHeader num="5" title={t("ec.q5.title")} lead={t("ec.q5.lead")} />
 
-      <Field label={t("ec.q5.field.label")}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 14, paddingTop: 6 }}>
-          {EC_CORRIDOR_GROUPS.map((g) => {
-            const items = EC_CORRIDORS.filter((c) => c.group === g.id);
-            if (!items.length) return null;
-            return (
-              <div key={g.id} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{
-                  fontSize: 11, fontWeight: 600,
-                  color: "var(--c-muted)", textTransform: "uppercase",
-                  letterSpacing: ".04em",
-                }}>
-                  {t(g.labelKey)}
-                </div>
-                <div className="ec-chips">
-                  {items.map((c) => {
-                    const hasFlag = !["APAC", "LATAM", "AFRICA", "ROW"].includes(c.code);
-                    return (
-                      <button key={c.code} type="button"
-                              aria-pressed={corridors.has(c.code)}
-                              className={"ec-chip" + (corridors.has(c.code) ? " is-on" : "")}
-                              onClick={() => tog(c.code)}>
-                        <span className="ec-chip__flag"
-                              style={!hasFlag
-                                ? { background: "var(--c-accent-soft)", color: "var(--c-primary)",
-                                    display: "inline-flex", alignItems: "center", justifyContent: "center",
-                                    width: 18, height: 18, borderRadius: "50%" }
-                                : undefined}>
-                          {hasFlag
-                            ? <Flag code={c.code === "EU" ? "EU" : c.code} size={18} />
-                            : <EcIco.globe style={{ width: 12, height: 12 }} />}
-                        </span>
-                        {t("ec.corridor." + c.code)}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </Field>
+      <div className="ec-flow-section">
+        <h3 className="ec-flow-section__head">{t("ec.q5.section.in")}</h3>
+        {renderChips(corridorsIn, togIn, t("ec.q5.section.in"))}
+      </div>
 
-      {/* A "Restricted regions — flagged automatically" alert used to
-          live here. It promised that sanctioned-jurisdiction profiles
-          would be "explained at the result step" — but ecRecommend has
-          no sanctions-screening logic, and EC_CORRIDORS already omits
-          every sanctioned region (no RU/IR/BY/KP/SY). The alert was
-          aspirational copy for a feature that doesn't exist, so it's
-          been removed rather than left as a false promise. */}
+      <div className="ec-flow-section">
+        <h3 className="ec-flow-section__head">{t("ec.q5.section.out")}</h3>
+        {renderChips(corridorsOut, togOut, t("ec.q5.section.out"))}
+      </div>
 
       <div className="ob-actions">
         <Button variant="primary" size="xl" onClick={onNext} iconRight="arrowRight"
-                disabled={corridors.size === 0}>
+                disabled={!canContinue}>
           {t("common.continue")}
         </Button>
       </div>
