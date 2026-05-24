@@ -846,10 +846,45 @@ function EcServices({ services, setServices, onBack, onNext }) {
   );
 }
 
+// Volume slider — discrete band picker rendered as a continuous-feeling
+// range input. Reused twice in EcVolume (incoming + outgoing). Keeping
+// it slider-only here because volumes have an intuitive linear-ish
+// monotonic mental model ("low → high"), while tx counts are picked
+// from a small finite set that reads better in a Select.
+function EcVolumeSlider({ idx, setIdx, labelKey, id }) {
+  const t = useT();
+  const band = EC_VOLUME_BANDS[idx];
+  const maxIdx = EC_VOLUME_BANDS.length - 1;
+  return (
+    <div className="ec-slider">
+      <div className="ec-slider__head">
+        <span className="ec-slider__label" id={id}>{t(labelKey)}</span>
+        <span className="ec-slider__value" aria-live="polite">{t(band.labelKey)}</span>
+      </div>
+      <div className="ec-slider__track">
+        <span className="ec-slider__rail" aria-hidden="true" />
+        <span className="ec-slider__fill" aria-hidden="true"
+              style={{ width: `${(idx / maxIdx) * 100}%` }} />
+        <input
+          className="ec-slider__input"
+          type="range"
+          min="0" max={maxIdx} step="1"
+          value={idx}
+          onChange={(e) => setIdx(parseInt(e.target.value, 10))}
+          aria-labelledby={id}
+          aria-valuetext={t(band.labelKey)}
+        />
+      </div>
+      <div className="ec-slider__ticks" aria-hidden="true">
+        <span>€0</span><span>€200k</span><span>€1M</span><span>€5M+</span>
+      </div>
+    </div>
+  );
+}
+
 function EcVolume({ volumeInIdx, setVolumeInIdx, volumeOutIdx, setVolumeOutIdx, txInIdx, setTxInIdx, txOutIdx, setTxOutIdx, onBack, onNext }) {
   const t = useT();
-  const volOptions = EC_VOLUME_BANDS.map((b) => ({ value: b.idx, label: t(b.labelKey) }));
-  const txOptions  = EC_TX_BANDS.map((b)     => ({ value: b.idx, label: t(b.labelKey) }));
+  const txOptions = EC_TX_BANDS.map((b) => ({ value: b.idx, label: t(b.labelKey) }));
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -859,12 +894,8 @@ function EcVolume({ volumeInIdx, setVolumeInIdx, volumeOutIdx, setVolumeOutIdx, 
 
       <div className="ec-flow-section">
         <h3 className="ec-flow-section__head">{t("ec.q4.section.in")}</h3>
-        <Select
-          label={t("ec.q4.vol.in.label")}
-          value={volumeInIdx}
-          onChange={(v) => setVolumeInIdx(v)}
-          options={volOptions}
-        />
+        <EcVolumeSlider idx={volumeInIdx} setIdx={setVolumeInIdx}
+          labelKey="ec.q4.vol.in.label" id="ec-q4-vol-in" />
         <Select
           label={t("ec.q4.tx.in.label")}
           value={txInIdx}
@@ -875,12 +906,8 @@ function EcVolume({ volumeInIdx, setVolumeInIdx, volumeOutIdx, setVolumeOutIdx, 
 
       <div className="ec-flow-section">
         <h3 className="ec-flow-section__head">{t("ec.q4.section.out")}</h3>
-        <Select
-          label={t("ec.q4.vol.out.label")}
-          value={volumeOutIdx}
-          onChange={(v) => setVolumeOutIdx(v)}
-          options={volOptions}
-        />
+        <EcVolumeSlider idx={volumeOutIdx} setIdx={setVolumeOutIdx}
+          labelKey="ec.q4.vol.out.label" id="ec-q4-vol-out" />
         <Select
           label={t("ec.q4.tx.out.label")}
           value={txOutIdx}
