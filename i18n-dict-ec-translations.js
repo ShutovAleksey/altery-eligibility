@@ -61,7 +61,7 @@
     "ec.q1.alert.blocked.title": "Für diese Branche eröffnen wir keine Konten",
     "ec.q1.alert.blocked.body": "Altery unterstützt {industry} in keiner unserer Gesellschaften. Auf der Ergebnisseite erläutern wir es — Sie können auch direkt unser Team kontaktieren.",
     "ec.q1.alert.crypto.title": "Krypto-nativ? Sie sind richtig hier.",
-    "ec.q1.alert.crypto.body": "Wir onboarden regelmäßig {category}. Ihre Bewerbung läuft über unsere Krypto-Spezialisten-Spur — kompetentes Compliance-Team, Fiat-Schienen via SEPA / Faster Payments / SWIFT, und Synterra Connect für Partner-Exchange-Flows.",
+    "ec.q1.alert.crypto.body": "Wir onboarden regelmäßig {category}. Ihre Bewerbung läuft über unsere Krypto-Spezialisten-Spur — kompetentes Compliance-Team, Fiat-Schienen via SEPA / Faster Payments / SWIFT, und Synterra Connect (unser Partner-Netzwerk für direkte Exchange-Abwicklung), das Mittel zu und von regulierten Plattformen ohne manuelle Abgleichung bewegt.",
     "ec.ind.saas": "SaaS, Software & KI-Tools",
     "ec.ind.apps": "Mobile Apps & Publisher",
     "ec.ind.games": "Spiele & Spielestudios",
@@ -181,13 +181,13 @@
     "ec.plan.ultra.p5": "Vorrangiger Operations-Support",
 
     "ec.cav.crypto.tag": "Krypto-erprobt",
-    "ec.cav.crypto.text": "Krypto-natives KYB läuft über unser Spezialistenteam, nicht die allgemeine Warteschlange. Synterra Connect leitet Partner-Exchange-Flüsse; Fiat-Ein-/-Auszahlungen via SEPA, Faster Payments und SWIFT.",
-    "ec.cav.row.tag": "Manuelle Prüfung",
-    "ec.cav.row.text": "Unternehmen aus {country} stehen nicht auf unserer Standardliste — wir leiten Ihren Antrag an einen Relationship-Manager zur Prüfung innerhalb eines Tages.",
-    "ec.cav.mena.tag": "Im Aufbau",
-    "ec.cav.mena.text": "Altery MENA ist von der DFSA voll lizenziert und im Betriebsaufbau. Ihr Konto wird sofort eröffnet; einige Korridore werden mit dem Integrationsfortschritt aktiviert.",
+    "ec.cav.crypto.text": "Krypto-natives KYB läuft über unser Spezialistenteam, nicht die allgemeine Warteschlange. Synterra Connect — unser Partner-Netzwerk für direkte Exchange-Abwicklung — leitet Mittel zu und von regulierten Plattformen; Fiat-Ein-/-Auszahlungen via SEPA, Faster Payments und SWIFT.",
+    "ec.cav.row.tag": "Spezialprüfung",
+    "ec.cav.row.text": "Unternehmen aus {country} stehen nicht auf unserer Standardliste — wir leiten Ihren Antrag an einen Relationship-Manager zur Prüfung innerhalb eines Tages. Sie erhalten eine namentliche Ansprechperson für Rückfragen; wenn wir die Struktur nicht betreuen können, erklären wir genau, warum.",
+    "ec.cav.mena.tag": "Konto öffnet heute",
+    "ec.cav.mena.text": "Altery MENA ist von der DFSA voll lizenziert. Das Konto auf den oben aufgeführten Schienen öffnet beim Onboarding. Weitere Korridore gehen live, sobald jede Bank-zu-Bank-Integration abgeschlossen ist — wir mailen Sie, sobald einer aktiviert wird.",
     "ec.cav.performance.tag": "Spezialprüfung",
-    "ec.cav.performance.text": "Performance-Marketing-Unternehmen ({industry}) brauchen klare Nachweise zu Traffic-Qualität und Auszahlungsmustern. Wir fragen, wie Sie Werbetreibende, Publisher und Auszahlungsregeln verifizieren — strukturierte Prüfung, keine Blackbox.",
+    "ec.cav.performance.text": "Performance-Marketing ({industry}) braucht klare Nachweise zu Traffic-Qualität und Auszahlungen. Compliance führt einen strukturierten Fragebogen durch — übliche Bearbeitungszeit drei Werktage. Bei Ablehnung erhalten Sie eine konkrete Begründung, keine Blackbox.",
 
 
     "common.close": "Schließen",
@@ -331,6 +331,7 @@
     "ec.b.row2.tag": "Quartalsweise aktualisiert",
     "ec.b.row2.text": "Unsere Liste unterstützter Branchen wächst mit neuen Lizenzen. Diese Seite halten wir aktuell.",
 
+    "ec.r.entity.regHint": "Öffnet das öffentliche Register der Aufsichtsbehörde in einem neuen Tab",
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "FCA-lizenzierte EMI",
     "ec.entity.uk.note": "Lokale GBP-IBAN mit Zugang zu Faster Payments und CHAPS.",
@@ -440,7 +441,7 @@
     "ec.q1.alert.blocked.title": "Счета для этой отрасли мы не открываем",
     "ec.q1.alert.blocked.body": "Altery не работает с {industry} ни в одном из подразделений. Подробности на экране результата — также можно сразу написать команде.",
     "ec.q1.alert.crypto.title": "Крипто-нативный? Вы у своих.",
-    "ec.q1.alert.crypto.body": "Регулярно работаем с {category}. Ваша заявка идёт через крипто-специализированную линию — компетентный комплаенс, фиат через SEPA / Faster Payments / SWIFT, и Synterra Connect для интеграции с партнёрскими биржами.",
+    "ec.q1.alert.crypto.body": "Регулярно работаем с {category}. Ваша заявка идёт через крипто-специализированную линию — компетентный комплаенс, фиат через SEPA / Faster Payments / SWIFT, и Synterra Connect (наша партнёрская сеть для прямых расчётов с биржами), который проводит средства в обе стороны через регулируемые площадки без ручной сверки.",
 
     
     "ec.ind.saas": "SaaS, ПО и AI-инструменты",
@@ -563,13 +564,13 @@
     "ec.plan.ultra.p5": "Приоритетная операционная поддержка",
 
     "ec.cav.crypto.tag": "Знаем крипту",
-    "ec.cav.crypto.text": "KYB крипто-нативного бизнеса проходит через специализированную команду, не общую очередь. Synterra Connect маршрутизирует партнёрские биржевые потоки; фиат через SEPA, Faster Payments и SWIFT.",
-    "ec.cav.row.tag": "Ручная проверка",
-    "ec.cav.row.text": "Компании из {country} нет в нашем стандартном списке — направим заявку менеджеру для проверки в течение одного дня.",
-    "ec.cav.mena.tag": "В процессе запуска",
-    "ec.cav.mena.text": "Altery MENA полностью лицензирована DFSA и операционализируется. Счёт откроем сразу; часть коридоров активируется по мере интеграции.",
-    "ec.cav.performance.tag": "Специальная проверка",
-    "ec.cav.performance.text": "Performance-маркетинговые бизнесы ({industry}) требуют чёткого подтверждения качества трафика и схем выплат. Мы спросим, как вы верифицируете рекламодателей, паблишеров и правила выплат — структурированная проверка, не чёрный ящик.",
+    "ec.cav.crypto.text": "KYB крипто-нативного бизнеса проходит через специализированную команду, не общую очередь. Synterra Connect — наша партнёрская сеть для прямых расчётов с биржами — проводит средства в обе стороны через регулируемые площадки; фиат через SEPA, Faster Payments и SWIFT.",
+    "ec.cav.row.tag": "Специализированная проверка",
+    "ec.cav.row.text": "Компании из {country} нет в нашем стандартном списке — направим заявку менеджеру для проверки в течение одного дня. У вас будет именованный контакт для уточнений; если структуру обслуживать не сможем — объясним, почему именно.",
+    "ec.cav.mena.tag": "Счёт открывается сразу",
+    "ec.cav.mena.text": "Altery MENA полностью лицензирована DFSA. Счёт по рельсам выше открываем на онбординге. Дополнительные коридоры подключаются по мере завершения каждой банк-к-банк интеграции — пришлём письмо в момент активации.",
+    "ec.cav.performance.tag": "Специализированная проверка",
+    "ec.cav.performance.text": "Performance-маркетинг ({industry}) требует чёткого подтверждения качества трафика и выплат. Комплаенс проводит структурированную анкету — стандартный срок до трёх рабочих дней. При отказе вы получите конкретное обоснование, а не чёрный ящик.",
 
 
     "common.close": "Закрыть",
@@ -713,6 +714,7 @@
     "ec.b.row2.tag": "Обновляется ежеквартально",
     "ec.b.row2.text": "Список поддерживаемых отраслей расширяется по мере получения новых лицензий. Эта страница остаётся актуальной.",
 
+    "ec.r.entity.regHint": "Öffnet das öffentliche Register der Aufsichtsbehörde in einem neuen Tab",
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "EMI с лицензией FCA",
     "ec.entity.uk.note": "Локальный GBP IBAN с доступом к Faster Payments и CHAPS.",

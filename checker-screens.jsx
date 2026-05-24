@@ -1353,6 +1353,20 @@ function EcResultApproved({ rec, onBack, onReset }) {
                 <span className="ec-r__pill__dot" />
                 {t("ec.r.entity.status", { licence: entityLicence })}
               </span>
+              {/* Verifiable regulator reference — clickable deep link
+                  to the public register. Lets visitors confirm the
+                  licence claim without leaving the page, and answers
+                  the recurring "can I read the licence number anywhere"
+                  prospect question with "yes — here". */}
+              {entity.regulatory && (
+                <a className="ec-r__pill ec-r__pill--reg"
+                   href={entity.regulatory.registerUrl}
+                   target="_blank" rel="noopener noreferrer"
+                   title={t("ec.r.entity.regHint")}>
+                  {entity.regulatory.refLabel}
+                  <Icon name="external" size={12} style={{ marginLeft: 4 }} aria-hidden="true" />
+                </a>
+              )}
               {rec.cryptoActive && (
                 <span className="ec-r__pill">
                   <EcIco.token style={{ width: 14, height: 14 }} aria-hidden="true" />
@@ -1522,14 +1536,30 @@ function EcResultApproved({ rec, onBack, onReset }) {
               </div>
             )}
             <ul className="ec-r__perks">
-              {activePlan.perkKeys.slice(0, 5).map((k, i) => (
-                <li className="ec-r__perk" key={i}>
-                  <span className="ec-r__perk__tick" aria-hidden="true">
-                    <EcIco.check style={{ width: 11, height: 11 }} />
-                  </span>
-                  <span>{t(k)}</span>
-                </li>
-              ))}
+              {activePlan.perkKeys.slice(0, 5).map((k, i) => {
+                // The "Everything in <prev plan>" perk (Pro.p1, Ultra.p1)
+                // referenced a plan the user hadn't seen — read as upsell
+                // trick. Make it a button that opens the comparison modal,
+                // so the user can verify what's actually included rather
+                // than take it on faith.
+                const isInheritedFromPrev =
+                  k === "ec.plan.pro.p1" || k === "ec.plan.ultra.p1";
+                return (
+                  <li className="ec-r__perk" key={i}>
+                    <span className="ec-r__perk__tick" aria-hidden="true">
+                      <EcIco.check style={{ width: 11, height: 11 }} />
+                    </span>
+                    {isInheritedFromPrev ? (
+                      <button type="button" className="ec-r__perk__link"
+                              onClick={() => setComparisonOpen(true)}>
+                        {t(k)}
+                      </button>
+                    ) : (
+                      <span>{t(k)}</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
             <div className="ec-r__planFoot">
               <button type="button" className="ec-r__planFoot__link" onClick={() => setComparisonOpen(true)}>

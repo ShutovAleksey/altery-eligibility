@@ -65,7 +65,7 @@
     "ec.q1.alert.blocked.title": "We can't open accounts for this industry",
     "ec.q1.alert.blocked.body": "Altery doesn't support {industry} on any of our entities. We'll explain on the result screen — you can also reach our team directly.",
     "ec.q1.alert.crypto.title": "Crypto-native? You're in the right place.",
-    "ec.q1.alert.crypto.body": "We onboard {category} regularly. Your application routes through our crypto-specialist lane — fluent compliance team, fiat rails via SEPA / Faster Payments / SWIFT, and Synterra Connect for partner-exchange flows.",
+    "ec.q1.alert.crypto.body": "We onboard {category} regularly. Your application routes through our crypto-specialist lane — fluent compliance team, fiat rails via SEPA / Faster Payments / SWIFT, and Synterra Connect (our partner-network for direct exchange settlement) for moving funds in and out of regulated venues without manual reconciliation.",
 
     // Industries
     
@@ -258,13 +258,13 @@
 
     // Caveats
     "ec.cav.crypto.tag": "Crypto-fluent",
-    "ec.cav.crypto.text": "Crypto-native KYB is handled by our specialist team, not the generalist queue. Synterra Connect routes partner-exchange flows; fiat in/out via SEPA, Faster Payments and SWIFT.",
-    "ec.cav.row.tag": "Manual review",
-    "ec.cav.row.text": "Companies incorporated in {country} aren't on our standard list — we'll route your application to a relationship manager for a 1-day review.",
-    "ec.cav.mena.tag": "In progress",
-    "ec.cav.mena.text": "Altery MENA is fully licensed by DFSA and operationalising. Your account opens immediately; some corridors activate as we progress integration.",
+    "ec.cav.crypto.text": "Crypto-native KYB is handled by our specialist team, not the generalist queue. Synterra Connect — our partner-network for direct exchange settlement — routes funds in and out of regulated venues; fiat in/out via SEPA, Faster Payments and SWIFT.",
+    "ec.cav.row.tag": "Specialist review",
+    "ec.cav.row.text": "Companies incorporated in {country} aren't on our standard list — we'll route your application to a relationship manager for a one-day review. You'll have a named contact for any follow-up; if we can't serve the structure, we'll explain exactly why.",
+    "ec.cav.mena.tag": "Account opens today",
+    "ec.cav.mena.text": "Altery MENA is fully licensed by DFSA. The account on the rails listed above opens at onboarding. Additional corridors come online as each bank-to-bank integration completes — we'll email you the moment one activates.",
     "ec.cav.performance.tag": "Specialist review",
-    "ec.cav.performance.text": "Performance marketing businesses ({industry}) need clearer traffic and payout evidence. We'll ask how you verify advertisers, publishers and payout rules — structured review, not a black box.",
+    "ec.cav.performance.text": "Performance marketing ({industry}) needs clearer traffic and payout evidence. Compliance runs a structured questionnaire — typical resolution within three business days. If we decline, you'll get specific reasoning, not a black box.",
 
     // Bank rejection history — optional inline question on result page
 
@@ -416,6 +416,7 @@
     "ec.b.row2.text": "Our supported-industries list expands as new licences come online. We'll keep this page accurate.",
 
     // Country regions/notes (for entity card)
+    "ec.r.entity.regHint": "Open the regulator's public register in a new tab",
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "FCA-licensed EMI",
     "ec.entity.uk.note": "Local GBP IBAN with Faster Payments and CHAPS access.",

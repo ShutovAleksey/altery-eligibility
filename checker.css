@@ -2272,6 +2272,19 @@
       background: #2EE08A;
       box-shadow: 0 0 0 3px rgba(46, 224, 138, .22);
     }
+    /* Regulator-reference pill — clickable, lighter weight than the live
+       pill since it sits secondary in the trust strip. Underline appears
+       on hover/focus so the affordance reads as a link. */
+    a.ec-r__pill--reg {
+      text-decoration: none;
+      font-variant-numeric: tabular-nums;
+      transition: background-color .15s ease, border-color .15s ease;
+    }
+    a.ec-r__pill--reg:hover,
+    a.ec-r__pill--reg:focus-visible {
+      background: rgba(255, 255, 255, .12);
+      border-color: rgba(255, 255, 255, .26);
+    }
     /* IBAN preview — subtle dark chip inside the hero */
     .ec-r__iban { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
     .ec-r__iban__chip {
@@ -2583,6 +2596,21 @@
       display: inline-flex; align-items: center; justify-content: center;
       margin-top: 1px;
     }
+    /* The "Everything in Starter / Pro" perk is rendered as a button
+       that opens the comparison modal, so the user can verify what
+       that bundle actually contains. Looks like an underlined link
+       so the affordance reads visually as actionable. */
+    .ec-r__perk__link {
+      appearance: none; border: 0; background: transparent;
+      padding: 0; font: inherit;
+      color: var(--c-accent);
+      text-decoration: underline;
+      text-decoration-style: dotted;
+      text-underline-offset: 2px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .ec-r__perk__link:hover { text-decoration-style: solid; }
     .ec-r__planFoot {
       display: flex; flex-direction: column; gap: 6px;
       padding-top: 12px;

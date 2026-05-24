@@ -555,6 +555,14 @@ const EC_ENTITIES = {
     noteKey: "ec.entity.uk.note",
     currencyPerkKey: "ec.entity.uk.currencyPerk",
     countries: ["GB", "IE", "NL", "DE"],
+    // Public regulator reference — shown in the result hero so visitors
+    // can verify the licence claim without leaving the page. The deep
+    // link goes to the firm's record on the FCA Financial Services
+    // Register; the ref is the FCA Firm Reference Number (FRN).
+    regulatory: {
+      refLabel: "FRN 901037",
+      registerUrl: "https://register.fca.org.uk/s/firm?id=001b000001EjC6SAAV",
+    },
     accounts: [
       {
         currency: "GBP",
@@ -591,6 +599,14 @@ const EC_ENTITIES = {
     noteKey: "ec.entity.eu.note",
     currencyPerkKey: "ec.entity.eu.currencyPerk",
     countries: ["DE", "FR", "NL", "IT", "ES", "IE"],
+    // Central Bank of Cyprus EMI authorisation number — public on
+    // CBC's e-money institutions register. Direct firm-detail deep
+    // link isn't exposed by CBC, so we link to the EMI list page where
+    // the number 115.1.3.61 appears against Altery EU Ltd.
+    regulatory: {
+      refLabel: "EMI 115.1.3.61",
+      registerUrl: "https://www.centralbank.cy/en/licensing-supervision/electronic-money-institutions",
+    },
     accounts: [
       {
         currency: "EUR",
@@ -623,6 +639,15 @@ const EC_ENTITIES = {
     noteKey: "ec.entity.mena.note",
     currencyPerkKey: "ec.entity.mena.currencyPerk",
     countries: ["AE", "SA", "EG", "TR"],
+    // DFSA's public-firm register doesn't expose an individual
+    // numeric ref through a stable deep link — the link goes to the
+    // searchable register where visitors can locate Altery MENA Ltd.
+    // Once DFSA publishes a stable firm-detail URL we should swap in
+    // the deep link here.
+    regulatory: {
+      refLabel: "DFSA register",
+      registerUrl: "https://www.dfsa.ae/public-register/firms",
+    },
     accounts: [
       {
         currency: "USD",

@@ -57,7 +57,7 @@
     "ec.q1.alert.blocked.title": "Voor deze sector openen we geen rekeningen",
     "ec.q1.alert.blocked.body": "Altery ondersteunt {industry} bij geen van onze entiteiten. We leggen het uit op het resultaatscherm — of mail ons team direct.",
     "ec.q1.alert.crypto.title": "Crypto-native? Goede plek.",
-    "ec.q1.alert.crypto.body": "We onboarden regelmatig {category}. Uw aanvraag loopt via onze crypto-specialistenstroom — deskundig compliance-team, fiat-rails via SEPA / Faster Payments / SWIFT, en Synterra Connect voor partner-exchange-flows.",
+    "ec.q1.alert.crypto.body": "We onboarden regelmatig {category}. Uw aanvraag loopt via onze crypto-specialistenstroom — deskundig compliance-team, fiat-rails via SEPA / Faster Payments / SWIFT, en Synterra Connect (ons partner-netwerk voor directe exchange-afwikkeling) voor het verplaatsen van middelen van en naar gereguleerde platforms zonder handmatige reconciliatie.",
     "ec.ind.saas": "SaaS, software & AI-tools",
     "ec.ind.apps": "Mobiele apps & publishers",
     "ec.ind.games": "Games & gamestudio's",
@@ -177,13 +177,13 @@
     "ec.plan.ultra.p5": "Priority operations support",
 
     "ec.cav.crypto.tag": "Crypto-ervaren",
-    "ec.cav.crypto.text": "Crypto-native KYB wordt afgehandeld door ons specialistenteam, niet de algemene wachtrij. Synterra Connect routeert partner-exchange-flows; fiat in/uit via SEPA, Faster Payments en SWIFT.",
-    "ec.cav.row.tag": "Handmatige review",
-    "ec.cav.row.text": "Bedrijven uit {country} staan niet op onze standaardlijst — we leiden je aanvraag door naar een relationship manager voor een review binnen één werkdag.",
-    "ec.cav.mena.tag": "In opbouw",
-    "ec.cav.mena.text": "Altery MENA is volledig DFSA-gelicentieerd en operationaliseert nog. Je rekening wordt direct geopend; sommige corridors activeren naarmate de integratie vordert.",
+    "ec.cav.crypto.text": "Crypto-native KYB wordt afgehandeld door ons specialistenteam, niet de algemene wachtrij. Synterra Connect — ons partner-netwerk voor directe exchange-afwikkeling — verplaatst middelen van en naar gereguleerde platforms; fiat in/uit via SEPA, Faster Payments en SWIFT.",
+    "ec.cav.row.tag": "Gespecialiseerde review",
+    "ec.cav.row.text": "Bedrijven uit {country} staan niet op onze standaardlijst — we leiden je aanvraag door naar een relationship manager voor een review binnen één werkdag. Je krijgt een vaste contactpersoon voor opvolging; als we de structuur niet kunnen bedienen, leggen we precies uit waarom.",
+    "ec.cav.mena.tag": "Rekening opent vandaag",
+    "ec.cav.mena.text": "Altery MENA is volledig DFSA-gelicentieerd. De rekening op de hierboven vermelde rails opent bij onboarding. Aanvullende corridors gaan live zodra elke bank-naar-bank-integratie is afgerond — we mailen je zodra er één geactiveerd wordt.",
     "ec.cav.performance.tag": "Gespecialiseerde beoordeling",
-    "ec.cav.performance.text": "Performance-marketingbedrijven ({industry}) hebben duidelijker bewijs nodig van verkeerskwaliteit en uitbetalingspatronen. We vragen hoe u adverteerders, publishers en uitbetalingsregels verifieert — gestructureerde beoordeling, geen black box.",
+    "ec.cav.performance.text": "Performance-marketing ({industry}) heeft duidelijker bewijs nodig van verkeerskwaliteit en uitbetalingen. Compliance werkt met een gestructureerde vragenlijst — typische doorlooptijd drie werkdagen. Bij afwijzing krijg je een concrete onderbouwing, geen black box.",
 
 
     "common.close": "Sluiten",
@@ -327,6 +327,7 @@
     "ec.b.row2.tag": "Per kwartaal bijgewerkt",
     "ec.b.row2.text": "Onze lijst van ondersteunde sectoren groeit met nieuwe licenties. Deze pagina blijft actueel.",
 
+    "ec.r.entity.regHint": "Open het openbare register van de toezichthouder in een nieuw tabblad",
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "FCA-gelicentieerde EMI",
     "ec.entity.uk.note": "Lokale GBP-IBAN met toegang tot Faster Payments en CHAPS.",
@@ -436,7 +437,7 @@
     "ec.q1.alert.blocked.title": "Bu sektör için hesap açmıyoruz",
     "ec.q1.alert.blocked.body": "Altery, hiçbir şirketinde {industry} alanını desteklemiyor. Sonuç ekranında açıklayacağız — ekibimizle doğrudan da iletişime geçebilirsiniz.",
     "ec.q1.alert.crypto.title": "Kripto-yerli mi? Doğru yerdesiniz.",
-    "ec.q1.alert.crypto.body": "{category} ile düzenli çalışıyoruz. Başvurunuz kripto-uzman ekip ile ilerler — yetkin uyum ekibi, SEPA / Faster Payments / SWIFT fiat ağları, ve Synterra Connect ile partner borsa entegrasyonları.",
+    "ec.q1.alert.crypto.body": "{category} ile düzenli çalışıyoruz. Başvurunuz kripto-uzman ekip ile ilerler — yetkin uyum ekibi, SEPA / Faster Payments / SWIFT fiat ağları, ve Synterra Connect (doğrudan borsa mutabakatı için ortak ağımız) ile düzenlenmiş platformlara manuel mutabakat olmadan giriş-çıkış akışları.",
 
     
     "ec.ind.saas": "SaaS, yazılım & AI araçları",
@@ -559,13 +560,13 @@
     "ec.plan.ultra.p5": "Öncelikli operasyon desteği",
 
     "ec.cav.crypto.tag": "Kripto-uzmanlık",
-    "ec.cav.crypto.text": "Kripto-yerli KYB, genel kuyrukta değil, uzman ekibimizde yürütülür. Synterra Connect partner borsa akışlarını yönlendirir; fiat giriş/çıkış SEPA, Faster Payments ve SWIFT üzerinden.",
-    "ec.cav.row.tag": "Manuel inceleme",
+    "ec.cav.crypto.text": "Kripto-yerli KYB, genel kuyrukta değil, uzman ekibimizde yürütülür. Synterra Connect — doğrudan borsa mutabakatı için ortak ağımız — düzenlenmiş platformlara fon giriş-çıkışını yönetir; fiat giriş/çıkış SEPA, Faster Payments ve SWIFT üzerinden.",
+    "ec.cav.row.tag": "Uzman incelemesi",
     "ec.cav.row.text": "{country}'da kurulu şirketler standart listemizde değil — başvurunuzu 1 günlük inceleme için bir ilişki yöneticisine yönlendiririz.",
-    "ec.cav.mena.tag": "Devam ediyor",
-    "ec.cav.mena.text": "Altery MENA, DFSA tarafından tam lisanslı ve operasyonel hale gelmektedir. Hesabınız hemen açılır; bazı koridorlar entegrasyon ilerledikçe etkinleşir.",
+    "ec.cav.mena.tag": "Hesap bugün açılır",
+    "ec.cav.mena.text": "Altery MENA, DFSA tarafından tam lisanslıdır. Yukarıda listelenen raylar üzerindeki hesap onboarding sırasında açılır. Ek koridorlar, her banka-bankaya entegrasyon tamamlandıkça devreye girer — biri aktive olduğunda size e-posta göndeririz.",
     "ec.cav.performance.tag": "Uzman incelemesi",
-    "ec.cav.performance.text": "Performans pazarlama şirketleri ({industry}) trafik kalitesi ve ödeme kalıpları konusunda daha net kanıt gerektirir. Reklamverenleri, yayıncıları ve ödeme kurallarını nasıl doğruladığınızı soracağız — yapılandırılmış inceleme, kara kutu değil.",
+    "ec.cav.performance.text": "Performans pazarlama ({industry}) trafik kalitesi ve ödemeler konusunda daha net kanıt gerektirir. Uyum, yapılandırılmış bir anket yürütür — tipik sonuç süresi üç iş günü. Reddedilirse, kara kutu değil, somut gerekçe alırsınız.",
 
 
     "common.close": "Kapat",
@@ -709,6 +710,7 @@
     "ec.b.row2.tag": "Üç ayda bir güncellenir",
     "ec.b.row2.text": "Desteklenen sektör listemiz yeni lisanslarla genişler. Bu sayfayı güncel tutarız.",
 
+    "ec.r.entity.regHint": "Düzenleyicinin kamu kayıt defterini yeni sekmede aç",
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "FCA lisanslı EMI",
     "ec.entity.uk.note": "Yerel GBP IBAN, Faster Payments ve CHAPS erişimiyle.",
