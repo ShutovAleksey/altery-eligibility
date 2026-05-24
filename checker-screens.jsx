@@ -1580,7 +1580,22 @@ function EcResultBlocked({ rec, onBack, onReset }) {
           <ul className="ec-caveats__list">
             <li className="ec-caveats__row">
               <span className="ec-tagslot"><Tag tone="blue" size="sm">{t("ec.b.row1.tag")}</Tag></span>
-              <span>{t("ec.b.row1.text")}</span>
+              <span>{(() => {
+                // Inline mailto: wrap the literal `sales@altery.com` in every
+                // translation as a clickable anchor. The address is verbatim
+                // across all 10 dict entries so a plain indexOf is safe.
+                const text = t("ec.b.row1.text");
+                const email = "sales@altery.com";
+                const idx = text.indexOf(email);
+                if (idx === -1) return text;
+                return (
+                  <>
+                    {text.slice(0, idx)}
+                    <a href={`mailto:${email}`}>{email}</a>
+                    {text.slice(idx + email.length)}
+                  </>
+                );
+              })()}</span>
             </li>
             <li className="ec-caveats__row">
               <span className="ec-tagslot"><Tag tone="grey" size="sm">{t("ec.b.row2.tag")}</Tag></span>
