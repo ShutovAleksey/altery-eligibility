@@ -32,7 +32,7 @@ Object.values(EC_ENTITIES).forEach((e) => {
 });
 
 // Pure routing function — answers → recommendation. Easy to test in isolation.
-function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corridors, txCount, services }) {
+function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corridors, monthlyTx, services }) {
   const country = EC_COUNTRIES.find((c) => c.code === countryCode);
   const ind = EC_INDUSTRIES.find((i) => i.value === industry);
 
@@ -82,7 +82,9 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
     volumePro:        monthlyVolume >= 100000,
     volumeUltra:      monthlyVolume >= 1000000,
     corridorsBreadth: (corridors?.length || 0) >= 4,
-    txHigh:           txCount === "high",
+    // ≥300 monthly transactions = "high" — matches the prior "high" band
+    // (101–500) lower-edge intent, expressed against the new in+out total.
+    txHigh:           monthlyTx >= 300,
     // Pro-tier services: mass payouts and cards have always pushed
     // to Pro; multiEntity is new — managing 2+ legal entities is
     // operational complexity Starter isn't designed for.

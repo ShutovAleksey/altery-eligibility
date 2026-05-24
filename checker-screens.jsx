@@ -1,7 +1,7 @@
 /* global React, useT, Button, Tag, Alert, SelectableListItem, Input, Select,
           Icon, Flag, Title, Field, WhyWeAsk,
           EC_COUNTRIES, EC_INDUSTRIES, EC_BUSINESS_TYPES, EC_SERVICES,
-          EC_VOLUME_BANDS, EC_CORRIDOR_GROUPS, EC_CORRIDORS, EC_PERKS,
+          EC_VOLUME_BANDS, EC_TX_BANDS, EC_CORRIDOR_GROUPS, EC_CORRIDORS, EC_PERKS,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
@@ -279,14 +279,20 @@ function EcApp() {
   // a confusing "why are these already checked?" signal for fresh
   // visitors who haven't read the question yet.
   const [services, setServices] = useState(new Set());
-  const [volumeIdx, setVolumeIdx] = useState(2);
+  // Q4 captures volume + tx count separately for incoming and outgoing —
+  // gives a more accurate picture of total throughput than a single
+  // combined slider. Recommendation engine reads the sum.
+  const [volumeInIdx,  setVolumeInIdx]  = useState(1); // €50k – €200k default
+  const [volumeOutIdx, setVolumeOutIdx] = useState(1);
+  const [txInIdx,      setTxInIdx]      = useState(1); // 20 – 100 default
+  const [txOutIdx,     setTxOutIdx]     = useState(1);
   const [corridors, setCorridors] = useState(new Set());
-  const [txCount, setTxCount] = useState("med");
   const totalSteps = TOTAL_STEPS;
-  const monthlyVolume = EC_VOLUME_BANDS[volumeIdx]?.value || 0;
+  const monthlyVolume = (EC_VOLUME_BANDS[volumeInIdx]?.value || 0) + (EC_VOLUME_BANDS[volumeOutIdx]?.value || 0);
+  const monthlyTx     = (EC_TX_BANDS[txInIdx]?.value || 0) + (EC_TX_BANDS[txOutIdx]?.value || 0);
   const recommendation = useMemo(() =>
-    ecRecommend({ countryCode: country, industry, businessType, monthlyVolume, corridors: [...corridors], txCount, services: [...services] }),
-  [country, industry, businessType, monthlyVolume, corridors, txCount, services]);
+    ecRecommend({ countryCode: country, industry, businessType, monthlyVolume, corridors: [...corridors], monthlyTx, services: [...services] }),
+  [country, industry, businessType, monthlyVolume, corridors, monthlyTx, services]);
 
   // Step navigation. Steps:
   //   0 intro · 1 country · 2 industry · 3 services · 4 volume · 5 corridors · 6 result
@@ -329,7 +335,12 @@ function EcApp() {
         {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}
         {step === 2 && <EcIndustry industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={back} onNext={next} onBlocked={jumpToResult} />}
         {step === 3 && <EcServices services={services} setServices={setServices} onBack={back} onNext={next} />}
-        {step === 4 && <EcVolume volumeIdx={volumeIdx} setVolumeIdx={setVolumeIdx} txCount={txCount} setTxCount={setTxCount} onBack={back} onNext={next} />}
+        {step === 4 && <EcVolume
+          volumeInIdx={volumeInIdx} setVolumeInIdx={setVolumeInIdx}
+          volumeOutIdx={volumeOutIdx} setVolumeOutIdx={setVolumeOutIdx}
+          txInIdx={txInIdx} setTxInIdx={setTxInIdx}
+          txOutIdx={txOutIdx} setTxOutIdx={setTxOutIdx}
+          onBack={back} onNext={next} />}
         {step === 5 && <EcCorridors corridors={corridors} setCorridors={setCorridors} onBack={back} onNext={next} />}
         {step === 6 && <EcResult rec={recommendation} onBack={back} onReset={reset} />}
       </main>
@@ -835,9 +846,10 @@ function EcServices({ services, setServices, onBack, onNext }) {
   );
 }
 
-function EcVolume({ volumeIdx, setVolumeIdx, txCount, setTxCount, onBack, onNext }) {
+function EcVolume({ volumeInIdx, setVolumeInIdx, volumeOutIdx, setVolumeOutIdx, txInIdx, setTxInIdx, txOutIdx, setTxOutIdx, onBack, onNext }) {
   const t = useT();
-  const band = EC_VOLUME_BANDS[volumeIdx];
+  const volOptions = EC_VOLUME_BANDS.map((b) => ({ value: b.idx, label: t(b.labelKey) }));
+  const txOptions  = EC_TX_BANDS.map((b)     => ({ value: b.idx, label: t(b.labelKey) }));
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -845,54 +857,42 @@ function EcVolume({ volumeIdx, setVolumeIdx, txCount, setTxCount, onBack, onNext
       </button>
       <EcQuestionHeader num="4" title={t("ec.q4.title")} lead={t("ec.q4.lead")} />
 
-      <div className="ec-slider">
-        <div className="ec-slider__head">
-          <span className="ec-slider__label" id="ec-slider-label">{t("ec.q4.slider.label")}</span>
-          <span className="ec-slider__value" aria-live="polite">{t("ec.q4.vol." + band.idx)}</span>
-        </div>
-        <div className="ec-slider__track">
-          <span className="ec-slider__rail" aria-hidden="true" />
-          <span className="ec-slider__fill" aria-hidden="true"
-                style={{ width: `${(volumeIdx / (EC_VOLUME_BANDS.length - 1)) * 100}%` }} />
-          <input
-            className="ec-slider__input"
-            type="range"
-            min="0" max={EC_VOLUME_BANDS.length - 1} step="1"
-            value={volumeIdx}
-            onChange={(e) => setVolumeIdx(parseInt(e.target.value, 10))}
-            aria-labelledby="ec-slider-label"
-            aria-valuetext={t("ec.q4.vol." + band.idx)}
-          />
-        </div>
-        <div className="ec-slider__ticks" aria-hidden="true">
-          <span>€0</span><span>€100k</span><span>€500k</span><span>€5m+</span>
-        </div>
+      <div className="ec-flow-section">
+        <h3 className="ec-flow-section__head">{t("ec.q4.section.in")}</h3>
+        <Select
+          label={t("ec.q4.vol.in.label")}
+          value={volumeInIdx}
+          onChange={(v) => setVolumeInIdx(v)}
+          options={volOptions}
+        />
+        <Select
+          label={t("ec.q4.tx.in.label")}
+          value={txInIdx}
+          onChange={(v) => setTxInIdx(v)}
+          options={txOptions}
+        />
       </div>
 
-      <Field label={t("ec.q4.tx.label")}>
-        <div className="ec-chips" role="radiogroup" aria-label={t("ec.q4.tx.label")} style={{ paddingTop: 6 }}>
-          {[
-            { v: "low",   k: "ec.q4.tx.low" },
-            { v: "med",   k: "ec.q4.tx.med" },
-            { v: "high",  k: "ec.q4.tx.high" },
-            { v: "vhigh", k: "ec.q4.tx.vhigh" },
-          ].map((o) => (
-            <button key={o.v}
-                    type="button"
-                    role="radio"
-                    aria-checked={txCount === o.v}
-                    className={"ec-chip" + (txCount === o.v ? " is-on" : "")}
-                    onClick={() => setTxCount(o.v)}>
-              {t(o.k)}
-            </button>
-          ))}
-        </div>
-      </Field>
+      <div className="ec-flow-section">
+        <h3 className="ec-flow-section__head">{t("ec.q4.section.out")}</h3>
+        <Select
+          label={t("ec.q4.vol.out.label")}
+          value={volumeOutIdx}
+          onChange={(v) => setVolumeOutIdx(v)}
+          options={volOptions}
+        />
+        <Select
+          label={t("ec.q4.tx.out.label")}
+          value={txOutIdx}
+          onChange={(v) => setTxOutIdx(v)}
+          options={txOptions}
+        />
+      </div>
 
       <WhyWeAsk>{t("ec.q4.why")}</WhyWeAsk>
 
       <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={onNext} iconRight="arrowRight" disabled={!txCount}>
+        <Button variant="primary" size="xl" onClick={onNext} iconRight="arrowRight">
           {t("common.continue")}
         </Button>
       </div>

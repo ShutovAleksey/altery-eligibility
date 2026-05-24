@@ -385,11 +385,27 @@ const EC_SERVICES = [
 // removing a question = bump this number; no string edits needed.
 const TOTAL_STEPS = 5;
 
+// Volume bands — used twice on Q4 (incoming + outgoing). `value` is the
+// band midpoint in EUR; the recommendation engine reads (volIn + volOut)
+// as monthly throughput. Threshold spacing follows KYB-industry norms.
 const EC_VOLUME_BANDS = [
-  { idx: 0, value: 5000 }, { idx: 1, value: 30000 },
-  { idx: 2, value: 75000 }, { idx: 3, value: 175000 },
-  { idx: 4, value: 375000 }, { idx: 5, value: 750000 },
-  { idx: 6, value: 3000000 }, { idx: 7, value: 7000000 },
+  { idx: 0, value: 25000,   labelKey: "ec.q4.vol.0" }, // Under €50k
+  { idx: 1, value: 125000,  labelKey: "ec.q4.vol.1" }, // €50k – €200k
+  { idx: 2, value: 350000,  labelKey: "ec.q4.vol.2" }, // €200k – €500k
+  { idx: 3, value: 750000,  labelKey: "ec.q4.vol.3" }, // €500k – €1M
+  { idx: 4, value: 3000000, labelKey: "ec.q4.vol.4" }, // €1M – €5M
+  { idx: 5, value: 7000000, labelKey: "ec.q4.vol.5" }, // €5M+
+];
+
+// Tx-count bands — same shape as volume. `value` is the band midpoint
+// transaction count; recommendation uses (txIn + txOut) total against
+// the txHigh threshold (≥300 monthly).
+const EC_TX_BANDS = [
+  { idx: 0, value: 10,   labelKey: "ec.q4.tx.0" }, // Under 20
+  { idx: 1, value: 60,   labelKey: "ec.q4.tx.1" }, // 20 – 100
+  { idx: 2, value: 200,  labelKey: "ec.q4.tx.2" }, // 101 – 300
+  { idx: 3, value: 650,  labelKey: "ec.q4.tx.3" }, // 301 – 1000
+  { idx: 4, value: 2000, labelKey: "ec.q4.tx.4" }, // 1000+
 ];
 
 // ── Fee schedule (canonical, from altery.com/fees/business) ───────
@@ -726,5 +742,5 @@ const EC_ENTITIES = {
 Object.assign(window, {
   EC_COUNTRIES, EC_CORRIDOR_GROUPS, EC_CORRIDORS, EC_INDUSTRIES,
   EC_BUSINESS_TYPES, EC_SERVICES, TOTAL_STEPS,
-  EC_VOLUME_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_PERKS, EC_ENTITIES,
+  EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_PERKS, EC_ENTITIES,
 });
