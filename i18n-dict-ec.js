@@ -466,7 +466,6 @@
     "ec.b.row1.text": "Some industries are case-by-case. If you operate adjacent to one of these (e.g. compliance tooling for the gambling industry), we'd still like to hear from you. Email sales@altery.com with a 2-line description.",
     "ec.b.row2.tag": "Updated quarterly",
     "ec.b.row2.text": "Our supported-industries list expands as new licences come online. We'll keep this page accurate.",
-    "ec.b.cta": "Try a different industry",
 
     // Country regions/notes (for entity card)
     "ec.entity.uk.name": "Altery Ltd · UK",

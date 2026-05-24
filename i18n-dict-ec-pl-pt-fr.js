@@ -363,7 +363,6 @@
     "ec.b.row1.text": "Niektóre branże oceniamy indywidualnie. Jeśli działasz w obszarze sąsiednim (np. narzędzia compliance dla branży hazardowej), chętnie poznamy Twój profil. Napisz na sales@altery.com z dwoma zdaniami opisu.",
     "ec.b.row2.tag": "Aktualizacja kwartalna",
     "ec.b.row2.text": "Lista obsługiwanych branż rośnie wraz z nowymi licencjami. Tę stronę utrzymujemy aktualną.",
-    "ec.b.cta": "Spróbuj innej branży",
 
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "EMI z licencją FCA",
@@ -747,7 +746,6 @@
     "ec.b.row1.text": "Alguns setores são caso a caso. Se opera numa área adjacente (ex.: ferramentas de compliance para o setor do jogo), gostaríamos de o conhecer. Escreva para sales@altery.com com duas linhas de descrição.",
     "ec.b.row2.tag": "Atualizada trimestralmente",
     "ec.b.row2.text": "A nossa lista de setores suportados cresce com novas licenças. Mantemos esta página atualizada.",
-    "ec.b.cta": "Tentar outro setor",
 
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "EMI licenciada pela FCA",
@@ -1129,7 +1127,6 @@
     "ec.b.row1.text": "Certains secteurs sont étudiés au cas par cas. Si vous opérez dans un domaine adjacent (ex. outils de compliance pour le secteur des jeux), nous voulons quand même vous entendre. Écrivez à sales@altery.com avec deux lignes de description.",
     "ec.b.row2.tag": "Mise à jour trimestrielle",
     "ec.b.row2.text": "Notre liste de secteurs pris en charge s'élargit avec chaque nouvelle licence. Cette page reste à jour.",
-    "ec.b.cta": "Essayer un autre secteur",
 
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "EMI agréée FCA",

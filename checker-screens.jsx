@@ -1584,7 +1584,7 @@ function EcResultBlocked({ rec, onBack, onReset }) {
           </ul>
         </div>
         <div className="ec-actions">
-          <Button variant="primary" size="xl" onClick={onReset}>{t("ec.b.cta")}</Button>
+          <Button variant="primary" size="xl" onClick={onReset}>{t("common.startOver")}</Button>
           {/* Soft-decline cohort: open the team's Google Calendar booking
               page so the visitor can request a conversation rather than
               composing a mailto thread. Same booking link the PDF/email

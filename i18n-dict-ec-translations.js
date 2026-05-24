@@ -366,7 +366,6 @@
     "ec.b.row1.text": "Manche Branchen prüfen wir individuell. Wenn Sie in einem Randbereich tätig sind (z. B. Compliance-Tools für die Glücksspielbranche), interessiert uns Ihr Profil. Schreiben Sie an sales@altery.com mit zwei Zeilen Beschreibung.",
     "ec.b.row2.tag": "Quartalsweise aktualisiert",
     "ec.b.row2.text": "Unsere Liste unterstützter Branchen wächst mit neuen Lizenzen. Diese Seite halten wir aktuell.",
-    "ec.b.cta": "Andere Branche versuchen",
 
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "FCA-lizenzierte EMI",
@@ -750,7 +749,6 @@
     "ec.b.row1.text": "Часть отраслей мы рассматриваем индивидуально. Если вы работаете рядом с одной из них (например, compliance-инструменты для индустрии азартных игр), нам интересно. Напишите на sales@altery.com — двух строк описания достаточно.",
     "ec.b.row2.tag": "Обновляется ежеквартально",
     "ec.b.row2.text": "Список поддерживаемых отраслей расширяется по мере получения новых лицензий. Эта страница остаётся актуальной.",
-    "ec.b.cta": "Попробовать другую отрасль",
 
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "EMI с лицензией FCA",

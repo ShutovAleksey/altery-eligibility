@@ -362,7 +362,6 @@
     "ec.b.row1.text": "Sommige sectoren bekijken we per geval. Werk je in een aangrenzend domein (bv. compliance-tooling voor de gokindustrie), dan horen we het graag. Mail sales@altery.com met twee zinnen uitleg.",
     "ec.b.row2.tag": "Per kwartaal bijgewerkt",
     "ec.b.row2.text": "Onze lijst van ondersteunde sectoren groeit met nieuwe licenties. Deze pagina blijft actueel.",
-    "ec.b.cta": "Probeer een andere sector",
 
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "FCA-gelicentieerde EMI",
@@ -746,7 +745,6 @@
     "ec.b.row1.text": "Bazı sektörleri vaka bazında değerlendiririz. Bunlardan birinin yan kolunda çalışıyorsanız (ör. kumar sektörü için uyumluluk araçları), profilinizi yine de duymak isteriz. sales@altery.com adresine iki satır açıklama ile yazın.",
     "ec.b.row2.tag": "Üç ayda bir güncellenir",
     "ec.b.row2.text": "Desteklenen sektör listemiz yeni lisanslarla genişler. Bu sayfayı güncel tutarız.",
-    "ec.b.cta": "Farklı bir sektör dene",
 
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "FCA lisanslı EMI",

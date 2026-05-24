@@ -362,7 +362,6 @@
     "ec.b.row1.text": "Alcuni settori li valutiamo caso per caso. Se operi in un'area adiacente (es. strumenti di compliance per il gioco d'azzardo), vorremmo comunque sentirti. Scrivi a sales@altery.com con due righe di descrizione.",
     "ec.b.row2.tag": "Aggiornata trimestralmente",
     "ec.b.row2.text": "La lista dei settori supportati cresce man mano che acquisiamo nuove licenze. Manteniamo questa pagina aggiornata.",
-    "ec.b.cta": "Prova un altro settore",
 
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "EMI autorizzata FCA",
@@ -746,7 +745,6 @@
     "ec.b.row1.text": "Algunos sectores los valoramos caso por caso. Si operas en un área adyacente (p. ej., herramientas de compliance para juego), seguimos queriendo conocerte. Escribe a sales@altery.com con dos líneas de descripción.",
     "ec.b.row2.tag": "Actualizada trimestralmente",
     "ec.b.row2.text": "Nuestra lista de sectores soportados crece con cada nueva licencia. Mantenemos esta página al día.",
-    "ec.b.cta": "Probar otro sector",
 
     "ec.entity.uk.name": "Altery Ltd · UK",
     "ec.entity.uk.licence": "EMI autorizada por FCA",
