@@ -261,33 +261,40 @@ function ecBaselineFor(entityId) {
   return cmp.uk_traditional;
 }
 
+// FX rate constant for converting EUR-denominated Altery rail tariffs
+// (SEPA / SWIFT) to GBP at math time. Conservative round-number rate
+// (1 EUR ≈ £0.85). Tariff DISPLAY strings remain rail-native ("€0.5
+// SEPA, £0.5 FP") — only the cost-projection summing converts.
+const EUR_TO_GBP = 0.85;
+
 function ecComputeCostBreakdown(rec) {
   const vol = rec?.monthlyVolume || 0;
   if (vol < 1000) return null;  // not enough to project credibly
 
-  // 60% of monthly volume assumed to be FX-touching (cross-border
-  // or non-base-currency). Conservative — many digital businesses
-  // run higher. Subscription-revenue SaaS in EUR may run lower
-  // (~20-40%), high-growth marketplaces often run >80%.
+  // Volume is treated as GBP throughout this calc — band midpoints in
+  // EC_VOLUME_BANDS are the user's declared monthly throughput (in £
+  // since the page anchor currency is £). 60% assumed FX-touching —
+  // conservative for digital businesses with multi-currency clients.
   const fxVolume = vol * 0.60;
 
   // Altery rails — read the active plan's published fees so the
   // projection moves with plan tier. Each plan exposes a fees object:
-  //   { sepa: "€1", swift: "€10 + 0.25%", fxMarkup: "up to 0.7%" }
-  // Falls back to historical Pro-tier defaults if a field is missing.
+  //   { sepa: "€0.5", swift: "€10 + 0.15%", fxMarkup: "up to 0.5%" }
+  // SEPA and SWIFT are EUR-denominated rails so the flat fees need
+  // conversion to GBP before they enter the GBP-summed line items.
+  // FX markup is a percentage so currency-neutral.
   const planFees = rec.plan?.fees || {};
   const fxFee    = ecParseFee(planFees.fxMarkup);
   const swiftFee = ecParseFee(planFees.swift);
   const sepaFee  = ecParseFee(planFees.sepa);
   const ALTERY_FX_MARKUP  = fxFee.pct    || 0.0065;
-  const ALTERY_SWIFT_FLAT = swiftFee.flat || 10;
+  const ALTERY_SWIFT_FLAT = (swiftFee.flat || 10) * EUR_TO_GBP;   // €10 → £8.50
   const ALTERY_SWIFT_PCT  = swiftFee.pct  || 0.0025;
-  const ALTERY_LOCAL      = sepaFee.flat  || 1;
+  const ALTERY_LOCAL      = (sepaFee.flat || 1)  * EUR_TO_GBP;   // €0.5 → £0.43
 
   // Baseline bank — picked by entity (uk → Barclays, eu → BNP, mena →
-  // Mashreq). Pulls real published-tariff numbers from EC_COMPARATORS
-  // so the comparison cites a named bank, not a "typical" anonymous
-  // baseline.
+  // Mashreq). Fee fields are already GBP-equivalent in EC_COMPARATORS
+  // (native for Barclays, converted for BNP and Mashreq).
   const baseline = ecBaselineFor(rec?.entity?.id || "uk");
   const BANK_FEES = baseline.fees;
 
@@ -314,19 +321,18 @@ function ecComputeCostBreakdown(rec) {
   };
   altery.total = altery.subscription + altery.fx + altery.swift + altery.local;
 
-  // Baseline bank cost — same operational profile, real tariffs from
-  // EC_COMPARATORS. `subscription` is new here; the legacy result
-  // page wasn't expecting it, but rendering with .total | 0 fallback
-  // keeps old call-sites working.
+  // Baseline bank cost — same operational profile, GBP-denominated
+  // tariffs from EC_COMPARATORS (native for Barclays, converted from
+  // EUR for BNP, from AED for Mashreq).
   const bank = {
-    subscription: BANK_FEES.subscriptionEur,
+    subscription: BANK_FEES.subscriptionGbp,
     fx:           Math.round(fxVolume * (BANK_FEES.fxMarkupBps / 10000)),
-    swift:        Math.round(swiftTxCount * BANK_FEES.swiftOutEur),
-    local:        Math.round(localTxCount * BANK_FEES.localOutEur),
+    swift:        Math.round(swiftTxCount * BANK_FEES.swiftOutGbp),
+    local:        Math.round(localTxCount * BANK_FEES.localOutGbp),
   };
   bank.total = bank.subscription + bank.fx + bank.swift + bank.local;
 
-  // Round savings to the nearest €100 for clean presentation.
+  // Round savings to the nearest £100 for clean presentation.
   const rawMonthly = Math.max(bank.total - altery.total, 0);
   const monthly    = Math.round(rawMonthly / 100) * 100;
   const annual     = monthly * 12;

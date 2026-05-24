@@ -288,7 +288,10 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   const cost = ecComputeCostBreakdown(rec);
   const outcomes = cost ? ecOutcomesForSavings(cost.savings.annual) : [];
 
-  const fmtEUR = (n) => "€" + (n || 0).toLocaleString("en-US");
+  // GBP formatter — page-anchor currency for all monetary lines on
+  // the proposal. Per-rail tariff strings inside the plan table can
+  // still display in their native rail currency (€ SEPA, £ FP).
+  const fmtEUR = (n) => "£" + (n || 0).toLocaleString("en-US");
 
   const costMathHTML = cost ? `
     <div style="margin:0 0 18px;">
@@ -341,7 +344,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         </div>
       </div>
 
-      <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:10px;">${t("ec.pdf.costMath.assumptions", { volume: ecFormatVolume(rec.monthlyVolume), txCount: cost.meta.txCount, fxPct: cost.meta.fxVolumePct })}</div>
+      <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:10px;">${t("ec.pdf.costMath.assumptions", { volume: "£" + ecFormatVolume(rec.monthlyVolume), txCount: cost.meta.txCount, fxPct: cost.meta.fxVolumePct })}</div>
     </div>` : "";
 
   // "What €X annual buys you" — future-self visualization. Turns

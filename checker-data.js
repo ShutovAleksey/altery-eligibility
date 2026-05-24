@@ -416,12 +416,12 @@ const TOTAL_STEPS = 5;
 // band midpoint in EUR; the recommendation engine reads (volIn + volOut)
 // as monthly throughput. Threshold spacing follows KYB-industry norms.
 const EC_VOLUME_BANDS = [
-  { idx: 0, value: 25000,   labelKey: "ec.q4.vol.0" }, // Under €50k
-  { idx: 1, value: 125000,  labelKey: "ec.q4.vol.1" }, // €50k – €200k
-  { idx: 2, value: 350000,  labelKey: "ec.q4.vol.2" }, // €200k – €500k
-  { idx: 3, value: 750000,  labelKey: "ec.q4.vol.3" }, // €500k – €1M
-  { idx: 4, value: 3000000, labelKey: "ec.q4.vol.4" }, // €1M – €5M
-  { idx: 5, value: 7000000, labelKey: "ec.q4.vol.5" }, // €5M+
+  { idx: 0, value: 25000,   labelKey: "ec.q4.vol.0" }, // Under £50k
+  { idx: 1, value: 125000,  labelKey: "ec.q4.vol.1" }, // £50k – £200k
+  { idx: 2, value: 350000,  labelKey: "ec.q4.vol.2" }, // £200k – £500k
+  { idx: 3, value: 750000,  labelKey: "ec.q4.vol.3" }, // £500k – £1M
+  { idx: 4, value: 3000000, labelKey: "ec.q4.vol.4" }, // £1M – £5M
+  { idx: 5, value: 7000000, labelKey: "ec.q4.vol.5" }, // £5M+
 ];
 
 // Tx-count bands — same shape as volume. `value` is the band midpoint
@@ -795,17 +795,17 @@ const EC_COMPARATORS = {
     sources: [
       "https://www.barclays.co.uk/business-banking/accounts/pricing/",
     ],
-    // Money — EUR-equivalent (£1 ≈ €1.18)
+    // Money — native GBP (Barclays publishes in £).
     fees: {
-      subscriptionEur:    10,     // £8.50 monthly fee
-      localOutEur:        0.40,   // £0.35 per electronic payment
-      sepaOutEur:         24,     // £20 SEPA outgoing
-      swiftOutEur:        30,     // £25 SWIFT outgoing
-      transferInEur:      7,      // £6 incoming
+      subscriptionGbp:    8.50,   // £8.50 monthly fee
+      localOutGbp:        0.35,   // £0.35 per electronic payment
+      sepaOutGbp:         20,     // £20 SEPA outgoing
+      swiftOutGbp:        25,     // £25 SWIFT outgoing
+      transferInGbp:      6,      // £6 incoming
       fxMarkupBps:        275,    // 2.75% standard variable spread
-      cardMonthlyEur:     3.50,   // £3 per card
+      cardMonthlyGbp:     3,      // £3 per card
       cardFxMarkupBps:    275,
-      massBatchEur:       30,     // £25 estimated per batch
+      massBatchGbp:       25,     // £25 estimated per batch
     },
     qualitative: {
       onboardingKey:   "ec.cmp.q.onboarding.weeks",
@@ -825,16 +825,17 @@ const EC_COMPARATORS = {
     sources: [
       "https://group.bnpparibas/uploads/file/business_tarif.pdf",
     ],
+    // BNP native EUR — converted to GBP via 1 EUR ≈ £0.85 (2026 mid).
     fees: {
-      subscriptionEur:    25,     // €25 monthly (Pro tier)
-      localOutEur:        0.50,   // €0.50 SEPA outgoing standard
-      sepaOutEur:         0.50,
-      swiftOutEur:        25,     // €25 flat + 0.10%
-      transferInEur:      0,      // SEPA in free
+      subscriptionGbp:    21,     // €25 → £21
+      localOutGbp:        0.43,   // €0.50 → £0.43
+      sepaOutGbp:         0.43,
+      swiftOutGbp:        21,     // €25 flat
+      transferInGbp:      0,      // SEPA in free
       fxMarkupBps:        275,    // 2.75% average
-      cardMonthlyEur:     8,
+      cardMonthlyGbp:     7,      // €8 → £7
       cardFxMarkupBps:    250,
-      massBatchEur:       35,
+      massBatchGbp:       30,     // €35 → £30
     },
     qualitative: {
       onboardingKey:   "ec.cmp.q.onboarding.weeks",
@@ -854,17 +855,17 @@ const EC_COMPARATORS = {
     sources: [
       "https://www.mashreqbank.com/uae/en/business/sme/business-banking",
     ],
-    // AED 1 ≈ €0.24
+    // Mashreq native AED — converted to GBP via 1 AED ≈ £0.21 (2026 mid).
     fees: {
-      subscriptionEur:    48,     // AED 200 monthly
-      localOutEur:        1.20,   // AED 5
-      sepaOutEur:         24,     // International ≈ AED 100
-      swiftOutEur:        30,     // AED 125 + correspondent
-      transferInEur:      4.80,   // AED 20
+      subscriptionGbp:    42,     // AED 200 → £42
+      localOutGbp:        1.05,   // AED 5 → £1.05
+      sepaOutGbp:         21,     // International ≈ AED 100 → £21
+      swiftOutGbp:        26,     // AED 125 → £26
+      transferInGbp:      4,      // AED 20 → £4
       fxMarkupBps:        300,    // 3.00% — MENA traditional spread
-      cardMonthlyEur:     12,
+      cardMonthlyGbp:     11,     // AED 50 → £11
       cardFxMarkupBps:    300,
-      massBatchEur:       48,
+      massBatchGbp:       42,     // AED 200 → £42
     },
     qualitative: {
       onboardingKey:   "ec.cmp.q.onboarding.weeks",

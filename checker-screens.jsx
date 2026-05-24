@@ -1426,7 +1426,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
   // "€9 500" instead of "€9,500". European convention used across the
   // result-page typography.
   const NBSP = " ";
-  const fmtNarrow = (n) => "€" + (n || 0).toLocaleString("en-US").replace(/,/g, NBSP);
+  const fmtNarrow = (n) => "£" + (n || 0).toLocaleString("en-US").replace(/,/g, NBSP);
   return (
     <div className="ec-content ec-content--wide fade-in">
       <button className="ob-link-back ec-r__backLink" onClick={onBack} type="button">
@@ -1521,7 +1521,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
                 </div>
               </div>
               <p className="ec-r__savings__note">
-                {t("ec.r.savings.note", { volume: ecFormatVolume(rec.monthlyVolume) })}
+                {t("ec.r.savings.note", { volume: "£" + ecFormatVolume(rec.monthlyVolume) })}
               </p>
               <details className="ec-r__method">
                 <summary className="ec-r__method__summary">{t("ec.r.method.summary")}</summary>
