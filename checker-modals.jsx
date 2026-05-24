@@ -103,7 +103,7 @@ function EcFeesModal({ plan, entity, onClose }) {
         <button
           type="button"
           className="ec-modal__close"
-          aria-label={t("ec.r.plan.compare.closeAria")}
+          aria-label={t("ec.r.plan.compare.close")}
           onClick={onClose}
         >
           <EcIco.close style={{ width: 18, height: 18 }} />

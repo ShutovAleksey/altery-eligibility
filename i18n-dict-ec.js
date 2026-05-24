@@ -132,7 +132,6 @@
     "ec.q4.vol.5": "£5M+",
 
     // Q4 corridors
-    "ec.q5.title": "Where does money come from and go to?",
     "ec.q5.lead": "Mark every region you work with — on inbound and outbound. We'll match you to the entity with the best corridor coverage.",
     "ec.q5.selected_count": "{n} selected",
     "ec.q5.placeholder": "Select countries",
@@ -146,22 +145,10 @@
 
         // Account preview — operational identifiers shown on result.
         // Other languages fall back to EN until translated.
-        "ec.account.head":           "Your account",
-        "ec.account.iban":           "IBAN",
-        "ec.account.sortCode":       "Sort code",
-        "ec.account.accountNo":      "Account number",
-        "ec.account.bic":            "BIC",
-        "ec.account.routing":        "ACH routing",
-        "ec.account.swiftOnlyTitle": "Via SWIFT correspondent",
-        "ec.account.swiftOnlyBody":  "Sending and receiving works through partner banks. Account details provided when your account opens.",
-        "ec.account.previewNote":    "Example values shown — your real numbers are issued at signup.",
-        "ec.account.copyHint":       "Copy",
 
         // Hero IBAN preview chip — shown right under the licence pill,
         // gives the user a concrete "this is your account" moment before
         // they commit to KYB. Mono-rendered, marked clearly as preview.
-        "ec.r.heroIban.preview":     "Preview",
-        "ec.r.heroIban.localLabel":  "Local account",
 
         // Plan comparison modal — opens from "Compare all plans →" link
         // on the plan card. Side-by-side feature + fees breakdown.
