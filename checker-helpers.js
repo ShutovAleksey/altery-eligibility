@@ -86,8 +86,10 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
     // Pro-tier services: mass payouts and cards have always pushed
     // to Pro; multiEntity is new — managing 2+ legal entities is
     // operational complexity Starter isn't designed for.
-    servicesPro:      svcSet.has("mass") || svcSet.has("cards") || svcSet.has("multiEntity"),
-    servicesUltra:    svcSet.has("api"),
+    servicesPro:      svcSet.has("mass") || svcSet.has("cards"),
+    // servicesUltra was driven by the now-removed "api" service. Ultra
+    // tier is now decided purely by volume (volumeUltra ≥ €1M/mo).
+    servicesUltra:    false,
     industryPro:      industry === "affiliate" || industry === "creator",
   };
   const needsPro = tierSignals.volumePro || tierSignals.corridorsBreadth ||
@@ -157,9 +159,6 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
     reasoning.push({ key: "ec.reasoning.volume.ultra", vars: { volume: volStr }, priority: 10 });
   }
   // Service-driven bullets
-  if (svcSet.has("api")) {
-    reasoning.push({ key: "ec.reasoning.services.api", priority: 9 });
-  }
   if (svcSet.has("mass") && plan.id !== "starter") {
     reasoning.push({ key: "ec.reasoning.services.mass", priority: 8 });
   }
@@ -177,16 +176,9 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
   if (tierSignals.txHigh && plan.id !== "starter") {
     reasoning.push({ key: "ec.reasoning.complexity.tx", priority: 5 });
   }
-  // Savings / value (when applicable)
-  if (svcSet.has("fx") && plan.id !== "starter") {
-    reasoning.push({ key: "ec.reasoning.savings.fx", priority: 4 });
-  }
   // Closers
   if (plan.id === "starter") {
     reasoning.push({ key: "ec.reasoning.upgrade.path", priority: 3 });
-  }
-  if (plan.id === "ultra" && svcSet.has("api")) {
-    reasoning.push({ key: "ec.reasoning.api.advance", priority: 3 });
   }
   // Sort by priority and take top 3
   const reasoningTop = reasoning

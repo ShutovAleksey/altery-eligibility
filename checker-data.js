@@ -372,15 +372,10 @@ const EC_BUSINESS_TYPES = [
 //   "ultra"      — strongly hints Ultra tier (api)
 //   "specialist" — triggers specialist review path (crypto rails)
 const EC_SERVICES = [
-  { value: "accounts",    titleKey: "ec.svc.accounts.title",    bodyKey: "ec.svc.accounts.body",    tier: "core" },
   { value: "crossBorder", titleKey: "ec.svc.crossBorder.title", bodyKey: "ec.svc.crossBorder.body", tier: "starter" },
   { value: "local",       titleKey: "ec.svc.local.title",       bodyKey: "ec.svc.local.body",       tier: "starter" },
-  { value: "fx",          titleKey: "ec.svc.fx.title",          bodyKey: "ec.svc.fx.body",          tier: "core" },
-  { value: "cards",       titleKey: "ec.svc.cards.title",       bodyKey: "ec.svc.cards.body",       tier: "pro" },
-  { value: "multiUser",   titleKey: "ec.svc.multiUser.title",   bodyKey: "ec.svc.multiUser.body",   tier: "starter" },
   { value: "mass",        titleKey: "ec.svc.mass.title",        bodyKey: "ec.svc.mass.body",        tier: "pro" },
-  { value: "multiEntity", titleKey: "ec.svc.multiEntity.title", bodyKey: "ec.svc.multiEntity.body", tier: "pro" },
-  { value: "api",         titleKey: "ec.svc.api.title",         bodyKey: "ec.svc.api.body",         tier: "ultra" },
+  { value: "cards",       titleKey: "ec.svc.cards.title",       bodyKey: "ec.svc.cards.body",       tier: "pro" },
   { value: "crypto",      titleKey: "ec.svc.crypto.title",      bodyKey: "ec.svc.crypto.body",      tier: "specialist" },
 ];
 
