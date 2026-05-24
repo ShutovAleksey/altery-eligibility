@@ -78,6 +78,10 @@ html { overflow-y: scroll; }
   font-weight: 500;
   cursor: pointer;
   transition: background .12s ease, border-color .12s ease;
+  /* Mobile: pill is row-flex; push Save right so it groups with the
+     lang switcher (which has no auto-margin anymore). */
+  margin-left: auto;
+  flex-shrink: 0;
 }
 .ob-sidebar__save:hover {
   background: rgba(255, 255, 255, .12);
@@ -183,7 +187,15 @@ html { overflow-y: scroll; }
     align-items: stretch;
     gap: 12px;
   }
-  .ob-sidebar__save { justify-content: center; }
+  .ob-sidebar__save {
+    justify-content: center;
+    /* Visual rhythm: list sits 48 (gap) + 12 (margin-top) below the
+       eyebrow; mirror the same 12px nudge here so Save sits the same
+       distance below the list. */
+    margin-left: 0;
+    margin-top: 12px;
+    align-self: stretch;
+  }
   .ob-sidebar__deco {
     display: block;
     position: absolute;

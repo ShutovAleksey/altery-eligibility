@@ -97,22 +97,25 @@ function ObSidebar({ step, onSave }) {
         })}
       </ol>
 
-      {/* Bottom row: Save button (when current screen accepts pause) +
-          language switcher. Save shown only when there's an active
-          section — list/payment/submit screens don't expose it. */}
+      {/* Save sits right under the section list — same visual rhythm as
+          the eyebrow → list gap above. On mobile (horizontal pill) the
+          list is hidden, so margin-left:auto keeps Save grouped with the
+          lang switcher on the right of the pill. Lang switcher stays in
+          its own bottom slot so it pins to the bottom of the panel. */}
+      {onSave && currentSection && (
+        <button className="ob-sidebar__save" onClick={onSave} type="button"
+                title={t("ob.common.save")}>
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+            <path d="M3 3.5A1.5 1.5 0 0 1 4.5 2h6L13 4.5v8A1.5 1.5 0 0 1 11.5 14h-7A1.5 1.5 0 0 1 3 12.5v-9Z"
+                  stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
+            <path d="M5.5 2v3h5V2M5.5 9.5h5M5.5 11.5h3"
+                  stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span>{t("ob.common.save")}</span>
+        </button>
+      )}
+
       <div className="ob-sidebar__bottom">
-        {onSave && currentSection && (
-          <button className="ob-sidebar__save" onClick={onSave} type="button"
-                  title={t("ob.common.save")}>
-            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
-              <path d="M3 3.5A1.5 1.5 0 0 1 4.5 2h6L13 4.5v8A1.5 1.5 0 0 1 11.5 14h-7A1.5 1.5 0 0 1 3 12.5v-9Z"
-                    stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round"/>
-              <path d="M5.5 2v3h5V2M5.5 9.5h5M5.5 11.5h3"
-                    stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-            <span>{t("ob.common.save")}</span>
-          </button>
-        )}
         <div className="ob-sidebar__lang">
           <LangSwitcher onDark={true} anchorRight={false} dropUp={true} />
         </div>
