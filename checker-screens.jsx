@@ -310,11 +310,7 @@ function EcApp() {
     // remaining questions because of the short-circuit, so stepping
     // back through ghost screens would be disorienting.
     if (step === 6 && recommendation.kind === "blocked") {
-      setStep(
-        recommendation.reason === "country"  ? 1
-      : recommendation.reason === "corridor" ? 5
-      :                                        2
-      );
+      setStep(recommendation.reason === "country" ? 1 : 2);
       return;
     }
     setStep((s) => Math.max(0, s - 1));
@@ -332,9 +328,7 @@ function EcApp() {
   // avoid marking all 5 steps as done when the user actually only
   // completed up to question N before being short-circuited.
   const blockedAt = recommendation.kind === "blocked"
-    ? (recommendation.reason === "country"  ? 1
-     : recommendation.reason === "corridor" ? 5
-     :                                        2)
+    ? (recommendation.reason === "country" ? 1 : 2)
     : null;
 
   return (
@@ -354,7 +348,7 @@ function EcApp() {
         {step === 5 && <EcCorridors
           corridorsIn={corridorsIn} setCorridorsIn={setCorridorsIn}
           corridorsOut={corridorsOut} setCorridorsOut={setCorridorsOut}
-          onBack={back} onNext={next} onBlocked={jumpToResult} />}
+          onBack={back} onNext={next} />}
         {step === 6 && <EcResult rec={recommendation} onBack={back} onReset={reset} />}
       </main>
     </div>
@@ -960,7 +954,13 @@ function EcCountryMultiSelect({ value, onChange, label, placeholder }) {
 
   const collator = useMemo(() => new Intl.Collator(undefined, { sensitivity: "base" }), []);
 
-  // Grouped, filtered, alpha-sorted-per-language list.
+  // Grouped, filtered, alpha-sorted-per-language list. Sanctioned
+  // jurisdictions (risk:"blocked") are filtered OUT — on Q5 corridors
+  // it's a trap UX to show countries we can't service; the user either
+  // picks one and gets booted, or skips it and proceeds, with KYB and
+  // TM catching real exposure either way. Q1 incorporation picker is
+  // intentionally NOT filtered — that's where a sanctioned-HQ user
+  // self-identifies and gets the fast-no.
   const grouped = useMemo(() => {
     const ql = query.trim().toLowerCase();
     const out = [];
@@ -969,6 +969,7 @@ function EcCountryMultiSelect({ value, onChange, label, placeholder }) {
         .filter((code) => {
           const c = EC_COUNTRIES.find((x) => x.code === code);
           if (!c) return false;
+          if (c.risk === "blocked") return false;
           if (!ql) return true;
           return nameOf(code).toLowerCase().includes(ql)
               || c.name.toLowerCase().includes(ql)
@@ -1129,23 +1130,9 @@ function EcCountryMultiSelect({ value, onChange, label, placeholder }) {
   );
 }
 
-function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOut, onBack, onNext, onBlocked }) {
+function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOut, onBack, onNext }) {
   const t = useT();
   const canContinue = corridorsIn.size > 0 || corridorsOut.size > 0;
-
-  // Selecting a sanctioned country (one with risk:"blocked" in EC_COUNTRIES)
-  // short-circuits to the soft-decline result via onBlocked. Mirrors Q1's
-  // EcCountrySelect behaviour — same compliance perimeter, same UX.
-  const checkBlocked = (newSet) => {
-    for (const code of newSet) {
-      const c = EC_COUNTRIES.find((x) => x.code === code);
-      if (c?.risk === "blocked") return true;
-    }
-    return false;
-  };
-  const handleInChange  = (newSet) => { setCorridorsIn(newSet);  if (checkBlocked(newSet)) onBlocked(); };
-  const handleOutChange = (newSet) => { setCorridorsOut(newSet); if (checkBlocked(newSet)) onBlocked(); };
-
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -1155,12 +1142,12 @@ function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOu
 
       <div className="ec-flow-section">
         <h3 className="ec-flow-section__head">{t("ec.q5.section.in")}</h3>
-        <EcCountryMultiSelect value={corridorsIn} onChange={handleInChange} />
+        <EcCountryMultiSelect value={corridorsIn} onChange={setCorridorsIn} />
       </div>
 
       <div className="ec-flow-section">
         <h3 className="ec-flow-section__head">{t("ec.q5.section.out")}</h3>
-        <EcCountryMultiSelect value={corridorsOut} onChange={handleOutChange} />
+        <EcCountryMultiSelect value={corridorsOut} onChange={setCorridorsOut} />
       </div>
 
       <div className="ob-actions">
@@ -1735,23 +1722,18 @@ function EcResultApproved({ rec, onBack, onReset }) {
 function EcResultBlocked({ rec, onBack, onReset }) {
   const t = useT();
   const lang = window.__I18N.getLang();
-  // Three block reasons share the same screen scaffolding:
-  //   "country"   — sanctioned country of incorporation (Q1)
-  //   "corridor"  — sanctioned transactional corridor (Q5)
-  //   "industry"  — blocked industry (Q2)
-  // Only the title verb fragment and (for industry) the accent casing
-  // differ; the lead reuses the country-regulatory-perimeter copy for
-  // both country-side reasons since the underlying constraint is the
-  // same — Altery's licensed entities can't touch this jurisdiction.
+  // Two block reasons share the same screen scaffolding; only the
+  // accent token, title fragments and lead copy differ.
+  const isCountry = rec.reason === "country";
   let accent, titleA, titleB, lead;
-  if (rec.reason === "country" || rec.reason === "corridor") {
-    // Country names stay in title-case ("Russia", "Iran" — proper nouns).
+  if (isCountry) {
+    // Country names stay in title-case ("Russia", "Iran" — proper nouns)
+    // so we don't toLocaleLowerCase them; the rest is taken straight from
+    // the ec.country.XX dict (with c.name fallback for un-translated codes).
     const c = rec.country;
     const localized = t("ec.country." + c.code);
     accent = localized === c.code ? c.name : localized;
-    titleA = rec.reason === "corridor"
-      ? t("ec.b.corridor.title.a")  // "We can't process payments to/from"
-      : t("ec.b.country.title.a");  // "We can't open accounts in"
+    titleA = t("ec.b.country.title.a");
     titleB = t("ec.b.title.b");
     lead   = t("ec.b.country.lead");
   } else {

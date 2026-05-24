@@ -112,7 +112,6 @@
 
     "ec.q5.title": "Da dove arrivano e dove vanno i fondi?",
     "ec.q5.lead": "Seleziona ogni regione con cui lavori — in entrata e in uscita. Ti abbineremo all'entità con la migliore copertura sui corridoi.",
-    "ec.b.corridor.title.a": "Non elaboriamo pagamenti verso o da",
     "ec.q5.selected_count": "{n} selezionati",
     "ec.q5.placeholder": "Seleziona paesi",
     "ec.region.africa": "Africa",
@@ -489,7 +488,6 @@
 
     "ec.q5.title": "Da dove arrivano e dove vanno i fondi?",
     "ec.q5.lead": "Selecciona cada región con la que trabajas — entrante y saliente. Te asignaremos a la entidad con mejor cobertura de corredores.",
-    "ec.b.corridor.title.a": "No procesamos pagos hacia o desde",
     "ec.q5.selected_count": "{n} seleccionados",
     "ec.q5.placeholder": "Selecciona países",
     "ec.region.africa": "África",

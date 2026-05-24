@@ -133,7 +133,6 @@
     // Q4 corridors
     "ec.q5.title": "Where does money come from and go to?",
     "ec.q5.lead": "Mark every region you work with — on inbound and outbound. We'll match you to the entity with the best corridor coverage.",
-    "ec.b.corridor.title.a": "We can't process payments to or from",
     "ec.q5.selected_count": "{n} selected",
     "ec.q5.placeholder": "Select countries",
     "ec.region.africa": "Africa",

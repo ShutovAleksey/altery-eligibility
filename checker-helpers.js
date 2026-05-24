@@ -46,19 +46,13 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
   // jurisdiction blocks regardless of what the business does. The
   // `reason` discriminator lets EcResultBlocked switch its copy
   // (country-specific lead vs industry-specific lead).
+  //
+  // Note: transactional-corridor sanctions (e.g. Cyprus-LLC trading with
+  // Russia) are NOT caught here. The Q5 picker filters those codes out
+  // entirely — showing them was a trap UX. Real exposure surfaces at
+  // KYB UBO screening and ongoing transaction monitoring.
   if (country && country.risk === "blocked") {
     return { kind: "blocked", reason: "country", country };
-  }
-  // Corridor sanctions: any transactional country with risk:"blocked"
-  // (RU, BY, IR, KP, SY, CU, MM, AF, SD) blocks. Closes the "Cyprus-LLC
-  // transacts with Russia" gap at eligibility stage rather than KYB.
-  const blockedCorridorCode = corridors.find((code) => {
-    const c = EC_COUNTRIES.find((x) => x.code === code);
-    return c && c.risk === "blocked";
-  });
-  if (blockedCorridorCode) {
-    const corridorCountry = EC_COUNTRIES.find((c) => c.code === blockedCorridorCode);
-    return { kind: "blocked", reason: "corridor", country: corridorCountry };
   }
   if (ind && ind.risk === "blocked") {
     return { kind: "blocked", reason: "industry", reasonKey: ind.labelKey };
