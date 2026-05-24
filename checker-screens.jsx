@@ -587,8 +587,13 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
               autoComplete="off"
               spellCheck="false"
               aria-controls="ec-country-listbox"
+              // .input-bare opts out of the global input:focus-visible
+              // ring (--sh-focus). The search field sits inside the menu
+              // panel that already has its own border/shadow, so a 3px
+              // blue glow on top looked stacked and noisy.
+              className="input-bare"
               style={{
-                flex: 1, minWidth: 0, border: 0, outline: "none",
+                flex: 1, minWidth: 0,
                 background: "transparent", font: "inherit", color: "var(--c-ink)",
                 fontSize: "var(--fs-body)",
               }}
