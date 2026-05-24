@@ -14,10 +14,13 @@ function useT() {
 }
 
 // LangSwitcher — pill with current flag + code, opens dropdown with full list.
-// Two visual variants:
+// Visual variants:
 //   onDark={true}  → semi-transparent white-on-navy (Onboarding header)
 //   onDark={false} → white card with border (Eligibility header — light area)
-function LangSwitcher({ onDark = true, anchorRight = true }) {
+//   dropUp={true}  → menu opens upward (adds .is-up); used when the pill
+//                    sits at the bottom of a fixed-height sidebar and has
+//                    no room to grow downward.
+function LangSwitcher({ onDark = true, anchorRight = true, dropUp = false }) {
   useT(); // re-render on language change so flag/code update
   const [open, setOpen] = i18nUseState(false);
   const ref = i18nUseRef(null);
@@ -55,7 +58,9 @@ function LangSwitcher({ onDark = true, anchorRight = true }) {
   );
 
   return (
-    <div className={"lang-switcher" + (anchorRight ? " is-right" : " is-left")} ref={ref}>
+    <div className={"lang-switcher"
+                    + (anchorRight ? " is-right" : " is-left")
+                    + (dropUp ? " is-up" : "")} ref={ref}>
       {trigger}
       {open && (
         <ul className="lang-menu" role="listbox">
