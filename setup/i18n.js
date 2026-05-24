@@ -23,13 +23,37 @@
   const DICT = {};
   LANGS.forEach((l) => { DICT[l.code] = {}; });
 
+  // Priority chain:
+  //   1. ?lang=xx URL param  — marketing links can force a locale (saved
+  //      back to storage so it sticks across navigation).
+  //   2. localStorage         — user's previous explicit pick wins next.
+  //   3. navigator.languages  — walk the browser's full preference list,
+  //      not just the first entry, so a user whose primary is unsupported
+  //      still gets the best of their secondary preferences.
+  //   4. "en"                 — ultimate fallback for anyone outside our
+  //      10-language coverage.
   function detectInitial() {
+    try {
+      const param = new URLSearchParams(window.location.search).get("lang");
+      if (param) {
+        const code = param.slice(0, 2).toLowerCase();
+        if (DICT[code]) {
+          try { localStorage.setItem(STORAGE_KEY, code); } catch (e) {}
+          return code;
+        }
+      }
+    } catch (e) {}
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored && DICT[stored]) return stored;
     } catch (e) { /* SSR / privacy mode */ }
-    const nav = (navigator.language || "en").slice(0, 2).toLowerCase();
-    if (DICT[nav]) return nav;
+    const prefs = (navigator.languages && navigator.languages.length)
+                ? navigator.languages
+                : [navigator.language || "en"];
+    for (let i = 0; i < prefs.length; i++) {
+      const code = (prefs[i] || "").slice(0, 2).toLowerCase();
+      if (DICT[code]) return code;
+    }
     return "en";
   }
 
