@@ -265,6 +265,18 @@
       box-shadow: 0 12px 32px rgba(0, 6, 57, .14), 0 4px 8px rgba(0, 6, 57, .06);
       animation: lang-menu-in .12s ease both;
     }
+    /* Mobile override — the lang-switcher button sits at the right edge
+       of the top-pill (margin-left:auto inside .ec-sidebar__lang). The
+       desktop default of anchorRight=false (= is-left) makes the menu
+       extend right from the button, which goes past the viewport edge.
+       Force right-anchored + cap width to fit inside the viewport gutter. */
+    @media (max-width: 899px) {
+      .lang-switcher .lang-menu {
+        left: auto !important;
+        right: 0 !important;
+        width: min(220px, calc(100vw - 24px));
+      }
+    }
     @keyframes lang-menu-in {
       from { opacity: 0; transform: translateY(-4px); }
       to   { opacity: 1; transform: translateY(0); }
