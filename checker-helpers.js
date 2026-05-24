@@ -267,6 +267,44 @@ function ecBaselineFor(entityId) {
 // SEPA, £0.5 FP") — only the cost-projection summing converts.
 const EUR_TO_GBP = 0.85;
 
+// GBP → issued-account currency for the result page's savings hero.
+// All cost math runs in GBP (page anchor currency, EUR_TO_GBP above);
+// these rates flip the figure back into whatever currency the user's
+// recommended account actually issues in, so a USD AE-IBAN user sees
+// savings in $, an AED IBAN user in AED, etc. Conservative round
+// numbers — refresh when material drift makes them misleading. The
+// AED rate is the USD peg (3.6725) × GBP→USD ≈ 4.66.
+const EC_FX_FROM_GBP = {
+  GBP: 1,
+  EUR: 1.18,
+  USD: 1.27,
+  AED: 4.66,
+};
+const EC_CURRENCY_SYMBOL = { GBP: "£", EUR: "€", USD: "$", AED: "AED " };
+
+// Convert a GBP amount to `currency` and format it with that currency's
+// symbol. NBSP thousands-separator matches the European typography used
+// elsewhere on the result page (see fmtNarrow). Unknown currency falls
+// back to £ so we never render a bare number with no symbol.
+function ecFmtFromGbp(gbpValue, currency) {
+  const rate = EC_FX_FROM_GBP[currency];
+  const symbol = EC_CURRENCY_SYMBOL[currency];
+  if (rate == null || symbol == null) return ecFmtFromGbp(gbpValue, "GBP");
+  const converted = Math.round((gbpValue || 0) * rate);
+  const NBSP = " ";
+  return symbol + converted.toLocaleString("en-US").replace(/,/g, NBSP);
+}
+
+// Pick the display currency for a recommendation — the primary
+// (first non-SWIFT-only) account on the entity, falling back to GBP.
+// "Primary" = first account in EC_ENTITIES[entity].accounts that has
+// a real local/IBAN type. UK → GBP, EU → EUR, MENA → USD.
+function ecDisplayCurrencyFor(rec) {
+  const accounts = rec?.entity?.accounts || [];
+  const primary = accounts.find((a) => a.type !== "swift-only") || accounts[0];
+  return primary?.currency || "GBP";
+}
+
 function ecComputeCostBreakdown(rec) {
   const vol = rec?.monthlyVolume || 0;
   if (vol < 1000) return null;  // not enough to project credibly
@@ -700,4 +738,5 @@ Object.assign(window, {
   ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
   ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,
   ecCaptureAndStoreUtms, ecAppendUtmsToURL,
+  ecFmtFromGbp, ecDisplayCurrencyFor, EC_FX_FROM_GBP, EC_CURRENCY_SYMBOL,
 });

@@ -500,12 +500,20 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
     );
   }, [options, query, nameOf]);
 
-  // Outside click closes.
+  // Outside pointer or Escape closes. Touchstart added so iOS Safari
+  // taps on whitespace outside the dropdown reliably close it.
   useEffect(() => {
     if (!open) return;
-    const onDoc = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    const onDown = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    const onKey  = (e) => { if (e.key === "Escape") { setOpen(false); triggerRef.current?.focus(); } };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onDown, { passive: true });
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
 
   // Reset transient state on close.
@@ -790,8 +798,19 @@ function EcIndustry({ industry, setIndustry, businessType, setBusinessType, onBa
         />
       </div>
 
-      {/* Crypto-native welcome — replaces the old orange "individual
-          review" warning. Crypto-native businesses are a core target
+      {/* Inline soft-decline — fires the instant a blocked industry is
+          picked, so the user gets the answer before pressing Continue
+          (which still works and lands on the dedicated EcResultBlocked
+          screen, with the team contact path). Without this, the header
+          copy "we'll flag before you start KYB" was a lie: blocked
+          users found out only AFTER pressing Continue. */}
+      {isBlocked && (
+        <Alert tone="danger" title={t("ec.q1.alert.blocked.title")}>
+          {t("ec.q1.alert.blocked.body", { industry: t(ind.labelKey).toLowerCase() })}
+        </Alert>
+      )}
+
+      {/* Crypto-native welcome — crypto businesses are a core target
           segment, not an exception we tolerate. Tone is info (blue,
           brand-aligned), copy interpolates the specific category so it
           reads "We onboard [crypto exchange / OTC desk] regularly" —
@@ -920,7 +939,7 @@ function EcVolumeSlider({ idx, setIdx, labelKey, id }) {
         />
       </div>
       <div className="ec-slider__ticks" aria-hidden="true">
-        <span>€0</span><span>€200k</span><span>€1M</span><span>€5M+</span>
+        <span>£0</span><span>£200k</span><span>£1M</span><span>£5M+</span>
       </div>
     </div>
   );
@@ -1018,11 +1037,21 @@ function EcCountryMultiSelect({ value, onChange, label, placeholder }) {
     return out;
   }, [query, t, collator]);
 
+  // Close on outside pointer or Escape. We listen on both mousedown and
+  // touchstart so iOS Safari behaves consistently — without touchstart
+  // the menu sometimes stayed open after a tap on whitespace outside.
   useEffect(() => {
     if (!open) return;
-    const onDoc = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
+    const onDown = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
+    const onKey  = (e) => { if (e.key === "Escape") { setOpen(false); } };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onDown, { passive: true });
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
   }, [open]);
   useEffect(() => { if (open) searchRef.current?.focus(); }, [open]);
   useEffect(() => { if (!open) setQuery(""); }, [open]);
@@ -1289,11 +1318,8 @@ function EcResultApproved({ rec, onBack, onReset }) {
   );
   const cost = useMemo(() => ecComputeCostBreakdown(activeRec), [activeRec]);
 
-  // Narrow no-break space (U+202F) as the thousands separator —
-  // "€9 500" instead of "€9,500". European convention used across the
-  // result-page typography.
-  const NBSP = " ";
-  const fmtNarrow = (n) => "£" + (n || 0).toLocaleString("en-US").replace(/,/g, NBSP);
+  const _displayCurrency = ecDisplayCurrencyFor(rec);
+  const fmtNarrow = (n) => ecFmtFromGbp(n, _displayCurrency);
   return (
     <div className="ec-content ec-content--wide fade-in">
       <button className="ob-link-back ec-r__backLink" onClick={onBack} type="button">
@@ -1388,7 +1414,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
                 </div>
               </div>
               <p className="ec-r__savings__note">
-                {t("ec.r.savings.note", { volume: "£" + ecFormatVolume(rec.monthlyVolume) })}
+                {t("ec.r.savings.note", { volume: fmtNarrow(rec.monthlyVolume) })}
               </p>
               <details className="ec-r__method">
                 <summary className="ec-r__method__summary">{t("ec.r.method.summary")}</summary>

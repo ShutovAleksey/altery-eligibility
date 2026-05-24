@@ -498,7 +498,10 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
           // figure. Falls back to a generic bullet when the volume
           // is too small for credible projection.
           const cost = ecComputeCostBreakdown(rec);
-          const fmt = (n) => "€" + (n || 0).toLocaleString("en-US");
+          // ecComputeCostBreakdown returns GBP-denominated numbers (see
+          // EUR_TO_GBP in checker-helpers.js); the rest of the result
+          // page is in £, so the modal matches to avoid currency whiplash.
+          const fmt = (n) => "£" + (n || 0).toLocaleString("en-GB");
           return (
           <>
             <h2 id="ec-handoff-title" className="ec-modal__title">

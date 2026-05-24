@@ -2305,14 +2305,16 @@
       letter-spacing: 0.01em;
     }
 
-    /* ── Two-column grid: savings + plan ─────────────────────────── */
+    /* ── Two-column grid: savings + plan ───────────────────────────
+       auto-fit + minmax means the cards stay two-up only when each
+       column can host ≥360px of content. Below that they collapse to
+       a single column. Earlier "1fr 1fr + breakpoint at 720px" had a
+       dead zone between 720–900px where the right Plan card clipped
+       its price ribbon. */
     .ec-r__grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
       gap: 16px;
-    }
-    @media (max-width: 720px) {
-      .ec-r__grid { grid-template-columns: 1fr; }
     }
     .ec-r__card {
       background: #fff;
