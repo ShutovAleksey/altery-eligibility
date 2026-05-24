@@ -1,12 +1,11 @@
 /* global React, useT, Button, Tag, Alert, SelectableListItem, Input, Select,
           Icon, Flag, Title, Field, WhyWeAsk,
           EC_COUNTRIES, EC_INDUSTRIES, EC_BUSINESS_TYPES, EC_SERVICES,
-          EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_PERKS,
+          EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
-          EcFeesModal, EcBankHistory, EcPerks, EcPlanComparisonModal, EcHandoffModal,
-          EcPaymentModal, EcAccountPreview */
+          EcFeesModal, EcPlanComparisonModal, EcHandoffModal, EcPaymentModal */
 // checker-screens.jsx — the eligibility-checker question screens, result
 // screens, and the supporting EcIco decorative-icon set.
 //
@@ -21,10 +20,7 @@
 //   EcServices       — Q3 services
 //   EcVolume         — Q4 monthly volume + tx count
 //   EcCorridors      — Q5 payment corridors
-//   EcCrypto         — Q6 crypto exposure (currently elided in flow)
 //   EcResult         — dispatcher to EcResultApproved / EcResultBlocked
-//   EcAccountPreview — currency cards on the result page
-//   EcAccountCard    — single currency identifier card
 //   EcResultApproved — full approved-recommendation page
 //   EcResultBlocked  — soft-decline result page
 //
@@ -455,8 +451,7 @@ function EcIntro({ onStart }) {
           products in text ('GBP/EUR/USD accounts, FX corridors, mass
           payouts, cards, crypto'), and post-CTA content slows the
           conversion path without adding signal beyond what's already
-          above. EcPerks remains exported from checker-modals for use
-          on the result page and inside handoff flows. */}
+          above. */}
       <div className="ec-intro__trust">{t("ec.intro.trust")}</div>
     </div>
   );
@@ -1204,184 +1199,10 @@ function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOu
   );
 }
 
-// ════════════════════════════════════════════════════════════════════════
-//  EcCrypto — Q5 / crypto-exposure
-//
-//  Two big tappable cards: fiat-only vs crypto-involved. Captured as
-//  a separate question (not folded into Q2 industry) because crypto
-//  exposure is orthogonal to primary industry — a SaaS company that
-//  accepts crypto payments is still "saas" for industry-risk purposes
-//  but needs the crypto-capable entity. Q2's "crypto-native" industry
-//  option remains valid; it just means a different thing (the business
-//  itself is crypto-first), and routing-wise it should usually pair
-//  with cryptoExposure === "yes".
-//
-//  Routing impact (handled in ecRecommend): if the user selects "yes"
-//  AND their country is in the EU region, we re-route them from
-//  Altery EU (Cyprus, CBC) to Altery Ltd (UK, FCA), because the
-//  Cyprus EMI licence doesn't cover crypto-business onboarding. UK
-//  is shown an inline alert on this screen too, so the routing
-//  switch is never a surprise on the result page.
-// ════════════════════════════════════════════════════════════════════════
-function EcCrypto({ cryptoExposure, setCryptoExposure, country, onBack, onNext }) {
-  const t = useT();
-  const countryObj = country ? EC_COUNTRIES.find((c) => c.code === country) : null;
-  const willReroute = cryptoExposure === "yes" && countryObj?.region === "eu";
-  const countryName = countryObj ? t("ec.country." + countryObj.code) : "";
-
-  const options = [
-    { value: "none", icon: "banknote", titleKey: "ec.q6.opt.none.title", descKey: "ec.q6.opt.none.desc" },
-    { value: "yes",  icon: "token",    titleKey: "ec.q6.opt.yes.title",  descKey: "ec.q6.opt.yes.desc"  },
-  ];
-
-  return (
-    <div className="ec-content fade-in">
-      <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
-        <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
-      </button>
-      <EcQuestionHeader num="6" title={t("ec.q6.title")} lead={t("ec.q6.lead")} />
-
-      <Field label={t("ec.q6.field.label")}>
-        <div className="ec-cryptoOptions">
-          {options.map((opt) => {
-            const Ico = EcIco[opt.icon];
-            const selected = cryptoExposure === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                className={"ec-cryptoCard" + (selected ? " is-on" : "")}
-                onClick={() => setCryptoExposure(opt.value)}
-                aria-pressed={selected}
-              >
-                <span className="ec-cryptoCard__iconWrap">
-                  <Ico style={{ width: 22, height: 22 }} />
-                </span>
-                <span>
-                  <span className="ec-cryptoCard__title">{t(opt.titleKey)}</span>
-                  <span className="ec-cryptoCard__desc">{t(opt.descKey)}</span>
-                </span>
-                <span className="ec-cryptoCard__check" aria-hidden="true">
-                  <EcIco.check style={{ width: 12, height: 12 }} />
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </Field>
-
-      {/* Preemptive transparency: if "yes" + EU country, tell the user
-          right here that the routing will switch. Better than surprising
-          them on the result page. Friendly tone — this is a normal
-          business outcome, not a problem with their application. */}
-      {willReroute && (
-        <Alert tone="info" title={t("ec.q6.alert.reroute.title")}>
-          {t("ec.q6.alert.reroute.body", { country: countryName })}
-        </Alert>
-      )}
-
-      <div className="ob-actions">
-        <Button variant="primary" size="xl" onClick={onNext} iconRight="arrowRight"
-                disabled={!cryptoExposure}>
-          {t("ec.q6.cta")}
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 function EcResult({ rec, onBack, onReset }) {
   if (rec.kind === "blocked") return <EcResultBlocked rec={rec} onBack={onBack} onReset={onReset} />;
   return <EcResultApproved rec={rec} onBack={onBack} onReset={onReset} />;
 }
-
-// ──────────────────── Account preview ────────────────────
-// Renders a stack of currency cards showing what the user's actual
-// account identifiers will look like after onboarding. For currencies
-// where the entity has a local rail (UK GBP, EU EUR, MENA AED/USD)
-// the IBAN/sort-code is shown in monospace with realistic format.
-// For SWIFT-only currencies (e.g. USD on UK entity) the card honestly
-// says "Via SWIFT correspondent" instead of faking a local IBAN.
-function EcAccountPreview({ entity }) {
-  const t = useT();
-  const lang = window.__I18N.getLang();
-  // Split accounts so SWIFT-only currencies (those served via
-  // correspondent banks rather than a local IBAN) are visually demoted
-  // into their own sub-group rather than mixed with the first-class
-  // local-rail accounts. Same EcAccountCard for both, but separator +
-  // section header signal the operational difference. Pattern adapted
-  // from 3S Money's split between supported/unsupported, but our case
-  // is "supported with local rail" vs "supported via SWIFT" — both
-  // work, just different cost/speed profiles. Honest framing matters.
-  const localAccounts = entity.accounts.filter((a) => a.type !== "swift-only");
-  const swiftAccounts = entity.accounts.filter((a) => a.type === "swift-only");
-  return (
-    <div className="ec-accounts">
-      <div className="ec-accounts__head">
-        <span className="ec-accounts__head__title">{t("ec.account.head")}</span>
-        <span className="ec-accounts__head__note">{t("ec.account.previewNote")}</span>
-      </div>
-      {localAccounts.map((acc) => (
-        <EcAccountCard key={acc.currency} account={acc} lang={lang} />
-      ))}
-      {swiftAccounts.length > 0 && (
-        <div className="ec-accounts__swiftGroup">
-          <div className="ec-accounts__swiftGroup__head">
-            {t("ec.account.swiftGroupHead")}
-          </div>
-          {swiftAccounts.map((acc) => (
-            <EcAccountCard key={acc.currency} account={acc} lang={lang} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EcAccountCard({ account, lang }) {
-  const t = useT();
-  const flagCode = ecCurrencyFlag(account.currency);
-  const currencyName = ecCurrencyName(account.currency, lang);
-  const isSwiftOnly = account.type === "swift-only";
-  // Eligibility-checker scope: show currency identity + rails, NOT the
-  // full account fields. Specific IBAN/sort code/BIC values are issued
-  // at signup and will differ from any placeholder we'd render here,
-  // so showing them would create false expectations and clutter a page
-  // whose purpose is "can Altery serve my business?" not "what's my
-  // exact account number?". The hero IBAN chip already carries one
-  // labeled "Preview" value as a format-trust signal — that's enough.
-  return (
-    <div className={"ec-account" + (isSwiftOnly ? " ec-account--swift" : "")}>
-      <div className="ec-account__header">
-        {flagCode && (
-          <span className="ec-account__header__flag">
-            <Flag code={flagCode} size={24} />
-          </span>
-        )}
-        <span className="ec-account__header__code">{account.currency}</span>
-        <span className="ec-account__header__name">{currencyName}</span>
-      </div>
-      {account.rails.length > 0 && (
-        <div className="ec-account__rails">
-          {account.rails.map((r) => (
-            <span key={r} className="ec-account__rail">{r}</span>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── EcFeesModal ────────────────────────────────────────────────
-// Surfaces the canonical Altery fee schedule for the active plan
-// and the entity the user will be routed to. Opens from the
-// "View all fees" link on the plan card. Region (UK-EU vs RoW) is
-// derived from entity.id via ecFeeRegion(). Plan-specific items
-// — monthly fee, FX cap, SWIFT cap — come from EC_PLANS perk
-// text, while all other rows are fixed from EC_FEE_SCHEDULE.
-// Footer links to altery.com/fees/business so any number can be
-// verified against the canonical source — prototype values stay
-// honest, not invented.
 
 function EcResultApproved({ rec, onBack, onReset }) {
   const t = useT();
@@ -1899,7 +1720,7 @@ Object.assign(window, {
   EcApp,
   EcIco,
   EcIntro, EcQuestionHeader,
-  EcCountry, EcIndustry, EcServices, EcVolume, EcCorridors, EcCrypto,
-  EcResult, EcAccountPreview, EcAccountCard,
+  EcCountry, EcIndustry, EcServices, EcVolume, EcCorridors,
+  EcResult,
   EcResultApproved, EcResultBlocked,
 });

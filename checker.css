@@ -1973,158 +1973,21 @@
        Each card stacks: header (flag + currency) → identifier rows →
        rails. Designed to read as authentic banking detail, not generic
        "supported currencies" chrome. */
-    .ec-accounts {
-      display: flex; flex-direction: column; gap: 8px;
-    }
-    .ec-accounts__head {
-      display: flex; align-items: baseline; justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 4px;
-    }
-    .ec-accounts__head__title {
-      font-size: 12px; font-weight: 600;
-      color: var(--c-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .ec-accounts__head__note {
-      font-size: 11px; color: var(--c-muted);
-    }
 
-    .ec-account {
-      background: var(--c-surface);
-      border: 1px solid var(--c-border);
-      border-radius: 12px;
-      overflow: hidden;
-      transition: border-color .15s ease;
-    }
-    .ec-account__header {
-      display: flex; align-items: center; gap: 12px;
-      padding: 12px 14px 8px;
-    }
-    .ec-account__header__flag {
-      width: 24px; height: 24px; flex: 0 0 24px;
-      border-radius: 999px; overflow: hidden;
-      background: var(--c-border-soft);
-    }
-    .ec-account__header__code {
-      font-size: 14px; font-weight: 600;
-      color: var(--c-ink);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: 0.01em;
-    }
-    .ec-account__header__name {
-      flex: 1; min-width: 0;
-      font-size: 12px; color: var(--c-muted);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    }
-
-    .ec-account__fields {
-      display: flex; flex-direction: column;
-      padding: 4px 16px;
-    }
-    .ec-account__field {
-      display: flex; align-items: center; gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid var(--c-border-soft);
-    }
-    .ec-account__field:last-child { border-bottom: none; }
-    .ec-account__field__label {
-      font-size: 12px; color: var(--c-muted);
-      width: 110px; flex: 0 0 110px;
-    }
-    .ec-account__field__value {
-      flex: 1; min-width: 0;
-      font-family: var(--ff-mono);
-      font-size: 13px;
-      font-variant-numeric: tabular-nums;
-      color: var(--c-ink);
-      letter-spacing: 0.01em;
-      word-break: break-all;
-    }
-    .ec-account__field--muted .ec-account__field__value {
-      color: var(--c-muted);
-    }
     /* Subtle copy-affordance on hover — doesn't actually copy in preview
        (values are placeholders), but signals the interaction will exist
        when real values land at signup. */
-    .ec-account__field__copy {
-      flex: 0 0 auto;
-      width: 24px; height: 24px;
-      display: inline-flex; align-items: center; justify-content: center;
-      color: var(--c-muted-2);
-      opacity: 0; transition: opacity .12s ease;
-      cursor: default;
-    }
-    .ec-account__field:hover .ec-account__field__copy { opacity: 0.6; }
-
-    .ec-account__rails {
-      display: flex; flex-wrap: wrap; gap: 6px;
-      padding: 4px 14px 12px;
-    }
-    .ec-account__rail {
-      display: inline-flex; align-items: center;
-      padding: 3px 10px;
-      font-size: 11px; font-weight: 500;
-      color: var(--c-ink-2);
-      background: var(--c-bg);
-      border: 1px solid var(--c-border-soft);
-      border-radius: 999px;
-      letter-spacing: 0.01em;
-    }
 
     /* SWIFT-only variant — subtle background tint flags these as
        correspondent-network currencies rather than primary local-rail.
        Section header above the group already labels them; this is just
        reinforcing visual demotion. */
-    .ec-account--swift {
-      background: var(--c-bg);
-    }
-    .ec-account--swift .ec-account__rail {
-      background: var(--c-surface);
-    }
-    .ec-account__swiftBody {
-      padding: 0 16px 14px;
-      font-size: 12px; line-height: 17px;
-      color: var(--c-muted);
-      max-width: 480px;
-    }
-    .ec-account__swiftBody__title {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-weight: 600;
-      color: var(--c-ink-2);
-      margin-bottom: 4px;
-      font-size: 12px;
-    }
-    .ec-account__swiftBody__title svg {
-      width: 12px; height: 12px;
-      color: var(--c-muted-2);
-    }
     /* SWIFT-group separator — visually demotes correspondent-network
        currencies below the local-rail ones. Dashed top border + section
        header create a clear "less primary" zone without hiding the
        currencies (they're still accessible, just not first-class). */
-    .ec-accounts__swiftGroup {
-      display: flex; flex-direction: column;
-      gap: 8px;
-      padding-top: 14px;
-      margin-top: 6px;
-      border-top: 1px dashed var(--c-border-soft);
-    }
-    .ec-accounts__swiftGroup__head {
-      font-size: 11px; font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--c-muted);
-      padding: 0 2px 2px;
-    }
 
     @media (max-width: 640px) {
-      .ec-account__field { gap: 8px; }
-      .ec-account__field__label {
-        width: auto; flex: 0 0 auto;
-        min-width: 76px;
-      }
     }
 
     /* Capability section — single container with internal dividers between
@@ -2189,41 +2052,6 @@
        altery.com/business — reads as a continuation of Altery's brand.
        Cards are 260px wide on desktop, 220px on mobile, with peek of
        next card as scroll affordance. No JS deps — native CSS snap. */
-    .ec-perks {
-      display: flex; flex-direction: column;
-      gap: 10px;
-    }
-    .ec-perks__head {
-      font-size: 13px; font-weight: 600;
-      color: var(--c-ink);
-      padding: 0 2px;
-    }
-    .ec-perks__slider {
-      display: flex;
-      gap: 12px;
-      overflow-x: auto;
-      overflow-y: hidden;
-      scroll-snap-type: x mandatory;
-      scroll-padding-inline-start: 2px;
-      padding: 4px 2px 14px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--c-border) transparent;
-    }
-    .ec-perks__slider::-webkit-scrollbar {
-      height: 6px;
-    }
-    .ec-perks__slider::-webkit-scrollbar-track {
-      background: transparent;
-    }
-    .ec-perks__slider::-webkit-scrollbar-thumb {
-      background: var(--c-border);
-      border-radius: 3px;
-    }
-    .ec-perks__slider:focus-visible {
-      outline: 3px solid var(--c-accent-ring, rgba(0, 111, 255, 0.25));
-      outline-offset: 2px;
-      border-radius: 12px;
-    }
     /* Perks slider cards — 3S Money premium magazine style. Full-bleed
        photographic image as the card surface, three-stop dark gradient
        (transparent top → faint darken middle → strong darken at bottom)
@@ -2233,86 +2061,14 @@
        Hover: subtle 4% image zoom (slow 800ms ease) + 2px card lift +
        navy-tinted shadow. The image-zoom-on-hover is the signature
        premium-fintech touch — Stripe, Wise, 3S Money all use it. */
-    .ec-perks__card {
-      position: relative;
-      flex: 0 0 280px;
-      height: 400px;
-      scroll-snap-align: start;
-      border-radius: 20px;
-      overflow: hidden;
-      background: var(--c-ink-2, #1a1d2e);
-      cursor: default;
-      isolation: isolate;
-    }
     /* No card-level translate on hover — the user explicitly asked
        for the lift to be removed while keeping the image zoom below.
        The image scale(1.04) on .ec-perks__card:hover .ec-perks__card__media img
        still fires because :hover targets the card; only the lift moved away. */
-    .ec-perks__card__media {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-      overflow: hidden;
-    }
-    .ec-perks__card__media img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      object-position: center;
-      display: block;
-      transition: transform .8s cubic-bezier(.2, .6, .2, 1);
-    }
-    .ec-perks__card:hover .ec-perks__card__media img {
-      transform: scale(1.04);
-    }
     /* Dark gradient overlay — three-stop fall-off so the top of the
        image stays clean while the bottom is dark enough for text
        legibility regardless of underlying image. */
-    .ec-perks__card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      pointer-events: none;
-      background: linear-gradient(
-        to bottom,
-        rgba(0, 0, 0, 0) 0%,
-        rgba(0, 0, 0, 0) 30%,
-        rgba(0, 0, 0, 0.35) 60%,
-        rgba(0, 0, 0, 0.85) 100%
-      );
-      z-index: 1;
-    }
-    .ec-perks__card__content {
-      position: absolute;
-      left: 0; right: 0; bottom: 0;
-      padding: 22px 24px 24px;
-      color: #fff;
-      z-index: 2;
-    }
-    .ec-perks__card__title {
-      font-size: 20px;
-      font-weight: 700;
-      line-height: 24px;
-      letter-spacing: -0.012em;
-      color: #fff;
-      margin-bottom: 6px;
-    }
-    .ec-perks__card__body {
-      font-size: 13.5px;
-      line-height: 19px;
-      color: rgba(255, 255, 255, 0.86);
-      text-wrap: pretty;
-    }
     @media (max-width: 640px) {
-      .ec-perks__card {
-        flex-basis: 240px;
-        height: 340px;
-        border-radius: 18px;
-      }
-      .ec-perks__card__content {
-        padding: 18px 20px 20px;
-      }
-      .ec-perks__card__title { font-size: 18px; line-height: 22px; }
-      .ec-perks__card__body  { font-size: 13px; line-height: 18px; }
     }
 
     /* Blocked variant — calm, not alarmist. A solid muted slate communicates
@@ -2815,12 +2571,6 @@
     }
     .ec-r__planAlt__switch:hover { text-decoration: underline; }
 
-    .ec-r__perks {
-      list-style: none; margin: 0; padding: 16px 0;
-      display: flex; flex-direction: column; gap: 10px;
-      font-size: 13px; color: var(--c-ink-2); line-height: 1.45;
-      border-top: 1px solid var(--c-border-soft);
-    }
     .ec-r__perk {
       display: flex; align-items: flex-start; gap: 10px;
     }

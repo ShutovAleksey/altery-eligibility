@@ -702,114 +702,24 @@
   // Kept in a single block per language so additions/edits stay together.
   // {country} interpolated at render time with the localised country name.
   Object.assign(D.en, {
-    "ec.q6.title": "Does your business handle crypto?",
-    "ec.q6.lead": "We mean broadly — accepting crypto payments, holding it as treasury, or running a crypto-native service all count. The answer can change which Altery entity opens your account.",
-    "ec.q6.field.label": "Crypto exposure",
-    "ec.q6.opt.none.title": "Fiat only",
-    "ec.q6.opt.none.desc": "We don't accept, hold, or process crypto in any form.",
-    "ec.q6.opt.yes.title": "Yes, crypto involved",
-    "ec.q6.opt.yes.desc": "We accept crypto payments, hold digital assets, or run a crypto-native service.",
-    "ec.q6.alert.reroute.title": "Heads up: this routes you to our UK entity",
-    "ec.q6.alert.reroute.body": "Your {country} incorporation would normally route to Altery EU (Cyprus, CBC), but Cyprus EMI doesn't onboard crypto businesses. We'll open your account with Altery Ltd (UK, FCA-authorised), which can serve crypto operations.",
   });
   Object.assign(D.ru, {
-    "ec.q6.title": "Работает ли ваш бизнес с криптой?",
-    "ec.q6.lead": "В широком смысле — приём крипто-платежей, хранение цифровых активов в казне или крипто-нативный сервис. Ответ может изменить, через какую лицензию Altery мы откроем счёт.",
-    "ec.q6.field.label": "Криптовалюты",
-    "ec.q6.opt.none.title": "Только фиат",
-    "ec.q6.opt.none.desc": "Не принимаем, не храним и не обрабатываем криптовалюту.",
-    "ec.q6.opt.yes.title": "Да, есть крипта",
-    "ec.q6.opt.yes.desc": "Принимаем крипто-платежи, держим цифровые активы или ведём крипто-нативный сервис.",
-    "ec.q6.alert.reroute.title": "Меняем маршрут на британскую лицензию",
-    "ec.q6.alert.reroute.body": "Регистрация в стране {country} обычно ведёт к Altery EU (Кипр, CBC), но кипрская EMI не работает с крипто-бизнесом. Откроем счёт через Altery Ltd (Великобритания, FCA) — она поддерживает крипто-операции.",
   });
   Object.assign(D.de, {
-    "ec.q6.title": "Arbeitet Ihr Unternehmen mit Krypto?",
-    "ec.q6.lead": "Im weiten Sinne — Krypto-Zahlungen akzeptieren, digitale Vermögenswerte halten oder einen Krypto-nativen Dienst betreiben. Die Antwort kann ändern, mit welcher Altery-Einheit wir Ihr Konto eröffnen.",
-    "ec.q6.field.label": "Krypto-Exposition",
-    "ec.q6.opt.none.title": "Nur Fiat",
-    "ec.q6.opt.none.desc": "Wir akzeptieren, halten oder verarbeiten keine Krypto-Werte.",
-    "ec.q6.opt.yes.title": "Ja, mit Krypto",
-    "ec.q6.opt.yes.desc": "Wir akzeptieren Krypto-Zahlungen, halten digitale Vermögenswerte oder betreiben einen Krypto-Dienst.",
-    "ec.q6.alert.reroute.title": "Hinweis: Wir leiten Sie zu unserer UK-Einheit weiter",
-    "ec.q6.alert.reroute.body": "Ihre Eintragung in {country} würde normalerweise zu Altery EU (Zypern, CBC) führen, aber die zypriotische EMI-Lizenz erlaubt kein Onboarding von Krypto-Unternehmen. Wir eröffnen Ihr Konto bei Altery Ltd (UK, FCA-lizenziert), die Krypto-Geschäfte abdecken kann.",
   });
   Object.assign(D.nl, {
-    "ec.q6.title": "Werkt uw bedrijf met crypto?",
-    "ec.q6.lead": "Bedoeld in brede zin — crypto-betalingen accepteren, digitale activa in beheer hebben of een crypto-native dienst aanbieden. Het antwoord kan veranderen via welke Altery-entiteit we uw rekening openen.",
-    "ec.q6.field.label": "Crypto-blootstelling",
-    "ec.q6.opt.none.title": "Alleen fiat",
-    "ec.q6.opt.none.desc": "We accepteren, houden of verwerken geen crypto in enige vorm.",
-    "ec.q6.opt.yes.title": "Ja, met crypto",
-    "ec.q6.opt.yes.desc": "We accepteren crypto-betalingen, houden digitale activa aan of zijn een crypto-native dienst.",
-    "ec.q6.alert.reroute.title": "Let op: we routeren u naar onze UK-entiteit",
-    "ec.q6.alert.reroute.body": "Uw inschrijving in {country} zou normaal gesproken naar Altery EU (Cyprus, CBC) gaan, maar Cyprus EMI onboardt geen crypto-bedrijven. We openen uw rekening bij Altery Ltd (UK, FCA-vergund), die crypto-operaties wel kan ondersteunen.",
   });
   Object.assign(D.tr, {
-    "ec.q6.title": "İşletmeniz kripto ile çalışıyor mu?",
-    "ec.q6.lead": "Geniş anlamda — kripto ödeme kabul etmek, dijital varlık tutmak veya kripto-yerli bir hizmet işletmek. Yanıt, Altery'nin hangi lisansıyla hesap açacağımızı değiştirebilir.",
-    "ec.q6.field.label": "Kripto faaliyeti",
-    "ec.q6.opt.none.title": "Sadece fiat",
-    "ec.q6.opt.none.desc": "Hiçbir biçimde kripto kabul etmiyor, tutmuyor veya işlemiyoruz.",
-    "ec.q6.opt.yes.title": "Evet, kripto var",
-    "ec.q6.opt.yes.desc": "Kripto ödeme kabul ediyor, dijital varlık tutuyor veya kripto-yerli hizmet veriyoruz.",
-    "ec.q6.alert.reroute.title": "Bilgi: Sizi UK lisansımıza yönlendiriyoruz",
-    "ec.q6.alert.reroute.body": "{country} tescili normalde Altery EU (Kıbrıs, CBC) yönlendirilirdi, ancak Kıbrıs EMI lisansı kripto işletmelerini kabul etmiyor. Hesabınızı kripto faaliyetlerini destekleyen Altery Ltd (Birleşik Krallık, FCA) ile açacağız.",
   });
   Object.assign(D.it, {
-    "ec.q6.title": "La tua attività opera con crypto?",
-    "ec.q6.lead": "In senso ampio — accettare pagamenti in crypto, detenere asset digitali in tesoreria o gestire un servizio crypto-nativo. La risposta può cambiare quale entità Altery aprirà il tuo conto.",
-    "ec.q6.field.label": "Esposizione crypto",
-    "ec.q6.opt.none.title": "Solo fiat",
-    "ec.q6.opt.none.desc": "Non accettiamo, deteniamo o trattiamo crypto in alcuna forma.",
-    "ec.q6.opt.yes.title": "Sì, crypto coinvolto",
-    "ec.q6.opt.yes.desc": "Accettiamo pagamenti in crypto, deteniamo asset digitali o gestiamo un servizio crypto-nativo.",
-    "ec.q6.alert.reroute.title": "Nota: ti indirizziamo all'entità UK",
-    "ec.q6.alert.reroute.body": "La tua registrazione in {country} di norma porterebbe a Altery EU (Cipro, CBC), ma la licenza EMI di Cipro non accoglie attività crypto. Apriremo il tuo conto con Altery Ltd (UK, FCA), che può servire operazioni crypto.",
   });
   Object.assign(D.es, {
-    "ec.q6.title": "¿Tu empresa trabaja con cripto?",
-    "ec.q6.lead": "En sentido amplio — aceptar pagos en cripto, mantener activos digitales en tesorería u ofrecer un servicio cripto-nativo. La respuesta puede cambiar qué entidad de Altery abre tu cuenta.",
-    "ec.q6.field.label": "Exposición a cripto",
-    "ec.q6.opt.none.title": "Solo fiat",
-    "ec.q6.opt.none.desc": "No aceptamos, mantenemos ni procesamos cripto en ninguna forma.",
-    "ec.q6.opt.yes.title": "Sí, con cripto",
-    "ec.q6.opt.yes.desc": "Aceptamos pagos en cripto, mantenemos activos digitales o tenemos servicio cripto-nativo.",
-    "ec.q6.alert.reroute.title": "Aviso: te redirigimos a nuestra entidad UK",
-    "ec.q6.alert.reroute.body": "Tu constitución en {country} normalmente iría a Altery EU (Chipre, CBC), pero la licencia EMI de Chipre no admite negocios cripto. Abriremos tu cuenta con Altery Ltd (Reino Unido, FCA), que sí puede atender operaciones cripto.",
   });
   Object.assign(D.pl, {
-    "ec.q6.title": "Czy Twoja firma działa z kryptowalutami?",
-    "ec.q6.lead": "W szerokim sensie — przyjmowanie płatności w krypto, trzymanie aktywów cyfrowych w skarbcu lub prowadzenie usługi crypto-native. Odpowiedź może zmienić, z którą licencją Altery otworzymy konto.",
-    "ec.q6.field.label": "Ekspozycja na krypto",
-    "ec.q6.opt.none.title": "Tylko fiat",
-    "ec.q6.opt.none.desc": "Nie przyjmujemy, nie trzymamy ani nie przetwarzamy krypto w żadnej formie.",
-    "ec.q6.opt.yes.title": "Tak, krypto w grze",
-    "ec.q6.opt.yes.desc": "Przyjmujemy płatności krypto, trzymamy aktywa cyfrowe lub prowadzimy usługę crypto-native.",
-    "ec.q6.alert.reroute.title": "Uwaga: kierujemy do naszej brytyjskiej spółki",
-    "ec.q6.alert.reroute.body": "Rejestracja w {country} zwykle prowadziłaby do Altery EU (Cypr, CBC), ale cypryjska licencja EMI nie obsługuje firm krypto. Otworzymy konto z Altery Ltd (Wielka Brytania, FCA), która obsługuje operacje krypto.",
   });
   Object.assign(D.pt, {
-    "ec.q6.title": "A sua empresa lida com cripto?",
-    "ec.q6.lead": "Em sentido amplo — aceitar pagamentos em cripto, manter ativos digitais em tesouraria ou operar um serviço cripto-nativo. A resposta pode mudar com qual entidade Altery abrimos a sua conta.",
-    "ec.q6.field.label": "Exposição a cripto",
-    "ec.q6.opt.none.title": "Apenas fiat",
-    "ec.q6.opt.none.desc": "Não aceitamos, mantemos nem processamos cripto de forma alguma.",
-    "ec.q6.opt.yes.title": "Sim, com cripto",
-    "ec.q6.opt.yes.desc": "Aceitamos pagamentos cripto, mantemos ativos digitais ou operamos serviço cripto-nativo.",
-    "ec.q6.alert.reroute.title": "Aviso: vamos encaminhá-lo para a nossa entidade UK",
-    "ec.q6.alert.reroute.body": "A sua constituição em {country} normalmente iria para Altery EU (Chipre, CBC), mas a licença EMI de Chipre não aceita negócios cripto. Abriremos a sua conta com Altery Ltd (Reino Unido, FCA), que pode servir operações cripto.",
   });
   Object.assign(D.fr, {
-    "ec.q6.title": "Votre entreprise traite-t-elle de la crypto ?",
-    "ec.q6.lead": "Au sens large — accepter des paiements crypto, détenir des actifs numériques en trésorerie ou exploiter un service crypto-natif. La réponse peut changer quelle entité Altery ouvre votre compte.",
-    "ec.q6.field.label": "Exposition crypto",
-    "ec.q6.opt.none.title": "Fiat uniquement",
-    "ec.q6.opt.none.desc": "Nous n'acceptons, ne détenons et ne traitons aucune crypto.",
-    "ec.q6.opt.yes.title": "Oui, crypto impliquée",
-    "ec.q6.opt.yes.desc": "Nous acceptons des paiements crypto, détenons des actifs numériques ou exploitons un service crypto-natif.",
-    "ec.q6.alert.reroute.title": "Note : nous vous orientons vers notre entité UK",
-    "ec.q6.alert.reroute.body": "Votre immatriculation en {country} mènerait normalement à Altery EU (Chypre, CBC), mais la licence EMI chypriote n'accepte pas les entreprises crypto. Nous ouvrirons votre compte avec Altery Ltd (Royaume-Uni, FCA), qui peut servir les opérations crypto.",
   });
 
   // ─────────── Hero crypto-fluent badge ──────────
@@ -1063,134 +973,24 @@
   // on the result page. Copy + visual assets pulled directly from
   // altery.com/business. 11 keys × 10 langs = 110 strings.
   Object.assign(D.en, {
-    "ec.r.perks.head": "Built to back your business",
-    "ec.r.perks.multiEntity.title": "Multi-entity account",
-    "ec.r.perks.multiEntity.body": "Manage one company or ten — everything in one account.",
-    "ec.r.perks.multiUser.title": "Multi-user access",
-    "ec.r.perks.multiUser.body": "Bring in your team, assign roles, collaborate with full visibility.",
-    "ec.r.perks.currencyExchange.title": "Currency exchange",
-    "ec.r.perks.currencyExchange.body": "Hold and convert 30+ currencies at near-mid-market rates.",
-    "ec.r.perks.businessCards.title": "Business cards",
-    "ec.r.perks.businessCards.body": "Pay like locals worldwide, with real-time spend control.",
-    "ec.r.perks.permissions.title": "Granular permissions",
-    "ec.r.perks.permissions.body": "Set what each team member can view, send and approve.",
   });
   Object.assign(D.es, {
-    "ec.r.perks.head": "Diseñado para impulsar tu negocio",
-    "ec.r.perks.multiEntity.title": "Cuenta multi-entidad",
-    "ec.r.perks.multiEntity.body": "Gestiona una empresa o diez — todo en una sola cuenta.",
-    "ec.r.perks.multiUser.title": "Acceso multi-usuario",
-    "ec.r.perks.multiUser.body": "Incorpora a tu equipo, asigna roles y colabora con visibilidad total.",
-    "ec.r.perks.currencyExchange.title": "Cambio de divisas",
-    "ec.r.perks.currencyExchange.body": "Mantén y convierte 30+ divisas a tipos cercanos al mid-market.",
-    "ec.r.perks.businessCards.title": "Tarjetas corporativas",
-    "ec.r.perks.businessCards.body": "Paga como local en todo el mundo, con control de gasto en tiempo real.",
-    "ec.r.perks.permissions.title": "Permisos granulares",
-    "ec.r.perks.permissions.body": "Define qué puede ver, enviar y aprobar cada miembro del equipo.",
   });
   Object.assign(D.fr, {
-    "ec.r.perks.head": "Conçu pour soutenir votre activité",
-    "ec.r.perks.multiEntity.title": "Compte multi-entités",
-    "ec.r.perks.multiEntity.body": "Gérez une entreprise ou dix — tout dans un seul compte.",
-    "ec.r.perks.multiUser.title": "Accès multi-utilisateurs",
-    "ec.r.perks.multiUser.body": "Intégrez votre équipe, attribuez des rôles, collaborez en pleine visibilité.",
-    "ec.r.perks.currencyExchange.title": "Conversion de devises",
-    "ec.r.perks.currencyExchange.body": "Détenez et convertissez 30+ devises à des taux proches du mid-market.",
-    "ec.r.perks.businessCards.title": "Cartes professionnelles",
-    "ec.r.perks.businessCards.body": "Payez comme un local partout, avec contrôle des dépenses en temps réel.",
-    "ec.r.perks.permissions.title": "Permissions granulaires",
-    "ec.r.perks.permissions.body": "Définissez ce que chaque membre de l'équipe peut voir, envoyer et approuver.",
   });
   Object.assign(D.pt, {
-    "ec.r.perks.head": "Feito para apoiar o seu negócio",
-    "ec.r.perks.multiEntity.title": "Conta multi-entidade",
-    "ec.r.perks.multiEntity.body": "Gerencie uma empresa ou dez — tudo em uma conta.",
-    "ec.r.perks.multiUser.title": "Acesso multi-utilizador",
-    "ec.r.perks.multiUser.body": "Adicione a sua equipa, atribua funções, colabore com visibilidade total.",
-    "ec.r.perks.currencyExchange.title": "Câmbio de moedas",
-    "ec.r.perks.currencyExchange.body": "Mantenha e converta 30+ moedas a taxas próximas do mid-market.",
-    "ec.r.perks.businessCards.title": "Cartões empresariais",
-    "ec.r.perks.businessCards.body": "Pague como um local em todo o mundo, com controlo em tempo real.",
-    "ec.r.perks.permissions.title": "Permissões granulares",
-    "ec.r.perks.permissions.body": "Defina o que cada membro da equipa pode ver, enviar e aprovar.",
   });
   Object.assign(D.ru, {
-    "ec.r.perks.head": "Создано для поддержки вашего бизнеса",
-    "ec.r.perks.multiEntity.title": "Мульти-юр-лицо",
-    "ec.r.perks.multiEntity.body": "Управляйте одной компанией или десятью — всё в одном аккаунте.",
-    "ec.r.perks.multiUser.title": "Многопользовательский доступ",
-    "ec.r.perks.multiUser.body": "Подключите команду, назначьте роли, работайте с полной видимостью.",
-    "ec.r.perks.currencyExchange.title": "Обмен валют",
-    "ec.r.perks.currencyExchange.body": "Храните и конвертируйте 30+ валют по курсам близким к mid-market.",
-    "ec.r.perks.businessCards.title": "Корпоративные карты",
-    "ec.r.perks.businessCards.body": "Платите как местный по всему миру, с контролем расходов в реальном времени.",
-    "ec.r.perks.permissions.title": "Гранулярные права",
-    "ec.r.perks.permissions.body": "Задайте, что каждый член команды может видеть, отправлять и подтверждать.",
   });
   Object.assign(D.de, {
-    "ec.r.perks.head": "Wir stehen hinter Ihrem Geschäft",
-    "ec.r.perks.multiEntity.title": "Multi-Entitäts-Konto",
-    "ec.r.perks.multiEntity.body": "Ein Unternehmen oder zehn verwalten — alles in einem Konto.",
-    "ec.r.perks.multiUser.title": "Multi-User-Zugang",
-    "ec.r.perks.multiUser.body": "Holen Sie Ihr Team an Bord, vergeben Sie Rollen, kollaborieren Sie transparent.",
-    "ec.r.perks.currencyExchange.title": "Währungstausch",
-    "ec.r.perks.currencyExchange.body": "30+ Währungen halten und nahe am Mittelkurs umtauschen.",
-    "ec.r.perks.businessCards.title": "Firmenkarten",
-    "ec.r.perks.businessCards.body": "Zahlen wie ein Einheimischer weltweit, mit Echtzeit-Ausgabenkontrolle.",
-    "ec.r.perks.permissions.title": "Granulare Berechtigungen",
-    "ec.r.perks.permissions.body": "Legen Sie fest, was jedes Teammitglied sehen, senden und freigeben darf.",
   });
   Object.assign(D.it, {
-    "ec.r.perks.head": "Pensato per sostenere il tuo business",
-    "ec.r.perks.multiEntity.title": "Account multi-entità",
-    "ec.r.perks.multiEntity.body": "Gestisci un'azienda o dieci — tutto in un solo account.",
-    "ec.r.perks.multiUser.title": "Accesso multi-utente",
-    "ec.r.perks.multiUser.body": "Coinvolgi il team, assegna ruoli, collabora con piena visibilità.",
-    "ec.r.perks.currencyExchange.title": "Cambio valuta",
-    "ec.r.perks.currencyExchange.body": "Tieni e converti 30+ valute a tassi vicini al mid-market.",
-    "ec.r.perks.businessCards.title": "Carte aziendali",
-    "ec.r.perks.businessCards.body": "Paga come un locale ovunque, con controllo spese in tempo reale.",
-    "ec.r.perks.permissions.title": "Permessi granulari",
-    "ec.r.perks.permissions.body": "Imposta cosa ogni membro del team può vedere, inviare e approvare.",
   });
   Object.assign(D.tr, {
-    "ec.r.perks.head": "İşinizin arkasında olmak için tasarlandı",
-    "ec.r.perks.multiEntity.title": "Çoklu şirket hesabı",
-    "ec.r.perks.multiEntity.body": "Bir şirket veya on — hepsi tek bir hesapta.",
-    "ec.r.perks.multiUser.title": "Çoklu kullanıcı erişimi",
-    "ec.r.perks.multiUser.body": "Ekibinizi dahil edin, roller atayın, tam görünürlükle çalışın.",
-    "ec.r.perks.currencyExchange.title": "Döviz dönüşümü",
-    "ec.r.perks.currencyExchange.body": "30+ para birimini orta piyasaya yakın kurlarla tutun ve dönüştürün.",
-    "ec.r.perks.businessCards.title": "Kurumsal kartlar",
-    "ec.r.perks.businessCards.body": "Dünya çapında yerel gibi ödeyin, gerçek zamanlı harcama kontrolüyle.",
-    "ec.r.perks.permissions.title": "Hassas yetkilendirme",
-    "ec.r.perks.permissions.body": "Her ekip üyesinin neyi görebileceğini, gönderebileceğini ve onaylayabileceğini belirleyin.",
   });
   Object.assign(D.pl, {
-    "ec.r.perks.head": "Stworzone, aby wspierać Twój biznes",
-    "ec.r.perks.multiEntity.title": "Konto wielopodmiotowe",
-    "ec.r.perks.multiEntity.body": "Zarządzaj jedną firmą lub dziesięcioma — wszystko w jednym koncie.",
-    "ec.r.perks.multiUser.title": "Dostęp wielu użytkowników",
-    "ec.r.perks.multiUser.body": "Włącz zespół, przypisz role, pracujcie razem z pełną widocznością.",
-    "ec.r.perks.currencyExchange.title": "Wymiana walut",
-    "ec.r.perks.currencyExchange.body": "Trzymaj i wymieniaj 30+ walut po kursach zbliżonych do mid-market.",
-    "ec.r.perks.businessCards.title": "Karty firmowe",
-    "ec.r.perks.businessCards.body": "Płać jak miejscowy na całym świecie, z kontrolą wydatków w czasie rzeczywistym.",
-    "ec.r.perks.permissions.title": "Granularne uprawnienia",
-    "ec.r.perks.permissions.body": "Ustal, co każdy członek zespołu może zobaczyć, wysłać i zatwierdzić.",
   });
   Object.assign(D.nl, {
-    "ec.r.perks.head": "Gemaakt om uw bedrijf te ondersteunen",
-    "ec.r.perks.multiEntity.title": "Multi-entiteit account",
-    "ec.r.perks.multiEntity.body": "Beheer één bedrijf of tien — alles in één account.",
-    "ec.r.perks.multiUser.title": "Multi-user toegang",
-    "ec.r.perks.multiUser.body": "Voeg uw team toe, wijs rollen toe, werk samen met volledige zichtbaarheid.",
-    "ec.r.perks.currencyExchange.title": "Valutawissel",
-    "ec.r.perks.currencyExchange.body": "Houd en wissel 30+ valuta's tegen koersen dichtbij de midmarktprijs.",
-    "ec.r.perks.businessCards.title": "Zakelijke kaarten",
-    "ec.r.perks.businessCards.body": "Betaal als een local wereldwijd, met realtime uitgavencontrole.",
-    "ec.r.perks.permissions.title": "Gedetailleerde rechten",
-    "ec.r.perks.permissions.body": "Bepaal wat elk teamlid kan bekijken, versturen en goedkeuren.",
   });
 
   // ─────────── Entity-specific currency perk ──────────────

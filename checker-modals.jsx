@@ -1,10 +1,10 @@
 /* global React, useT, Button, Tag, Alert, Input, Modal, Card, Spinner,
           Icon, Flag, Field, WhyWeAsk,
-          EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, EC_PERKS,
+          EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,
           ecOutcomesForSavings, ecGenProposalRef, ecLoadStripe,
           ecBuildAnalysisHTML, ecSendAnalysisEmail, ecWaitForPdfLibs,
-          EcIco, EcAccountPreview, EC_BOOKING_URL */
+          EcIco, EC_BOOKING_URL */
 // checker-modals.jsx — all the modal/handoff/payment overlays the result
 // page can open.
 //
@@ -12,7 +12,6 @@
 // /index.html after /checker-screens.jsx. Exports to window:
 //
 //   EcFeesModal          — full fee schedule popup, opened by the "View all fees" link
-//   EcPerks              — perk grid (used on the result page and in the handoff)
 //   EcPlanComparisonModal — "Compare plans" popup with three plan cards
 //   EcPlanIcon           — small helper, renders a tier icon from EcIco
 //   EcPlanCompareCard    — single plan card inside EcPlanComparisonModal
@@ -155,91 +154,6 @@ function EcFeesModal({ plan, entity, onClose }) {
       </div>
     </div>
   ), document.body);
-}
-
-
-//
-// Image loading defenses:
-//   • referrerPolicy="no-referrer" — Framer's CDN sometimes refuses
-//     hotlinks where the Referer header doesn't match altery.com or
-//     framer.media; stripping the referrer entirely sidesteps this.
-//   • onError → React state tracks per-card failures and re-renders
-//     without the image div. Card collapses to title+body — no
-//     broken-image icon, no layout glitch.
-// EcBankHistory deleted — the bank-rejection Q now lives as a proper
-// optional step in the quiz (EcBankHistoryStep in /checker-screens.jsx)
-// with the answer threaded into rec.bankHistory via ecRecommend.
-
-function EcPerks({ services }) {
-  const t = useT();
-  const [failed, setFailed] = useState(() => new Set());
-  // Sort perks so selected services float to the front. Mapping is
-  // direct service → perk where it exists: cards → businessCards,
-  // multiUser → multiUser, multiEntity → multiEntity, mass →
-  // permissions (mass payouts depend on approval flows), fx →
-  // currencyExchange. Services without a direct perk match (accounts,
-  // crossBorder, local, api, crypto) don't boost any perk. Stable
-  // sort keeps original order among unboosted perks.
-  const perksSorted = React.useMemo(() => {
-    const svcSet = new Set(services || []);
-    const serviceToPerk = {
-      cards:       "businessCards",
-      mass:        "permissions",
-      fx:          "currencyExchange",
-      multiUser:   "multiUser",
-      multiEntity: "multiEntity",
-    };
-    const boosted = new Set();
-    svcSet.forEach((svc) => {
-      const perkKey = serviceToPerk[svc];
-      if (perkKey) boosted.add(perkKey);
-    });
-    return [...EC_PERKS].sort((a, b) => {
-      const aB = boosted.has(a.key) ? 0 : 1;
-      const bB = boosted.has(b.key) ? 0 : 1;
-      return aB - bB; // stable: ties keep original order
-    });
-  }, [services]);
-  return (
-    <div className="ec-perks">
-      <div className="ec-perks__head">{t("ec.r.perks.head")}</div>
-      <div
-        className="ec-perks__slider"
-        role="region"
-        aria-label={t("ec.r.perks.head")}
-        tabIndex={0}
-      >
-        {perksSorted.map((p) => {
-          const showImage = p.imageUrl && !failed.has(p.key);
-          return (
-            <div className="ec-perks__card" key={p.key}>
-              {showImage && (
-                <div className="ec-perks__card__media">
-                  <img
-                    src={p.imageUrl}
-                    alt=""
-                    loading="lazy"
-                    referrerPolicy="no-referrer"
-                    onError={() =>
-                      setFailed((prev) => {
-                        const next = new Set(prev);
-                        next.add(p.key);
-                        return next;
-                      })
-                    }
-                  />
-                </div>
-              )}
-              <div className="ec-perks__card__content">
-                <div className="ec-perks__card__title">{t(p.titleKey)}</div>
-                <div className="ec-perks__card__body">{t(p.bodyKey)}</div>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
 }
 
 // ──────────────────── Plan comparison modal ────────────────────
@@ -1346,7 +1260,7 @@ function EcPaymentModal({ activePlan, onClose }) {
 }
 
 Object.assign(window, {
-  EcFeesModal, EcPerks,
+  EcFeesModal,
   EcPlanComparisonModal, EcPlanIcon, EcPlanCompareCard,
   EcHandoffModal, EcPaymentModal,
 });

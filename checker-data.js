@@ -547,117 +547,6 @@ const EC_PLANS = {
   },
 };
 
-// ── "Built to back your business" perks carousel ──────────────────
-// Five Altery Business solutions surfaced on the result page as a
-// 3S-Money-style horizontal scroll-snap slider. Each card is a tall
-// portrait (280×400) with a full-bleed photographic image, a
-// three-stop dark gradient overlay for text legibility, and a white
-// title+body anchored to the bottom. Hover triggers a subtle 4%
-// image zoom (800ms ease) and 3px card lift — the signature
-// premium-fintech touch.
-//
-// Images live in /images/ alongside index.html. Stored as AVIF
-// (where the source asset is AVIF) or WebP, both modern formats
-// with universal support in Claude's target browsers (Chrome 85+,
-// Safari 16.4+, Firefox 113+). The onError handler in EcPerks
-// collapses a card to title+body if an image fails to load —
-// no broken-image icon ever shows.
-//
-// Perk-to-image mapping:
-//   multiEntity      → perk-global-accounts (Earth + flags)
-//   multiUser        → perk-team-access (people + plus icon)
-//   currencyExchange → perk-fx (FX widget on building backdrop)
-//   businessCards    → perk-cards (Altery Visa + UnionPay cards)
-//   permissions      → perk-permissions (role-based access UI)
-const EC_PERKS = [
-  {
-    key: "multiEntity",
-    imageUrl: "./images/perk-global-accounts.avif",
-    titleKey: "ec.r.perks.multiEntity.title",
-    bodyKey:  "ec.r.perks.multiEntity.body",
-  },
-  {
-    key: "multiUser",
-    imageUrl: "./images/perk-team-access.avif",
-    titleKey: "ec.r.perks.multiUser.title",
-    bodyKey:  "ec.r.perks.multiUser.body",
-  },
-  {
-    key: "currencyExchange",
-    imageUrl: "./images/perk-fx.avif",
-    titleKey: "ec.r.perks.currencyExchange.title",
-    bodyKey:  "ec.r.perks.currencyExchange.body",
-  },
-  {
-    key: "businessCards",
-    imageUrl: "./images/perk-cards.webp",
-    titleKey: "ec.r.perks.businessCards.title",
-    bodyKey:  "ec.r.perks.businessCards.body",
-  },
-  {
-    key: "permissions",
-    imageUrl: "./images/perk-permissions.webp",
-    titleKey: "ec.r.perks.permissions.title",
-    bodyKey:  "ec.r.perks.permissions.body",
-  },
-];
-
-// Hero identifier — picks the most operationally relevant account from
-// the entity (always accounts[0] in our data; ordered by relevance per
-// entity). For UK it's GBP local (sort code + account number), for EU
-// it's the SEPA-reachable IBAN, for MENA it's USD/AE-IBAN. Skipped for
-// SWIFT-only primaries (we don't fake a local-rail identifier).
-function ecHeroIdentifier(entity) {
-  const acct = entity?.accounts?.[0];
-  if (!acct || acct.type === "swift-only") return null;
-  if (acct.type === "iban") {
-    const f = acct.fields.find((x) => x.labelKey === "ec.account.iban");
-    return f ? { currency: acct.currency, value: f.value, kind: "iban" } : null;
-  }
-  if (acct.type === "local") {
-    const sort = acct.fields.find((x) => x.labelKey === "ec.account.sortCode")?.value;
-    const accountNo = acct.fields.find((x) => x.labelKey === "ec.account.accountNo")?.value;
-    const value = [sort, accountNo].filter(Boolean).join(" · ");
-    return value ? { currency: acct.currency, value, kind: "local" } : null;
-  }
-  return null;
-}
-
-// Mask the trailing portion of an account identifier with vertically-
-// centred middle dots (·····). Replaces the old "Preview" badge — the
-// dots themselves communicate "this isn't your real number" while
-// preserving the IBAN/sort-code format as a trust signal. Splits on
-// whitespace, replaces the last token: with `n` dots if the token is
-// short (≤n), or with `last (length-n) chars + n dots` if longer.
-// Behaviour by entity:
-//   • UK GBP local "23-14-70 · 1234 5678" → "23-14-70 · 1234 ····"
-//   • UK EUR IBAN  "GB29 ALTY ... 9268 19" → "GB29 ALTY ... 9268 ····"
-//   • EU EUR IBAN  "CY17 ... 0052 7600"    → "CY17 ... 0052 ····"
-function maskTailDots(s, n = 4) {
-  if (!s) return s;
-  const parts = s.split(/(\s+)/);
-  for (let i = parts.length - 1; i >= 0; i--) {
-    if (parts[i] && !/^\s+$/.test(parts[i])) {
-      const t = parts[i];
-      parts[i] = t.length > n
-        ? t.slice(0, -n) + "·".repeat(n)
-        : "·".repeat(n);
-      break;
-    }
-  }
-  return parts.join("");
-}
-
-// ── Account preview data ──────────────────────────────────────────
-// Per-entity, per-currency account identifiers + rails. Values are
-// example placeholders — real numbers are issued at signup. Format is
-// jurisdiction-correct so the preview reads as authentic:
-//   - GBP local on UK entity: sort code + 8-digit account
-//   - EUR via SEPA-reachable IBAN (CY for EU entity, GB IBAN for UK)
-//   - USD/AED via DIFC IBAN on MENA entity
-//   - "swift-only" rows render as honest "Via SWIFT correspondent"
-//     instead of a fake local IBAN — matches the reality that not
-//     every entity has a domestic-rail relationship for every currency.
 const EC_ENTITIES = {
   uk: {
     id: "uk",
@@ -988,6 +877,6 @@ const EC_COMPARATORS = {
 Object.assign(window, {
   EC_COUNTRIES, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_INDUSTRIES,
   EC_BUSINESS_TYPES, EC_SERVICES, TOTAL_STEPS,
-  EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_PERKS, EC_ENTITIES,
+  EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
   EC_COMPARATORS,
 });

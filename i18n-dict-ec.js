@@ -143,7 +143,6 @@
     "ec.q5.section.out": "Where funds go",
     "ec.q5.section.in": "Where funds come from",
     "ec.q5.title": "Where do funds come from and go?",
-    "ec.q6.cta": "See my recommendation",
 
         // Account preview — operational identifiers shown on result.
         // Other languages fall back to EN until translated.
@@ -229,9 +228,6 @@
         "ec.r.persona.creator.line": "For creator platforms paying at scale",
         "ec.r.persona.crypto.line": "For crypto-native operations with licensed rails",
         "ec.r.entity.status": "{licence} · operational",
-        "ec.r.cards.currencies": "Supported currencies",
-        "ec.r.cards.currenciesMore": "All available with a local IBAN. 60+ more currencies for outgoing SWIFT.",
-        "ec.r.cards.localIban": "Local IBAN",
         "ec.r.plan.fit": "Best fit for your volume",
         "ec.r.plan.switch": "You can switch plans any time from the dashboard.",
         "ec.r.plan.compareAll": "Compare all plans →",
