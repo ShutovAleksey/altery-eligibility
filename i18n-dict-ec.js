@@ -42,6 +42,7 @@
     "ec.sidebar.step5": "Corridors",
     "ec.sidebar.status.current": "In progress",
     "ec.sidebar.status.done": "Completed",
+    "ec.sidebar.editStep": "Edit {label}",
 
     // Question header
     "ec.q.eyebrow": "of {total} questions",

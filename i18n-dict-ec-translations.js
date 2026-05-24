@@ -37,6 +37,7 @@
     "ec.sidebar.step5": "Korridore",
     "ec.sidebar.status.current": "In Bearbeitung",
     "ec.sidebar.status.done": "Abgeschlossen",
+    "ec.sidebar.editStep": "{label} bearbeiten",
 
     "ec.q.eyebrow": "von {total} Fragen",
 
@@ -412,6 +413,7 @@
     "ec.sidebar.step2": "Отрасль",
     "ec.sidebar.status.current": "В процессе",
     "ec.sidebar.status.done": "Завершено",
+    "ec.sidebar.editStep": "Изменить «{label}»",
     "ec.sidebar.step3": "Сервисы",
     "ec.sidebar.step4": "Объём",
     "ec.sidebar.step5": "Коридоры",

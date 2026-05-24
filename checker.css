@@ -534,6 +534,35 @@
         color: rgba(255,255,255,.45);
         white-space: nowrap;
       }
+      /* Clickable done-step — bare <button> wraps the num + body so the
+         entire row reads as one tap target. Background remains transparent
+         in default state (the sidebar is brand-dark, no chrome needed)
+         and gets a subtle accent-soft tint on hover/focus to signal
+         interactivity without competing with the current step. */
+      .ec-sidebar__step__btn {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 100%;
+        padding: 4px 8px;
+        margin: -4px -8px;
+        border: 0;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: background-color .15s ease;
+      }
+      .ec-sidebar__step__btn:hover {
+        background: rgba(255,255,255,.06);
+      }
+      .ec-sidebar__step__btn:focus-visible {
+        outline: none;
+        background: rgba(255,255,255,.08);
+        box-shadow: 0 0 0 2px rgba(255,255,255,.25);
+      }
       .ec-sidebar__lang {
         margin-top: auto;
         margin-left: 0;

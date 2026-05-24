@@ -33,6 +33,7 @@
     "ec.sidebar.step5": "Corridoi",
     "ec.sidebar.status.current": "In corso",
     "ec.sidebar.status.done": "Completato",
+    "ec.sidebar.editStep": "Modifica {label}",
 
     "ec.q.eyebrow": "di {total} domande",
 
@@ -408,6 +409,7 @@
     "ec.sidebar.step2": "Sector",
     "ec.sidebar.status.current": "En curso",
     "ec.sidebar.status.done": "Completado",
+    "ec.sidebar.editStep": "Editar {label}",
     "ec.sidebar.step3": "Servicios",
     "ec.sidebar.step4": "Volumen",
     "ec.sidebar.step5": "Corredores",

@@ -166,18 +166,19 @@ const EcIco = {
 //   - intro (step 0)            → all 5 dots in "todo" (preview of journey)
 //   - question N (step 1..5)    → dots <N done, dot N current, others todo
 //   - result (step 6)           → all 5 dots done
-function EcSidebar({ step, totalSteps, blockedAt }) {
+function EcSidebar({ step, totalSteps, blockedAt, maxStep, onStepClick }) {
   const t = useT();
-  const isQuestion = step >= 1 && step <= totalSteps;
   const onResult = step > totalSteps;
-  // Full-completion (all 5 steps as 'done') only when the user reached
-  // result via the approved path. A blocked result means they jumped
-  // straight from the question that triggered the block — anything
-  // after that question was never asked. `blockedAt` is only honoured
-  // when actually on the result screen; mid-flow back-navigation after
-  // a block still highlights the current question normally.
-  const isDone = onResult && !blockedAt;
+  // A blocked result means the user jumped straight from the gating
+  // question — anything after that question was never asked. `blockedAt`
+  // is only honoured when actually on the result screen; mid-flow
+  // back-navigation after a block still highlights the current question
+  // normally.
   const showBlocked = onResult && blockedAt;
+  // Highest question index the user has reached this session. Stays put
+  // when they navigate back via sidebar — so revisiting Q1 from Q5
+  // doesn't downgrade Q2-Q5 to 'todo'.
+  const reached = maxStep || 0;
   const stepLabels = [
     "ec.sidebar.step1", "ec.sidebar.step2", "ec.sidebar.step3",
     "ec.sidebar.step4", "ec.sidebar.step5",
@@ -201,36 +202,53 @@ function EcSidebar({ step, totalSteps, blockedAt }) {
       <ol className="ec-sidebar__steps">
         {stepLabels.map((labelKey, i) => {
           const n = i + 1;
-          // Blocked-result branch: mark only the question that triggered
-          // the block (and everything before it) as done. No 'current'
-          // — the user is parked on the soft-decline screen, not inside
-          // a question. Subsequent steps stay 'todo' because they were
-          // never asked.
+          // Blocked-result branch: mark only the gating question (and
+          // anything before it) as done; subsequent steps stay 'todo'.
+          // Outside the blocked case: done = (n <= maxStep AND n !==
+          // current), current = (n === step), else todo.
           const state = showBlocked
                         ? (n <= blockedAt ? "done" : "todo")
-                      : isDone                  ? "done"
-                      : isQuestion && n < step  ? "done"
-                      : isQuestion && n === step ? "current"
+                      : n === step              ? "current"
+                      : n <= reached            ? "done"
                       :                           "todo";
           const statusKey = state === "current" ? "ec.sidebar.status.current"
                           : state === "done"    ? "ec.sidebar.status.done"
                           : null;
+          // Done steps are clickable — user can jump back to edit any
+          // answer they've already given. Current step is where they
+          // already are; todo steps haven't been visited yet, so no
+          // navigation affordance for either.
+          const isClickable = state === "done" && typeof onStepClick === "function";
+          const num = (
+            <span className="ec-sidebar__step__num" aria-hidden="true">
+              {state === "done" ? (
+                <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+                  <path d="M3.5 8.5 6.5 11.5 12.5 5.5" stroke="currentColor" strokeWidth="2"
+                        strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              ) : n}
+            </span>
+          );
+          const body = (
+            <span className="ec-sidebar__step__body">
+              <span className="ec-sidebar__step__label">{t(labelKey)}</span>
+              {statusKey && <span className="ec-sidebar__step__status">{t(statusKey)}</span>}
+            </span>
+          );
           return (
-            <li key={n} className={`ec-sidebar__step is-${state}`} aria-current={state === "current" ? "step" : undefined}>
-              <span className="ec-sidebar__step__num" aria-hidden="true">
-                {state === "done"
-                  ? (
-                    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
-                      <path d="M3.5 8.5 6.5 11.5 12.5 5.5" stroke="currentColor" strokeWidth="2"
-                            strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )
-                  : n}
-              </span>
-              <span className="ec-sidebar__step__body">
-                <span className="ec-sidebar__step__label">{t(labelKey)}</span>
-                {statusKey && <span className="ec-sidebar__step__status">{t(statusKey)}</span>}
-              </span>
+            <li key={n}
+                className={`ec-sidebar__step is-${state}${isClickable ? " is-clickable" : ""}`}
+                aria-current={state === "current" ? "step" : undefined}>
+              {isClickable ? (
+                <button type="button"
+                        className="ec-sidebar__step__btn"
+                        onClick={() => onStepClick(n)}
+                        aria-label={t("ec.sidebar.editStep", { label: t(labelKey) })}>
+                  {num}{body}
+                </button>
+              ) : (
+                <>{num}{body}</>
+              )}
             </li>
           );
         })}
@@ -259,6 +277,11 @@ function EcSidebar({ step, totalSteps, blockedAt }) {
 function EcApp() {
   const t = useT();
   const [step, setStep] = useState(0);
+  // Highest step ever reached this session. Used by EcSidebar so that
+  // back-navigation (whether via the back-arrow or via a sidebar click)
+  // doesn't visually downgrade later steps to 'todo' — the user's
+  // answers persist, so the sidebar should reflect that.
+  const [maxStep, setMaxStep] = useState(0);
   const [direction, setDirection] = useState("forward");
   // First-touch UTM capture — runs once on mount. The helper is a
   // no-op if there's nothing in the URL AND nothing in sessionStorage,
@@ -315,14 +338,29 @@ function EcApp() {
     }
     setStep((s) => Math.max(0, s - 1));
   };
-  const next  = () => { setDirection("forward"); setStep((s) => Math.min(totalSteps + 1, s + 1)); };
-  const reset = () => { setDirection("back");    setStep(0); };
+  const next  = () => {
+    setDirection("forward");
+    setStep((s) => {
+      const ns = Math.min(totalSteps + 1, s + 1);
+      setMaxStep((m) => Math.max(m, ns));
+      return ns;
+    });
+  };
+  // Sidebar deep-link: clickable done-step jumps directly to that
+  // question. Direction-aware animation but doesn't reset maxStep —
+  // the user's later answers are still in state, so the sidebar
+  // continues showing those steps as done.
+  const goToStep = (n) => {
+    setDirection(n < step ? "back" : "forward");
+    setStep(n);
+  };
+  const reset = () => { setDirection("back");    setStep(0); setMaxStep(0); };
   // Short-circuit handler used by EcIndustry when the picked industry
   // is one we can't onboard (gambling/adult/weapons/lending). Jumps
   // straight to step 6 (result); ecRecommend returns kind:"blocked"
   // regardless of the unanswered later questions, so EcResultBlocked
   // renders cleanly with just the industry context.
-  const jumpToResult = () => { setDirection("forward"); setStep(6); };
+  const jumpToResult = () => { setDirection("forward"); setStep(6); setMaxStep((m) => Math.max(m, 6)); };
 
   // Which question caused a soft-decline, if any. Used by EcSidebar to
   // avoid marking all 5 steps as done when the user actually only
@@ -333,7 +371,7 @@ function EcApp() {
 
   return (
     <div className="ec-app">
-      <EcSidebar step={step} totalSteps={totalSteps} blockedAt={blockedAt} />
+      <EcSidebar step={step} totalSteps={totalSteps} blockedAt={blockedAt} maxStep={maxStep} onStepClick={goToStep} />
       <main className="ec-main" data-direction={direction}>
         {step === 0 && <EcIntro onStart={next} />}
         {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}

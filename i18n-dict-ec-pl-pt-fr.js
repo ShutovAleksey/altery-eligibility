@@ -34,6 +34,7 @@
     "ec.sidebar.step5": "Korytarze",
     "ec.sidebar.status.current": "W trakcie",
     "ec.sidebar.status.done": "Ukończone",
+    "ec.sidebar.editStep": "Edytuj {label}",
 
     "ec.q.eyebrow": "z {total} pytań",
 
@@ -409,6 +410,7 @@
     "ec.sidebar.step2": "Setor",
     "ec.sidebar.status.current": "Em andamento",
     "ec.sidebar.status.done": "Concluído",
+    "ec.sidebar.editStep": "Editar {label}",
     "ec.sidebar.step3": "Serviços",
     "ec.sidebar.step4": "Volume",
     "ec.sidebar.step5": "Corredores",
@@ -789,6 +791,7 @@
     "ec.sidebar.step2": "Secteur",
     "ec.sidebar.status.current": "En cours",
     "ec.sidebar.status.done": "Terminé",
+    "ec.sidebar.editStep": "Modifier {label}",
     "ec.sidebar.step3": "Services",
     "ec.sidebar.step4": "Volume",
     "ec.sidebar.step5": "Corridors",

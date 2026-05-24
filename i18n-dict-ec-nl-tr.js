@@ -33,6 +33,7 @@
     "ec.sidebar.step5": "Corridors",
     "ec.sidebar.status.current": "Bezig",
     "ec.sidebar.status.done": "Voltooid",
+    "ec.sidebar.editStep": "{label} bewerken",
 
     "ec.q.eyebrow": "van {total} vragen",
 
@@ -408,6 +409,7 @@
     "ec.sidebar.step2": "Sektör",
     "ec.sidebar.status.current": "Devam ediyor",
     "ec.sidebar.status.done": "Tamamlandı",
+    "ec.sidebar.editStep": "{label} düzenle",
     "ec.sidebar.step3": "Hizmetler",
     "ec.sidebar.step4": "Hacim",
     "ec.sidebar.step5": "Koridorlar",
