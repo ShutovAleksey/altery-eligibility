@@ -7,6 +7,20 @@
 .lang-switcher.is-right .lang-menu { right: 0; }
 .lang-switcher.is-left .lang-menu { left: 0; }
 
+/* Drop-up variant — used when the trigger sits at the bottom of a
+   sidebar/panel so the menu has nowhere to grow downward. The shell
+   passes dropUp={true} and gets class .is-up; menu opens above. */
+.lang-switcher.is-up .lang-menu {
+  top: auto;
+  bottom: calc(100% + 8px);
+  animation: lang-menu-in-up .12s ease both;
+}
+
+@keyframes lang-menu-in-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 .lang-pill {
   display: inline-flex;
   align-items: center;
@@ -109,3 +123,14 @@
   letter-spacing: .04em;
 }
 .lang-menu__item.is-current .lang-menu__code { color: var(--c-primary); opacity: .7; }
+
+/* Mobile: sidebar collapses to a 56-px top pill. The lang trigger sits
+   at the far right of that pill, so the menu must anchor right and shrink
+   to the viewport width — otherwise it bleeds past the right edge. */
+@media (max-width: 899px) {
+  .lang-switcher .lang-menu {
+    left: auto !important;
+    right: 0 !important;
+    width: min(220px, calc(100vw - 24px));
+  }
+}
