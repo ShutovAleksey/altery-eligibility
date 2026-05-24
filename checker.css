@@ -2114,9 +2114,15 @@
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
-    .ec-caveats__list { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
-    .ec-caveats__row { display: flex; gap: 12px; align-items: flex-start; font-size: 13px; line-height: 19px; color: var(--c-ink-2); }
-    .ec-caveats__row .ec-tagslot { flex: 0 0 auto; padding-top: 1px; }
+    .ec-caveats__list { display: flex; flex-direction: column; gap: 16px; margin: 0; padding: 0; list-style: none; }
+    /* Stack tag above text instead of inline. Inline layout created a
+       visual staircase: each tag has different width (especially across
+       10 languages — "Напишите нам" vs "Обновляется ежеквартально"),
+       so the text column started at a different x on every row. Vertical
+       stacking is language-agnostic — every row's body left-aligns at
+       the section gutter. */
+    .ec-caveats__row { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 19px; color: var(--c-ink-2); }
+    .ec-caveats__row .ec-tagslot { flex: 0 0 auto; }
 
     .ec-actions { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 8px; }
 
