@@ -357,33 +357,50 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         </div>`).join("")}
     </div>` : "";
 
-  // Altery vs typical business bank — comparison table. By the
-  // end of these 8 rows the customer has made the case for
-  // switching to themselves. Each row a single fact that
-  // accumulates into a clear winner.
-  const comparisonRows = [
-    "setup", "kyb", "fx", "swift", "multiCcy", "crypto", "api", "multiEntity"
-  ];
+  // Multi-comparator qualitative matrix — the same matrix that used to
+  // live on the result page, moved here. Six columns (Altery + the
+  // entity-matched traditional bank + 4 neobanks), eight rows
+  // (onboarding, digital-native acceptance, affiliate/creator, crypto,
+  // multi-entity, FX margin, SWIFT outgoing, doc friction). Lives in
+  // the PDF because the considered-evaluation context (CFO opens to
+  // study) suits multi-comparator density; the live result page is
+  // optimised for scanning, so it stays clean.
+  const matrix = ecQualitativeMatrix(rec);
+  const renderCell = (cell) => {
+    if (cell.kind === "yes")   return `<span style="color:${C.success};font-weight:700;">✓</span>`;
+    if (cell.kind === "no")    return `<span style="color:${C.muted};font-weight:500;">—</span>`;
+    if (cell.kind === "i18n")  return `<span>${t(cell.value)}</span>`;
+    if (cell.kind === "state") return `<span>${t("ec.cmp.state." + cell.value)}</span>`;
+    return `<span>${cell.value || "—"}</span>`;
+  };
+  const matrixThStyle = (isUs) =>
+    `text-align:center;font-size:10.5px;font-weight:700;padding:10px 8px;border-bottom:1px solid ${C.border};letter-spacing:-0.005em;` +
+    (isUs ? `color:${C.primary};` : `color:${C.inkSoft};`);
+  const matrixRowThStyle = `text-align:left;font-size:11.5px;font-weight:500;color:${C.muted};padding:10px 14px;`;
+  const matrixTdStyle = (isUs) =>
+    `text-align:center;font-size:11.5px;padding:10px 8px;` +
+    (isUs ? `background:${C.beige};color:${C.primary};font-weight:600;` : `color:${C.ink};`);
   const comparisonHTML = `
     <div style="margin:0 0 30px;">
-      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 14px;">${t("ec.pdf.comparison.head")}</div>
+      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 14px;">${t("ec.cmp.head")}</div>
       <table style="width:100%;border-collapse:collapse;background:${C.surface};border:1px solid ${C.border};border-radius:12px;overflow:hidden;">
         <thead>
           <tr style="background:${C.white};">
-            <th style="text-align:left;font-size:11px;font-weight:600;color:${C.muted};padding:10px 14px;border-bottom:1px solid ${C.border};text-transform:uppercase;letter-spacing:0.06em;width:38%;"></th>
-            <th style="text-align:left;font-size:11px;font-weight:600;color:${C.primary};padding:10px 14px;border-bottom:1px solid ${C.border};text-transform:uppercase;letter-spacing:0.06em;">Altery</th>
-            <th style="text-align:left;font-size:11px;font-weight:600;color:${C.muted};padding:10px 14px;border-bottom:1px solid ${C.border};text-transform:uppercase;letter-spacing:0.06em;">${t("ec.pdf.comparison.bank")}</th>
+            <th style="${matrixThStyle(false)}text-align:left;padding-left:14px;width:30%;"></th>
+            ${matrix.comparators.map((c) => `
+              <th style="${matrixThStyle(c.id === "altery")}">${c.name}</th>`).join("")}
           </tr>
         </thead>
         <tbody>
-          ${comparisonRows.map((row, i) => `
+          ${matrix.rows.map((row, i) => `
             <tr ${i > 0 ? `style="border-top:1px solid ${C.border};"` : ""}>
-              <td style="padding:10px 14px;font-size:12px;color:${C.muted};font-weight:500;">${t(`ec.pdf.comparison.row.${row}.label`)}</td>
-              <td style="padding:10px 14px;font-size:12px;color:${C.ink};font-weight:500;">${t(`ec.pdf.comparison.row.${row}.altery`)}</td>
-              <td style="padding:10px 14px;font-size:12px;color:${C.muted};">${t(`ec.pdf.comparison.row.${row}.bank`)}</td>
+              <td style="${matrixRowThStyle}">${t(row.labelKey)}</td>
+              ${row.cells.map((cell, j) => `
+                <td style="${matrixTdStyle(matrix.comparators[j].id === "altery")}">${renderCell(cell)}</td>`).join("")}
             </tr>`).join("")}
         </tbody>
       </table>
+      <div style="font-size:10px;color:${C.muted};line-height:15px;margin-top:8px;">${t("ec.cmp.note")}</div>
     </div>`;
 
   // Onboarding checklist — neutralizes the #1 friction: "what do

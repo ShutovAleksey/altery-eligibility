@@ -3,7 +3,7 @@
           EC_COUNTRIES, EC_INDUSTRIES, EC_BUSINESS_TYPES, EC_SERVICES,
           EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_PERKS,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
-          ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecQualitativeMatrix, ecVolumeHintKey,
+          ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
           EcFeesModal, EcBankHistory, EcPerks, EcPlanComparisonModal, EcHandoffModal,
           EcPaymentModal, EcAccountPreview */
@@ -1676,53 +1676,11 @@ function EcResultApproved({ rec, onBack, onReset }) {
           </div>
         </section>
 
-        {/* ───── Qualitative matrix — why Altery, not just fees ────
-            Side-by-side check against the same traditional bank baseline
-            we used in the money panel, plus 3 neobank comparators. The
-            money story is one column of value — this is the multi-axis
-            story (speed, acceptance, crypto, multi-entity). */}
-        {(() => {
-          const matrix = ecQualitativeMatrix(rec);
-          const cellIcon = (cell) => {
-            if (cell.kind === "yes") return <span className="ec-r__matrix__cell--yes" aria-label="yes">✓</span>;
-            if (cell.kind === "no")  return <span className="ec-r__matrix__cell--no"  aria-label="no">−</span>;
-            if (cell.kind === "i18n") return t(cell.value);
-            if (cell.kind === "state") return t("ec.cmp.state." + cell.value);
-            return cell.value;
-          };
-          return (
-            <section className="ec-r__matrix">
-              <div className="ec-r__cardEyebrow">{t("ec.cmp.head")}</div>
-              <div className="ec-r__matrix__scroll">
-                <table className="ec-r__matrix__table">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      {matrix.comparators.map((c) => (
-                        <th key={c.id} className={c.id === "altery" ? "is-us" : ""}>
-                          {c.name}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {matrix.rows.map((row) => (
-                      <tr key={row.key}>
-                        <th scope="row">{t(row.labelKey)}</th>
-                        {row.cells.map((cell, i) => (
-                          <td key={i} className={matrix.comparators[i].id === "altery" ? "is-us" : ""}>
-                            {cellIcon(cell)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <p className="ec-r__matrix__note">{t("ec.cmp.note")}</p>
-            </section>
-          );
-        })()}
+        {/* The qualitative comparison matrix used to render here. Moved
+            to the PDF (ecBuildAnalysisHTML): a six-column table reads
+            as page-density overload on the live result screen, but
+            lives well in the considered-evaluation context of a PDF
+            opened by a CFO who's set aside time to study it. */}
 
         {/* ───── Caveats (only if any) ──────────────────────────── */}
         {caveats.length > 0 && (
