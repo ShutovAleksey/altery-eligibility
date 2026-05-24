@@ -1655,26 +1655,12 @@ function EcResultApproved({ rec, onBack, onReset }) {
             transactional decision surface (hero → savings → plan →
             coverage → caveats → action), uninterrupted by promo cards. */}
 
-        {/* ───── Coverage strip ─────────────────────────────────── */}
-        <section className="ec-r__coverage">
-          <div className="ec-r__cardEyebrow">{t("ec.r.cards.countries")}</div>
-          <div className="ec-r__coverage__row">
-            <div className="ec-r__coverage__flags">
-              {entity.countries.map((c) => (
-                <span key={c} className="ec-r__coverage__flag">
-                  <Flag code={c} size={20} />
-                  <span>{t("ec.country." + c)}</span>
-                </span>
-              ))}
-            </div>
-            <div className="ec-r__coverage__more">
-              <span className="ec-r__coverage__moreIcon" aria-hidden="true">
-                <EcIco.globe style={{ width: 14, height: 14 }} />
-              </span>
-              {t("ec.r.cards.countriesMore")}
-            </div>
-          </div>
-        </section>
+        {/* The "Supported countries" strip used to render here. Removed:
+            by the time the user reaches the result page they've already
+            picked their country (Q1) and corridors (Q5), so seeing a row
+            of arbitrary entity-country flags + "+100 more via SWIFT" was
+            redundant reassurance that ate ~120px of vertical real estate
+            without contributing to the conversion path. */}
 
         {/* The qualitative comparison matrix used to render here. Moved
             to the PDF (ecBuildAnalysisHTML): a six-column table reads

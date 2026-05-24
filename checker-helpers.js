@@ -147,9 +147,11 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
   if (entity?.id === "mena") {
     caveats.push({ tagKey: "ec.cav.mena.tag", textKey: "ec.cav.mena.text", tone: "orange" });
   }
-  if (plan.id === "ultra") {
-    caveats.push({ tagKey: "ec.cav.ultra.tag", textKey: "ec.cav.ultra.text", tone: "blue" });
-  }
+  // Ultra pricing is firm now (£300/mo with a full fee schedule in
+  // EC_PLANS.ultra). The previous "Ultra prices set after a call"
+  // caveat contradicted the public price so it's been removed. If
+  // Ultra ever moves back to bespoke pricing, drop the price field
+  // from EC_PLANS.ultra and restore the caveat together.
 
   // ── Reasoning bullets — "Why we recommend this plan" ──────────────
   // The single most important addition for conversion: instead of just

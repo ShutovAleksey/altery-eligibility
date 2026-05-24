@@ -228,9 +228,7 @@
         "ec.r.persona.creator.line": "For creator platforms paying at scale",
         "ec.r.persona.crypto.line": "For crypto-native operations with licensed rails",
         "ec.r.entity.status": "{licence} · operational",
-        "ec.r.cards.countries": "Supported countries",
         "ec.r.cards.currencies": "Supported currencies",
-        "ec.r.cards.countriesMore": "+ 100 more available globally via SWIFT",
         "ec.r.cards.currenciesMore": "All available with a local IBAN. 60+ more currencies for outgoing SWIFT.",
         "ec.r.cards.localIban": "Local IBAN",
         "ec.r.plan.fit": "Best fit for your volume",
@@ -281,8 +279,6 @@
     "ec.cav.row.text": "Companies incorporated in {country} aren't on our standard list — we'll route your application to a relationship manager for a 1-day review.",
     "ec.cav.mena.tag": "In progress",
     "ec.cav.mena.text": "Altery MENA is fully licensed by DFSA and operationalising. Your account opens immediately; some corridors activate as we progress integration.",
-    "ec.cav.ultra.tag": "Contact us",
-    "ec.cav.ultra.text": "Ultra pricing is set per business after a short discovery call. We'll book it during application — typically within 24h.",
     "ec.cav.performance.tag": "Specialist review",
     "ec.cav.performance.text": "Performance marketing businesses ({industry}) need clearer traffic and payout evidence. We'll ask how you verify advertisers, publishers and payout rules — structured review, not a black box.",
 
