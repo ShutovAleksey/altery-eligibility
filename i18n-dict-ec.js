@@ -66,6 +66,14 @@
     "ec.q1.alert.blocked.body": "Altery doesn't support {industry} on any of our entities. We'll explain on the result screen — you can also reach our team directly.",
     "ec.q1.alert.crypto.title": "Crypto-native? You're in the right place.",
     "ec.q1.alert.crypto.body": "We onboard {category} regularly. Your application routes through our crypto-specialist lane — fluent compliance team, fiat rails via SEPA / Faster Payments / SWIFT, and Synterra Connect (our partner-network for direct exchange settlement) for moving funds in and out of regulated venues without manual reconciliation.",
+    "ec.q1.alert.saas.title": "Digital-native? You're in the right place.",
+    "ec.q1.alert.saas.body": "SaaS, AI-native apps, games and digital products are the bulk of who we onboard. Multi-currency collection, SEPA Direct Debit for EU subscribers, FX corridors for global revenue mixes, payouts on API for Pro+ — all live on day one.",
+    "ec.q1.alert.marketplace.title": "Split-flow ops? We see this regularly.",
+    "ec.q1.alert.marketplace.body": "Marketplaces with collection accounts and payout obligations to sellers route well on our rails. Mass payouts via API on Pro and Ultra, virtual sub-accounts for reconciliation, and FX corridors when payouts cross currencies.",
+    "ec.q1.alert.creator.title": "Creator economy? We onboard regularly.",
+    "ec.q1.alert.creator.body": "Creator and influencer platforms with subscription, sponsorship and tipping flows are a core segment. Subscription rails, multi-currency payouts to creators, and structured KYB — not a black box.",
+    "ec.q1.alert.freezone.title": "DMCC, ADGM, JAFZA — all welcome.",
+    "ec.q1.alert.freezone.body": "Free-zone incorporations get the same treatment as mainland UAE entities — Altery MENA is DFSA-licensed and serves both. Tell us your free zone during onboarding; the document list adjusts automatically.",
 
     // Industries
     

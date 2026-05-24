@@ -371,7 +371,7 @@ function EcApp() {
       <main className="ec-main" data-direction={direction}>
         {step === 0 && <EcIntro onStart={next} />}
         {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}
-        {step === 2 && <EcIndustry industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={back} onNext={next} onBlocked={jumpToResult} />}
+        {step === 2 && <EcIndustry country={country} industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={back} onNext={next} onBlocked={jumpToResult} />}
         {step === 3 && <EcServices services={services} setServices={setServices} onBack={back} onNext={next} />}
         {step === 4 && <EcVolume
           volumeInIdx={volumeInIdx} setVolumeInIdx={setVolumeInIdx}
@@ -762,9 +762,14 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
   );
 }
 
-function EcIndustry({ industry, setIndustry, businessType, setBusinessType, onBack, onNext, onBlocked }) {
+function EcIndustry({ country, industry, setIndustry, businessType, setBusinessType, onBack, onNext, onBlocked }) {
   const t = useT();
   const ind = EC_INDUSTRIES.find((i) => i.value === industry);
+  // UAE incorporations frequently arrive worried that free-zone (DMCC,
+  // ADGM, JAFZA…) vs onshore status will be a blocker. It isn't — DIFC-
+  // licensed Altery MENA serves both. Banner only fires once the user
+  // is committed to UAE (Q1) so it doesn't surface for unrelated picks.
+  const showFreezone = country === "AE";
   // If the user picks an industry we can't onboard (gambling, adult,
   // weapons, unregulated lending) there is no point asking the next four
   // questions — country/services/volume/corridors won't change the
@@ -819,6 +824,27 @@ function EcIndustry({ industry, setIndustry, businessType, setBusinessType, onBa
       {ind?.crypto && (
         <Alert tone="info" title={t("ec.q1.alert.crypto.title")}>
           {t("ec.q1.alert.crypto.body", { category: t(ind.labelKey).toLowerCase() })}
+        </Alert>
+      )}
+
+      {/* Industry-specific reassurance — same tone as the crypto alert.
+          Triggers via `reassureKey` on the industry definition. Reads
+          well for AI / SaaS / marketplace / creator picks where the
+          first instinct of a prospect is "is this segment unusual?". */}
+      {!isBlocked && !ind?.crypto && ind?.reassureKey && (
+        <Alert tone="info" title={t(ind.reassureKey + ".title")}>
+          {t(ind.reassureKey + ".body", { category: t(ind.labelKey).toLowerCase() })}
+        </Alert>
+      )}
+
+      {/* UAE free-zone reassurance — fires for any industry once the
+          user has chosen UAE on Q1. Hassan's worry that DMCC/ADGM/JAFZA
+          incorporations might be a problem comes up in nearly every
+          UAE conversation; the inline answer is "no, they're all
+          welcome". Country-conditional, not industry-conditional. */}
+      {showFreezone && !isBlocked && (
+        <Alert tone="info" title={t("ec.q1.alert.freezone.title")}>
+          {t("ec.q1.alert.freezone.body")}
         </Alert>
       )}
 

@@ -342,11 +342,15 @@ const EC_INDUSTRIES = [
   // — SaaS/apps/games lead because they make up the bulk of inbound
   // demand for cross-border digital business banking. Marketplace
   // and e-commerce follow as adjacent segments.
-  { value: "saas",        labelKey: "ec.ind.saas",        risk: "ok" },         // Digital Founder
-  { value: "apps",        labelKey: "ec.ind.apps",        risk: "ok" },         // App Publisher / AI App
-  { value: "games",       labelKey: "ec.ind.games",       risk: "ok" },         // Game Studio Operator
-  { value: "edtech",      labelKey: "ec.ind.edtech",      risk: "ok" },         // EdTech Platform Operator
-  { value: "marketplace", labelKey: "ec.ind.marketplace", risk: "ok" },         // Marketplaces & platforms
+  // `reassureKey` (optional) is the i18n root for an inline info alert
+  // that fires when the industry is picked. Same pattern as the crypto
+  // alert: title at `{key}.title`, body at `{key}.body` — body may
+  // interpolate {category}.
+  { value: "saas",        labelKey: "ec.ind.saas",        risk: "ok", reassureKey: "ec.q1.alert.saas" },         // Digital Founder
+  { value: "apps",        labelKey: "ec.ind.apps",        risk: "ok", reassureKey: "ec.q1.alert.saas" },         // App Publisher / AI App
+  { value: "games",       labelKey: "ec.ind.games",       risk: "ok", reassureKey: "ec.q1.alert.saas" },         // Game Studio Operator
+  { value: "edtech",      labelKey: "ec.ind.edtech",      risk: "ok", reassureKey: "ec.q1.alert.saas" },         // EdTech Platform Operator
+  { value: "marketplace", labelKey: "ec.ind.marketplace", risk: "ok", reassureKey: "ec.q1.alert.marketplace" },  // Marketplaces & platforms
   { value: "ecom",        labelKey: "ec.ind.ecom",        risk: "ok" },         // E-commerce & digital goods
   { value: "prof",        labelKey: "ec.ind.prof",        risk: "ok" },         // Professional services
   // ── Specialist review path ────────────────────────────────────────
@@ -354,7 +358,7 @@ const EC_INDUSTRIES = [
   // Altery actively onboards them. Result page caveats set the
   // expectation that review is structured, not a black box ("Caveats
   // now, not after KYB" promise from the intro screen).
-  { value: "creator",     labelKey: "ec.ind.creator",     risk: "specialist" }, // Creator / influencer platforms
+  { value: "creator",     labelKey: "ec.ind.creator",     risk: "specialist", reassureKey: "ec.q1.alert.creator" }, // Creator / influencer platforms
   { value: "affiliate",   labelKey: "ec.ind.affiliate",   risk: "specialist" }, // Affiliate / performance marketing
   { value: "crypto",      labelKey: "ec.ind.crypto",      risk: "specialist", crypto: true }, // Crypto-native Operator
   // ── Fallback ──────────────────────────────────────────────────────
