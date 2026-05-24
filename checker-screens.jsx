@@ -3,7 +3,7 @@
           EC_COUNTRIES, EC_INDUSTRIES, EC_BUSINESS_TYPES, EC_SERVICES,
           EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_PERKS,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
-          ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
+          ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecQualitativeMatrix, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
           EcFeesModal, EcBankHistory, EcPerks, EcPlanComparisonModal, EcHandoffModal,
           EcPaymentModal, EcAccountPreview */
@@ -1495,10 +1495,12 @@ function EcResultApproved({ rec, onBack, onReset }) {
         <div className="ec-r__grid">
           {cost && cost.savings && cost.savings.monthly >= 100 && (
             <section className="ec-r__card ec-r__savings">
-              <div className="ec-r__cardEyebrow">{t("ec.r.savings.head")}</div>
+              <div className="ec-r__cardEyebrow">
+                {t("ec.r.savings.head", { bank: cost.methodology.baseline })}
+              </div>
               <div className="ec-r__compare">
                 <div className="ec-r__compare__col">
-                  <div className="ec-r__compare__label">{t("ec.r.savings.bank")}</div>
+                  <div className="ec-r__compare__label">{cost.methodology.baseline}</div>
                   <div className="ec-r__compare__amount ec-r__compare__amount--strike">{fmtNarrow(cost.bank.total)}</div>
                   <div className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</div>
                 </div>
@@ -1514,15 +1516,68 @@ function EcResultApproved({ rec, onBack, onReset }) {
               <div className="ec-r__savingsHero">
                 <div className="ec-r__savingsHero__label">{t("ec.r.savings.heroLabel")}</div>
                 <div className="ec-r__savingsHero__amount">
-                  {fmtNarrow(cost.savings.monthly)}<span className="ec-r__savingsHero__cycle">{t("ec.r.savings.cycle")}</span>
+                  {fmtNarrow(cost.savings.monthlyLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.savings.monthlyHigh)}<span className="ec-r__savingsHero__cycle">{t("ec.r.savings.cycle")}</span>
                 </div>
                 <div className="ec-r__savingsHero__year">
-                  {t("ec.r.savings.year", { amount: fmtNarrow(cost.savings.annual) })}
+                  {t("ec.r.savings.yearRange", { low: fmtNarrow(cost.savings.annualLow), high: fmtNarrow(cost.savings.annualHigh) })}
                 </div>
               </div>
               <p className="ec-r__savings__note">
                 {t("ec.r.savings.note", { volume: ecFormatVolume(rec.monthlyVolume) })}
               </p>
+              <details className="ec-r__method">
+                <summary className="ec-r__method__summary">{t("ec.r.method.summary")}</summary>
+                <div className="ec-r__method__body">
+                  <div className="ec-r__method__lines">
+                    <div className="ec-r__method__lineRow ec-r__method__lineRow--head">
+                      <span></span>
+                      <span>{t("ec.r.savings.altery")}</span>
+                      <span>{cost.methodology.baseline}</span>
+                    </div>
+                    <div className="ec-r__method__lineRow">
+                      <span>{t("ec.r.method.line.subscription")}</span>
+                      <span>{fmtNarrow(cost.altery.subscription)}</span>
+                      <span>{fmtNarrow(cost.bank.subscription || 0)}</span>
+                    </div>
+                    <div className="ec-r__method__lineRow">
+                      <span>{t("ec.r.method.line.fx")}</span>
+                      <span>{fmtNarrow(cost.altery.fx)}</span>
+                      <span>{fmtNarrow(cost.bank.fx)}</span>
+                    </div>
+                    <div className="ec-r__method__lineRow">
+                      <span>{t("ec.r.method.line.swift")}</span>
+                      <span>{fmtNarrow(cost.altery.swift)}</span>
+                      <span>{fmtNarrow(cost.bank.swift)}</span>
+                    </div>
+                    <div className="ec-r__method__lineRow">
+                      <span>{t("ec.r.method.line.local")}</span>
+                      <span>{fmtNarrow(cost.altery.local)}</span>
+                      <span>{fmtNarrow(cost.bank.local)}</span>
+                    </div>
+                    <div className="ec-r__method__lineRow ec-r__method__lineRow--total">
+                      <span>{t("ec.r.method.line.total")}</span>
+                      <span>{fmtNarrow(cost.altery.total)}</span>
+                      <span>{fmtNarrow(cost.bank.total)}</span>
+                    </div>
+                  </div>
+                  <ul className="ec-r__method__assumptions">
+                    {cost.methodology.assumptions.map((a, i) => (
+                      <li key={i}>{t(a.key, a.vars)}</li>
+                    ))}
+                  </ul>
+                  <div className="ec-r__method__sources">
+                    {t("ec.r.method.asof", { date: cost.methodology.asof })}
+                    {cost.methodology.baselineSources.map((url, i) => (
+                      <span key={i}>
+                        {" · "}
+                        <a href={url} target="_blank" rel="noopener noreferrer">
+                          {t("ec.r.method.sourceLink", { bank: cost.methodology.baseline })}
+                        </a>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </details>
             </section>
           )}
 
@@ -1622,6 +1677,54 @@ function EcResultApproved({ rec, onBack, onReset }) {
             </div>
           </div>
         </section>
+
+        {/* ───── Qualitative matrix — why Altery, not just fees ────
+            Side-by-side check against the same traditional bank baseline
+            we used in the money panel, plus 3 neobank comparators. The
+            money story is one column of value — this is the multi-axis
+            story (speed, acceptance, crypto, multi-entity). */}
+        {(() => {
+          const matrix = ecQualitativeMatrix(rec);
+          const cellIcon = (cell) => {
+            if (cell.kind === "yes") return <span className="ec-r__matrix__cell--yes" aria-label="yes">✓</span>;
+            if (cell.kind === "no")  return <span className="ec-r__matrix__cell--no"  aria-label="no">−</span>;
+            if (cell.kind === "i18n") return t(cell.value);
+            if (cell.kind === "state") return t("ec.cmp.state." + cell.value);
+            return cell.value;
+          };
+          return (
+            <section className="ec-r__matrix">
+              <div className="ec-r__cardEyebrow">{t("ec.cmp.head")}</div>
+              <div className="ec-r__matrix__scroll">
+                <table className="ec-r__matrix__table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      {matrix.comparators.map((c) => (
+                        <th key={c.id} className={c.id === "altery" ? "is-us" : ""}>
+                          {c.name}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {matrix.rows.map((row) => (
+                      <tr key={row.key}>
+                        <th scope="row">{t(row.labelKey)}</th>
+                        {row.cells.map((cell, i) => (
+                          <td key={i} className={matrix.comparators[i].id === "altery" ? "is-us" : ""}>
+                            {cellIcon(cell)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p className="ec-r__matrix__note">{t("ec.cmp.note")}</p>
+            </section>
+          );
+        })()}
 
         {/* ───── Caveats (only if any) ──────────────────────────── */}
         {caveats.length > 0 && (

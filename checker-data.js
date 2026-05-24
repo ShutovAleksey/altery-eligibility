@@ -764,10 +764,229 @@ const EC_ENTITIES = {
   },
 };
 
-// Export all 13 names to window so other scripts can reference them
+// ── Comparator banks for result-page cost-projection ──────────────
+//
+// Two purposes:
+//   (1) Pick the traditional bank baseline for the money panel — fee
+//       schedule used to compute the side-by-side comparison number.
+//   (2) Provide qualitative attributes for the matrix below the money
+//       panel — speed, acceptance, crypto, multi-entity etc.
+//
+// Selection rationale (per founder direction): pick traditional banks
+// that are EXPENSIVE and SLOW — Barclays / BNP Paribas / Mashreq —
+// because that's where Altery's value proposition (fast + accepting +
+// digital-first + crypto + low FX) shows the widest delta. Neobank
+// comparators (Wise / Revolut / Mercury / 3S Money / Payset) round out
+// the qualitative matrix to demonstrate that on multiple non-fee axes
+// (acceptance, crypto, multi-entity), Altery wins even where neobanks
+// match on fees.
+//
+// All fee numbers normalised to EUR for math consistency with rec.
+// monthlyVolume (which is EUR). Conversion at standard rates documented
+// inline. Re-validate quarterly against `asof` dates.
+const EC_COMPARATORS = {
+  // ── Traditional bank baselines (one per entity region) ──────────
+  uk_traditional: {
+    id: "uk_traditional",
+    name: "Barclays Business",
+    type: "traditional",
+    forEntities: ["uk", "row"],
+    asof: "2026-05-23",
+    sources: [
+      "https://www.barclays.co.uk/business-banking/accounts/pricing/",
+    ],
+    // Money — EUR-equivalent (£1 ≈ €1.18)
+    fees: {
+      subscriptionEur:    10,     // £8.50 monthly fee
+      localOutEur:        0.40,   // £0.35 per electronic payment
+      sepaOutEur:         24,     // £20 SEPA outgoing
+      swiftOutEur:        30,     // £25 SWIFT outgoing
+      transferInEur:      7,      // £6 incoming
+      fxMarkupBps:        275,    // 2.75% standard variable spread
+      cardMonthlyEur:     3.50,   // £3 per card
+      cardFxMarkupBps:    275,
+      massBatchEur:       30,     // £25 estimated per batch
+    },
+    qualitative: {
+      onboardingKey:   "ec.cmp.q.onboarding.weeks",
+      digitalNative:   false,
+      affiliate:       "caseByCase",
+      cryptoNative:    false,
+      multiEntity:     false,
+      docFriction:     "high",
+    },
+  },
+  eu_traditional: {
+    id: "eu_traditional",
+    name: "BNP Paribas Business",
+    type: "traditional",
+    forEntities: ["eu"],
+    asof: "2026-05-23",
+    sources: [
+      "https://group.bnpparibas/uploads/file/business_tarif.pdf",
+    ],
+    fees: {
+      subscriptionEur:    25,     // €25 monthly (Pro tier)
+      localOutEur:        0.50,   // €0.50 SEPA outgoing standard
+      sepaOutEur:         0.50,
+      swiftOutEur:        25,     // €25 flat + 0.10%
+      transferInEur:      0,      // SEPA in free
+      fxMarkupBps:        275,    // 2.75% average
+      cardMonthlyEur:     8,
+      cardFxMarkupBps:    250,
+      massBatchEur:       35,
+    },
+    qualitative: {
+      onboardingKey:   "ec.cmp.q.onboarding.weeks",
+      digitalNative:   false,
+      affiliate:       "no",
+      cryptoNative:    false,
+      multiEntity:     false,
+      docFriction:     "high",
+    },
+  },
+  mena_traditional: {
+    id: "mena_traditional",
+    name: "Mashreq Business",
+    type: "traditional",
+    forEntities: ["mena"],
+    asof: "2026-05-23",
+    sources: [
+      "https://www.mashreqbank.com/uae/en/business/sme/business-banking",
+    ],
+    // AED 1 ≈ €0.24
+    fees: {
+      subscriptionEur:    48,     // AED 200 monthly
+      localOutEur:        1.20,   // AED 5
+      sepaOutEur:         24,     // International ≈ AED 100
+      swiftOutEur:        30,     // AED 125 + correspondent
+      transferInEur:      4.80,   // AED 20
+      fxMarkupBps:        300,    // 3.00% — MENA traditional spread
+      cardMonthlyEur:     12,
+      cardFxMarkupBps:    300,
+      massBatchEur:       48,
+    },
+    qualitative: {
+      onboardingKey:   "ec.cmp.q.onboarding.weeks",
+      digitalNative:   false,
+      affiliate:       "no",
+      cryptoNative:    false,
+      multiEntity:     false,
+      docFriction:     "high",
+    },
+  },
+  // ── Neobank / cross-border-fintech comparators ─────────────────
+  // No full fee schedule needed — used only in qualitative matrix.
+  // `qualitative` strings show what they don't do well for our ICP.
+  wise: {
+    id: "wise",
+    name: "Wise Business",
+    type: "neobank",
+    asof: "2026-05-23",
+    sources: ["https://wise.com/help/articles/2978049/where-can-i-use-wise"],
+    qualitative: {
+      onboardingKey: "ec.cmp.q.onboarding.days",
+      digitalNative: "partial",     // accepts SaaS but not high-risk
+      affiliate:     "restricted",  // many affiliate niches restricted
+      cryptoNative:  false,         // explicitly banned
+      multiEntity:   false,
+      docFriction:   "medium",
+      fxMarkup:      "0.43-0.65%",
+      swiftOut:      "£5-15",
+    },
+  },
+  revolut: {
+    id: "revolut",
+    name: "Revolut Business",
+    type: "neobank",
+    asof: "2026-05-23",
+    sources: ["https://help.revolut.com/en-US/business/help/setting-up-an-account/is-my-business-eligible/"],
+    qualitative: {
+      onboardingKey: "ec.cmp.q.onboarding.days",
+      digitalNative: "partial",
+      affiliate:     "no",
+      cryptoNative:  false,
+      multiEntity:   false,
+      docFriction:   "medium",
+      fxMarkup:      "0-1.0%",     // free up to plan limit
+      swiftOut:      "£1-15",
+    },
+  },
+  mercury: {
+    id: "mercury",
+    name: "Mercury",
+    type: "neobank",
+    asof: "2026-05-23",
+    sources: ["https://support.mercury.com/hc/en-us/articles/28770467511060"],
+    qualitative: {
+      onboardingKey: "ec.cmp.q.onboarding.days",
+      digitalNative: true,           // built for digital
+      affiliate:     "partial",
+      cryptoNative:  false,
+      multiEntity:   false,
+      docFriction:   "low",
+      restriction:   "US-only",      // hard limit for non-US bizzes
+      fxMarkup:      "1.0%",
+      swiftOut:      "$5",
+    },
+  },
+  three_s_money: {
+    id: "three_s_money",
+    name: "3S Money",
+    type: "neobank",
+    asof: "2026-05-23",
+    sources: ["https://3s.money/help-centre/getting-started/is-my-business-eligible-for-a-3s-money-international-business-account"],
+    qualitative: {
+      onboardingKey: "ec.cmp.q.onboarding.weeks",  // 2-3 weeks despite digital flow
+      digitalNative: "partial",
+      affiliate:     "caseByCase",
+      cryptoNative:  false,                        // crypto prohibited
+      multiEntity:   false,
+      docFriction:   "medium",
+      restriction:   "£100k/yr min + opening fee", // hard barrier for early-stage
+      fxMarkup:      "1.0-1.5%",
+      swiftOut:      "£15-25",
+    },
+  },
+  payset: {
+    id: "payset",
+    name: "Payset",
+    type: "neobank",
+    asof: "2026-05-23",
+    sources: ["https://www.payset.io/multi-currency-account/"],
+    qualitative: {
+      onboardingKey: "ec.cmp.q.onboarding.days",
+      digitalNative: "partial",
+      affiliate:     "restricted",
+      cryptoNative:  false,
+      multiEntity:   false,
+      docFriction:   "medium",
+      fxMarkup:      "0.5-1.5%",
+      swiftOut:      "£10-20",
+    },
+  },
+  // ── Altery — the reference row in both panels ───────────────────
+  altery: {
+    id: "altery",
+    name: "Altery",
+    type: "self",
+    qualitative: {
+      onboardingKey: "ec.cmp.q.onboarding.sameDay",
+      digitalNative: true,
+      affiliate:     true,
+      cryptoNative:  true,
+      multiEntity:   true,
+      docFriction:   "low",
+      // FX/SWIFT come from the active plan — rendered dynamically
+    },
+  },
+};
+
+// Export all names to window so other scripts can reference them
 // unqualified.
 Object.assign(window, {
   EC_COUNTRIES, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_INDUSTRIES,
   EC_BUSINESS_TYPES, EC_SERVICES, TOTAL_STEPS,
   EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_PERKS, EC_ENTITIES,
+  EC_COMPARATORS,
 });

@@ -244,6 +244,21 @@ function ecParseFee(raw) {
   };
 }
 
+// Pick the named traditional-bank baseline for an entity. Returns the
+// EC_COMPARATORS entry whose forEntities list includes the entity id,
+// or falls back to UK (Barclays) if no match (rare — guards against
+// unknown entity ids without throwing).
+function ecBaselineFor(entityId) {
+  const cmp = window.EC_COMPARATORS || {};
+  for (const k of Object.keys(cmp)) {
+    const c = cmp[k];
+    if (c.type === "traditional" && Array.isArray(c.forEntities) && c.forEntities.includes(entityId)) {
+      return c;
+    }
+  }
+  return cmp.uk_traditional;
+}
+
 function ecComputeCostBreakdown(rec) {
   const vol = rec?.monthlyVolume || 0;
   if (vol < 1000) return null;  // not enough to project credibly
@@ -257,10 +272,7 @@ function ecComputeCostBreakdown(rec) {
   // Altery rails — read the active plan's published fees so the
   // projection moves with plan tier. Each plan exposes a fees object:
   //   { sepa: "€1", swift: "€10 + 0.25%", fxMarkup: "up to 0.7%" }
-  // We parse the strings once here and use them as multipliers below.
-  // Falls back to the historical Pro-tier defaults if a field is
-  // missing — this keeps the helper resilient if a plan is added
-  // without all fee fields populated.
+  // Falls back to historical Pro-tier defaults if a field is missing.
   const planFees = rec.plan?.fees || {};
   const fxFee    = ecParseFee(planFees.fxMarkup);
   const swiftFee = ecParseFee(planFees.swift);
@@ -270,14 +282,12 @@ function ecComputeCostBreakdown(rec) {
   const ALTERY_SWIFT_PCT  = swiftFee.pct  || 0.0025;
   const ALTERY_LOCAL      = sepaFee.flat  || 1;
 
-  // Industry-average traditional business bank (HSBC/Barclays/
-  // Deutsche/Santander SMB tier — public retail business pricing,
-  // averaged). Plan-independent — the comparison side is always the
-  // same legacy bank baseline.
-  const BANK_FX_MARKUP   = 0.025;     // 2.5% — typical mid of 2–4% spread
-  const BANK_SWIFT_FLAT  = 40;        // €40 per outgoing — typical
-  const BANK_LOCAL       = 0.5;       // €0.50 — bank local cheaper but
-                                      // requires sep. account per currency
+  // Baseline bank — picked by entity (uk → Barclays, eu → BNP, mena →
+  // Mashreq). Pulls real published-tariff numbers from EC_COMPARATORS
+  // so the comparison cites a named bank, not a "typical" anonymous
+  // baseline.
+  const baseline = ecBaselineFor(rec?.entity?.id || "uk");
+  const BANK_FEES = baseline.fees;
 
   const txCount  = ecEstimateTxCount(vol);
   const avgTxVal = vol / Math.max(txCount, 1);
@@ -288,9 +298,7 @@ function ecComputeCostBreakdown(rec) {
   const localTxCount = Math.round(txCount * 0.6);
   const swiftTxCount = txCount - localTxCount;
 
-  // Plan subscription — taken straight from rec.plan.price. We
-  // strip currency symbol and parse, defaulting to 0 if it's a
-  // free tier or starter.
+  // Plan subscription — taken straight from rec.plan.price.
   const planNumeric = (() => {
     const raw = String(rec.plan?.price || "").replace(/[^\d.]/g, "");
     return parseFloat(raw) || 0;
@@ -304,24 +312,124 @@ function ecComputeCostBreakdown(rec) {
   };
   altery.total = altery.subscription + altery.fx + altery.swift + altery.local;
 
+  // Baseline bank cost — same operational profile, real tariffs from
+  // EC_COMPARATORS. `subscription` is new here; the legacy result
+  // page wasn't expecting it, but rendering with .total | 0 fallback
+  // keeps old call-sites working.
   const bank = {
-    fx:    Math.round(fxVolume * BANK_FX_MARKUP),
-    swift: Math.round(swiftTxCount * BANK_SWIFT_FLAT),
-    local: Math.round(localTxCount * BANK_LOCAL),
+    subscription: BANK_FEES.subscriptionEur,
+    fx:           Math.round(fxVolume * (BANK_FEES.fxMarkupBps / 10000)),
+    swift:        Math.round(swiftTxCount * BANK_FEES.swiftOutEur),
+    local:        Math.round(localTxCount * BANK_FEES.localOutEur),
   };
-  bank.total = bank.fx + bank.swift + bank.local;
+  bank.total = bank.subscription + bank.fx + bank.swift + bank.local;
 
   // Round savings to the nearest €100 for clean presentation.
-  // Numbers like "€9,547/month" look fake-precise; "€9,500/month"
-  // reads as the considered estimate it actually is.
   const rawMonthly = Math.max(bank.total - altery.total, 0);
   const monthly    = Math.round(rawMonthly / 100) * 100;
   const annual     = monthly * 12;
 
+  // ±15% confidence band — savings depend on actual cross-border mix
+  // and FX exposure, which we estimate from volume rather than measure.
+  // Showing the range is more honest than a snap point estimate.
+  const savings = {
+    monthly,
+    annual,
+    monthlyLow:  Math.round(monthly * 0.85 / 100) * 100,
+    monthlyHigh: Math.round(monthly * 1.15 / 100) * 100,
+    annualLow:   Math.round(annual  * 0.85 / 100) * 100,
+    annualHigh:  Math.round(annual  * 1.15 / 100) * 100,
+  };
+
+  // Methodology — exposed via the result-page <details> block so a
+  // skeptical CFO can audit assumptions and check the bank's tariff
+  // page directly. asof = data-validity stamp.
+  const methodology = {
+    baseline:        baseline.name,
+    baselineSources: baseline.sources,
+    asof:            baseline.asof,
+    assumptions: [
+      { key: "ec.r.method.fxRatio",   vars: { pct: 60 } },
+      { key: "ec.r.method.txMix",     vars: { localPct: 60, swiftPct: 40 } },
+      { key: "ec.r.method.txCount",   vars: { n: txCount, swift: swiftTxCount, local: localTxCount } },
+      { key: "ec.r.method.alteryFx",  vars: { pct: (ALTERY_FX_MARKUP * 100).toFixed(2) } },
+      { key: "ec.r.method.bankFx",    vars: { pct: (BANK_FEES.fxMarkupBps / 100).toFixed(2), bank: baseline.name } },
+    ],
+  };
+
   return {
     altery, bank,
-    savings: { monthly, annual },
-    meta: { txCount, fxVolumePct: 60, fxVolume: Math.round(fxVolume) },
+    savings,
+    meta: { txCount, fxVolumePct: 60, fxVolume: Math.round(fxVolume), baseline: baseline.id },
+    methodology,
+  };
+}
+
+// Build the qualitative comparison matrix for the result page.
+// Returns 1 row per attribute, with one cell per comparator. Comparator
+// list is region-aware: traditional bank matches the user's entity,
+// plus the 2-3 most-relevant neobanks.
+function ecQualitativeMatrix(rec) {
+  const cmp = window.EC_COMPARATORS || {};
+  const baseline = ecBaselineFor(rec?.entity?.id || "uk");
+  // Pick neobank lineup. Wise + Revolut for all; add 3S Money for
+  // anyone (direct competitor), Mercury for US-bound profiles, Payset
+  // for EU/UK cross-border.
+  const isUS = rec?.country?.code === "US";
+  const comparators = [
+    cmp.altery,
+    baseline,
+    cmp.wise,
+    cmp.revolut,
+    cmp.three_s_money,
+    isUS ? cmp.mercury : cmp.payset,
+  ].filter(Boolean);
+
+  // Attribute rows — each row maps to a labelKey, and each cell is
+  // either a value-string or a boolean/state token rendered as icon.
+  // Altery row is dynamic for fxMarkup/swiftOut (plan-dependent).
+  const planFees = rec?.plan?.fees || {};
+  const rows = [
+    { key: "onboarding",   labelKey: "ec.cmp.row.onboarding"   },
+    { key: "digitalNative",labelKey: "ec.cmp.row.digitalNative"},
+    { key: "affiliate",    labelKey: "ec.cmp.row.affiliate"    },
+    { key: "cryptoNative", labelKey: "ec.cmp.row.crypto"       },
+    { key: "multiEntity",  labelKey: "ec.cmp.row.multiEntity"  },
+    { key: "fxMarkup",     labelKey: "ec.cmp.row.fxMarkup"     },
+    { key: "swiftOut",     labelKey: "ec.cmp.row.swiftOut"     },
+    { key: "docFriction",  labelKey: "ec.cmp.row.docFriction"  },
+  ];
+
+  const cellFor = (cmpObj, rowKey) => {
+    const q = cmpObj.qualitative || {};
+    if (rowKey === "onboarding") return { kind: "i18n", value: q.onboardingKey };
+    if (rowKey === "fxMarkup") {
+      if (cmpObj.id === "altery") return { kind: "text", value: planFees.fxMarkup || "0.65%" };
+      if (cmpObj.fees) return { kind: "text", value: `${(cmpObj.fees.fxMarkupBps / 100).toFixed(2)}%` };
+      return { kind: "text", value: q.fxMarkup || "—" };
+    }
+    if (rowKey === "swiftOut") {
+      if (cmpObj.id === "altery") return { kind: "text", value: planFees.swift || "€10 + 0.25%" };
+      if (cmpObj.fees) return { kind: "text", value: `€${cmpObj.fees.swiftOutEur}` };
+      return { kind: "text", value: q.swiftOut || "—" };
+    }
+    if (rowKey === "docFriction") {
+      return { kind: "state", value: q.docFriction || "high" }; // low / medium / high
+    }
+    // Booleans and tri-state strings (true / false / "caseByCase" / "no" / "partial" / "restricted")
+    const v = q[rowKey];
+    if (v === true)       return { kind: "yes" };
+    if (v === false)      return { kind: "no" };
+    if (typeof v === "string") return { kind: "state", value: v };
+    return { kind: "text", value: "—" };
+  };
+
+  return {
+    comparators,
+    rows: rows.map((r) => ({
+      ...r,
+      cells: comparators.map((c) => cellFor(c, r.key)),
+    })),
   };
 }
 
@@ -579,6 +687,7 @@ function ecAppendUtmsToURL(url, utms) {
 Object.assign(window, {
   ecCurrencyFlag, ecCurrencyName, ecRecommend,
   ecEstimateTxCount, ecComputeCostBreakdown, ecOutcomesForSavings,
+  ecBaselineFor, ecQualitativeMatrix,
   ecVolumeHintKey, ecFormatVolume, ecEstimateSavings, ecGenProposalRef,
   ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
   ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,
