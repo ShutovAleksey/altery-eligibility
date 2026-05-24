@@ -646,10 +646,16 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
               // panel that already has its own border/shadow, so a 3px
               // blue glow on top looked stacked and noisy.
               className="input-bare"
+              // fontSize: 16 — iOS Safari auto-zooms on any focused input
+              // whose computed font-size is < 16px. The page's body size
+              // is 14px (--fs-body), which would trigger zoom-in on tap
+              // and clip half the panel out of view. 16px on the search
+              // field is the safest universally-supported guard; the
+              // visual delta vs surrounding 14-15px text is invisible.
               style={{
                 flex: 1, minWidth: 0,
                 background: "transparent", font: "inherit", color: "var(--c-ink)",
-                fontSize: "var(--fs-body)",
+                fontSize: 16,
               }}
             />
           </div>
@@ -1109,7 +1115,9 @@ function EcCountryMultiSelect({ value, onChange, label, placeholder }) {
               placeholder={t("ec.q2.input.placeholder")}
               autoComplete="off" spellCheck="false"
               className="input-bare"
-              style={{ flex: 1, minWidth: 0, background: "transparent", font: "inherit", color: "var(--c-ink)", fontSize: "var(--fs-body)" }}
+              // fontSize: 16 — see EcCountrySelect's search field for
+              // why (iOS auto-zoom guard on tap-focus).
+              style={{ flex: 1, minWidth: 0, background: "transparent", font: "inherit", color: "var(--c-ink)", fontSize: 16 }}
             />
           </div>
           <div style={{ overflowY: "auto", flex: 1 }}>
