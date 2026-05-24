@@ -410,17 +410,15 @@ function EcIntro({ onStart }) {
         </Button>
       </div>
 
-      {/* Product showcase slider — sits below the CTA so visitors who
-          are convinced by the value rows can act immediately; the
-          carousel serves as additional context for the second-look /
-          scroll-further cohort. No services context yet, so EcPerks
-          renders in its natural EC_PERKS order. */}
-      <EcPerks services={[]} />
-
-      {/* Quiet trust footnote at the very bottom — three commitments
-          (no signup / no credit check / licensed EMI). Lives below the
-          carousel so it reads as a closing reassurance rather than
-          gating the CTA above. */}
+      {/* Quiet trust footnote — three commitments (no signup / no credit
+          check / licensed EMI). Sits directly under the CTA as closing
+          reassurance. The product-showcase carousel that used to live
+          between CTA and trust was removed: value-row 2 already covers
+          products in text ('GBP/EUR/USD accounts, FX corridors, mass
+          payouts, cards, crypto'), and post-CTA content slows the
+          conversion path without adding signal beyond what's already
+          above. EcPerks remains exported from checker-modals for use
+          on the result page and inside handoff flows. */}
       <div className="ec-intro__trust">{t("ec.intro.trust")}</div>
     </div>
   );
