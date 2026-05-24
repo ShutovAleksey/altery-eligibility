@@ -673,6 +673,52 @@ const EC_ENTITIES = {
 // All fee numbers normalised to EUR for math consistency with rec.
 // monthlyVolume (which is EUR). Conversion at standard rates documented
 // inline. Re-validate quarterly against `asof` dates.
+//
+// ── Hero identifier ───────────────────────────────────────────────
+// Picks the most operationally relevant account from the entity
+// (always accounts[0] in our data; ordered by relevance per entity).
+// For UK it's GBP local (sort code + account number), for EU it's
+// the SEPA-reachable IBAN, for MENA it's USD/AE-IBAN. Skipped for
+// SWIFT-only primaries — we don't fake a local-rail identifier.
+function ecHeroIdentifier(entity) {
+  const acct = entity?.accounts?.[0];
+  if (!acct || acct.type === "swift-only") return null;
+  if (acct.type === "iban") {
+    const f = acct.fields.find((x) => x.labelKey === "ec.account.iban");
+    return f ? { currency: acct.currency, value: f.value, kind: "iban" } : null;
+  }
+  if (acct.type === "local") {
+    const sort = acct.fields.find((x) => x.labelKey === "ec.account.sortCode")?.value;
+    const accountNo = acct.fields.find((x) => x.labelKey === "ec.account.accountNo")?.value;
+    const value = [sort, accountNo].filter(Boolean).join(" · ");
+    return value ? { currency: acct.currency, value, kind: "local" } : null;
+  }
+  return null;
+}
+
+// Mask the trailing portion of an account identifier with vertically
+// centred middle dots (·····). The dots themselves communicate "this
+// isn't your real number" while preserving the IBAN/sort-code format
+// as a trust signal. Splits on whitespace, replaces the last token:
+// with `n` dots if the token is short (≤n), or with `last (length-n)
+// chars + n dots` if longer.
+//   UK GBP local  "23-14-70 · 1234 5678"  → "23-14-70 · 1234 ····"
+//   UK EUR IBAN   "GB29 ALTY ... 9268 19" → "GB29 ALTY ... 9268 ····"
+function maskTailDots(s, n = 4) {
+  if (!s) return s;
+  const parts = s.split(/(\s+)/);
+  for (let i = parts.length - 1; i >= 0; i--) {
+    if (parts[i] && !/^\s+$/.test(parts[i])) {
+      const t = parts[i];
+      parts[i] = t.length > n
+        ? t.slice(0, -n) + "·".repeat(n)
+        : "·".repeat(n);
+      break;
+    }
+  }
+  return parts.join("");
+}
+
 const EC_COMPARATORS = {
   // ── Traditional bank baselines (one per entity region) ──────────
   uk_traditional: {
@@ -878,5 +924,5 @@ Object.assign(window, {
   EC_COUNTRIES, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_INDUSTRIES,
   EC_BUSINESS_TYPES, EC_SERVICES, TOTAL_STEPS,
   EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
-  EC_COMPARATORS,
+  EC_COMPARATORS, ecHeroIdentifier, maskTailDots, ecFeeRegion,
 });
