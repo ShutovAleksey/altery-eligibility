@@ -832,9 +832,8 @@ function App() {
 
   return (
     <div className="ob-app">
-      <ObHeader
+      <ObSidebar
         step={step}
-        onClose={() => setStep("applications-list")}
         onSave={showSaveChip ? () => setShowSaveModal(true) : null}
       />
       <main className="ob-main">

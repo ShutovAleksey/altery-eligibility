@@ -8,78 +8,192 @@ html { overflow-y: scroll; }
 .ob-app {
   min-height: 100vh;
   background: var(--c-bg);
+  /* Mobile (default): vertical stack — sidebar collapses to a top-pill,
+     content scrolls below. Desktop ≥900px lifts to a 2-column grid in
+     the @media block at the bottom of this file. */
   display: flex;
   flex-direction: column;
 }
 
-/* Header (dark navy bar with logo + 4 step pills + close) */
-.ob-header {
+/* ── Sidebar (replaces .ob-header) ─────────────────────────────────
+   Same visual language as the eligibility checker's .ec-sidebar:
+   midnight-navy panel, 5 numbered sections with state-aware dots and
+   status badges, language switcher pinned to the bottom. On mobile
+   it stays as a horizontal pill at the top of the page (logo + label
+   + lang) — section list hidden because there's no vertical room. */
+.ob-sidebar {
   position: relative;
   margin: 16px;
-  height: 64px;
   border-radius: 16px;
   background: #000537;
-  box-shadow: 0 12px 32px rgba(0,6,57,.16);
+  box-shadow: 0 12px 32px rgba(0, 6, 57, .16);
   color: #fff;
+  /* Mobile horizontal pill */
   display: flex;
   align-items: center;
-  padding: 0 16px 0 24px;
-  gap: 32px;
-}
-.ob-header__bg {
-  position: absolute; inset: 0; pointer-events: none;
-  overflow: hidden;
-  border-radius: inherit;
-}
-.ob-header__bg svg path { fill: #000756; }
-.ob-header__logo { height: 32px; width: auto; flex: 0 0 auto; position: relative; z-index: 2; }
-.ob-header__steps {
-  /* Steps cluster fills the middle of the header via flex, instead of
-     being absolutely centered. Absolute centering used to cause the
-     last pill to overlap the right-side "Save & continue later" button
-     at narrower desktop widths — the cluster grew symmetrically from
-     the centre and crashed into the absolutely-positioned actions. */
-  flex: 1 1 0;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0 20px 0 24px;
+  height: 64px;
   gap: 24px;
-  z-index: 2;
+  overflow: hidden;
 }
-.ob-step {
+.ob-sidebar__top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+.ob-sidebar__logo img { display: block; height: 24px; width: auto; }
+.ob-sidebar__label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: rgba(255, 255, 255, .82);
+  padding-left: 16px;
+  border-left: 1px solid rgba(255, 255, 255, .18);
+}
+.ob-sidebar__steps {
+  /* Hidden on mobile — the per-screen Title eyebrow already says where
+     the user is, and a 5-item stack doesn't fit a 64px-tall pill. */
+  display: none;
+}
+.ob-sidebar__bottom {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.ob-sidebar__save {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .06);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, .92);
+  font: inherit;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: -0.01em;
-  color: rgba(255,255,255,.4);
-  white-space: nowrap;
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease;
 }
-.ob-step.is-current { color: #fff; }
-.ob-step.is-completed { color: #fff; }
-.ob-step.is-todo { color: rgba(255,255,255,.4); }
+.ob-sidebar__save:hover {
+  background: rgba(255, 255, 255, .12);
+  border-color: rgba(255, 255, 255, .26);
+}
+.ob-sidebar__lang { display: inline-flex; }
 
-.ob-step__dot {
-  flex: 0 0 20px;
-  width: 20px; height: 20px;
-  border-radius: 50%;
-  display: inline-flex; align-items: center; justify-content: center;
-  position: relative;
-}
-.ob-step__num {
-  font-size: 12px; font-weight: 500; color: #fff;
-  line-height: 1;
-}
-.ob-step__dot.is-todo {
-  border: 1px solid rgba(157,163,174,.5);
-}
-.ob-step__dot.is-current {
-  border: 1px solid #fff;
-}
-.ob-step__dot.is-completed {
-  background: #0A9F52;
+.ob-sidebar__deco { display: none; }
+
+/* Desktop (≥900px) — sidebar lifts to a vertical column on the left of
+   the page; main content takes the remaining column. Same width clamp
+   and visual treatment as the checker so the brand reads continuous
+   across the checker → onboarding hop. */
+@media (min-width: 900px) {
+  .ob-app {
+    display: grid;
+    grid-template-columns: clamp(320px, 33%, 480px) 1fr;
+    align-items: stretch;
+  }
+  .ob-sidebar {
+    margin: 20px 0 20px 20px;
+    padding: 36px 32px;
+    height: calc(100vh - 40px);
+    align-self: start;
+    position: sticky;
+    top: 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 48px;
+  }
+  .ob-sidebar__top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+  .ob-sidebar__logo img { height: 40px; }
+  .ob-sidebar__label {
+    padding-left: 0;
+    border-left: 0;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, .55);
+  }
+  .ob-sidebar__steps {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    margin-top: 12px;
+  }
+  .ob-sidebar__step {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, .45);
+    transition: color .15s ease;
+  }
+  .ob-sidebar__step.is-done,
+  .ob-sidebar__step.is-current { color: #fff; font-weight: 600; }
+  .ob-sidebar__step__num {
+    width: 28px; height: 28px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(255, 255, 255, .25);
+    background: transparent;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: rgba(255, 255, 255, .55);
+    flex-shrink: 0;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  }
+  .ob-sidebar__step.is-current .ob-sidebar__step__num {
+    border-color: rgba(255, 255, 255, .55);
+    color: #fff;
+  }
+  .ob-sidebar__step.is-done .ob-sidebar__step__num {
+    background: #fff;
+    border-color: #fff;
+    color: var(--c-primary);
+  }
+  .ob-sidebar__step__body {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    min-width: 0;
+  }
+  .ob-sidebar__step__label { white-space: nowrap; }
+  .ob-sidebar__step__status {
+    font-size: 13px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, .45);
+    white-space: nowrap;
+  }
+  .ob-sidebar__bottom {
+    margin-top: auto;
+    margin-left: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .ob-sidebar__save { justify-content: center; }
+  .ob-sidebar__deco {
+    display: block;
+    position: absolute;
+    right: -60px;
+    bottom: -80px;
+    width: 280px;
+    height: auto;
+    pointer-events: none;
+    user-select: none;
+  }
 }
 
 /* Main canvas */
@@ -691,41 +805,6 @@ html { overflow-y: scroll; }
   display: inline-flex; align-items: center; justify-content: center;
 }
 
-/* ============================================================
-   Section pills — show time-remaining tooltip on hover
-   ============================================================ */
-.ob-step__time {
-  font-size: 11px; font-weight: 500;
-  color: rgba(255,255,255,.5);
-  margin-left: 4px;
-}
-.ob-step.is-current .ob-step__time { color: rgba(255,255,255,.75); }
-
-/* ============================================================
-   Save-and-continue header chip + Resume modal
-   ============================================================ */
-.ob-header__actions {
-  position: relative; z-index: 2;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.ob-header__save {
-  position: relative; z-index: 2;
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 8px 14px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.16);
-  border-radius: 999px;
-  color: #fff;
-  font-size: 13px; font-weight: 500;
-  cursor: pointer;
-  transition: background .15s;
-}
-.ob-header__save:hover { background: rgba(255,255,255,.14); }
-.ob-header__save svg { width: 14px; height: 14px; }
-
 /* Resume-later modal (renders inside its own portal-y position fixed overlay) */
 .ob-modal-overlay {
   position: fixed; inset: 0;
@@ -861,25 +940,17 @@ html { overflow-y: scroll; }
    Mobile & tablet — full responsive pass
    ============================================================ */
 
-/* Tablet (≤900px): condensed pills, tighter padding */
+/* Tablet / mobile (≤900px): sidebar collapses to top-pill, content
+   takes the full page width. Save button shows icon-only, lang
+   switcher pinned to the right. */
 @media (max-width: 900px) {
-  .ob-header {
+  .ob-sidebar {
     margin: 12px;
-    height: 56px;
     padding: 0 12px 0 16px;
+    height: 56px;
     gap: 16px;
   }
-  .ob-header__logo { height: 24px !important; width: auto !important; }
-  .ob-header__steps { gap: 14px; position: static; transform: none; left: auto; top: auto; }
-  .ob-step__label {
-    max-width: 0; opacity: 0;
-    transition: none;
-  }
-  .ob-step.is-current .ob-step__label {
-    max-width: 200px; opacity: 1;
-    margin-left: 0;
-  }
-  .ob-step__time { display: none; }
+  .ob-sidebar__logo img { height: 22px; }
   .ob-main { padding: 0 16px 48px; }
   .ob-content {
     padding: 16px 0 120px; gap: 20px;
@@ -887,66 +958,31 @@ html { overflow-y: scroll; }
   }
 }
 
-/* Mobile (≤640px): bottom-sheet step nav, sticky CTA */
 @media (max-width: 640px) {
   html, body { scrollbar-gutter: auto; }
-  .ob-header {
-    margin: 8px 8px 0;
-    height: 52px;
-    padding: 0 8px 0 14px;
+  .ob-sidebar {
+    margin: 8px;
+    padding: 0 10px 0 14px;
+    height: 56px;
     gap: 8px;
     border-radius: 12px;
   }
-  .ob-header__logo { height: 20px !important; }
-  .ob-header__steps {
-    gap: 0;
-    flex: 1;
-    justify-content: flex-end;
-    overflow: hidden;
-  }
-  /* On mobile we collapse the multi-pill nav into a single "step X of 4" chip */
-  .ob-header__steps .ob-step { display: none; }
-  .ob-header__steps .ob-step.is-current {
-    display: inline-flex;
-    background: rgba(255,255,255,.10);
-    border: 1px solid rgba(255,255,255,.18);
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-size: 12px;
-    gap: 6px;
-  }
-  .ob-header__steps .ob-step.is-current .ob-step__label { font-size: 12px; }
-  .ob-header__steps .ob-step__dot { width: 16px; height: 16px; flex: 0 0 16px; }
-  .ob-header__steps .ob-step__dot .ob-step__num { font-size: 10px; }
-  .ob-header__save {
+  .ob-sidebar__logo img { height: 20px; }
+  .ob-sidebar__label { display: none; }
+  /* Save shrinks to icon-only on tight mobile widths */
+  .ob-sidebar__save {
     padding: 6px 10px;
     font-size: 12px;
   }
-  .ob-header__save .ob-header__save-label { display: none; }
-  .ob-header__actions { gap: 6px; }
-  .ob-header__actions .lang-pill {
+  .ob-sidebar__save > span { display: none; }
+  .ob-sidebar__bottom { gap: 6px; }
+  .ob-sidebar__lang .lang-pill {
     height: 30px;
     padding: 0 8px 0 6px;
     font-size: 12px;
     gap: 6px;
   }
-  .ob-header__actions .lang-pill__flag { width: 18px; height: 18px; flex: 0 0 18px; }
-
-  /* Sticky thin progress bar under the header */
-  .ob-mobile-progress {
-    position: sticky; top: 0; z-index: 5;
-    height: 3px;
-    background: var(--c-border-soft);
-    margin: 8px 8px 0;
-    border-radius: 999px;
-    overflow: hidden;
-  }
-  .ob-mobile-progress__fill {
-    height: 100%;
-    background: var(--c-success);
-    transition: width .35s cubic-bezier(.2,.9,.3,1);
-    border-radius: 999px;
-  }
+  .ob-sidebar__lang .lang-pill__flag { width: 18px; height: 18px; flex: 0 0 18px; }
 
   .ob-main { padding: 0 16px 96px; }
   .ob-content {

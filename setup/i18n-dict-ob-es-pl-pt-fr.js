@@ -15,6 +15,10 @@
     "ob.common.contactSupport": "Contactar con soporte",
 
     "ob.section.account": "Datos de la cuenta",
+    "ob.sidebar.eyebrow": "Onboarding empresarial · 13 min",
+    "ob.sidebar.status.current": "En curso",
+    "ob.sidebar.status.done": "Completado",
+    "ob.section.review": "Revisar y enviar",
     "ob.section.nature": "Naturaleza del negocio",
     "ob.section.plan": "Elección del plan",
     "ob.section.documents": "Documentos de la empresa",
@@ -349,6 +353,10 @@
     "ob.common.contactSupport": "Skontaktuj się z pomocą",
 
     "ob.section.account": "Dane konta",
+    "ob.sidebar.eyebrow": "Onboarding firmowy · 13 min",
+    "ob.sidebar.status.current": "W trakcie",
+    "ob.sidebar.status.done": "Ukończone",
+    "ob.section.review": "Przegląd i wysyłka",
     "ob.section.nature": "Rodzaj działalności",
     "ob.section.plan": "Wybór planu",
     "ob.section.documents": "Dokumenty firmy",
@@ -683,6 +691,10 @@
     "ob.common.contactSupport": "Contactar o suporte",
 
     "ob.section.account": "Dados da conta",
+    "ob.sidebar.eyebrow": "Onboarding empresarial · 13 min",
+    "ob.sidebar.status.current": "Em andamento",
+    "ob.sidebar.status.done": "Concluído",
+    "ob.section.review": "Revisar e enviar",
     "ob.section.nature": "Natureza do negócio",
     "ob.section.plan": "Escolha de plano",
     "ob.section.documents": "Documentos da empresa",
@@ -1017,6 +1029,10 @@
     "ob.common.contactSupport": "Contacter le support",
 
     "ob.section.account": "Informations du compte",
+    "ob.sidebar.eyebrow": "Onboarding entreprise · 13 min",
+    "ob.sidebar.status.current": "En cours",
+    "ob.sidebar.status.done": "Terminé",
+    "ob.section.review": "Vérification et envoi",
     "ob.section.nature": "Nature de l'activité",
     "ob.section.plan": "Choix du plan",
     "ob.section.documents": "Documents de l'entreprise",

@@ -15,6 +15,10 @@
     "ob.common.contactSupport": "Contact opnemen",
 
     "ob.section.account": "Accountgegevens",
+    "ob.sidebar.eyebrow": "Zakelijke onboarding · 13 min",
+    "ob.sidebar.status.current": "Bezig",
+    "ob.sidebar.status.done": "Voltooid",
+    "ob.section.review": "Controleren & indienen",
     "ob.section.nature": "Aard van het bedrijf",
     "ob.section.plan": "Abonnement kiezen",
     "ob.section.documents": "Bedrijfsdocumenten",
@@ -349,6 +353,10 @@
     "ob.common.contactSupport": "Destek ile iletişime geç",
 
     "ob.section.account": "Hesap bilgileri",
+    "ob.sidebar.eyebrow": "Kurumsal onboarding · 13 dk",
+    "ob.sidebar.status.current": "Devam ediyor",
+    "ob.sidebar.status.done": "Tamamlandı",
+    "ob.section.review": "İncele ve gönder",
     "ob.section.nature": "İşin niteliği",
     "ob.section.plan": "Plan seçimi",
     "ob.section.documents": "Şirket belgeleri",
@@ -683,6 +691,10 @@
     "ob.common.contactSupport": "Contatta l'assistenza",
 
     "ob.section.account": "Dati account",
+    "ob.sidebar.eyebrow": "Onboarding aziendale · 13 min",
+    "ob.sidebar.status.current": "In corso",
+    "ob.sidebar.status.done": "Completato",
+    "ob.section.review": "Revisione e invio",
     "ob.section.nature": "Natura dell'attività",
     "ob.section.plan": "Scelta del piano",
     "ob.section.documents": "Documenti aziendali",

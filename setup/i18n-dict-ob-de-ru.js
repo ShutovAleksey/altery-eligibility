@@ -18,6 +18,10 @@
     "ob.common.contactSupport": "Support kontaktieren",
 
     "ob.section.account": "Kontoangaben",
+    "ob.sidebar.eyebrow": "Geschäfts-Onboarding · 13 Min",
+    "ob.sidebar.status.current": "In Bearbeitung",
+    "ob.sidebar.status.done": "Abgeschlossen",
+    "ob.section.review": "Prüfen & einreichen",
     "ob.section.nature": "Geschäftstätigkeit",
     "ob.section.plan": "Tarif wählen",
     "ob.section.documents": "Unternehmensunterlagen",
@@ -352,6 +356,10 @@
     "ob.common.contactSupport": "Связаться с поддержкой",
 
     "ob.section.account": "Данные аккаунта",
+    "ob.sidebar.eyebrow": "Онбординг бизнеса · 13 мин",
+    "ob.sidebar.status.current": "В процессе",
+    "ob.sidebar.status.done": "Завершено",
+    "ob.section.review": "Проверка и отправка",
     "ob.section.nature": "Характер бизнеса",
     "ob.section.plan": "Выбор тарифа",
     "ob.section.documents": "Документы компании",

@@ -25,6 +25,10 @@
 
     // ── Header / sections ──
     "ob.section.account": "Account info",
+    "ob.sidebar.eyebrow": "Business onboarding · 13 min",
+    "ob.sidebar.status.current": "In progress",
+    "ob.sidebar.status.done": "Completed",
+    "ob.section.review": "Review & submit",
     "ob.section.nature": "Nature of business",
     "ob.section.plan": "Choose plan",
     "ob.section.documents": "Company documents",
