@@ -2480,19 +2480,29 @@
       background: #2EE08A;
       box-shadow: 0 0 0 3px rgba(46, 224, 138, .22);
     }
-    /* Regulator-reference pill — clickable, lighter weight than the live
-       pill since it sits secondary in the trust strip. Underline appears
-       on hover/focus so the affordance reads as a link. */
+    /* Regulator-reference pill — clickable, sits on the dark navy
+       result hero. Hover INVERTS to a white fill with primary-navy
+       text, which reads as a clear interactive state-change on the
+       navy surface. A subtler white-alpha brighten (the previous
+       approach) blends into the hero's gradient and reads as fade-
+       rather-than-action — wrong cue for a clickable verifier link. */
     a.ec-r__pill--reg {
       text-decoration: none;
       font-variant-numeric: tabular-nums;
-      transition: background-color .15s ease, border-color .15s ease;
+      color: rgba(255, 255, 255, .92);
+      transition: background-color .15s ease, border-color .15s ease, color .15s ease;
     }
     a.ec-r__pill--reg:hover,
     a.ec-r__pill--reg:focus-visible {
-      background: rgba(255, 255, 255, .12);
-      border-color: rgba(255, 255, 255, .26);
+      background: #fff;
+      border-color: #fff;
+      color: var(--c-primary);
+      outline: none;
     }
+    /* Inherit the inverted colour for the trailing "external link"
+       icon so its currentColor follows the text. */
+    a.ec-r__pill--reg:hover svg,
+    a.ec-r__pill--reg:focus-visible svg { color: var(--c-primary); }
     /* IBAN preview — subtle dark chip inside the hero */
     .ec-r__iban { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
     .ec-r__iban__chip {
