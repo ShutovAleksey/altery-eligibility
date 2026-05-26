@@ -161,8 +161,6 @@
 
     "ec.cav.crypto.tag": "Krypto-erprobt",
     "ec.cav.crypto.text": "Krypto-natives KYB läuft über unser Spezialistenteam, nicht die allgemeine Warteschlange. Synterra Connect — unser Partner-Netzwerk für direkte Exchange-Abwicklung — leitet Mittel zu und von regulierten Plattformen; Fiat-Ein-/-Auszahlungen via SEPA, Faster Payments und SWIFT.",
-    "ec.cav.row.tag": "Spezialprüfung",
-    "ec.cav.row.text": "Unternehmen aus {country} stehen nicht auf unserer Standardliste — wir leiten Ihren Antrag an einen Relationship-Manager zur Prüfung innerhalb eines Tages. Sie erhalten eine namentliche Ansprechperson für Rückfragen; wenn wir die Struktur nicht betreuen können, erklären wir genau, warum.",
     "ec.cav.mena.tag": "Konto öffnet heute",
     "ec.cav.mena.text": "Altery MENA ist von der DFSA voll lizenziert. Das Konto auf den oben aufgeführten Schienen öffnet beim Onboarding. Weitere Korridore gehen live, sobald jede Bank-zu-Bank-Integration abgeschlossen ist — wir mailen Sie, sobald einer aktiviert wird.",
     "ec.cav.performance.tag": "Spezialprüfung",
@@ -596,8 +594,6 @@
 
     "ec.cav.crypto.tag": "Знаем крипту",
     "ec.cav.crypto.text": "KYB крипто-нативного бизнеса проходит через специализированную команду, не общую очередь. Synterra Connect — наша партнёрская сеть для прямых расчётов с биржами — проводит средства в обе стороны через регулируемые площадки; фиат через SEPA, Faster Payments и SWIFT.",
-    "ec.cav.row.tag": "Специализированная проверка",
-    "ec.cav.row.text": "Компании из {country} нет в нашем стандартном списке — направим заявку менеджеру для проверки в течение одного дня. У вас будет именованный контакт для уточнений; если структуру обслуживать не сможем — объясним, почему именно.",
     "ec.cav.mena.tag": "Счёт открывается сразу",
     "ec.cav.mena.text": "Altery MENA полностью лицензирована DFSA. Счёт по рельсам выше открываем на онбординге. Дополнительные коридоры подключаются по мере завершения каждой банк-к-банк интеграции — пришлём письмо в момент активации.",
     "ec.cav.performance.tag": "Специализированная проверка",

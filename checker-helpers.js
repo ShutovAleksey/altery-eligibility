@@ -140,12 +140,15 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
       vars: { industry: window.__I18N.t(ind.labelKey).toLowerCase() },
     });
   }
-  if (country?.region === "row" && country?.code !== "US") {
-    caveats.push({
-      tagKey: "ec.cav.row.tag", textKey: "ec.cav.row.text", tone: "blue",
-      vars: { country: window.__I18N.t("ec.country." + country.code) },
-    });
-  }
+  // Note: a wide "Specialist review" caveat used to fire for every
+  // non-EU/UK/MENA/US country in the row bucket (~220 countries). It
+  // misfired on mature jurisdictions (Singapore, Japan, Canada,
+  // Switzerland, Crown Dependencies, EU-adjacent micro-states like
+  // Åland) where no specialist review actually happens. Removed in
+  // favour of letting the KYB stage catch real edge cases. If we
+  // later want a targeted version, add a `requiresSpecialistReview:
+  // true` flag on the genuinely affected countries in EC_COUNTRIES
+  // and fire a caveat only for those.
   if (entity?.id === "mena") {
     caveats.push({ tagKey: "ec.cav.mena.tag", textKey: "ec.cav.mena.text", tone: "orange" });
   }

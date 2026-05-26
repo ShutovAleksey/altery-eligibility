@@ -158,8 +158,6 @@
 
     "ec.cav.crypto.tag": "Znamy krypto",
     "ec.cav.crypto.text": "KYB krypto-natywne obsługuje nasz zespół specjalistyczny, nie ogólna kolejka. Synterra Connect — nasza sieć partnerska do bezpośredniego rozliczania z giełdami — przenosi środki do i z regulowanych platform; fiat in/out przez SEPA, Faster Payments i SWIFT.",
-    "ec.cav.row.tag": "Przegląd specjalistyczny",
-    "ec.cav.row.text": "Spółek z {country} nie ma na naszej standardowej liście — kierujemy wniosek do relationship managera na jednodniową ocenę. Otrzymasz wskazaną osobę kontaktową do dalszych pytań; jeśli nie możemy obsłużyć struktury, wyjaśnimy dokładnie dlaczego.",
     "ec.cav.mena.tag": "Konto otwierane dziś",
     "ec.cav.mena.text": "Altery MENA jest w pełni licencjonowana przez DFSA. Konto na szynach wymienionych powyżej otwiera się w trakcie onboardingu. Dodatkowe korytarze wchodzą do produkcji wraz z zakończeniem każdej integracji bank-do-banku — wyślemy wiadomość, gdy któryś się aktywuje.",
     "ec.cav.performance.tag": "Przegląd specjalistyczny",
@@ -592,8 +590,6 @@
 
     "ec.cav.crypto.tag": "Crypto-fluente",
     "ec.cav.crypto.text": "O KYB crypto-nativo é gerido pela nossa equipa especialista, não pela fila geral. Synterra Connect — a nossa rede de parceiros para liquidação direta com exchanges — movimenta fundos de e para plataformas reguladas; fiat in/out via SEPA, Faster Payments e SWIFT.",
-    "ec.cav.row.tag": "Análise especializada",
-    "ec.cav.row.text": "Empresas constituídas em {country} não estão na nossa lista padrão — encaminhamos o pedido para um relationship manager para análise de um dia. Terá um contacto dedicado para qualquer acompanhamento; se não pudermos servir a estrutura, explicamos exatamente porquê.",
     "ec.cav.mena.tag": "Conta abre hoje",
     "ec.cav.mena.text": "A Altery MENA está totalmente licenciada pela DFSA. A conta nas vias listadas acima abre no onboarding. Corredores adicionais entram em produção à medida que cada integração banco-a-banco é concluída — enviamos email assim que um for ativado.",
     "ec.cav.performance.tag": "Análise especializada",
@@ -1025,8 +1021,6 @@
 
     "ec.cav.crypto.tag": "Crypto-experts",
     "ec.cav.crypto.text": "Le KYB crypto-natif est géré par notre équipe spécialiste, pas la file généraliste. Synterra Connect — notre réseau partenaire pour le règlement direct avec les exchanges — déplace des fonds vers et depuis des plateformes régulées ; fiat entrée/sortie via SEPA, Faster Payments et SWIFT.",
-    "ec.cav.row.tag": "Examen spécialisé",
-    "ec.cav.row.text": "Les sociétés immatriculées en {country} ne figurent pas sur notre liste standard — nous transmettons votre demande à un relationship manager pour une revue d'une journée. Vous aurez un interlocuteur dédié pour le suivi ; si nous ne pouvons pas servir la structure, nous expliquerons exactement pourquoi.",
     "ec.cav.mena.tag": "Le compte ouvre aujourd'hui",
     "ec.cav.mena.text": "Altery MENA est pleinement agréée par la DFSA. Le compte sur les rails listés ci-dessus s'ouvre lors de l'onboarding. Des corridors supplémentaires entrent en production au fur et à mesure que chaque intégration banque-à-banque s'achève — nous vous écrivons dès qu'un s'active.",
     "ec.cav.performance.tag": "Examen spécialisé",

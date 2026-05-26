@@ -350,8 +350,6 @@
     // Caveats
     "ec.cav.crypto.tag": "Crypto-fluent",
     "ec.cav.crypto.text": "Crypto-native KYB is handled by our specialist team, not the generalist queue. Synterra Connect — our partner-network for direct exchange settlement — routes funds in and out of regulated venues; fiat in/out via SEPA, Faster Payments and SWIFT.",
-    "ec.cav.row.tag": "Specialist review",
-    "ec.cav.row.text": "Companies incorporated in {country} aren't on our standard list — we'll route your application to a relationship manager for a one-day review. You'll have a named contact for any follow-up; if we can't serve the structure, we'll explain exactly why.",
     "ec.cav.mena.tag": "Account opens today",
     "ec.cav.mena.text": "Altery MENA is fully licensed by DFSA. The account on the rails listed above opens at onboarding. Additional corridors come online as each bank-to-bank integration completes — we'll email you the moment one activates.",
     "ec.cav.performance.tag": "Specialist review",

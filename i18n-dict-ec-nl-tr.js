@@ -157,8 +157,6 @@
 
     "ec.cav.crypto.tag": "Crypto-ervaren",
     "ec.cav.crypto.text": "Crypto-native KYB wordt afgehandeld door ons specialistenteam, niet de algemene wachtrij. Synterra Connect — ons partner-netwerk voor directe exchange-afwikkeling — verplaatst middelen van en naar gereguleerde platforms; fiat in/uit via SEPA, Faster Payments en SWIFT.",
-    "ec.cav.row.tag": "Gespecialiseerde review",
-    "ec.cav.row.text": "Bedrijven uit {country} staan niet op onze standaardlijst — we leiden je aanvraag door naar een relationship manager voor een review binnen één werkdag. Je krijgt een vaste contactpersoon voor opvolging; als we de structuur niet kunnen bedienen, leggen we precies uit waarom.",
     "ec.cav.mena.tag": "Rekening opent vandaag",
     "ec.cav.mena.text": "Altery MENA is volledig DFSA-gelicentieerd. De rekening op de hierboven vermelde rails opent bij onboarding. Aanvullende corridors gaan live zodra elke bank-naar-bank-integratie is afgerond — we mailen je zodra er één geactiveerd wordt.",
     "ec.cav.performance.tag": "Gespecialiseerde beoordeling",
@@ -592,8 +590,6 @@
 
     "ec.cav.crypto.tag": "Kripto-uzmanlık",
     "ec.cav.crypto.text": "Kripto-yerli KYB, genel kuyrukta değil, uzman ekibimizde yürütülür. Synterra Connect — doğrudan borsa mutabakatı için ortak ağımız — düzenlenmiş platformlara fon giriş-çıkışını yönetir; fiat giriş/çıkış SEPA, Faster Payments ve SWIFT üzerinden.",
-    "ec.cav.row.tag": "Uzman incelemesi",
-    "ec.cav.row.text": "{country}'da kurulu şirketler standart listemizde değil — başvurunuzu 1 günlük inceleme için bir ilişki yöneticisine yönlendiririz.",
     "ec.cav.mena.tag": "Hesap bugün açılır",
     "ec.cav.mena.text": "Altery MENA, DFSA tarafından tam lisanslıdır. Yukarıda listelenen raylar üzerindeki hesap onboarding sırasında açılır. Ek koridorlar, her banka-bankaya entegrasyon tamamlandıkça devreye girer — biri aktive olduğunda size e-posta göndeririz.",
     "ec.cav.performance.tag": "Uzman incelemesi",
