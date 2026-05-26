@@ -155,6 +155,12 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
 
         ${bookingBlock}
 
+        <!-- Capability matrix — three-section wins/equal/bank-wins
+             read. Rendered client-side and slotted in here because
+             the matrix data lives in browser-only modules. Empty
+             string when the client didn't send it (older client). -->
+        ${s.capabilityHTML || ""}
+
         <!-- Tail copy -->
         <tr><td style="padding:24px 36px 32px;">
           <p style="font-size:13px;line-height:20px;color:${C.inkSoft};margin:0 0 12px;">

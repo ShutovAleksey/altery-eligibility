@@ -1820,43 +1820,14 @@ function EcResultApproved({ rec, onBack, onReset }) {
             redundant reassurance that ate ~120px of vertical real estate
             without contributing to the conversion path. */}
 
-        {/* ───── Capability matrix — Altery wins / equal / bank wins ─
-            Three-section honest read of where Altery is clearly better,
-            where we're comparable, and where a traditional bank may
-            still serve the user better. The bank-wins section is the
-            trust-driver: conceding 3-4 areas where the bank does
-            something we don't makes the entire page read as honest
-            comparison rather than marketing. Built via ecCapabilityMatrix
-            so the rows can be made conditional (crypto-rails only fires
-            when rec.cryptoActive). */}
-        {(() => {
-          const cap = ecCapabilityMatrix(rec);
-          const Block = ({ kind, head, rows }) => (
-            <div className={`ec-r__cap__col ec-r__cap__col--${kind}`}>
-              <h3 className="ec-r__cap__colHead">{head}</h3>
-              <ul className="ec-r__cap__list">
-                {rows.map((r, i) => (
-                  <li className="ec-r__cap__row" key={i}>
-                    <div className="ec-r__cap__rowTitle">{t(r.titleKey)}</div>
-                    <div className="ec-r__cap__rowDetail">{t(r.detailKey)}</div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-          return (
-            <section className="ec-r__cap">
-              <div className="ec-r__cardEyebrow">{t("ec.cap.eyebrow")}</div>
-              <h2 className="ec-r__cap__title">{t("ec.cap.title")}</h2>
-              <p className="ec-r__cap__lead">{t("ec.cap.lead")}</p>
-              <div className="ec-r__cap__grid">
-                <Block kind="wins"  head={t("ec.cap.section.wins")}       rows={cap.alteryWins} />
-                <Block kind="equal" head={t("ec.cap.section.comparable")} rows={cap.comparable} />
-                <Block kind="bank"  head={t("ec.cap.section.bankWins", { bank: cap.bankName })} rows={cap.bankWins} />
-              </div>
-            </section>
-          );
-        })()}
+        {/* The capability matrix (Altery wins / Roughly equal /
+            Where bank may still win) lives only in the PDF + email
+            now — too dense for the live result page, but exactly the
+            right considered-evaluation surface for a CFO opening the
+            full proposal. See ecBuildAnalysisHTML in checker-pdf.js
+            for the PDF render and buildEmailHTML in api/send-analysis
+            for the email render. UI keeps the savings card + plan
+            card + caveats only. */}
 
         {/* ───── Caveats (only if any) ──────────────────────────── */}
         {caveats.length > 0 && (

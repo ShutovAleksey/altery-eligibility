@@ -406,6 +406,37 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <div style="font-size:10px;color:${C.muted};line-height:15px;margin-top:8px;">${t("ec.cmp.note")}</div>
     </div>`;
 
+  // Capability matrix — Altery wins / Roughly equal / Where bank
+  // may still win. Three-section narrative read that lives only in
+  // the PDF and email (too dense for the live result page).
+  //
+  // The bank-wins section is the trust-driver: conceding 3-4 areas
+  // where the bank does something we don't makes the entire
+  // analysis read as honest comparison, not marketing copy.
+  const cap = ecCapabilityMatrix(rec);
+  const capColBg = { wins: C.beige, equal: C.surface, bank: "#FFF4E5" };
+  const capColBorder = { wins: C.beigeBorder, equal: C.border, bank: "#F2D9B8" };
+  const capCol = (kind, head, rows) => `
+    <div style="flex:1 1 200px;background:${capColBg[kind]};border:1px solid ${capColBorder[kind]};border-radius:12px;padding:14px 16px;min-width:0;">
+      <div style="font-size:11px;font-weight:700;color:${C.ink};margin:0 0 10px;letter-spacing:0.005em;">${head}</div>
+      ${rows.map((r) => `
+        <div style="margin:0 0 10px;">
+          <div style="font-size:12px;font-weight:600;color:${C.ink};line-height:17px;">${t(r.titleKey)}</div>
+          <div style="font-size:11px;color:${C.inkSoft};line-height:16px;margin-top:2px;">${t(r.detailKey)}</div>
+        </div>`).join("")}
+    </div>`;
+  const capabilityHTML = `
+    <div style="margin:0 0 30px;page-break-inside:avoid;">
+      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">${t("ec.cap.eyebrow")}</div>
+      <h2 style="font-size:17px;font-weight:700;color:${C.ink};margin:0 0 6px;letter-spacing:-0.01em;">${t("ec.cap.title")}</h2>
+      <div style="font-size:12px;color:${C.inkSoft};line-height:17px;margin:0 0 14px;max-width:560px;">${t("ec.cap.lead")}</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        ${capCol("wins",  t("ec.cap.section.wins"),       cap.alteryWins)}
+        ${capCol("equal", t("ec.cap.section.comparable"), cap.comparable)}
+        ${capCol("bank",  t("ec.cap.section.bankWins", { bank: cap.bankName }), cap.bankWins)}
+      </div>
+    </div>`;
+
   // Onboarding checklist — neutralizes the #1 friction: "what do
   // I need to prepare?" By spelling it out before they ask, we
   // remove the procrastination excuse and reward their earlier
@@ -518,6 +549,8 @@ ${volumeHintHTML}
 <div style="margin-bottom:32px;">${reasoningHTML}</div>
 
 ${comparisonHTML}
+
+${capabilityHTML}
 
 <!-- Selected services — compact card list -->
 <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
@@ -972,6 +1005,48 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       ? t("ec.email.forwarded.label")
       : "";
 
+    // Capability matrix — 3 short blocks (Altery wins / Roughly
+    // equal / Where bank may still win). Rendered client-side here
+    // because the matrix data + i18n live in browser-only modules;
+    // the serverless function just slots this HTML into its
+    // template. Inline styles only — Gmail / Outlook strip <style>.
+    const capabilityHTML = (() => {
+      if (typeof ecCapabilityMatrix !== "function") return "";
+      const cap = ecCapabilityMatrix(rec);
+      const COL = {
+        wins:  { bg: "#F0EBE3", bd: "#E5E0D5" },
+        equal: { bg: "#F8F7F4", bd: "#E5E7EE" },
+        bank:  { bg: "#FFF4E5", bd: "#F2D9B8" },
+      };
+      const col = (kind, head, rows) => `
+        <td valign="top" width="33%" style="padding:0 4px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+                 style="background:${COL[kind].bg};border:1px solid ${COL[kind].bd};border-radius:10px;">
+            <tr><td style="padding:12px 14px;">
+              <div style="font-size:11px;font-weight:700;color:#14171F;margin:0 0 8px;letter-spacing:0.01em;">${head}</div>
+              ${rows.map((r) => `
+                <div style="margin:0 0 9px;">
+                  <div style="font-size:12px;font-weight:600;color:#14171F;line-height:16px;">${t(r.titleKey)}</div>
+                  <div style="font-size:11px;color:#4B5063;line-height:15px;margin-top:1px;">${t(r.detailKey)}</div>
+                </div>`).join("")}
+            </td></tr>
+          </table>
+        </td>`;
+      return `
+        <tr><td style="padding:0 36px 24px;">
+          <div style="font-size:11px;font-weight:600;color:#6B6F7B;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">${t("ec.cap.eyebrow")}</div>
+          <h3 style="font-size:16px;font-weight:700;color:#14171F;margin:0 0 6px;letter-spacing:-0.01em;">${t("ec.cap.title")}</h3>
+          <div style="font-size:12px;color:#4B5063;line-height:17px;margin:0 0 12px;">${t("ec.cap.lead")}</div>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              ${col("wins",  t("ec.cap.section.wins"),       cap.alteryWins)}
+              ${col("equal", t("ec.cap.section.comparable"), cap.comparable)}
+              ${col("bank",  t("ec.cap.section.bankWins", { bank: cap.bankName }), cap.bankWins)}
+            </tr>
+          </table>
+        </td></tr>`;
+    })();
+
     const emailStrings = {
       subject:        safeForwarder
         ? t("ec.email.forwarded.subject", { forwarder: safeForwarder, plan: planName })
@@ -992,6 +1067,7 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       footerEntities: t("ec.pdf.footer.entities"),
       forwardedByBanner,
       forwardedByLabel,
+      capabilityHTML,
     };
 
     const apiRes = await fetch("/api/send-analysis", {
