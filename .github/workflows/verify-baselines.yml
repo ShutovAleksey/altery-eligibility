@@ -1,0 +1,97 @@
+name: Verify bank baselines
+
+# Runs the source-URL + freshness check on EC_COMPARATORS every Monday
+# morning. On failure (broken URL or stale asof), opens a tracking
+# issue so the data layer gets refreshed before drift compounds. Can
+# also be triggered manually from the Actions tab.
+
+on:
+  schedule:
+    # Every Monday at 07:00 UTC — early enough that any opened issue
+    # is visible at the start of the working week.
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed for the issue-on-failure step to call the GitHub API.
+      issues: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run verify:baselines
+        id: verify
+        run: |
+          set +e
+          npm run verify:baselines > verify-report.txt 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          cat verify-report.txt
+        continue-on-error: true
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-baselines-report
+          path: verify-report.txt
+          retention-days: 30
+
+      - name: Open issue if verify failed
+        if: steps.verify.outputs.exit_code != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('verify-report.txt', 'utf8');
+            const today = new Date().toISOString().slice(0, 10);
+            const title = `[baselines] Verify failed on ${today}`;
+
+            // Search for an existing open issue with the same title
+            // prefix to avoid spamming weekly. If found, comment on
+            // it instead of opening a new one.
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'baselines',
+            });
+            const body = [
+              'Weekly `npm run verify:baselines` reported one or more',
+              'issues with the bank source URLs or asof timestamps in',
+              '`EC_COMPARATORS`. Refresh the relevant entries before',
+              'shipping any pricing-page-driven copy change.',
+              '',
+              '```',
+              report.slice(0, 6000),
+              '```',
+              '',
+              `Workflow run: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
+            ].join('\n');
+
+            if (existing.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['baselines', 'maintenance'],
+              });
+            }
+
+      - name: Fail the job
+        if: steps.verify.outputs.exit_code != '0'
+        run: exit 1
