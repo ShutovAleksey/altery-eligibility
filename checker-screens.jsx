@@ -1272,9 +1272,26 @@ function EcRegionChips({ value, onChange, label, ariaLabel }) {
               onClick={() => toggleRegion(regionId)}
               aria-pressed={on}
             >
-              <span className="ec-region-chip__flag" aria-hidden="true">
-                <Flag code={EC_CHIP_REGION_FLAG[regionId]} size={22} />
-              </span>
+              {(() => {
+                // Flag spec can be a single ISO code or an array (stacked
+                // pair). Array form is used for blocs that don't map to a
+                // single country flag — e.g. UK+EEA stacks GB+EU.
+                const spec = EC_CHIP_REGION_FLAG[regionId];
+                const codes = Array.isArray(spec) ? spec : [spec];
+                return (
+                  <span className={"ec-region-chip__flag"
+                                  + (codes.length > 1 ? " is-dual" : "")}
+                        aria-hidden="true">
+                    {codes.map((code, idx) => (
+                      <span key={code}
+                            className={"ec-region-chip__flagItem"
+                                      + (idx > 0 ? " is-secondary" : "")}>
+                        <Flag code={code} size={22} />
+                      </span>
+                    ))}
+                  </span>
+                );
+              })()}
               <span className="ec-region-chip__label">{t("ec.region." + regionId)}</span>
               {on && (
                 <span className="ec-region-chip__check" aria-hidden="true">

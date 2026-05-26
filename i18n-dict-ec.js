@@ -181,7 +181,7 @@
     "ec.region.apac_me":  "Asia-Pacific & Middle East",
     "ec.region.europe":   "Europe",
     /* New 7-chip region labels for the Q5 picker. */
-    "ec.region.uk-eea":        "UK + € EEA",
+    "ec.region.uk-eea":        "UK + EEA",
     "ec.region.middle-east":   "Middle East",
     "ec.region.south-asia":    "India & South Asia",
     "ec.region.apac":          "Asia-Pacific",

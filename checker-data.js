@@ -392,10 +392,12 @@ const EC_CHIP_REGION_ORDER = [
 ];
 
 // Representative country flag for each chip (visual anchor inside the
-// chip — saves having to render a multi-flag stack). Picked the most
-// recognisable / fintech-anchor country per region.
+// chip). String = single flag; array = stacked flag pair (overlapping
+// avatar style). UK+EEA stacks GB and EU because EEA isn't a country
+// flag of its own — the stack communicates the "two-bloc" composition
+// at a glance, replacing the earlier "€" symbol prefix in the label.
 const EC_CHIP_REGION_FLAG = {
-  "uk-eea":        "GB",
+  "uk-eea":        ["GB", "EU"],
   "middle-east":   "AE",
   "south-asia":    "IN",
   "apac":          "SG",

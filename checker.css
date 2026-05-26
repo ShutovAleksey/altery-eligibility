@@ -662,17 +662,21 @@
       font-size: 13px; font-weight: 500; color: var(--c-ink-2);
     }
     .ec-region-chips__grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      /* Mobile-first single column — labels like "India & South Asia"
+         and "Latin America" don't fit comfortably in a 2-col grid on
+         iPhone-SE widths. Single column gives generous thumb-targets
+         and full label visibility at the cost of 7 chips fitting in
+         one screenful (acceptable — content above is short). */
+      display: flex;
+      flex-direction: column;
       gap: 10px;
     }
     @media (min-width: 720px) {
       /* Desktop / tablet: let chips size to content so the row hosts
          all seven without overflowing on common widths. */
       .ec-region-chips__grid {
-        display: flex;
+        flex-direction: row;
         flex-wrap: wrap;
-        gap: 10px;
       }
     }
     .ec-region-chip {
@@ -714,12 +718,32 @@
     }
     .ec-region-chip__flag {
       display: inline-flex;
+      align-items: center;
+      flex: 0 0 auto;
+    }
+    .ec-region-chip__flagItem {
+      display: inline-flex;
       width: 22px; height: 22px;
       border-radius: 999px;
       overflow: hidden;
       background: var(--c-border-soft);
       align-items: center; justify-content: center;
       flex: 0 0 22px;
+    }
+    /* Dual-flag stack — used by UK+EEA chip. Second flag overlaps
+       the first by ~8px (avatar-stack pattern) with a thin background
+       outline so the boundary reads cleanly against either flag. */
+    .ec-region-chip__flag.is-dual {
+      gap: 0;
+    }
+    .ec-region-chip__flagItem.is-secondary {
+      margin-left: -8px;
+      box-shadow: 0 0 0 1.5px var(--c-surface);
+    }
+    .ec-region-chip.is-on .ec-region-chip__flagItem.is-secondary {
+      /* Chip turns accent-soft when selected — match the outline so the
+         second flag's boundary keeps visual separation in either state. */
+      box-shadow: 0 0 0 1.5px var(--c-accent-soft);
     }
     .ec-region-chip__label {
       flex: 1; min-width: 0;
