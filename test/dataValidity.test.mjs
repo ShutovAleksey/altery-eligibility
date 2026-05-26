@@ -139,35 +139,23 @@ test("forEntities mapping covers every entity id", () => {
 });
 
 // ────────────────────────────────────────────────────────────────
-// EC_INDUSTRIES — two-level taxonomy (category → subindustry).
-// Categories carry labelKey + an array of subs; only the leaf carries
-// risk / crypto / craKey. Validation walks both levels.
+// EC_INDUSTRIES — flat ICP-aligned list. Each entry carries
+// value / labelKey / risk; optionally crypto / reassureKey / craKey.
 // ────────────────────────────────────────────────────────────────
-test("Every category has value + labelKey + subs; every leaf has a valid risk", () => {
-  const validRisks = new Set(["ok", "specialist", "blocked", undefined]);
-  for (const cat of w.EC_INDUSTRIES) {
-    assert.equal(typeof cat.value, "string", `category missing value`);
-    assert.ok(cat.labelKey, `${cat.value} missing labelKey`);
-    assert.ok(Array.isArray(cat.subs) && cat.subs.length > 0, `${cat.value} missing subs`);
-    for (const s of cat.subs) {
-      assert.equal(typeof s.value, "string", `${cat.value}: sub missing value`);
-      assert.ok(s.labelKey, `${cat.value}/${s.value} missing labelKey`);
-      // risk is optional (omitted = "ok"); if set, must be valid.
-      assert.ok(validRisks.has(s.risk), `${cat.value}/${s.value} invalid risk ${s.risk}`);
-    }
+test("Every industry has value, labelKey, and a valid risk", () => {
+  const validRisks = new Set(["ok", "specialist", "blocked"]);
+  for (const i of w.EC_INDUSTRIES) {
+    assert.equal(typeof i.value, "string", `industry missing value`);
+    assert.ok(i.labelKey, `${i.value} missing labelKey`);
+    assert.ok(validRisks.has(i.risk), `${i.value} has invalid risk ${i.risk}`);
   }
 });
 
-test("Exactly 4 blocked subindustries (gambling/adult/weapons/lending)", () => {
-  const blocked = [];
-  for (const cat of w.EC_INDUSTRIES) {
-    for (const s of (cat.subs || [])) {
-      if (s.risk === "blocked") blocked.push(s.value);
-    }
-  }
-  blocked.sort();
-  // VM-context arrays don't share prototype with the runner; JSON
-  // round-trip is the cross-realm-safe comparison.
+test("Exactly 4 blocked industries (gambling/adult/weapons/lending)", () => {
+  // VM-context arrays have a different Array prototype than the test
+  // runner's, so deepStrictEqual on the raw array fails on identity.
+  // JSON round-trip is the cross-realm-safe comparison.
+  const blocked = w.EC_INDUSTRIES.filter((i) => i.risk === "blocked").map((i) => i.value).sort();
   assert.equal(JSON.stringify(blocked), JSON.stringify(["adult", "gambling", "lending", "weapons"]));
 });
 

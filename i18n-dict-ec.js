@@ -58,10 +58,8 @@
     // Q2 industry
     "ec.q1.title": "What kind of business do you run?",
     "ec.q1.lead": "A few industries we can't serve right now — better to know before you start KYB. Pick the closest match; we'll refine on the application.",
-    "ec.q1.field.industry":       "Industry",
-    "ec.q1.field.industryPh":     "Select industry",
-    "ec.q1.field.subindustry":    "Subindustry",
-    "ec.q1.field.subindustryPh":  "Select subindustry",
+    "ec.q1.field.industry":   "Industry",
+    "ec.q1.field.industryPh": "Select industry",
     "ec.q1.alert.blocked.title": "We can't open accounts for this industry",
     "ec.q1.alert.blocked.body": "Altery doesn't support {industry} on any of our entities. We'll explain on the result screen — you can also reach our team directly.",
     "ec.q1.alert.crypto.title": "Crypto-native? You're in the right place.",
@@ -75,74 +73,25 @@
     "ec.q1.alert.freezone.title": "DMCC, ADGM, JAFZA — all welcome.",
     "ec.q1.alert.freezone.body": "Free-zone incorporations get the same treatment as mainland UAE entities — Altery MENA is DFSA-licensed and serves both. Tell us your free zone during onboarding; the document list adjusts automatically.",
 
-    // Industry taxonomy — two levels.
-    // Top-level categories (`ec.ind.*`) populate the first Select.
-    "ec.ind.marketing":   "Marketing & advertising",
-    "ec.ind.it":          "Information technology",
-    "ec.ind.freelance":   "Freelance & contract work",
-    "ec.ind.legal-prof":  "Legal & professional services",
-    "ec.ind.retail":      "Retail, e-commerce, wholesale or manufacturing",
-    "ec.ind.transport":   "Transportation & logistics",
-    "ec.ind.restricted":  "Restricted (not currently served)",
-
-    // Subindustries (`ec.sub.*`) populate the second Select — filtered
-    // by the chosen category. Wording stays consistent with the
-    // back-office CRA mapping; both lists live in checker-data.js.
-    // Marketing
-    "ec.sub.digital-marketing":  "Digital marketing",
-    "ec.sub.smm":                "Social media marketing (SMM)",
-    "ec.sub.seo":                "Search engine optimisation (SEO)",
-    "ec.sub.market-research":    "Market research",
-    "ec.sub.network-marketing":  "Network marketing (MLM)",
-    "ec.sub.referral-marketing": "Referral marketing",
-    // IT
-    "ec.sub.it-support":      "IT support",
-    "ec.sub.it-development":  "IT development",
-    "ec.sub.graphic-design":  "Graphic design",
-    "ec.sub.cloud-services":  "Cloud services",
-    "ec.sub.vpn":             "VPN services",
-    "ec.sub.software-dev":    "Software development",
-    "ec.sub.web-mobile-dev":  "Web & mobile application development",
-    "ec.sub.web-hosting":     "Web hosting & web design",
-    "ec.sub.it-consulting":   "IT consulting",
-    "ec.sub.it-infra":        "IT infrastructure",
-    "ec.sub.it-security":     "IT security",
-    "ec.sub.ai":              "Artificial intelligence",
-    "ec.sub.data-processing": "Data processing & hosting",
-    "ec.sub.saas":            "Software as a Service (SaaS)",
-    "ec.sub.blockchain-dev":  "Blockchain development",
-    // Freelance
-    "ec.sub.freelance-platforms": "Freelance platforms",
-    "ec.sub.freelance-writing":   "Freelance writing services",
-    "ec.sub.translation":         "Translation services",
-    "ec.sub.copywriting":         "Copywriting",
-    // Legal & professional
-    "ec.sub.legal-services": "Legal services",
-    "ec.sub.healthcare":     "Healthcare",
-    "ec.sub.accounting":     "Accounting services",
-    "ec.sub.hr-services":    "HR services",
-    "ec.sub.consulting":     "Consulting services",
-    "ec.sub.tax-consulting": "Tax consulting",
-    "ec.sub.real-estate":    "Real estate services",
-    // Retail
-    "ec.sub.online-shops":     "Online shops",
-    "ec.sub.ecom-platforms":   "E-commerce platforms",
-    "ec.sub.marketplaces":     "Marketplaces",
-    "ec.sub.retail-stores":    "Retail stores",
-    "ec.sub.wholesale":        "Wholesale",
-    "ec.sub.beauty-products":  "Beauty products",
-    "ec.sub.automotive-trade": "Automotive trading (cars, motorbikes, planes, boats)",
-    "ec.sub.automotive-maint": "Automotive maintenance & repair",
-    "ec.sub.manufacturing":    "Manufacturing",
-    // Transport
-    "ec.sub.courier":           "Courier services",
-    "ec.sub.logistics":         "Logistics services",
-    "ec.sub.private-transport": "Private transportation providers",
-    // Restricted (soft-decline)
-    "ec.sub.gambling": "Gambling, betting, iGaming",
-    "ec.sub.adult":    "Adult content",
-    "ec.sub.weapons":  "Weapons manufacture",
-    "ec.sub.lending":  "Unregulated lending",
+    // Industries — flat ICP-aligned list.
+    "ec.ind.saas":        "SaaS, software & AI tools",
+    "ec.ind.apps":        "Mobile apps & publishers",
+    "ec.ind.games":       "Games & game studios",
+    "ec.ind.edtech":      "EdTech & online learning",
+    "ec.ind.marketplace": "Marketplaces & platforms",
+    "ec.ind.ecom":        "E-commerce & digital goods",
+    "ec.ind.marketing":   "Marketing & advertising agency",
+    "ec.ind.freelance":   "Freelance platforms & freelancers",
+    "ec.ind.prof":        "Professional services",
+    "ec.ind.creator":     "Creator & influencer platforms",
+    "ec.ind.affiliate":   "Affiliate & performance marketing",
+    "ec.ind.vpn":         "VPN services",
+    "ec.ind.crypto":      "Crypto & Web3",
+    "ec.ind.other":       "Other digital business",
+    "ec.ind.gambling":    "Gambling, betting, iGaming",
+    "ec.ind.adult":       "Adult content",
+    "ec.ind.weapons":     "Weapons manufacture",
+    "ec.ind.lending":     "Unregulated lending",
 
     // Q3 services multi-select — 9 products / use-cases. Default-on
     // accounts + crossBorder (universal needs for any digital business
@@ -259,10 +208,12 @@
         // industries. Names what the persona does with Altery (specific
         // operations), not Altery features. Skipped for generic industries.
         "ec.r.persona.saas.line": "For SaaS teams operating globally",
-        "ec.r.persona.ai.line": "For AI-native products with global compute and billing",
-        "ec.r.persona.blockchain-dev.line": "For crypto-native operations with licensed rails",
-        "ec.r.persona.marketplaces.line": "For marketplaces routing seller payouts at scale",
-        "ec.r.persona.ecom-platforms.line": "For e-commerce platforms with multi-merchant payouts",
+        "ec.r.persona.apps.line": "For app publishers and store-payout flows",
+        "ec.r.persona.games.line": "For studios with multi-platform revenue",
+        "ec.r.persona.edtech.line": "For platforms paying instructors worldwide",
+        "ec.r.persona.affiliate.line": "For affiliate networks paying at scale",
+        "ec.r.persona.creator.line": "For creator platforms paying at scale",
+        "ec.r.persona.crypto.line": "For crypto-native operations with licensed rails",
         "ec.r.entity.status": "{licence} · operational",
         "ec.r.plan.fit": "Best fit for your volume",
         "ec.r.plan.switch": "You can switch plans any time from the dashboard.",
