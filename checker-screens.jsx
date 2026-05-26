@@ -1,6 +1,6 @@
 /* global React, useT, Button, Tag, Alert, SelectableListItem, Input, Select,
           Icon, Flag, Title, Field, WhyWeAsk,
-          EC_COUNTRIES, EC_INDUSTRIES, EC_BUSINESS_TYPES, EC_SERVICES,
+          EC_COUNTRIES, EC_INDUSTRIES, EC_SERVICES, ecFindSubindustry, ecReassureKeyFor,
           EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
@@ -287,8 +287,13 @@ function EcApp() {
   // don't need to thread it through component state.
   useEffect(() => { ecCaptureAndStoreUtms(); }, []);
   const [country, setCountry] = useState(null);
+  // `industryCategory` is the top-level industry category (e.g. "it"),
+  // `industry` is the leaf subindustry the user picked (e.g. "saas").
+  // ecRecommend receives only the leaf; the category drives the second
+  // Select's option list. Business type was dropped — KYB will capture
+  // legal form during onboarding where it actually matters.
+  const [industryCategory, setIndustryCategory] = useState("");
   const [industry, setIndustry] = useState("");
-  const [businessType, setBusinessType] = useState("");
   // services: multi-select of products/use-cases the user wants.
   // Drives plan tier hint (Pro for mass/cards/multiEntity, Ultra for
   // API, specialist review for crypto rails) and result page perk
@@ -314,8 +319,8 @@ function EcApp() {
   const monthlyVolume = (EC_VOLUME_BANDS[volumeInIdx]?.value || 0) + (EC_VOLUME_BANDS[volumeOutIdx]?.value || 0);
   const monthlyTx     = (EC_TX_BANDS[txInIdx]?.value || 0) + (EC_TX_BANDS[txOutIdx]?.value || 0);
   const recommendation = useMemo(() =>
-    ecRecommend({ countryCode: country, industry, businessType, monthlyVolume, corridorsIn: [...corridorsIn], corridorsOut: [...corridorsOut], monthlyTx, services: [...services] }),
-  [country, industry, businessType, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services]);
+    ecRecommend({ countryCode: country, industry, monthlyVolume, corridorsIn: [...corridorsIn], corridorsOut: [...corridorsOut], monthlyTx, services: [...services] }),
+  [country, industry, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services]);
 
   // Step navigation. Steps:
   //   0 intro · 1 country · 2 industry · 3 services · 4 volume · 5 corridors · 6 result
@@ -371,7 +376,7 @@ function EcApp() {
       <main className="ec-main" data-direction={direction}>
         {step === 0 && <EcIntro onStart={next} />}
         {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}
-        {step === 2 && <EcIndustry country={country} industry={industry} setIndustry={setIndustry} businessType={businessType} setBusinessType={setBusinessType} onBack={back} onNext={next} onBlocked={jumpToResult} />}
+        {step === 2 && <EcIndustry country={country} industryCategory={industryCategory} setIndustryCategory={setIndustryCategory} industry={industry} setIndustry={setIndustry} onBack={back} onNext={next} onBlocked={jumpToResult} />}
         {step === 3 && <EcServices services={services} setServices={setServices} onBack={back} onNext={next} />}
         {step === 4 && <EcVolume
           volumeInIdx={volumeInIdx} setVolumeInIdx={setVolumeInIdx}
@@ -762,23 +767,39 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
   );
 }
 
-function EcIndustry({ country, industry, setIndustry, businessType, setBusinessType, onBack, onNext, onBlocked }) {
+function EcIndustry({ country, industryCategory, setIndustryCategory, industry, setIndustry, onBack, onNext, onBlocked }) {
   const t = useT();
-  const ind = EC_INDUSTRIES.find((i) => i.value === industry);
+  // Two-level industry pick: category first (broad sector) then leaf
+  // subindustry (the actual signal). The leaf carries risk / crypto /
+  // craKey flags; the category drives the second Select's option list.
+  const category = EC_INDUSTRIES.find((c) => c.value === industryCategory);
+  const ind = ecFindSubindustry(industry);
+  const reassureKey = ecReassureKeyFor(industry);
   // UAE incorporations frequently arrive worried that free-zone (DMCC,
   // ADGM, JAFZA…) vs onshore status will be a blocker. It isn't — DIFC-
   // licensed Altery MENA serves both. Banner only fires once the user
   // is committed to UAE (Q1) so it doesn't surface for unrelated picks.
   const showFreezone = country === "AE";
-  // If the user picks an industry we can't onboard (gambling, adult,
-  // weapons, unregulated lending) there is no point asking the next four
-  // questions — country/services/volume/corridors won't change the
-  // outcome. We short-circuit straight to EcResultBlocked, which the
-  // soft-decline result screen handles end-to-end. The earlier inline
-  // danger Alert is gone too: showing it AND letting the user continue
-  // through the remaining questions was a worse UX than just landing
-  // them on the explanation page immediately.
+  // If the user picks a blocked subindustry we short-circuit to the
+  // EcResultBlocked screen — answering the remaining questions can't
+  // change the outcome. Inline danger Alert appears the moment they
+  // pick, so they don't have to press Continue to learn.
   const isBlocked = ind?.risk === "blocked";
+
+  // When the category changes, reset the leaf so the second Select
+  // doesn't keep a stale value from a different category. Wrapped here
+  // (not in EcApp) because both `industryCategory` and `industry` are
+  // logically coupled and the UI is the only place that knows when the
+  // user changed the category.
+  const onCategoryChange = (v) => {
+    setIndustryCategory(v);
+    setIndustry("");
+  };
+
+  const subOptions = (category?.subs || []).map(
+    (s) => ({ value: s.value, label: t(s.labelKey) })
+  );
+
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -789,59 +810,52 @@ function EcIndustry({ country, industry, setIndustry, businessType, setBusinessT
       <div className="ec-twocol">
         <Select
           label={t("ec.q1.field.industry")}
-          value={industry}
-          onChange={(v) => setIndustry(v)}
+          value={industryCategory}
+          onChange={onCategoryChange}
           placeholder={t("ec.q1.field.industryPh")}
-          options={EC_INDUSTRIES.map((i) => ({ value: i.value, label: t(i.labelKey) }))}
+          options={EC_INDUSTRIES.map((c) => ({ value: c.value, label: t(c.labelKey) }))}
         />
         <Select
-          label={t("ec.q1.field.businessType")}
-          value={businessType}
-          onChange={(v) => setBusinessType(v)}
-          placeholder={t("ec.q1.field.businessTypePh")}
-          options={EC_BUSINESS_TYPES.map((b) => ({ value: b.value, label: t(b.labelKey) }))}
+          label={t("ec.q1.field.subindustry")}
+          value={industry}
+          onChange={setIndustry}
+          placeholder={t("ec.q1.field.subindustryPh")}
+          options={subOptions}
+          disabled={!industryCategory}
         />
       </div>
 
-      {/* Inline soft-decline — fires the instant a blocked industry is
-          picked, so the user gets the answer before pressing Continue
-          (which still works and lands on the dedicated EcResultBlocked
-          screen, with the team contact path). Without this, the header
-          copy "we'll flag before you start KYB" was a lie: blocked
-          users found out only AFTER pressing Continue. */}
+      {/* Inline soft-decline — fires the instant a blocked subindustry
+          is picked, so the user gets the answer before pressing
+          Continue (which still works and lands on EcResultBlocked). */}
       {isBlocked && (
         <Alert tone="danger" title={t("ec.q1.alert.blocked.title")}>
           {t("ec.q1.alert.blocked.body", { industry: t(ind.labelKey).toLowerCase() })}
         </Alert>
       )}
 
-      {/* Crypto-native welcome — crypto businesses are a core target
+      {/* Crypto-native welcome — crypto subindustries are a core target
           segment, not an exception we tolerate. Tone is info (blue,
-          brand-aligned), copy interpolates the specific category so it
-          reads "We onboard [crypto exchange / OTC desk] regularly" —
-          demonstrating we differentiate the categories instead of
-          lumping them. */}
-      {ind?.crypto && (
+          brand-aligned). */}
+      {!isBlocked && ind?.crypto && (
         <Alert tone="info" title={t("ec.q1.alert.crypto.title")}>
           {t("ec.q1.alert.crypto.body", { category: t(ind.labelKey).toLowerCase() })}
         </Alert>
       )}
 
-      {/* Industry-specific reassurance — same tone as the crypto alert.
-          Triggers via `reassureKey` on the industry definition. Reads
-          well for AI / SaaS / marketplace / creator picks where the
-          first instinct of a prospect is "is this segment unusual?". */}
-      {!isBlocked && !ind?.crypto && ind?.reassureKey && (
-        <Alert tone="info" title={t(ind.reassureKey + ".title")}>
-          {t(ind.reassureKey + ".body", { category: t(ind.labelKey).toLowerCase() })}
+      {/* Industry-specific reassurance — picks up the leaf subindustry's
+          own reassureKey if it has one, otherwise the parent category's
+          (e.g. IT category's SaaS banner applies to all IT subindustries
+          unless the leaf overrides — blockchain-dev sets its own crypto
+          banner above). */}
+      {!isBlocked && !ind?.crypto && reassureKey && (
+        <Alert tone="info" title={t(reassureKey + ".title")}>
+          {t(reassureKey + ".body", { category: ind ? t(ind.labelKey).toLowerCase() : "" })}
         </Alert>
       )}
 
-      {/* UAE free-zone reassurance — fires for any industry once the
-          user has chosen UAE on Q1. Hassan's worry that DMCC/ADGM/JAFZA
-          incorporations might be a problem comes up in nearly every
-          UAE conversation; the inline answer is "no, they're all
-          welcome". Country-conditional, not industry-conditional. */}
+      {/* UAE free-zone reassurance — country-conditional banner for the
+          recurring "is DMCC/ADGM/JAFZA a problem?" worry. */}
       {showFreezone && !isBlocked && (
         <Alert tone="info" title={t("ec.q1.alert.freezone.title")}>
           {t("ec.q1.alert.freezone.body")}
@@ -854,7 +868,7 @@ function EcIndustry({ country, industry, setIndustry, businessType, setBusinessT
           size="xl"
           onClick={isBlocked ? onBlocked : onNext}
           iconRight="arrowRight"
-          disabled={!industry || !businessType}
+          disabled={!industryCategory || !industry}
         >
           {t("common.continue")}
         </Button>

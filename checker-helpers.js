@@ -32,7 +32,7 @@ Object.values(EC_ENTITIES).forEach((e) => {
 });
 
 // Pure routing function — answers → recommendation. Easy to test in isolation.
-function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services }) {
+function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services }) {
   // Union of regions hit on either direction = the actual corridor
   // breadth of the business. Keep both directions on rec for the PDF
   // and downstream consumers; expose the merged set as `corridors`.
@@ -40,7 +40,13 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
   const cOut = Array.isArray(corridorsOut) ? corridorsOut : [];
   const corridors = Array.from(new Set([...cIn, ...cOut]));
   const country = EC_COUNTRIES.find((c) => c.code === countryCode);
-  const ind = EC_INDUSTRIES.find((i) => i.value === industry);
+  // `industry` is the LEAF subindustry id (e.g. "saas", "blockchain-dev")
+  // after the category→subindustry rebuild. ecFindSubindustry searches
+  // every category for a matching leaf and returns the object with
+  // risk / crypto / craKey / reassureKey. `ind` keeps the same downstream
+  // shape it had as a flat-list entry.
+  const ind = ecFindSubindustry(industry);
+  const indCategory = ecFindCategoryFor(industry);
 
   // Country sanctions check runs before the industry check: a sanctioned
   // jurisdiction blocks regardless of what the business does. The
@@ -107,7 +113,13 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
     // servicesUltra was driven by the now-removed "api" service. Ultra
     // tier is now decided purely by volume (volumeUltra ≥ €1M/mo).
     servicesUltra:    false,
-    industryPro:      industry === "affiliate" || industry === "creator",
+    // industryPro used to fire for the old "affiliate" / "creator"
+    // industries. Under the new category→subindustry taxonomy there
+    // is no leaf that uniquely implies Pro on its own — operational
+    // complexity is already captured by volume / corridors / services
+    // signals above. Kept on rec.tierSignals as `false` so downstream
+    // code that reads the signal map doesn't need a shape check.
+    industryPro:      false,
   };
   const needsPro = tierSignals.volumePro || tierSignals.corridorsBreadth ||
                    tierSignals.txHigh || tierSignals.servicesPro ||
@@ -126,11 +138,12 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
   if (ind?.crypto) {
     caveats.push({ tagKey: "ec.cav.crypto.tag", textKey: "ec.cav.crypto.text", tone: "blue" });
   }
-  // Performance-marketing caveat — affiliate and creator platforms need
-  // a structured-review explanation. Copy borrows from the Tone of Voice
-  // doc: "Performance marketing businesses need clearer traffic and
-  // payout evidence" — confident, specific, not gatekeeping.
-  if (industry === "affiliate" || industry === "creator") {
+  // Performance-marketing caveat — network-marketing (MLM-shaped
+  // payout structures) is the post-taxonomy fit for the original
+  // affiliate/creator copy: "needs clearer traffic and payout
+  // evidence". Other specialist-tier subindustries (VPN, blockchain)
+  // have their own dedicated explanations.
+  if (industry === "network-marketing") {
     caveats.push({
       tagKey: "ec.cav.performance.tag",
       textKey: "ec.cav.performance.text",
@@ -204,7 +217,7 @@ function ecRecommend({ countryCode, industry, businessType, monthlyVolume, corri
     .sort((a, b) => b.priority - a.priority)
     .slice(0, 3);
 
-  return { kind: "approved", entity, plan, caveats, country, ind, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoReroute, cryptoActive, services: svcs, tierSignals, reasoning: reasoningTop };
+  return { kind: "approved", entity, plan, caveats, country, ind, indCategory, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoReroute, cryptoActive, services: svcs, tierSignals, reasoning: reasoningTop };
 }
 
 // Derive a transaction-count assumption from the monthly volume
@@ -615,7 +628,16 @@ function ecBuildHandoffPayload(rec, plan, opts) {
     country:      rec?.country?.code || null,
     currency:     rec?.entity?.id === "uk" ? "GBP" : "EUR",
     volume:       rec?.monthlyVolume || null,
+    // `industry` is the leaf subindustry the user picked (e.g. "saas",
+    // "blockchain-dev"). `category` is its parent (e.g. "it"). Both
+    // are kept so onboarding can prefill the category dropdown without
+    // re-deriving it, and so the back-office can group leads by
+    // category in reports. `cra` is the compliance-routing category
+    // (i18n key, e.g. "ec.cra.it-dev") — back-office uses this to
+    // route the KYB queue.
     industry:     rec?.ind?.value || null,
+    category:     rec?.indCategory?.value || null,
+    cra:          rec?.ind?.craKey || null,
     services:     Array.isArray(rec?.services) ? rec.services : [],
     corridors:    Array.isArray(rec?.corridors) ? rec.corridors : [],
     cryptoActive: !!rec?.cryptoActive,

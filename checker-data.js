@@ -334,57 +334,162 @@ const EC_REGION_ORDER = ["europe", "apac_me", "americas", "africa"];
 //     six crypto sub-types missed it.
 //   • "Gambling / Betting / iGaming" — added "iGaming" to the
 //     blocked label so the contrast with served "Gaming" is sharp.
+// Industry taxonomy — two levels (category → subindustry). The user
+// picks a category on the industry screen, then a subindustry from
+// the filtered second select. Each subindustry carries:
+//   value       — the canonical id passed to ecRecommend / handoff
+//   labelKey    — customer-facing i18n key
+//   craKey      — back-office Compliance/Risk Assessment category
+//                 (i18n key, prefix `ec.cra.`). Routed through the
+//                 handoff payload so onboarding/back-office can map
+//                 the leaf pick onto the existing CRA buckets.
+//   risk        — "ok" (default), "specialist" (manual review path),
+//                 or "blocked" (soft-decline path → EcResultBlocked).
+//   crypto      — true marks crypto-native flows; same semantics as
+//                 the previous flat-list `crypto` flag.
+//   reassureKey — optional override. By default subindustry inherits
+//                 the parent category's reassureKey; set this on a
+//                 subindustry to override (e.g. blockchain-dev under
+//                 IT shows the crypto banner, not the SaaS one).
+//
+// Categories also carry their own labelKey + optional reassureKey
+// that applies to all child subindustries unless overridden.
 const EC_INDUSTRIES = [
-  // ── Digital business segments — self-serve review path ────────────
-  // Aligned with ICP personas from the Altery Business 2026 strategy
-  // doc: each segment maps to a tailored result page tone and plan
-  // recommendation. Order is "most common digital businesses first"
-  // — SaaS/apps/games lead because they make up the bulk of inbound
-  // demand for cross-border digital business banking. Marketplace
-  // and e-commerce follow as adjacent segments.
-  // `reassureKey` (optional) is the i18n root for an inline info alert
-  // that fires when the industry is picked. Same pattern as the crypto
-  // alert: title at `{key}.title`, body at `{key}.body` — body may
-  // interpolate {category}.
-  { value: "saas",        labelKey: "ec.ind.saas",        risk: "ok", reassureKey: "ec.q1.alert.saas" },         // Digital Founder
-  { value: "apps",        labelKey: "ec.ind.apps",        risk: "ok", reassureKey: "ec.q1.alert.saas" },         // App Publisher / AI App
-  { value: "games",       labelKey: "ec.ind.games",       risk: "ok", reassureKey: "ec.q1.alert.saas" },         // Game Studio Operator
-  { value: "edtech",      labelKey: "ec.ind.edtech",      risk: "ok", reassureKey: "ec.q1.alert.saas" },         // EdTech Platform Operator
-  { value: "marketplace", labelKey: "ec.ind.marketplace", risk: "ok", reassureKey: "ec.q1.alert.marketplace" },  // Marketplaces & platforms
-  { value: "ecom",        labelKey: "ec.ind.ecom",        risk: "ok" },         // E-commerce & digital goods
-  { value: "prof",        labelKey: "ec.ind.prof",        risk: "ok" },         // Professional services
-  // ── Specialist review path ────────────────────────────────────────
-  // These segments need manual review before account opening but
-  // Altery actively onboards them. Result page caveats set the
-  // expectation that review is structured, not a black box ("Caveats
-  // now, not after KYB" promise from the intro screen).
-  { value: "creator",     labelKey: "ec.ind.creator",     risk: "specialist", reassureKey: "ec.q1.alert.creator" }, // Creator / influencer platforms
-  { value: "affiliate",   labelKey: "ec.ind.affiliate",   risk: "specialist" }, // Affiliate / performance marketing
-  { value: "crypto",      labelKey: "ec.ind.crypto",      risk: "specialist", crypto: true }, // Crypto-native Operator
-  // ── Fallback ──────────────────────────────────────────────────────
-  // Most users find themselves in segments above; "Other" exists for
-  // genuinely adjacent businesses we'd still consider (e.g. fintech
-  // tooling, compliance SaaS, niche cross-border services).
-  { value: "other",       labelKey: "ec.ind.other",       risk: "ok" },
+  {
+    value: "marketing",
+    labelKey: "ec.ind.marketing",
+    subs: [
+      { value: "digital-marketing",  labelKey: "ec.sub.digital-marketing",  craKey: "ec.cra.advertising" },
+      { value: "smm",                labelKey: "ec.sub.smm",                craKey: "ec.cra.advertising" },
+      { value: "seo",                labelKey: "ec.sub.seo",                craKey: "ec.cra.seo" },
+      { value: "market-research",    labelKey: "ec.sub.market-research",    craKey: "ec.cra.market-research" },
+      // MLM ("network marketing") triggers specialist review — common
+      // pretext for layered-payout schemes; KYB needs to see the
+      // payout structure before account opening.
+      { value: "network-marketing",  labelKey: "ec.sub.network-marketing",  craKey: "ec.cra.advertising", risk: "specialist" },
+      { value: "referral-marketing", labelKey: "ec.sub.referral-marketing", craKey: "ec.cra.advertising" },
+    ],
+  },
+  {
+    value: "it",
+    labelKey: "ec.ind.it",
+    // IT umbrella catches SaaS, dev shops, AI apps — same SaaS-banner
+    // reassurance applies to all of them.
+    reassureKey: "ec.q1.alert.saas",
+    subs: [
+      { value: "it-support",      labelKey: "ec.sub.it-support",      craKey: "ec.cra.it-dev" },
+      { value: "it-development",  labelKey: "ec.sub.it-development",  craKey: "ec.cra.it-dev" },
+      { value: "graphic-design",  labelKey: "ec.sub.graphic-design",  craKey: "ec.cra.it-dev" },
+      { value: "cloud-services",  labelKey: "ec.sub.cloud-services",  craKey: "ec.cra.hosting" },
+      // VPN service operators land in a sanctioned-traffic-monitoring
+      // bucket; explicit specialist review before account opening.
+      { value: "vpn",             labelKey: "ec.sub.vpn",             craKey: "ec.cra.vpn", risk: "specialist" },
+      { value: "software-dev",    labelKey: "ec.sub.software-dev",    craKey: "ec.cra.it-dev" },
+      { value: "web-mobile-dev",  labelKey: "ec.sub.web-mobile-dev",  craKey: "ec.cra.it-dev" },
+      { value: "web-hosting",     labelKey: "ec.sub.web-hosting",     craKey: "ec.cra.it-dev" },
+      { value: "it-consulting",   labelKey: "ec.sub.it-consulting",   craKey: "ec.cra.it-dev" },
+      { value: "it-infra",        labelKey: "ec.sub.it-infra",        craKey: "ec.cra.it-dev" },
+      { value: "it-security",     labelKey: "ec.sub.it-security",     craKey: "ec.cra.it-dev" },
+      { value: "ai",              labelKey: "ec.sub.ai",              craKey: "ec.cra.it-dev" },
+      { value: "data-processing", labelKey: "ec.sub.data-processing", craKey: "ec.cra.hosting" },
+      { value: "saas",            labelKey: "ec.sub.saas",            craKey: "ec.cra.it-dev" },
+      // Blockchain development = crypto-native operator. Overrides the
+      // parent IT category's SaaS banner with the crypto one and
+      // triggers the existing crypto-reroute logic in ecRecommend.
+      { value: "blockchain-dev",  labelKey: "ec.sub.blockchain-dev",  craKey: "ec.cra.it-dev", risk: "specialist", crypto: true, reassureKey: "ec.q1.alert.crypto" },
+    ],
+  },
+  {
+    value: "freelance",
+    labelKey: "ec.ind.freelance",
+    subs: [
+      { value: "freelance-platforms", labelKey: "ec.sub.freelance-platforms", craKey: "ec.cra.freelance" },
+      { value: "freelance-writing",   labelKey: "ec.sub.freelance-writing",   craKey: "ec.cra.translation" },
+      { value: "translation",         labelKey: "ec.sub.translation",         craKey: "ec.cra.translation" },
+      { value: "copywriting",         labelKey: "ec.sub.copywriting",         craKey: "ec.cra.translation" },
+    ],
+  },
+  {
+    value: "legal-prof",
+    labelKey: "ec.ind.legal-prof",
+    subs: [
+      { value: "legal-services", labelKey: "ec.sub.legal-services", craKey: "ec.cra.professional" },
+      { value: "healthcare",     labelKey: "ec.sub.healthcare",     craKey: "ec.cra.professional" },
+      { value: "accounting",     labelKey: "ec.sub.accounting",     craKey: "ec.cra.professional" },
+      { value: "hr-services",    labelKey: "ec.sub.hr-services",    craKey: "ec.cra.legal-accounting" },
+      { value: "consulting",     labelKey: "ec.sub.consulting",     craKey: "ec.cra.legal-accounting" },
+      { value: "tax-consulting", labelKey: "ec.sub.tax-consulting", craKey: "ec.cra.tax" },
+      { value: "real-estate",    labelKey: "ec.sub.real-estate",    craKey: "ec.cra.real-estate" },
+    ],
+  },
+  {
+    value: "retail",
+    labelKey: "ec.ind.retail",
+    subs: [
+      { value: "online-shops",     labelKey: "ec.sub.online-shops",     craKey: "ec.cra.online-shop" },
+      // E-com platforms + marketplaces are the "split-flow ops"
+      // pattern — collection + payouts to sellers. Reassure banner
+      // overrides the parent (which has none here).
+      { value: "ecom-platforms",   labelKey: "ec.sub.ecom-platforms",   craKey: "ec.cra.ecom-marketplace", reassureKey: "ec.q1.alert.marketplace" },
+      { value: "marketplaces",     labelKey: "ec.sub.marketplaces",     craKey: "ec.cra.ecom-marketplace", reassureKey: "ec.q1.alert.marketplace" },
+      { value: "retail-stores",    labelKey: "ec.sub.retail-stores",    craKey: "ec.cra.retail-wholesale" },
+      { value: "wholesale",        labelKey: "ec.sub.wholesale",        craKey: "ec.cra.retail-wholesale" },
+      { value: "beauty-products",  labelKey: "ec.sub.beauty-products",  craKey: "ec.cra.beauty" },
+      { value: "automotive-trade", labelKey: "ec.sub.automotive-trade", craKey: "ec.cra.vehicle-trade" },
+      { value: "automotive-maint", labelKey: "ec.sub.automotive-maint", craKey: "ec.cra.vehicle-maint" },
+      { value: "manufacturing",    labelKey: "ec.sub.manufacturing",    craKey: "ec.cra.manufacturing" },
+    ],
+  },
+  {
+    value: "transport",
+    labelKey: "ec.ind.transport",
+    subs: [
+      { value: "courier",           labelKey: "ec.sub.courier",           craKey: "ec.cra.courier-logistics" },
+      { value: "logistics",         labelKey: "ec.sub.logistics",         craKey: "ec.cra.courier-logistics" },
+      { value: "private-transport", labelKey: "ec.sub.private-transport", craKey: "ec.cra.private-transport" },
+    ],
+  },
   // ── Blocked (Fast no's, not slow no's — see intro screen card 3) ─
   // Visible in the dropdown deliberately: the intro screen promises
   // we'll tell users in 60 seconds, not after a week of document
-  // uploads. Hiding these would break that promise — better to be
-  // transparent up-front.
-  { value: "gambling",    labelKey: "ec.ind.gambling",    risk: "blocked" },
-  { value: "adult",       labelKey: "ec.ind.adult",       risk: "blocked" },
-  { value: "weapons",     labelKey: "ec.ind.weapons",     risk: "blocked" },
-  { value: "lending",     labelKey: "ec.ind.lending",     risk: "blocked" },
+  // uploads. Hiding these would break that promise.
+  {
+    value: "restricted",
+    labelKey: "ec.ind.restricted",
+    subs: [
+      { value: "gambling", labelKey: "ec.sub.gambling", risk: "blocked" },
+      { value: "adult",    labelKey: "ec.sub.adult",    risk: "blocked" },
+      { value: "weapons",  labelKey: "ec.sub.weapons",  risk: "blocked" },
+      { value: "lending",  labelKey: "ec.sub.lending",  risk: "blocked" },
+    ],
+  },
 ];
 
-const EC_BUSINESS_TYPES = [
-  { value: "ltd", labelKey: "ec.bt.ltd" },
-  { value: "llc", labelKey: "ec.bt.llc" },
-  { value: "plc", labelKey: "ec.bt.plc" },
-  { value: "fz", labelKey: "ec.bt.fz" },
-  { value: "branch", labelKey: "ec.bt.branch" },
-  { value: "sole", labelKey: "ec.bt.sole" },
-];
+// Flat-lookup helpers — used by ecRecommend and the result page when
+// they have a leaf `industry` value and need the subindustry object
+// (with risk / crypto / craKey / reassureKey) or its parent category.
+function ecFindSubindustry(value) {
+  for (const cat of EC_INDUSTRIES) {
+    const sub = (cat.subs || []).find((s) => s.value === value);
+    if (sub) return sub;
+  }
+  return null;
+}
+function ecFindCategoryFor(value) {
+  for (const cat of EC_INDUSTRIES) {
+    if ((cat.subs || []).some((s) => s.value === value)) return cat;
+  }
+  return null;
+}
+// Resolve the effective reassureKey for a leaf value, preferring the
+// subindustry's own override and falling back to its category.
+function ecReassureKeyFor(value) {
+  const sub = ecFindSubindustry(value);
+  if (!sub) return null;
+  if (sub.reassureKey) return sub.reassureKey;
+  const cat = ecFindCategoryFor(value);
+  return cat?.reassureKey || null;
+}
 
 // ── Services multi-select (Q3) ────────────────────────────────────
 // What does the user want to do with Altery? Second-strongest signal
@@ -951,7 +1056,8 @@ const EC_COMPARATORS = {
 // unqualified.
 Object.assign(window, {
   EC_COUNTRIES, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_INDUSTRIES,
-  EC_BUSINESS_TYPES, EC_SERVICES, TOTAL_STEPS,
+  EC_SERVICES, TOTAL_STEPS,
+  ecFindSubindustry, ecFindCategoryFor, ecReassureKeyFor,
   EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
   EC_COMPARATORS, ecHeroIdentifier, maskTailDots, ecFeeRegion,
 });

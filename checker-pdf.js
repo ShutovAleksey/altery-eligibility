@@ -221,7 +221,10 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   const savings      = ecEstimateSavings(monthlyVolume);
   const proposalRef  = ecGenProposalRef();
 
-  const personaIndustries = ["saas", "apps", "games", "edtech", "affiliate", "creator", "crypto"];
+  // Persona eyebrow lines on the PDF / email hero — mapped to the new
+  // subindustry taxonomy. We keep the set small (high-recall personas
+  // only) because the per-key copy has to read well in 10 languages.
+  const personaIndustries = ["saas", "ai", "blockchain-dev", "marketplaces", "ecom-platforms"];
   const personaLine = rec.ind && personaIndustries.includes(rec.ind.value)
     ? t(`ec.r.persona.${rec.ind.value}.line`)
     : null;

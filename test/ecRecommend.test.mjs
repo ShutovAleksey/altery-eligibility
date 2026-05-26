@@ -123,7 +123,10 @@ test("tierSignals expose which signals fired", () => {
 // Crypto re-route: EU + crypto → UK entity
 // ────────────────────────────────────────────────────────────────
 test("EU country + crypto industry re-routes to UK (Cyprus EMI doesn't cover crypto)", () => {
-  const rec = w.ecRecommend(input({ countryCode: "DE", industry: "crypto" }));
+  // After the category→subindustry rebuild, "crypto" is no longer a
+  // top-level industry — `blockchain-dev` is the crypto-native leaf
+  // (with crypto: true). Same routing logic applies.
+  const rec = w.ecRecommend(input({ countryCode: "DE", industry: "blockchain-dev" }));
   assert.equal(rec.entity.id, "uk", "EU crypto should land on UK FCA");
   assert.equal(rec.cryptoReroute, true);
   assert.equal(rec.cryptoActive, true);
@@ -136,7 +139,7 @@ test("EU country + crypto SERVICE (not industry) also triggers re-route", () => 
 });
 
 test("UK + crypto: no re-route flag (already on UK)", () => {
-  const rec = w.ecRecommend(input({ countryCode: "GB", industry: "crypto" }));
+  const rec = w.ecRecommend(input({ countryCode: "GB", industry: "blockchain-dev" }));
   assert.equal(rec.entity.id, "uk");
   assert.equal(rec.cryptoReroute, false);
   assert.equal(rec.cryptoActive, true);
