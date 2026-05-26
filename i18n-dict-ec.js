@@ -301,6 +301,14 @@
     "ec.plan.ultra.p4":   "FX markup up to 0.5%",
     "ec.plan.ultra.p5":   "Priority operations support",
 
+    // Realistic-track savings callout — bank-side hidden costs added
+    // on top of the published-rates headline. Hint cites the two
+    // categories (FX spread + correspondent SWIFT).
+    "ec.r.savings.realistic.label": "Including costs the bank doesn't show:",
+    "ec.r.savings.realistic.hint":  "Wholesale FX spread (≈ +0.5% on top of published markup) and correspondent SWIFT fees (≈ £18 per outgoing transfer) — items most banks don't list on their pricing page.",
+    "ec.r.method.hiddenFxSpread":   "Estimated +{pct}% wholesale FX spread on top of bank's published markup",
+    "ec.r.method.hiddenSwiftCorr":  "Estimated £{gbp} correspondent SWIFT fee per outgoing transfer",
+
     // Capability matrix — wins / comparable / bank-wins.
     // Three-section honest comparison on the result page. The
     // bank-wins section is the trust-driver: conceding 3-4 areas

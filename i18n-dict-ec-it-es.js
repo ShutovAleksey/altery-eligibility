@@ -429,6 +429,10 @@
     "ec.cap.bank.assetFin.detail": "Asset finance, invoice discounting e trade finance rimangono punti di forza delle banche.",
     "ec.cap.bank.branches": "Accesso alle filiali",
     "ec.cap.bank.branches.detail": "Per operazioni cash-heavy o paperwork-heavy, le filiali fisiche aiutano ancora.",
+    "ec.r.savings.realistic.label": "Inclusi costi non mostrati dalla banca:",
+    "ec.r.savings.realistic.hint": "Spread FX all'ingrosso (≈ +0,5% sopra il margine pubblicato) e commissioni SWIFT di banca corrispondente (≈ £18 per bonifico in uscita) — voci che la maggior parte delle banche non elenca sulla pagina prezzi.",
+    "ec.r.method.hiddenFxSpread": "Stimato +{pct}% spread FX all'ingrosso sopra il margine pubblicato della banca",
+    "ec.r.method.hiddenSwiftCorr": "Stimata £{gbp} commissione SWIFT di banca corrispondente per bonifico in uscita",
 });
 
   // ─────────────────────────── ESPAÑOL (ES) ───────────────────────────
@@ -860,6 +864,10 @@
     "ec.cap.bank.assetFin.detail": "Asset finance, invoice discounting y trade finance siguen siendo fortalezas de los bancos.",
     "ec.cap.bank.branches": "Acceso a sucursales",
     "ec.cap.bank.branches.detail": "Para operaciones intensivas en efectivo o papeleo, las sucursales físicas aún ayudan.",
+    "ec.r.savings.realistic.label": "Incluyendo costes que el banco no muestra:",
+    "ec.r.savings.realistic.hint": "Spread FX mayorista (≈ +0,5% sobre el markup publicado) y comisiones SWIFT de banco corresponsal (≈ £18 por transferencia saliente) — partidas que la mayoría de los bancos no enumeran en su página de precios.",
+    "ec.r.method.hiddenFxSpread": "Estimado +{pct}% spread FX mayorista sobre el markup publicado del banco",
+    "ec.r.method.hiddenSwiftCorr": "Estimada £{gbp} comisión SWIFT de banco corresponsal por transferencia saliente",
 });
 
 })();

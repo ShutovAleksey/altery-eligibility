@@ -179,6 +179,51 @@ test("Capability matrix: crypto row visible for crypto biz", () => {
   assert.equal(hasCryptoRow, true);
 });
 
+// ────────────────────────────────────────────────────────────────
+// Realistic-track savings — bank-side hidden costs (wholesale FX
+// spread + correspondent SWIFT) layered on top of published rates.
+// ────────────────────────────────────────────────────────────────
+test("Realistic savings ≥ conservative when hidden costs > 0", () => {
+  const c = w.ecComputeCostBreakdown(rec({
+    monthlyVolume: 1000000,
+    corridorsIn:  ["uk-eea", "north-america"],
+    corridorsOut: ["uk-eea", "north-america"],
+  }));
+  assert.ok(c.savings.hiddenTotal > 0, "hiddenTotal should be positive for cross-border flow");
+  assert.ok(c.savings.monthlyRealistic >= c.savings.monthly,
+           "realistic monthly should be ≥ headline monthly (hidden costs added to bank)");
+});
+
+test("Realistic range respects same confidence band as headline", () => {
+  const c = w.ecComputeCostBreakdown(rec({
+    corridorsIn: ["uk-eea"], corridorsOut: ["uk-eea"],
+  }));
+  const band = c.savings.confidenceBand;
+  const lo = 1 - band, hi = 1 + band;
+  assert.equal(c.savings.monthlyRealisticLow,
+               Math.round(c.savings.monthlyRealistic * lo / 100) * 100);
+  assert.equal(c.savings.monthlyRealisticHigh,
+               Math.round(c.savings.monthlyRealistic * hi / 100) * 100);
+});
+
+test("Hidden cost components break down into FX + SWIFT", () => {
+  const c = w.ecComputeCostBreakdown(rec({
+    monthlyVolume: 1000000,
+    corridorsIn:  ["uk-eea", "apac"],
+    corridorsOut: ["uk-eea", "apac"],
+  }));
+  assert.equal(c.savings.hiddenTotal, c.savings.hiddenFx + c.savings.hiddenSwift);
+  assert.ok(c.bank.totalRealistic > c.bank.total, "bank realistic > bank conservative");
+  assert.equal(c.bank.totalRealistic, c.bank.total + c.bank.hiddenFx + c.bank.hiddenSwift);
+});
+
+test("Methodology block now exposes hidden-cost assumptions", () => {
+  const c = w.ecComputeCostBreakdown(rec());
+  const keys = c.methodology.assumptions.map((a) => a.key);
+  assert.ok(keys.includes("ec.r.method.hiddenFxSpread"));
+  assert.ok(keys.includes("ec.r.method.hiddenSwiftCorr"));
+});
+
 test("Apples-to-apples: bank subscription scales with Altery plan tier", () => {
   // Same volume, different plans → different bank subscription line.
   const proRec = rec({ monthlyVolume: 200000 });          // → Pro

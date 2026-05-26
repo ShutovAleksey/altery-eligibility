@@ -430,6 +430,10 @@
     "ec.cap.bank.assetFin.detail": "Asset finance, invoice discounting i trade finance pozostają mocnymi stronami banków.",
     "ec.cap.bank.branches": "Dostęp do oddziałów",
     "ec.cap.bank.branches.detail": "Dla operacji wymagających dużej ilości gotówki lub papierów, fizyczne oddziały nadal pomagają.",
+    "ec.r.savings.realistic.label": "Wliczając koszty, których bank nie pokazuje:",
+    "ec.r.savings.realistic.hint": "Hurtowy spread FX (≈ +0,5% ponad opublikowaną marżę) i opłaty korespondenckie SWIFT (≈ £18 za przelew wychodzący) — pozycje, których większość banków nie wymienia na stronie cennika.",
+    "ec.r.method.hiddenFxSpread": "Szacowany +{pct}% hurtowy spread FX ponad opublikowaną marżę banku",
+    "ec.r.method.hiddenSwiftCorr": "Szacowana £{gbp} opłata korespondencka SWIFT za przelew wychodzący",
 });
 
   // ─────────────────────────── PORTUGUÊS (PT) ───────────────────────────
@@ -860,6 +864,10 @@
     "ec.cap.bank.assetFin.detail": "Asset finance, invoice discounting e trade finance continuam a ser pontos fortes dos bancos.",
     "ec.cap.bank.branches": "Acesso a balcões",
     "ec.cap.bank.branches.detail": "Para operações com muito numerário ou papelada, os balcões físicos ainda ajudam.",
+    "ec.r.savings.realistic.label": "Incluindo custos que o banco não mostra:",
+    "ec.r.savings.realistic.hint": "Spread FX por grosso (≈ +0,5% sobre a margem publicada) e taxas SWIFT de banco correspondente (≈ £18 por transferência de saída) — itens que a maioria dos bancos não lista na página de preços.",
+    "ec.r.method.hiddenFxSpread": "Estimado +{pct}% spread FX por grosso sobre a margem publicada do banco",
+    "ec.r.method.hiddenSwiftCorr": "Estimada £{gbp} taxa SWIFT de banco correspondente por transferência de saída",
 });
 
   // ─────────────────────────── FRANÇAIS (FR) ───────────────────────────
@@ -1289,6 +1297,10 @@
     "ec.cap.bank.assetFin.detail": "L'asset finance, l'invoice discounting et le trade finance restent des points forts des banques.",
     "ec.cap.bank.branches": "Accès aux agences",
     "ec.cap.bank.branches.detail": "Pour les opérations à forte intensité en espèces ou en paperasse, les agences physiques aident encore.",
+    "ec.r.savings.realistic.label": "Y compris les coûts que la banque ne montre pas :",
+    "ec.r.savings.realistic.hint": "Spread FX de gros (≈ +0,5% au-dessus de la marge publiée) et frais SWIFT de banque correspondante (≈ £18 par virement sortant) — postes que la plupart des banques ne listent pas sur leur page tarifaire.",
+    "ec.r.method.hiddenFxSpread": "Estimé +{pct}% spread FX de gros au-dessus de la marge publiée par la banque",
+    "ec.r.method.hiddenSwiftCorr": "Estimés £{gbp} frais SWIFT de banque correspondante par virement sortant",
 });
 
 })();

@@ -1590,6 +1590,31 @@ function EcResultApproved({ rec, onBack, onReset }) {
                   {t("ec.r.savings.yearRange", { low: fmtNarrow(cost.savings.annualLow), high: fmtNarrow(cost.savings.annualHigh) })}
                 </div>
               </div>
+
+              {/* Realistic-track callout — adds bank-side hidden costs
+                  (wholesale FX spread + correspondent SWIFT fees) that
+                  most banks don't surface on their public pricing page.
+                  Conservative (headline) range stays citation-only; this
+                  line shows what a customer would actually pay incl.
+                  the hidden layer, which is materially higher. Only
+                  renders when the hidden contribution is meaningful. */}
+              {cost.savings.hiddenTotal > 0 && (
+                <div className="ec-r__savings__realistic">
+                  <div className="ec-r__savings__realisticLine">
+                    {t("ec.r.savings.realistic.label")}{" "}
+                    <strong>
+                      {fmtNarrow(cost.savings.monthlyRealisticLow)}
+                      <span className="ec-r__savingsHero__sep">–</span>
+                      {fmtNarrow(cost.savings.monthlyRealisticHigh)}
+                      {t("ec.r.savings.cycle")}
+                    </strong>
+                  </div>
+                  <div className="ec-r__savings__realisticHint">
+                    {t("ec.r.savings.realistic.hint")}
+                  </div>
+                </div>
+              )}
+
               <p className="ec-r__savings__note">
                 {t("ec.r.savings.note", { volume: fmtNarrow(rec.monthlyVolume) })}
               </p>

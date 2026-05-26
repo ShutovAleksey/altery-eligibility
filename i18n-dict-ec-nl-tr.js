@@ -429,6 +429,10 @@
     "ec.cap.bank.assetFin.detail": "Asset finance, invoice discounting en trade finance blijven sterke punten van banken.",
     "ec.cap.bank.branches": "Filiaaltoegang",
     "ec.cap.bank.branches.detail": "Voor cash-zware of papier-zware operaties helpen fysieke filialen nog steeds.",
+    "ec.r.savings.realistic.label": "Incl. kosten die de bank niet toont:",
+    "ec.r.savings.realistic.hint": "Groothandel FX-spread (≈ +0,5% bovenop de gepubliceerde markup) en correspondent SWIFT-kosten (≈ £18 per uitgaande overdracht) — items die de meeste banken niet vermelden op hun prijspagina.",
+    "ec.r.method.hiddenFxSpread": "Geschatte +{pct}% groothandel FX-spread bovenop de gepubliceerde markup van de bank",
+    "ec.r.method.hiddenSwiftCorr": "Geschatte £{gbp} correspondent SWIFT-fee per uitgaande overdracht",
 });
 
   // ─────────────────────────── TÜRKÇE (TR) ───────────────────────────
@@ -860,6 +864,10 @@
     "ec.cap.bank.assetFin.detail": "Varlık finansmanı, fatura iskontosu ve ticaret finansmanı bankaların güçlü yanları olmaya devam ediyor.",
     "ec.cap.bank.branches": "Şube erişimi",
     "ec.cap.bank.branches.detail": "Nakit-yoğun veya evrak-yoğun operasyonlar için fiziksel şubeler hala yardımcı oluyor.",
+    "ec.r.savings.realistic.label": "Bankanın göstermediği maliyetler dahil:",
+    "ec.r.savings.realistic.hint": "Toptan FX spread (yayınlanan markup üzerine ≈ +%0,5) ve muhabir SWIFT ücretleri (giden transfer başına ≈ £18) — çoğu bankanın fiyat sayfasında listelemediği kalemler.",
+    "ec.r.method.hiddenFxSpread": "Bankanın yayınlanan markup'ı üzerine tahmini +%{pct} toptan FX spread",
+    "ec.r.method.hiddenSwiftCorr": "Giden transfer başına tahmini £{gbp} muhabir SWIFT ücreti",
 });
 
 })();

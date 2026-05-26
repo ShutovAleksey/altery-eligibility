@@ -433,6 +433,10 @@
     "ec.cap.bank.assetFin.detail": "Asset Finance, Invoice Discounting und Trade Finance bleiben Bankstärken.",
     "ec.cap.bank.branches": "Filialzugang",
     "ec.cap.bank.branches.detail": "Für bargeld- oder papierlastige Operationen helfen physische Filialen weiterhin.",
+    "ec.r.savings.realistic.label": "Inkl. Kosten, die die Bank nicht ausweist:",
+    "ec.r.savings.realistic.hint": "Großhandels-FX-Spread (≈ +0,5% über dem publizierten Markup) und Korrespondent-SWIFT-Gebühren (≈ £18 pro ausgehender Transfer) — Posten, die die meisten Banken nicht auf ihrer Preisseite auflisten.",
+    "ec.r.method.hiddenFxSpread": "Geschätzte +{pct}% Großhandels-FX-Spread zusätzlich zum publizierten Markup der Bank",
+    "ec.r.method.hiddenSwiftCorr": "Geschätzte £{gbp} Korrespondent-SWIFT-Gebühr pro ausgehendem Transfer",
 });
 
   // ─────────────────────────── РУССКИЙ (RU) ───────────────────────────
@@ -865,6 +869,10 @@
     "ec.cap.bank.assetFin.detail": "Asset finance, invoice discounting и trade finance остаются сильными сторонами банков.",
     "ec.cap.bank.branches": "Доступ к филиалам",
     "ec.cap.bank.branches.detail": "Для операций с большим объёмом наличных или бумаги физические филиалы всё ещё помогают.",
+    "ec.r.savings.realistic.label": "Включая скрытые издержки, не указанные банком:",
+    "ec.r.savings.realistic.hint": "Оптовый FX-спред (≈ +0,5% поверх опубликованной наценки) и комиссии корреспондентских SWIFT (≈ £18 за исходящий перевод) — статьи, которые большинство банков не публикуют на странице тарифов.",
+    "ec.r.method.hiddenFxSpread": "Оценочный +{pct}% оптовый FX-спред поверх опубликованной банковской наценки",
+    "ec.r.method.hiddenSwiftCorr": "Оценочный £{gbp} сбор корреспондентского SWIFT за каждый исходящий перевод",
 });
 
 })();

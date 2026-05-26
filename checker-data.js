@@ -1125,6 +1125,28 @@ const EC_COMPARATORS = {
 // `showIf` (optional) gates a row on a rec.* property — only render
 // when that path on the recommendation is truthy. Used to keep the
 // crypto-rails row out of the matrix for non-crypto businesses.
+// ─────────────────────────────────────────────────────────────────
+// Hidden bank costs — items banks DON'T publish on their pricing
+// pages but DO charge customers. Two universal categories:
+//   1. FX additional spread — banks publish e.g. 2.75% markup, but
+//      their real total spread (wholesale-to-retail gap on top of
+//      published markup) typically adds 50 bps. Customer never sees
+//      the wholesale rate, so the gap stays invisible.
+//   2. Correspondent SWIFT — when a SWIFT transfer hops through a
+//      correspondent bank, each correspondent takes a chunk out of
+//      the principal. Typical chain has 1-2 correspondents at
+//      $15-30 each; we use £18 as a conservative average.
+//
+// Both are applied to the bank baseline ONLY in the "realistic"
+// track of ecComputeCostBreakdown. The "conservative" track stays
+// on published rates so each cell remains independently citation-
+// backed (used for the headline savings range). Altery has no
+// hidden costs to add — published markup is the worst case.
+const EC_BANK_HIDDEN_COSTS = {
+  fxAdditionalBps:       50,   // +0.50% on top of published markup
+  swiftCorrespondentGbp: 18,   // typical correspondent fee per SWIFT tx
+};
+
 const EC_CAPABILITY_MATRIX = {
   alteryWins: [
     { titleKey: "ec.cap.win.fx",            detailKey: "ec.cap.win.fx.detail" },
@@ -1153,7 +1175,7 @@ const EC_CAPABILITY_MATRIX = {
 Object.assign(window, {
   EC_COUNTRIES, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_INDUSTRIES,
   EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,
-  EC_CAPABILITY_MATRIX,
+  EC_CAPABILITY_MATRIX, EC_BANK_HIDDEN_COSTS,
   EC_SERVICES, TOTAL_STEPS,
   EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
   EC_COMPARATORS, ecHeroIdentifier, maskTailDots, ecFeeRegion,

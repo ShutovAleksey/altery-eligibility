@@ -2774,6 +2774,36 @@
       font-size: 12px; color: var(--c-muted);
     }
 
+    /* Realistic-track callout under savings hero — bank's hidden
+       costs (FX wholesale spread + correspondent SWIFT fees) layered
+       on top of the published-rates headline. Visual treatment is
+       subtle but distinct: warning-soft tint hints "this is the
+       wider, less flattering reality" without overpowering the
+       headline number above. */
+    .ec-r__savings__realistic {
+      margin: 4px 0 14px;
+      padding: 10px 14px;
+      background: var(--c-warning-soft);
+      border-radius: 12px;
+      border: 1px dashed var(--c-warning);
+      display: flex; flex-direction: column;
+      gap: 2px;
+    }
+    .ec-r__savings__realisticLine {
+      font-size: 13px;
+      color: var(--c-ink);
+      font-variant-numeric: tabular-nums;
+    }
+    .ec-r__savings__realisticLine strong {
+      color: var(--c-primary);
+      font-weight: 700;
+    }
+    .ec-r__savings__realisticHint {
+      font-size: 11px;
+      color: var(--c-muted);
+      line-height: 1.45;
+    }
+
     /* ── Capability matrix (wins / equal / bank-wins) ────────────────
        Three-column on desktop, single-column stacked on mobile. The
        bank-wins column has a softer treatment (muted bg, dashed

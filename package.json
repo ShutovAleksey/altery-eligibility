@@ -8,7 +8,8 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "verify:baselines": "node scripts/verify-baselines.mjs"
   },
   "dependencies": {
     "stripe": "^17.5.0"

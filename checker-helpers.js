@@ -542,10 +542,25 @@ function ecComputeCostBreakdown(rec) {
   };
   bank.total = bank.subscription + bank.fx + bank.swift + bank.local;
 
-  // Round savings to the nearest £100 for clean presentation.
-  const rawMonthly = Math.max(bank.total - altery.total, 0);
-  const monthly    = Math.round(rawMonthly / 100) * 100;
-  const annual     = monthly * 12;
+  // Hidden bank costs — items the bank doesn't publish but does
+  // charge. Applied only to the "realistic" track; conservative
+  // (headline) range above stays on published rates. See
+  // EC_BANK_HIDDEN_COSTS for sourcing rationale.
+  const hidden = window.EC_BANK_HIDDEN_COSTS || {};
+  bank.hiddenFx    = Math.round(fxVolume * (hidden.fxAdditionalBps || 0) / 10000);
+  bank.hiddenSwift = Math.round(swiftTxCount * (hidden.swiftCorrespondentGbp || 0));
+  bank.totalRealistic = bank.total + bank.hiddenFx + bank.hiddenSwift;
+
+  // Round savings to the nearest £100 for clean presentation. Two
+  // tracks: conservative (published rates only) is the headline;
+  // realistic (with bank-side hidden costs) is the trust-strip number
+  // shown right below the range. Both use the same confidence band.
+  const rawMonthly          = Math.max(bank.total - altery.total, 0);
+  const rawRealisticMonthly = Math.max(bank.totalRealistic - altery.total, 0);
+  const monthly             = Math.round(rawMonthly / 100) * 100;
+  const realisticMonthly    = Math.round(rawRealisticMonthly / 100) * 100;
+  const annual              = monthly * 12;
+  const realisticAnnual     = realisticMonthly * 12;
 
   // Adaptive confidence band — tighter when the user supplied a full
   // set of inputs (industry + corridors + volume), wider when one or
@@ -561,6 +576,19 @@ function ecComputeCostBreakdown(rec) {
     monthlyHigh: Math.round(monthly * hi / 100) * 100,
     annualLow:   Math.round(annual  * lo / 100) * 100,
     annualHigh:  Math.round(annual  * hi / 100) * 100,
+    // Realistic track — published rates + hidden bank costs (FX
+    // wholesale-spread + correspondent SWIFT). Shown as a secondary
+    // line under the headline range so users can compare what they'd
+    // actually pay vs what the bank advertises.
+    monthlyRealistic:     realisticMonthly,
+    monthlyRealisticLow:  Math.round(realisticMonthly * lo / 100) * 100,
+    monthlyRealisticHigh: Math.round(realisticMonthly * hi / 100) * 100,
+    annualRealistic:      realisticAnnual,
+    annualRealisticLow:   Math.round(realisticAnnual * lo / 100) * 100,
+    annualRealisticHigh:  Math.round(realisticAnnual * hi / 100) * 100,
+    hiddenFx:             bank.hiddenFx,
+    hiddenSwift:          bank.hiddenSwift,
+    hiddenTotal:          bank.hiddenFx + bank.hiddenSwift,
     confidence:        conf.level,
     confidenceBand:    conf.band,
     confidenceMissing: conf.missing,
@@ -584,6 +612,8 @@ function ecComputeCostBreakdown(rec) {
                                                avg: Math.round(avgTxVal) } },
       { key: "ec.r.method.alteryFx",  vars: { pct: (ALTERY_FX_MARKUP * 100).toFixed(2) } },
       { key: "ec.r.method.bankFx",    vars: { pct: (BANK_FEES.fxMarkupBps / 100).toFixed(2), bank: baseline.name } },
+      { key: "ec.r.method.hiddenFxSpread", vars: { pct: ((hidden.fxAdditionalBps || 0) / 100).toFixed(2) } },
+      { key: "ec.r.method.hiddenSwiftCorr", vars: { gbp: hidden.swiftCorrespondentGbp || 0 } },
     ],
   };
 
