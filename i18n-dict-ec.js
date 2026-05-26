@@ -259,7 +259,7 @@
         "ec.r.persona.affiliate.line": "For affiliate networks paying at scale",
         "ec.r.persona.creator.line": "For creator platforms paying at scale",
         "ec.r.persona.crypto.line": "For crypto-native operations with licensed rails",
-        "ec.r.entity.status": "{licence} · operational",
+        "ec.r.entity.status": "{licence}",
         "ec.r.plan.fit": "Best fit for your volume",
         "ec.r.plan.switch": "You can switch plans any time from the dashboard.",
         "ec.r.plan.compareAll": "Compare all plans →",
@@ -269,7 +269,7 @@
         "ec.r.plan.notRecommended.down.body": "{selected} has a lower subscription, but its higher per-transaction fees and lower volume cap can leave services you selected (mass payouts, FX corridors, business cards) outside the plan — those become paid extras the projection above doesn't account for.",
         "ec.r.plan.notRecommended.switchBack": "Switch back to {recommended}",
         "ec.r.caveats.head": "Worth knowing before you apply",
-        "ec.r.cta.continue": "Set up this account",
+        "ec.r.cta.continue": "Set up your account",
 
     // Plan names
     "ec.plan.starter": "Starter",

@@ -661,12 +661,15 @@ const EC_ENTITIES = {
     currencyPerkKey: "ec.entity.uk.currencyPerk",
     countries: ["GB", "IE", "NL", "DE"],
     // Public regulator reference — shown in the result hero so visitors
-    // can verify the licence claim without leaving the page. The deep
-    // link goes to the firm's record on the FCA Financial Services
-    // Register; the ref is the FCA Firm Reference Number (FRN).
+    // can verify the licence claim without leaving the page. Links to
+    // the FCA Financial Services Register search page pre-filled with
+    // Altery's FRN (901037). The previous Salesforce-deep-link mapped
+    // to a different firm on FCA's side; the search URL is the format
+    // Altery's own T&C points at, so it stays accurate as FCA rotates
+    // their internal IDs.
     regulatory: {
       refLabel: "FRN 901037",
-      registerUrl: "https://register.fca.org.uk/s/firm?id=001b000001EjC6SAAV",
+      registerUrl: "https://register.fca.org.uk/s/search?q=901037",
     },
     accounts: [
       {

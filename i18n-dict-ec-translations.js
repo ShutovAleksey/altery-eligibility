@@ -555,7 +555,7 @@
     "ec.r.lead": "Счёт откроет {entity} по лицензии {licence}. {note}",
 
     "ec.r.persona.saas.line": "Для SaaS-команд, работающих глобально",
-    "ec.r.entity.status": "{licence} · работает",
+    "ec.r.entity.status": "{licence}",
     "ec.r.plan.fit": "Подходит под ваш объём",
     "ec.r.plan.switch": "План можно сменить в любой момент в дашборде.",
     "ec.r.plan.compareAll": "Сравнить все планы →",

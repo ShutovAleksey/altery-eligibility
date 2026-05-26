@@ -118,7 +118,7 @@
     "ec.r.lead": "Il tuo conto sarà emesso da {entity} sotto {licence}. {note}",
 
     "ec.r.persona.saas.line": "Per team SaaS operanti globalmente",
-    "ec.r.entity.status": "{licence} · operativa",
+    "ec.r.entity.status": "{licence}",
     "ec.r.plan.fit": "Adatto al tuo volume",
     "ec.r.plan.switch": "Puoi cambiare piano in qualsiasi momento dalla dashboard.",
     "ec.r.plan.compareAll": "Confronta tutti i piani →",
@@ -128,7 +128,7 @@
     "ec.r.plan.notRecommended.down.body": "{selected} ha un abbonamento più basso, ma tariffe per transazione più alte e un tetto di volume inferiore — i servizi che hai selezionato (pagamenti di massa, corridoi FX, carte business) possono rimanere fuori dal piano e diventare extra a pagamento che la proiezione qui sopra non considera.",
     "ec.r.plan.notRecommended.switchBack": "Torna a {recommended}",
     "ec.r.caveats.head": "Da sapere prima di candidarti",
-    "ec.r.cta.continue": "Vai alla richiesta — ≈ 17 min",
+    "ec.r.cta.continue": "Configura il tuo conto",
 
     "ec.plan.starter": "Starter",
     "ec.plan.pro": "Pro",
@@ -551,7 +551,7 @@
     "ec.r.lead": "Tu cuenta será emitida por {entity} bajo {licence}. {note}",
 
     "ec.r.persona.saas.line": "Para equipos SaaS que operan globalmente",
-    "ec.r.entity.status": "{licence} · operativa",
+    "ec.r.entity.status": "{licence}",
     "ec.r.plan.fit": "Adecuado para tu volumen",
     "ec.r.plan.switch": "Puedes cambiar de plan cuando quieras desde el panel.",
     "ec.r.plan.compareAll": "Comparar todos los planes →",
@@ -561,7 +561,7 @@
     "ec.r.plan.notRecommended.down.body": "{selected} tiene una suscripción más baja, pero tarifas por transacción más altas y un límite de volumen menor — los servicios que seleccionaste (pagos masivos, corredores FX, tarjetas de empresa) pueden quedar fuera del plan y convertirse en extras de pago que la proyección de arriba no contempla.",
     "ec.r.plan.notRecommended.switchBack": "Volver a {recommended}",
     "ec.r.caveats.head": "Conviene saber antes de solicitar",
-    "ec.r.cta.continue": "Continuar a la solicitud — ≈ 17 min",
+    "ec.r.cta.continue": "Configurar tu cuenta",
 
     "ec.plan.starter": "Starter",
     "ec.plan.pro": "Pro",

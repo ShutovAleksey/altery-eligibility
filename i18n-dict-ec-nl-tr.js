@@ -118,7 +118,7 @@
     "ec.r.lead": "Je rekening wordt uitgegeven door {entity} onder {licence}. {note}",
 
     "ec.r.persona.saas.line": "Voor SaaS-teams die wereldwijd opereren",
-    "ec.r.entity.status": "{licence} · operationeel",
+    "ec.r.entity.status": "{licence}",
     "ec.r.plan.fit": "Passend bij jouw volume",
     "ec.r.plan.switch": "Je kunt het plan altijd wisselen vanuit het dashboard.",
     "ec.r.plan.compareAll": "Alle plannen vergelijken →",
@@ -551,7 +551,7 @@
     "ec.r.lead": "Hesabınız {entity} tarafından {licence} kapsamında açılacak. {note}",
 
     "ec.r.persona.saas.line": "Küresel çalışan SaaS ekipleri için",
-    "ec.r.entity.status": "{licence} · operasyonel",
+    "ec.r.entity.status": "{licence}",
     "ec.r.plan.fit": "Hacminize uygun",
     "ec.r.plan.switch": "Planı dilediğiniz an dashboard'dan değiştirebilirsiniz.",
     "ec.r.plan.compareAll": "Tüm planları karşılaştır →",

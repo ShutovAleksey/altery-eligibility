@@ -551,7 +551,7 @@
     "ec.r.lead": "A sua conta será emitida por {entity} sob {licence}. {note}",
 
     "ec.r.persona.saas.line": "Para equipas SaaS a operar globalmente",
-    "ec.r.entity.status": "{licence} · operacional",
+    "ec.r.entity.status": "{licence}",
     "ec.r.plan.fit": "Adequado ao seu volume",
     "ec.r.plan.switch": "Pode mudar de plano a qualquer momento no painel.",
     "ec.r.plan.compareAll": "Comparar todos os planos →",
@@ -982,7 +982,7 @@
     "ec.r.lead": "Votre compte sera émis par {entity} sous {licence}. {note}",
 
     "ec.r.persona.saas.line": "Pour les équipes SaaS opérant à l'échelle mondiale",
-    "ec.r.entity.status": "{licence} · opérationnel",
+    "ec.r.entity.status": "{licence}",
     "ec.r.plan.fit": "Adapté à votre volume",
     "ec.r.plan.switch": "Vous pouvez changer de plan à tout moment depuis le tableau de bord.",
     "ec.r.plan.compareAll": "Comparer tous les plans →",

@@ -2967,8 +2967,11 @@
     .ec-r__action__primary {
       display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
     }
+    /* Primary CTA used to stretch via flex:1 → felt like a full-width
+       banner. Sized to content with a comfortable min-width so it
+       still reads as the dominant action without spanning the row. */
     .ec-r__action__primary > button:first-child {
-      flex: 1; min-width: 220px;
+      flex: 0 0 auto; min-width: 220px;
     }
     .ec-r__action__secondary {
       display: inline-flex; align-items: center; gap: 8px;

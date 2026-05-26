@@ -1527,7 +1527,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
   const _displayCurrency = ecDisplayCurrencyFor(rec);
   const fmtNarrow = (n) => ecFmtFromGbp(n, _displayCurrency);
   return (
-    <div className="ec-content ec-content--wide fade-in">
+    <div className="ec-content fade-in">
       <button className="ob-link-back ec-r__backLink" onClick={onBack} type="button">
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.editAnswers")}
       </button>
@@ -1541,7 +1541,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
         <header className="ec-r__hero">
           <div className="ec-r__hero__inner">
             <div className="ec-r__heroEyebrow">
-              <span className="ec-r__heroEyebrow__dot" />
               {t(isOnRecommended ? "ec.r.eyebrow" : "ec.r.eyebrow.selected")}
             </div>
             <h1 className="ec-r__heroTitle">
@@ -1555,8 +1554,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
             </p>
 
             <div className="ec-r__pills">
-              <span className="ec-r__pill ec-r__pill--live">
-                <span className="ec-r__pill__dot" />
+              <span className="ec-r__pill">
                 {t("ec.r.entity.status", { licence: entityLicence })}
               </span>
               {/* Verifiable regulator reference — clickable deep link
