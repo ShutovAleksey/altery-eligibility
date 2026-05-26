@@ -93,6 +93,35 @@
     "ec.ind.weapons":     "Weapons manufacture",
     "ec.ind.lending":     "Unregulated lending",
 
+    // Back-office Compliance / Risk Assessment (CRA) labels.
+    // These are NOT shown to the user — they're shipped in the
+    // handoff payload's `cra` field so onboarding / back-office can
+    // route the KYB queue. EN-only by design (back-office surface,
+    // not customer-facing); the `ec.cra.` prefix is on the i18n test's
+    // skip list so missing translations don't fail integrity checks.
+    "ec.cra.advertising":      "Advertising & Marketing (incl. SMM)",
+    "ec.cra.seo":              "SEO (Search Engine Optimisation)",
+    "ec.cra.market-research":  "Market Research",
+    "ec.cra.it-dev":           "IT Support / Development / Graphic Design",
+    "ec.cra.hosting":          "Hosting, Cloud Services",
+    "ec.cra.vpn":              "VPN Services",
+    "ec.cra.freelance":        "Freelance platforms / Freelancers",
+    "ec.cra.translation":      "Translation / Writing / Copywriting",
+    "ec.cra.professional":     "Professional service providers (attorneys, accountants, doctors, real estate)",
+    "ec.cra.legal-accounting": "Legal / Accounting / HR / Consulting Services",
+    "ec.cra.tax":              "Tax consulting services",
+    "ec.cra.real-estate":      "Real estate business",
+    "ec.cra.online-shop":      "Online Seller / Online Shops",
+    "ec.cra.ecom-marketplace": "E-commerce Platforms and Marketplaces",
+    "ec.cra.retail-wholesale": "Retail and Wholesale",
+    "ec.cra.beauty":           "Beauty Products (excluding pharma and drugs)",
+    "ec.cra.vehicle-trade":    "Trade in vehicles (cars, motorbikes, planes, boats)",
+    "ec.cra.vehicle-maint":    "Maintenance and repair of vehicles",
+    "ec.cra.manufacturing":    "Manufacturing",
+    "ec.cra.courier-logistics":"Courier / Logistics Services",
+    "ec.cra.private-transport":"Private Transportation Providers",
+    "ec.cra.crypto":           "Crypto / Digital Asset Services",
+
     // Q3 services multi-select — 9 products / use-cases. Default-on
     // accounts + crossBorder (universal needs for any digital business
     // looking at Altery), so users only tick specialist extras.

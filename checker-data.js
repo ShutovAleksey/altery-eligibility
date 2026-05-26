@@ -367,14 +367,24 @@ const EC_INDUSTRIES = [
   { value: "freelance",  labelKey: "ec.ind.freelance",  risk: "ok", craKey: "ec.cra.freelance" },
   { value: "prof",       labelKey: "ec.ind.prof",       risk: "ok", craKey: "ec.cra.professional" },
   // ── Specialist review path ────────────────────────────────────────
-  { value: "creator",    labelKey: "ec.ind.creator",    risk: "specialist", reassureKey: "ec.q1.alert.creator", craKey: "ec.cra.advertising" },
+  // Creator platforms map to the e-commerce-marketplace CRA bucket:
+  // operationally they're multi-payee split-flow platforms (platform
+  // → creators), same compliance shape as marketplace → sellers. Not
+  // "Advertising & Marketing" — that bucket is for agencies running
+  // marketing for clients, a different operational model.
+  { value: "creator",    labelKey: "ec.ind.creator",    risk: "specialist", reassureKey: "ec.q1.alert.creator", craKey: "ec.cra.ecom-marketplace" },
   { value: "affiliate",  labelKey: "ec.ind.affiliate",  risk: "specialist", craKey: "ec.cra.advertising" },
-  // New row — VPN service operators. Compliance team flags these for
-  // structured review (sanctions screening, traffic-source diligence)
-  // before account opening. Hidden under `other` previously, which
-  // skipped the specialist-tier signal.
+  // VPN service operators. Compliance team flags these for structured
+  // review (sanctions screening, traffic-source diligence) before
+  // account opening. Hidden under `other` previously, which skipped
+  // the specialist-tier signal.
   { value: "vpn",        labelKey: "ec.ind.vpn",        risk: "specialist", craKey: "ec.cra.vpn" },
-  { value: "crypto",     labelKey: "ec.ind.crypto",     risk: "specialist", crypto: true, craKey: "ec.cra.it-dev" },
+  // Crypto gets its own CRA bucket — Travel Rule, MiCA categorisation,
+  // sanctions screening on-chain, and source-of-digital-asset-funds
+  // are materially different compliance work than IT-development KYB.
+  // Folding crypto under "IT Support / Development" would lose that
+  // signal at back-office routing time.
+  { value: "crypto",     labelKey: "ec.ind.crypto",     risk: "specialist", crypto: true, craKey: "ec.cra.crypto" },
   // ── Fallback ──────────────────────────────────────────────────────
   { value: "other",      labelKey: "ec.ind.other",      risk: "ok", craKey: null },
   // ── Blocked (Fast no's, not slow no's — intro screen card 3) ──────

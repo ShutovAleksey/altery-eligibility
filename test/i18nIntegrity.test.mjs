@@ -148,10 +148,17 @@ test("Every EN key declared for user-facing copy exists in all 9 other languages
   //                                  rail-name copy that's only on the
   //                                  EN/RU surface today; deferred i18n
   //   ec.account.*                  — see KNOWN_ORPHAN_REFS above
+  //   ec.cra.*                      — back-office Compliance/Risk
+  //                                  Assessment labels. Identifier
+  //                                  shipped raw in the handoff
+  //                                  payload's `cra` field; only
+  //                                  surfaces in EN back-office UI,
+  //                                  never customer-facing.
   const SKIP_PREFIXES = [
     "ec.country.", "ec.corridor.", "ec.region.",
     "ec.cmp.state.", "ec.cmp.q.onboarding.",
     "ec.r.payment.", "ec.fees.", "ec.account.",
+    "ec.cra.",
   ];
   const interestingEnKeys = [...declared.en].filter(
     (k) => !SKIP_PREFIXES.some((p) => k.startsWith(p))
