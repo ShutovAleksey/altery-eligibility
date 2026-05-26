@@ -808,6 +808,35 @@ function ecEstimateSavings(monthlyVolume) {
   };
 }
 
+// Build the HubSpot Meetings URL for a given recommendation, prefilled
+// with the visitor's email and tagged with the checker's recommendation
+// context. The custom params map 1:1 to HubSpot contact properties
+// (verified internal names + enum values): checker_entity (UK/EU/MENA),
+// checker_plan (Starter/Pro/Ultra), checker_monthly_volume_gbp,
+// checker_est_annual_savings_gbp. HubSpot only persists these when the
+// matching fields are present on the booking form; absent fields are
+// silently ignored, so passing them is always safe.
+//
+// `email` is optional — the result-page CTA path doesn't have one yet,
+// the email/colleague path does. Blocked recommendations (no plan/entity)
+// just yield the bare scheduling page plus whatever context exists.
+function ecBookingUrl(rec, email) {
+  const base = window.EC_BOOKING_URL || "";
+  if (!rec) return base;
+  const params = new URLSearchParams();
+  if (email) params.set("email", String(email).trim());
+  const entityId = rec.entity && rec.entity.id;
+  if (entityId) params.set("checker_entity", String(entityId).toUpperCase());
+  const planId = rec.plan && rec.plan.id;
+  if (planId) params.set("checker_plan", planId.charAt(0).toUpperCase() + planId.slice(1));
+  if (rec.monthlyVolume) params.set("checker_monthly_volume_gbp", String(Math.round(rec.monthlyVolume)));
+  const cost = (typeof ecComputeCostBreakdown === "function") ? ecComputeCostBreakdown(rec) : null;
+  const annual = cost && cost.savings && cost.savings.annual;
+  if (annual) params.set("checker_est_annual_savings_gbp", String(annual));
+  const qs = params.toString();
+  return qs ? base + "?" + qs : base;
+}
+
 // Generate a deterministic-looking proposal reference. Format
 // "EL-{YYYY}-{4 alphanum}". Mostly cosmetic — gives the document
 // a tracking-number feel that legit business proposals have.
@@ -988,7 +1017,7 @@ Object.assign(window, {
   ecEstimateTxCount, ecComputeCostBreakdown, ecOutcomesForSavings,
   ecBaselineFor, ecQualitativeMatrix, ecCapabilityMatrix,
   ecConfidenceLevel, ecFxVolumeRatio, ecLocalSwiftSplit, ecAvgTxGbp,
-  ecVolumeHintKey, ecFormatVolume, ecEstimateSavings, ecGenProposalRef,
+  ecVolumeHintKey, ecFormatVolume, ecEstimateSavings, ecBookingUrl, ecGenProposalRef,
   ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
   ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,
   ecCaptureAndStoreUtms, ecAppendUtmsToURL,

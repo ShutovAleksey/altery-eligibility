@@ -5,7 +5,7 @@
           EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
-          ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
+          ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount, ecBookingUrl,
           EcFeesModal, EcPlanComparisonModal, EcHandoffModal, EcPaymentModal */
 // checker-screens.jsx — the eligibility-checker question screens, result
 // screens, and the supporting EcIco decorative-icon set.
@@ -1995,12 +1995,13 @@ function EcResultBlocked({ rec, onBack, onReset }) {
         </div>
         <div className="ec-actions">
           <Button variant="primary" size="xl" onClick={onReset}>{t("common.startOver")}</Button>
-          {/* Soft-decline cohort: open the team's Google Calendar booking
+          {/* Soft-decline cohort: open the team's HubSpot Meetings booking
               page so the visitor can request a conversation rather than
-              composing a mailto thread. Same booking link the PDF/email
-              flow points at, so the team operates one calendar surface. */}
+              composing a mailto thread. ecBookingUrl carries whatever
+              context the blocked recommendation has; same surface the
+              PDF/email flow points at, so the team operates one calendar. */}
           <Button variant="outline" size="xl"
-                  onClick={() => window.open(EC_BOOKING_URL, "_blank", "noopener,noreferrer")}>
+                  onClick={() => window.open(ecBookingUrl(rec), "_blank", "noopener,noreferrer")}>
             {t("common.contactTeam")}
           </Button>
         </div>

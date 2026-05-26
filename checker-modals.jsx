@@ -4,7 +4,7 @@
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,
           ecOutcomesForSavings, ecGenProposalRef, ecLoadStripe,
           ecBuildAnalysisHTML, ecSendAnalysisEmail, ecWaitForPdfLibs,
-          EcIco, EC_BOOKING_URL */
+          EcIco, ecBookingUrl */
 // checker-modals.jsx — all the modal/handoff/payment overlays the result
 // page can open.
 //
@@ -618,15 +618,13 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                   <div>
                     <div className="ec-handoff__nextSteps__title">{t("ec.handoff.sent.step3.title")}</div>
                     <div className="ec-handoff__nextSteps__body">
-                      <a
-                        href={EC_BOOKING_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        type="button"
                         className="ec-handoff__nextSteps__link"
-                        onClick={() => setScheduleClicked(true)}
+                        onClick={() => { setScheduleClicked(true); setStage("booking"); }}
                       >
                         {t("ec.handoff.sent.step3.link")} →
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </li>
@@ -691,6 +689,28 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
               </Button>
             </div>
           </>
+        )}
+
+        {stage === "booking" && (
+          <div className="ec-handoff__booking">
+            <button
+              type="button"
+              className="ec-handoff__booking__back"
+              onClick={() => setStage("sent")}
+            >
+              <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
+            </button>
+            <h2 id="ec-handoff-title" className="ec-modal__title">{t("ec.handoff.sent.step3.title")}</h2>
+            {/* Inline HubSpot Meetings page. embed=true strips HubSpot's
+                page chrome; ecBookingUrl prefills email + checker context
+                so the booked contact carries the recommendation. */}
+            <iframe
+              className="ec-handoff__booking__frame"
+              title={t("ec.handoff.sent.step3.title")}
+              src={ecBookingUrl(rec, email) + "&embed=true"}
+              loading="lazy"
+            />
+          </div>
         )}
       </div>
     </div>
