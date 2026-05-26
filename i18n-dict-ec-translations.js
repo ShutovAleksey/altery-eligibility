@@ -304,9 +304,7 @@
     "ec.b.country.lead": "Der Lizenzperimeter von Altery (UK FCA, Zypern CBC, VAE DFSA) deckt diese Jurisdiktion derzeit nicht ab. Eine regulatorische Grenze, kein Urteil über Ihr Geschäft — Sanktionen und FATF-Vorgaben ändern sich, wir melden uns, falls sich die Lage entwickelt.",
     "ec.b.head": "Wenn Ihr Geschäft differenzierter ist als die Auswahl",
     "ec.b.row1.tag": "Sprechen Sie uns an",
-    "ec.b.row1.text": "Manche Branchen prüfen wir individuell. Wenn Sie in einem Randbereich tätig sind (z. B. Compliance-Tools für die Glücksspielbranche), interessiert uns Ihr Profil. Schreiben Sie an sales@altery.com mit zwei Zeilen Beschreibung.",
-    "ec.b.row2.tag": "Quartalsweise aktualisiert",
-    "ec.b.row2.text": "Unsere Liste unterstützter Branchen wächst mit neuen Lizenzen. Diese Seite halten wir aktuell.",
+    "ec.b.row1.text": "Manche Branchen prüfen wir individuell. Wenn Sie in einem Randbereich tätig sind (z. B. Compliance-Tools für die Glücksspielbranche), interessiert uns Ihr Profil. Schreiben Sie an sales@altery.com mit zwei Zeilen Beschreibung. Die Liste unterstützter Branchen wächst mit neuen Lizenzen — diese Seite halten wir aktuell.",
 
     "ec.r.entity.regHint": "Öffnet das öffentliche Register der Aufsichtsbehörde in einem neuen Tab",
     "ec.entity.uk.name": "Altery Ltd · UK",
@@ -737,9 +735,7 @@
     "ec.b.country.lead": "Лицензионный периметр Altery (UK FCA, Cyprus CBC, UAE DFSA) сейчас не покрывает эту юрисдикцию. Это регуляторное ограничение, а не оценка вашего бизнеса — санкции и рекомендации FATF меняются, мы напишем, если ситуация изменится.",
     "ec.b.head": "Если ваш бизнес тоньше, чем варианты в списке",
     "ec.b.row1.tag": "Напишите нам",
-    "ec.b.row1.text": "Часть отраслей мы рассматриваем индивидуально. Если вы работаете рядом с одной из них (например, compliance-инструменты для индустрии азартных игр), нам интересно. Напишите на sales@altery.com — двух строк описания достаточно.",
-    "ec.b.row2.tag": "Обновляется ежеквартально",
-    "ec.b.row2.text": "Список поддерживаемых отраслей расширяется по мере получения новых лицензий. Эта страница остаётся актуальной.",
+    "ec.b.row1.text": "Часть отраслей мы рассматриваем индивидуально. Если вы работаете рядом с одной из них (например, compliance-инструменты для индустрии азартных игр), нам интересно. Напишите на sales@altery.com — двух строк описания достаточно. Список поддерживаемых отраслей расширяется по мере получения новых лицензий — эта страница остаётся актуальной.",
 
     "ec.r.entity.regHint": "Öffnet das öffentliche Register der Aufsichtsbehörde in einem neuen Tab",
     "ec.entity.uk.name": "Altery Ltd · UK",

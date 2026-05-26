@@ -300,9 +300,7 @@
     "ec.b.country.lead": "De vergunningsperimeter van Altery (UK FCA, Cyprus CBC, UAE DFSA) dekt deze jurisdictie momenteel niet. Een regulatoire grens, geen oordeel over je bedrijf — sancties en FATF-richtlijnen veranderen, we laten het weten als dat het geval is.",
     "ec.b.head": "Als jouw bedrijf genuanceerder is dan de keuzelijst",
     "ec.b.row1.tag": "Praat met ons",
-    "ec.b.row1.text": "Sommige sectoren bekijken we per geval. Werk je in een aangrenzend domein (bv. compliance-tooling voor de gokindustrie), dan horen we het graag. Mail sales@altery.com met twee zinnen uitleg.",
-    "ec.b.row2.tag": "Per kwartaal bijgewerkt",
-    "ec.b.row2.text": "Onze lijst van ondersteunde sectoren groeit met nieuwe licenties. Deze pagina blijft actueel.",
+    "ec.b.row1.text": "Sommige branches bekijken we per geval. Als u in een aangrenzend gebied werkt (bv. compliance-tools voor de goksector), horen we graag van u. Mail naar sales@altery.com met een beschrijving van twee regels. De lijst met ondersteunde branches groeit naarmate nieuwe vergunningen aansluiten — we houden deze pagina actueel.",
 
     "ec.r.entity.regHint": "Open het openbare register van de toezichthouder in een nieuw tabblad",
     "ec.entity.uk.name": "Altery Ltd · UK",
@@ -733,9 +731,7 @@
     "ec.b.country.lead": "Altery'nin lisans çerçevesi (UK FCA, Kıbrıs CBC, BAE DFSA) şu anda bu yargı bölgesini kapsamıyor. Bu, işinizle ilgili bir yargı değil, düzenleyici bir sınırdır — yaptırımlar ve FATF rehberliği değişir; durum değişirse haber veririz.",
     "ec.b.head": "İşiniz seçim listesinden daha incelikliyse",
     "ec.b.row1.tag": "Bizimle konuşun",
-    "ec.b.row1.text": "Bazı sektörleri vaka bazında değerlendiririz. Bunlardan birinin yan kolunda çalışıyorsanız (ör. kumar sektörü için uyumluluk araçları), profilinizi yine de duymak isteriz. sales@altery.com adresine iki satır açıklama ile yazın.",
-    "ec.b.row2.tag": "Üç ayda bir güncellenir",
-    "ec.b.row2.text": "Desteklenen sektör listemiz yeni lisanslarla genişler. Bu sayfayı güncel tutarız.",
+    "ec.b.row1.text": "Bazı sektörleri vaka bazında değerlendiririz. Bunlardan birinin yanında çalışıyorsanız (örn. kumar sektörü için uyum araçları), sizi tanımak isteriz. İki satırlık bir açıklamayla sales@altery.com adresine yazın. Desteklenen sektörler listesi yeni lisanslarla genişler — bu sayfayı güncel tutarız.",
 
     "ec.r.entity.regHint": "Düzenleyicinin kamu kayıt defterini yeni sekmede aç",
     "ec.entity.uk.name": "Altery Ltd · UK",

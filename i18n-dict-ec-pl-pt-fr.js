@@ -301,9 +301,7 @@
     "ec.b.country.lead": "Zakres licencji Altery (UK FCA, Cypr CBC, ZEA DFSA) obecnie nie obejmuje tej jurysdykcji. To ograniczenie regulacyjne, a nie ocena Twojego biznesu — sankcje i wytyczne FATF się zmieniają; damy znać, jeśli sytuacja się rozwinie.",
     "ec.b.head": "Jeśli działalność jest bardziej zniuansowana niż lista",
     "ec.b.row1.tag": "Porozmawiajmy",
-    "ec.b.row1.text": "Niektóre branże oceniamy indywidualnie. Jeśli działasz w obszarze sąsiednim (np. narzędzia compliance dla branży hazardowej), chętnie poznamy Twój profil. Napisz na sales@altery.com z dwoma zdaniami opisu.",
-    "ec.b.row2.tag": "Aktualizacja kwartalna",
-    "ec.b.row2.text": "Lista obsługiwanych branż rośnie wraz z nowymi licencjami. Tę stronę utrzymujemy aktualną.",
+    "ec.b.row1.text": "Niektóre branże oceniamy indywidualnie. Jeśli działają Państwo w obszarze sąsiednim (np. narzędzia compliance dla branży hazardowej), chętnie poznamy Państwa profil. Proszę napisać na sales@altery.com z dwuwierszowym opisem. Lista wspieranych branż rośnie wraz z nowymi licencjami — utrzymujemy tę stronę na bieżąco.",
 
     "ec.r.entity.regHint": "Otwórz publiczny rejestr regulatora w nowej karcie",
     "ec.entity.uk.name": "Altery Ltd · UK",
@@ -733,9 +731,7 @@
     "ec.b.country.lead": "O perímetro de licenças da Altery (UK FCA, Chipre CBC, EAU DFSA) não cobre atualmente esta jurisdição. É um limite regulatório, não um juízo sobre o seu negócio — as sanções e as orientações do FATF mudam; informaremos se a situação evoluir.",
     "ec.b.head": "Se o seu negócio é mais matizado do que a lista",
     "ec.b.row1.tag": "Falar connosco",
-    "ec.b.row1.text": "Alguns setores são caso a caso. Se opera numa área adjacente (ex.: ferramentas de compliance para o setor do jogo), gostaríamos de o conhecer. Escreva para sales@altery.com com duas linhas de descrição.",
-    "ec.b.row2.tag": "Atualizada trimestralmente",
-    "ec.b.row2.text": "A nossa lista de setores suportados cresce com novas licenças. Mantemos esta página atualizada.",
+    "ec.b.row1.text": "Alguns setores avaliamos caso a caso. Se operam numa área adjacente a um destes (por ex. ferramentas de compliance para o setor do jogo), gostávamos de vos conhecer. Escrevam para sales@altery.com com uma descrição de duas linhas. A lista de setores apoiados expande-se à medida que novas licenças chegam — mantemos esta página atualizada.",
 
     "ec.r.entity.regHint": "Abre o registo público do regulador num novo separador",
     "ec.entity.uk.name": "Altery Ltd · UK",
@@ -1164,9 +1160,7 @@
     "ec.b.country.lead": "Le périmètre de licences d'Altery (UK FCA, Chypre CBC, EAU DFSA) ne couvre actuellement pas cette juridiction. Une limite réglementaire, pas un jugement sur votre activité — les sanctions et les recommandations du GAFI évoluent ; nous vous tiendrons informé si la situation change.",
     "ec.b.head": "Si votre activité est plus nuancée que la liste",
     "ec.b.row1.tag": "Parlons-en",
-    "ec.b.row1.text": "Certains secteurs sont étudiés au cas par cas. Si vous opérez dans un domaine adjacent (ex. outils de compliance pour le secteur des jeux), nous voulons quand même vous entendre. Écrivez à sales@altery.com avec deux lignes de description.",
-    "ec.b.row2.tag": "Mise à jour trimestrielle",
-    "ec.b.row2.text": "Notre liste de secteurs pris en charge s'élargit avec chaque nouvelle licence. Cette page reste à jour.",
+    "ec.b.row1.text": "Certains secteurs sont étudiés au cas par cas. Si vous opérez dans un domaine adjacent à l'un de ceux-ci (p. ex. outils de conformité pour le secteur des jeux d'argent), nous serions ravis d'échanger. Écrivez à sales@altery.com avec une description en deux lignes. La liste des secteurs pris en charge s'élargit à mesure que de nouvelles licences arrivent — nous gardons cette page à jour.",
 
     "ec.r.entity.regHint": "Ouvrir le registre public du régulateur dans un nouvel onglet",
     "ec.entity.uk.name": "Altery Ltd · UK",

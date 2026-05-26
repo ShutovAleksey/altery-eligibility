@@ -1988,10 +1988,6 @@ function EcResultBlocked({ rec, onBack, onReset }) {
                 );
               })()}</span>
             </li>
-            <li className="ec-caveats__row">
-              <span className="ec-tagslot"><Tag tone="grey" size="sm">{t("ec.b.row2.tag")}</Tag></span>
-              <span>{t("ec.b.row2.text")}</span>
-            </li>
           </ul>
         </div>
         <div className="ec-actions">
