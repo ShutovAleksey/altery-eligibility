@@ -157,8 +157,6 @@
 
     "ec.cav.crypto.tag": "Crypto-esperti",
     "ec.cav.crypto.text": "Il KYB crypto-nativo è gestito dal nostro team specialista, non dalla coda generalista. Synterra Connect — la nostra rete partner per regolamento diretto con exchange — movimenta fondi da e verso piattaforme regolamentate; fiat in/out via SEPA, Faster Payments e SWIFT.",
-    "ec.cav.mena.tag": "Il conto si apre oggi",
-    "ec.cav.mena.text": "Altery MENA è pienamente autorizzata da DFSA. Il conto sui binari elencati sopra si apre durante l'onboarding. Ulteriori corridoi vanno in produzione man mano che ogni integrazione banca-a-banca si conclude — ti scriviamo non appena se ne attiva uno.",
     "ec.cav.performance.tag": "Revisione specialistica",
     "ec.cav.performance.text": "Il performance marketing ({industry}) richiede prove più chiare sulla qualità del traffico e sui pagamenti. La compliance gestisce un questionario strutturato — tempo tipico di risoluzione tre giorni lavorativi. In caso di rifiuto, ricevi una motivazione concreta, non una scatola nera.",
 
@@ -588,8 +586,6 @@
 
     "ec.cav.crypto.tag": "Cripto-experto",
     "ec.cav.crypto.text": "El KYB cripto-nativo lo gestiona nuestro equipo especialista, no la cola general. Synterra Connect — nuestra red de socios para liquidación directa con exchanges — mueve fondos hacia y desde plataformas reguladas; fiat entrada/salida vía SEPA, Faster Payments y SWIFT.",
-    "ec.cav.mena.tag": "La cuenta se abre hoy",
-    "ec.cav.mena.text": "Altery MENA está plenamente licenciada por DFSA. La cuenta en los rieles listados arriba se abre durante el onboarding. Corredores adicionales entran en producción a medida que se completa cada integración banco-a-banco — te enviaremos un correo en cuanto uno se active.",
     "ec.cav.performance.tag": "Revisión especializada",
     "ec.cav.performance.text": "Performance marketing ({industry}) requiere pruebas más claras de calidad del tráfico y pagos. Compliance gestiona un cuestionario estructurado — resolución típica en tres días hábiles. Si rechazamos, recibirás una motivación concreta, no una caja negra.",
 

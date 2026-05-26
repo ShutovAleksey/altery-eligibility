@@ -161,8 +161,6 @@
 
     "ec.cav.crypto.tag": "Krypto-erprobt",
     "ec.cav.crypto.text": "Krypto-natives KYB läuft über unser Spezialistenteam, nicht die allgemeine Warteschlange. Synterra Connect — unser Partner-Netzwerk für direkte Exchange-Abwicklung — leitet Mittel zu und von regulierten Plattformen; Fiat-Ein-/-Auszahlungen via SEPA, Faster Payments und SWIFT.",
-    "ec.cav.mena.tag": "Konto öffnet heute",
-    "ec.cav.mena.text": "Altery MENA ist von der DFSA voll lizenziert. Das Konto auf den oben aufgeführten Schienen öffnet beim Onboarding. Weitere Korridore gehen live, sobald jede Bank-zu-Bank-Integration abgeschlossen ist — wir mailen Sie, sobald einer aktiviert wird.",
     "ec.cav.performance.tag": "Spezialprüfung",
     "ec.cav.performance.text": "Performance-Marketing ({industry}) braucht klare Nachweise zu Traffic-Qualität und Auszahlungen. Compliance führt einen strukturierten Fragebogen durch — übliche Bearbeitungszeit drei Werktage. Bei Ablehnung erhalten Sie eine konkrete Begründung, keine Blackbox.",
 
@@ -592,8 +590,6 @@
 
     "ec.cav.crypto.tag": "Знаем крипту",
     "ec.cav.crypto.text": "KYB крипто-нативного бизнеса проходит через специализированную команду, не общую очередь. Synterra Connect — наша партнёрская сеть для прямых расчётов с биржами — проводит средства в обе стороны через регулируемые площадки; фиат через SEPA, Faster Payments и SWIFT.",
-    "ec.cav.mena.tag": "Счёт открывается сразу",
-    "ec.cav.mena.text": "Altery MENA полностью лицензирована DFSA. Счёт по рельсам выше открываем на онбординге. Дополнительные коридоры подключаются по мере завершения каждой банк-к-банк интеграции — пришлём письмо в момент активации.",
     "ec.cav.performance.tag": "Специализированная проверка",
     "ec.cav.performance.text": "Performance-маркетинг ({industry}) требует чёткого подтверждения качества трафика и выплат. Комплаенс проводит структурированную анкету — стандартный срок до трёх рабочих дней. При отказе вы получите конкретное обоснование, а не чёрный ящик.",
 

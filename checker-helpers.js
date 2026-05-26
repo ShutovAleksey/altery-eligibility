@@ -149,9 +149,12 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
   // later want a targeted version, add a `requiresSpecialistReview:
   // true` flag on the genuinely affected countries in EC_COUNTRIES
   // and fire a caveat only for those.
-  if (entity?.id === "mena") {
-    caveats.push({ tagKey: "ec.cav.mena.tag", textKey: "ec.cav.mena.text", tone: "orange" });
-  }
+  // Note: there used to be a MENA-specific 'Account opens today,
+  // corridors come online as each bank-to-bank integration lands'
+  // caveat. Removed — it implied a partial-service state at the
+  // moment a user is reading 'Recommended for your business', which
+  // creates more doubt than reassurance. Corridor onboarding details
+  // belong in /setup/ once the user is past commitment.
   // Ultra pricing is firm now (£300/mo with a full fee schedule in
   // EC_PLANS.ultra). The previous "Ultra prices set after a call"
   // caveat contradicted the public price so it's been removed. If
