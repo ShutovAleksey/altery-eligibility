@@ -344,7 +344,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         </div>
       </div>
 
-      <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:10px;">${t("ec.pdf.costMath.assumptions", { volume: "£" + ecFormatVolume(rec.monthlyVolume), txCount: cost.meta.txCount, fxPct: cost.meta.fxVolumePct })}</div>
+      <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:10px;">${t("ec.pdf.costMath.assumptions", { volume: ecFormatVolume(rec.monthlyVolume), txCount: cost.meta.txCount, fxPct: cost.meta.fxVolumePct })}</div>
     </div>` : "";
 
   // "What €X annual buys you" — future-self visualization. Turns
@@ -523,13 +523,13 @@ ${personaLine ? `<div style="font-size:13px;font-weight:500;color:${C.primary};m
 
 <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin:0 0 10px;">${t("ec.pdf.recommendation")}</div>
 
-<h1 style="font-size:26px;font-weight:700;letter-spacing:-0.02em;line-height:32px;color:${C.ink};margin:0 0 14px;">
+<h1 style="font-size:26px;font-weight:700;letter-spacing:normal;line-height:32px;color:${C.ink};margin:0 0 14px;">
   <span style="color:${C.primary};">${entityName}</span> ${t("ec.r.title.middle")} <span style="color:${C.primary};">${planName}</span>${t("ec.r.title.after")}
 </h1>
 
 <p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0 0 20px;">${leadText}</p>
 
-<div style="display:inline-block;padding:7px 14px 7px 10px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;font-size:12px;color:${C.ink};margin-bottom:28px;">
+<div style="display:inline-block;white-space:nowrap;padding:7px 14px 7px 10px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;font-size:12px;color:${C.ink};margin-bottom:28px;">
   <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${C.success};margin-right:8px;vertical-align:middle;"></span>
   ${entityName} · ${entityLicence}
 </div>
