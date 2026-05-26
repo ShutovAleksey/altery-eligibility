@@ -1639,7 +1639,10 @@
     }
 
     /* Switch CTA — primary button at bottom of each plan card. Full-width,
-       large hit target, clear affordance. Active scale for tactile feedback. */
+       large hit target, clear affordance. Active scale for tactile feedback.
+       margin-top: auto pushes the button to the bottom of the flex column so
+       CTAs align horizontally across cards even when their fees lists differ
+       in length (Starter has 5 rows, Pro has 6 with the bulk-transfers row). */
     .ec-plan-compare__switch {
       width: 100%;
       padding: 12px 16px;
@@ -1653,7 +1656,7 @@
       cursor: pointer;
       letter-spacing: -0.005em;
       transition: background .15s ease, transform .08s ease;
-      margin-top: 4px;
+      margin-top: auto;
     }
     .ec-plan-compare__switch:hover { background: #001a52; }
     .ec-plan-compare__switch:active { transform: scale(0.98); }
