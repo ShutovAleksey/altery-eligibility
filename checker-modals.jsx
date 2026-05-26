@@ -4,7 +4,7 @@
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,
           ecOutcomesForSavings, ecGenProposalRef, ecLoadStripe,
           ecBuildAnalysisHTML, ecSendAnalysisEmail, ecWaitForPdfLibs,
-          EcIco, ecBookingUrl */
+          EcIco, ecSubmitHubspotLead */
 // checker-modals.jsx — all the modal/handoff/payment overlays the result
 // page can open.
 //
@@ -364,12 +364,10 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
   const [colleagueSent, setColleagueSent] = useState(false);
   const [colleagueError, setColleagueError] = useState(null);
 
-  // Engagement signals for the next-steps checklist on the sent stage.
+  // Engagement signal for the next-steps checklist on the sent stage.
   // colleagueSent → step 2 ("Forward to your CFO or co-founder") flips done.
-  // scheduleClicked → step 3 ("Schedule a 15-min intro call") flips done.
-  // Both are write-once locally — there's no value in toggling back, and
-  // refreshing the modal regenerates state from scratch.
-  const [scheduleClicked, setScheduleClicked] = useState(false);
+  // Write-once locally — there's no value in toggling back, and refreshing
+  // the modal regenerates state from scratch.
 
   // ESC close + body scroll lock
   useEffect(() => {
@@ -399,6 +397,11 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
       // inbox greeting + setup CTA. See api/send-analysis.js
       // for server-side details (env vars, sender domain).
       await ecSendAnalysisEmail({ rec, email, t });
+      // Register the lead in HubSpot so round-robin rotation assigns it to
+      // the next available salesperson. Fire-and-forget — the PDF is the
+      // user's primary outcome and already succeeded; a HubSpot hiccup
+      // must not surface as a send failure.
+      ecSubmitHubspotLead({ email: email.trim(), rec }).catch(() => {});
       setStage("sent");
     } catch (err) {
       console.error("[EcHandoffModal] email send failed:", err);
@@ -613,19 +616,11 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                     <div className="ec-handoff__nextSteps__body">{t("ec.handoff.sent.step2.body")}</div>
                   </div>
                 </li>
-                <li className={"ec-handoff__nextSteps__item" + (scheduleClicked ? " is-done" : "")}>
-                  <span className="ec-handoff__nextSteps__num" aria-hidden="true">{scheduleClicked ? "✓" : "3"}</span>
+                <li className="ec-handoff__nextSteps__item is-done">
+                  <span className="ec-handoff__nextSteps__num" aria-hidden="true">✓</span>
                   <div>
                     <div className="ec-handoff__nextSteps__title">{t("ec.handoff.sent.step3.title")}</div>
-                    <div className="ec-handoff__nextSteps__body">
-                      <button
-                        type="button"
-                        className="ec-handoff__nextSteps__link"
-                        onClick={() => { setScheduleClicked(true); setStage("booking"); }}
-                      >
-                        {t("ec.handoff.sent.step3.link")} →
-                      </button>
-                    </div>
+                    <div className="ec-handoff__nextSteps__body">{t("ec.handoff.sent.step3.body")}</div>
                   </div>
                 </li>
               </ol>
@@ -689,28 +684,6 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
               </Button>
             </div>
           </>
-        )}
-
-        {stage === "booking" && (
-          <div className="ec-handoff__booking">
-            <button
-              type="button"
-              className="ec-handoff__booking__back"
-              onClick={() => setStage("sent")}
-            >
-              <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
-            </button>
-            <h2 id="ec-handoff-title" className="ec-modal__title">{t("ec.handoff.sent.step3.title")}</h2>
-            {/* Inline HubSpot Meetings page. embed=true strips HubSpot's
-                page chrome; ecBookingUrl prefills email + checker context
-                so the booked contact carries the recommendation. */}
-            <iframe
-              className="ec-handoff__booking__frame"
-              title={t("ec.handoff.sent.step3.title")}
-              src={ecBookingUrl(rec, email) + "&embed=true"}
-              loading="lazy"
-            />
-          </div>
         )}
       </div>
     </div>

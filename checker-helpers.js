@@ -808,33 +808,80 @@ function ecEstimateSavings(monthlyVolume) {
   };
 }
 
+// Map a recommendation to the checker's HubSpot contact properties.
+// Keys + values match the verified property schema exactly: checker_entity
+// (enum UK/EU/MENA), checker_plan (enum Starter/Pro/Ultra),
+// checker_monthly_volume_gbp (number), checker_est_annual_savings_gbp
+// (number). Returns a flat string-valued object; callers shape it into a
+// query string (booking URL) or a Forms-API fields array (lead submit).
+function ecCheckerContext(rec) {
+  const out = {};
+  if (!rec) return out;
+  const entityId = rec.entity && rec.entity.id;
+  if (entityId) out.checker_entity = String(entityId).toUpperCase();
+  const planId = rec.plan && rec.plan.id;
+  if (planId) out.checker_plan = planId.charAt(0).toUpperCase() + planId.slice(1);
+  if (rec.monthlyVolume) out.checker_monthly_volume_gbp = String(Math.round(rec.monthlyVolume));
+  const cost = (typeof ecComputeCostBreakdown === "function") ? ecComputeCostBreakdown(rec) : null;
+  const annual = cost && cost.savings && cost.savings.annual;
+  if (annual) out.checker_est_annual_savings_gbp = String(annual);
+  return out;
+}
+
 // Build the HubSpot Meetings URL for a given recommendation, prefilled
-// with the visitor's email and tagged with the checker's recommendation
-// context. The custom params map 1:1 to HubSpot contact properties
-// (verified internal names + enum values): checker_entity (UK/EU/MENA),
-// checker_plan (Starter/Pro/Ultra), checker_monthly_volume_gbp,
-// checker_est_annual_savings_gbp. HubSpot only persists these when the
-// matching fields are present on the booking form; absent fields are
-// silently ignored, so passing them is always safe.
-//
-// `email` is optional — the result-page CTA path doesn't have one yet,
-// the email/colleague path does. Blocked recommendations (no plan/entity)
-// just yield the bare scheduling page plus whatever context exists.
+// with the visitor's email and tagged with the checker context. Used by
+// the PDF/email "book a call" link and the soft-decline "talk to us"
+// button. (The in-app result flow routes leads via ecSubmitHubspotLead
+// instead.) `email` is optional.
 function ecBookingUrl(rec, email) {
   const base = window.EC_BOOKING_URL || "";
   if (!rec) return base;
   const params = new URLSearchParams();
   if (email) params.set("email", String(email).trim());
-  const entityId = rec.entity && rec.entity.id;
-  if (entityId) params.set("checker_entity", String(entityId).toUpperCase());
-  const planId = rec.plan && rec.plan.id;
-  if (planId) params.set("checker_plan", planId.charAt(0).toUpperCase() + planId.slice(1));
-  if (rec.monthlyVolume) params.set("checker_monthly_volume_gbp", String(Math.round(rec.monthlyVolume)));
-  const cost = (typeof ecComputeCostBreakdown === "function") ? ecComputeCostBreakdown(rec) : null;
-  const annual = cost && cost.savings && cost.savings.annual;
-  if (annual) params.set("checker_est_annual_savings_gbp", String(annual));
+  const ctx = ecCheckerContext(rec);
+  Object.keys(ctx).forEach((k) => params.set(k, ctx[k]));
   const qs = params.toString();
   return qs ? base + "?" + qs : base;
+}
+
+// HubSpot lead capture — a regular HubSpot Form (not the Meetings booking
+// form, whose custom fields are seat-gated). Submitting via the public
+// Forms API v3 endpoint creates/updates the contact by email, writes the
+// checker context, and fires any workflow listening on this form's
+// submission — which is where round-robin owner rotation routes the lead
+// to the next available salesperson. No auth token: portalId + formGuid
+// scope it. EU data-residency portal → api-eu1 host.
+const EC_HUBSPOT_PORTAL_ID = "26559519";
+const EC_HUBSPOT_FORM_GUID = "353936b1-175c-45bf-8e46-0604ddd7662a";
+const EC_HUBSPOT_SUBMIT_URL =
+  "https://api-eu1.hsforms.com/submissions/v3/integration/submit/" +
+  EC_HUBSPOT_PORTAL_ID + "/" + EC_HUBSPOT_FORM_GUID;
+
+async function ecSubmitHubspotLead({ email, rec }) {
+  if (!email) return { ok: false };
+  const fields = [{ objectTypeId: "0-1", name: "email", value: String(email).trim() }];
+  const ctx = ecCheckerContext(rec);
+  Object.keys(ctx).forEach((k) => fields.push({ objectTypeId: "0-1", name: k, value: ctx[k] }));
+  const context = { pageUri: location.href, pageName: document.title };
+  // HubSpot tracking cookie, when present, links the submission to the
+  // visitor's analytics session for first-touch attribution.
+  const hutk = (document.cookie.match(/hubspotutk=([^;]+)/) || [])[1];
+  if (hutk) context.hutk = hutk;
+  try {
+    const res = await fetch(EC_HUBSPOT_SUBMIT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fields, context }),
+    });
+    if (!res.ok) {
+      console.error("[ecSubmitHubspotLead] HTTP", res.status, await res.text().catch(() => ""));
+      return { ok: false };
+    }
+    return { ok: true };
+  } catch (e) {
+    console.error("[ecSubmitHubspotLead] failed:", e);
+    return { ok: false };
+  }
 }
 
 // Generate a deterministic-looking proposal reference. Format
@@ -1017,7 +1064,8 @@ Object.assign(window, {
   ecEstimateTxCount, ecComputeCostBreakdown, ecOutcomesForSavings,
   ecBaselineFor, ecQualitativeMatrix, ecCapabilityMatrix,
   ecConfidenceLevel, ecFxVolumeRatio, ecLocalSwiftSplit, ecAvgTxGbp,
-  ecVolumeHintKey, ecFormatVolume, ecEstimateSavings, ecBookingUrl, ecGenProposalRef,
+  ecVolumeHintKey, ecFormatVolume, ecEstimateSavings,
+  ecCheckerContext, ecBookingUrl, ecSubmitHubspotLead, ecGenProposalRef,
   ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
   ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,
   ecCaptureAndStoreUtms, ecAppendUtmsToURL,

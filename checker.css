@@ -1845,41 +1845,12 @@
       margin-top: 2px;
     }
     .ec-handoff__nextSteps__link {
-      display: inline;
-      background: none;
-      border: 0;
-      border-bottom: 1px solid var(--c-primary);
-      padding: 0;
-      font: inherit;
-      font-weight: 500;
       color: var(--c-primary);
       text-decoration: none;
-      cursor: pointer;
+      border-bottom: 1px solid var(--c-primary);
+      font-weight: 500;
     }
     .ec-handoff__nextSteps__link:hover { opacity: 0.75; }
-
-    /* Booking stage — HubSpot Meetings page embedded inline so the user
-       books without leaving the modal. Plain iframe (not the HubSpot
-       embed script) keeps it deterministic in the no-build Babel-standalone
-       runtime; fixed min-height with internal scroll handles the calendar. */
-    .ec-handoff__booking { display: flex; flex-direction: column; gap: 14px; }
-    .ec-handoff__booking__back {
-      align-self: flex-start;
-      display: inline-flex; align-items: center; gap: 6px;
-      background: none; border: 0; padding: 0;
-      font: inherit; font-size: 13px; font-weight: 500;
-      color: var(--c-muted); cursor: pointer;
-    }
-    .ec-handoff__booking__back:hover { color: var(--c-ink); }
-    .ec-handoff__booking__frame {
-      width: 100%;
-      min-height: 660px;
-      border: 1px solid var(--c-border);
-      border-radius: 12px;
-    }
-    @media (max-width: 640px) {
-      .ec-handoff__booking__frame { min-height: 560px; }
-    }
 
     /* Send-to-colleague row — secondary inline send. Inputs sit
        side by side for compactness on desktop, stack on mobile. */
