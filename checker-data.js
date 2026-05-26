@@ -661,15 +661,14 @@ const EC_ENTITIES = {
     currencyPerkKey: "ec.entity.uk.currencyPerk",
     countries: ["GB", "IE", "NL", "DE"],
     // Public regulator reference — shown in the result hero so visitors
-    // can verify the licence claim without leaving the page. Links to
-    // the FCA Financial Services Register search page pre-filled with
-    // Altery's FRN (901037). The previous Salesforce-deep-link mapped
-    // to a different firm on FCA's side; the search URL is the format
-    // Altery's own T&C points at, so it stays accurate as FCA rotates
-    // their internal IDs.
+    // can verify the licence claim without leaving the page. The bare
+    // ?q=901037 search hung for some users because FCA's register
+    // does a global scan without filters. Pre-filtering by location
+    // (London, UK) + type=Companies narrows it to the right result
+    // immediately. geocodes is FCA's Google Places ID for London.
     regulatory: {
       refLabel: "FRN 901037",
-      registerUrl: "https://register.fca.org.uk/s/search?q=901037",
+      registerUrl: "https://register.fca.org.uk/s/search?q=%20901037&location=London%2C%20UK&geocodes=ChIJdd4hrwug2EcRmSrV3Vo6llI&type=Companies",
     },
     accounts: [
       {
