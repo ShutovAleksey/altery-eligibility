@@ -1051,24 +1051,36 @@ const Select = ({ label, value, onChange, options, placeholder, error, disabled,
         style={{ transition: "transform var(--motion-base)", transform: open ? "rotate(180deg)" : "none" }} aria-hidden="true" />
       </button>
       {open &&
-      <ul
-        ref={listRef}
-        id={listId}
-        role="listbox"
-        aria-labelledby={labelId}
+      <div
         className="scale-in"
         style={{
+          // Outer panel — paints the background / border / shadow and
+          // does NOT scroll. The inner <ul> is the only scrollable
+          // element, so the macOS trackpad rubber-band can never reveal
+          // anything behind the panel (the bg is on the parent, the ul
+          // shifts inside but the parent stays put).
           position: "absolute", top: panelTop, left: 0, right: 0, zIndex: 40,
-          background: "var(--c-surface)", borderRadius: "var(--r-md)", border: "1px solid var(--c-border-soft)",
-          boxShadow: "var(--sh-3)", padding: 4, maxHeight: 300, overflow: "auto",
-          // Prevents macOS rubber-band bounce from chaining the scroll
-          // up to the page body — without `contain`, hitting the end of
-          // the list with a trackpad flick scrolls the page underneath
-          // the open dropdown, leaving a visible gap where the dropdown
-          // was positioned a moment ago.
-          overscrollBehavior: "contain",
-          margin: 0, listStyle: "none"
+          background: "var(--c-surface)",
+          borderRadius: "var(--r-md)",
+          border: "1px solid var(--c-border-soft)",
+          boxShadow: "var(--sh-3)",
+          padding: 4,
+          // Crop the scrollbar to the rounded corners — without this
+          // overflow:hidden the inner ul's scrollbar pokes outside the
+          // rounded panel edge.
+          overflow: "hidden",
         }}>
+        <ul
+          ref={listRef}
+          id={listId}
+          role="listbox"
+          aria-labelledby={labelId}
+          style={{
+            maxHeight: 292, // 300 minus the outer 4px×2 padding
+            overflowY: "auto",
+            overscrollBehavior: "contain",
+            margin: 0, padding: 0, listStyle: "none",
+          }}>
           {options.map((o, i) => {
           const on = value === o.value;
           const active = i === activeIdx;
@@ -1090,6 +1102,7 @@ const Select = ({ label, value, onChange, options, placeholder, error, disabled,
 
         })}
         </ul>
+      </div>
       }
     </div>);
 
