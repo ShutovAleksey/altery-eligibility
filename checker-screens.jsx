@@ -396,7 +396,15 @@ function EcApp() {
 function EcIntro({ onStart }) {
   const t = useT();
   return (
-    <div className="ec-content fade-in">
+    <div className="ec-content ec-intro fade-in">
+      {/* Brand doodle in the top-right of the intro card — warmer
+          first impression vs a text-only landing. Sized small (96px)
+          and corner-positioned so it doesn't compete with the title
+          / value-cards / CTA stack below. Hidden under 480px to keep
+          the cramped mobile viewport text-first. */}
+      <span className="ec-doodle ec-doodle--md ec-intro__doodle">
+        <img src="/images/doodles/onboarding.svg" alt="" aria-hidden="true" />
+      </span>
       {/* Eyebrow with an inline sparkle icon — visual "this is built
           specifically for you" cue before the user reads the title.
           Title accepts JSX as `eyebrow`, so we compose a span here
@@ -1513,6 +1521,14 @@ function EcResultApproved({ rec, onBack, onReset }) {
             blue accent) + lead paragraph + 2 pills (entity status, +
             crypto-fluent for crypto users) + IBAN preview chip. */}
         <header className="ec-r__hero">
+          {/* Brand doodle — the result moment is the conversion peak;
+              winner illustration in the top-right corner reinforces
+              the brand at the celebration. Ghost variant (line-art
+              only) keeps it from competing with the entity name +
+              savings hero below. */}
+          <span className="ec-doodle ec-doodle--md ec-doodle--ghost ec-r__heroDoodle">
+            <img src="/images/doodles/winner.svg" alt="" aria-hidden="true" />
+          </span>
           <div className="ec-r__hero__inner">
             <div className="ec-r__heroEyebrow">
               <span className="ec-r__heroEyebrow__dot" />
@@ -1957,6 +1973,14 @@ function EcResultBlocked({ rec, onBack, onReset }) {
       </button>
       <div className="ec-result ec-result--guarded">
         <div className="ec-result__hero">
+          {/* Brand doodle softens the soft-decline moment — visitor's
+              first impression of "we said no" lands on the warm
+              illustration before they read the title. Ghost variant
+              (line-art only) fits the dark navy hero without a
+              white card-on-navy contrast clash. */}
+          <span className="ec-doodle ec-doodle--lg ec-doodle--ghost ec-result__heroDoodle">
+            <img src="/images/doodles/refusal.svg" alt="" aria-hidden="true" />
+          </span>
           <div className="ec-result__heroEyebrow">{t("ec.b.eyebrow")}</div>
           <h1 className="ec-result__heroTitle">
             {titleA}{" "}

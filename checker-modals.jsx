@@ -583,11 +583,15 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
 
         {stage === "sent" && (
           <>
+            {/* Brand doodle replaces the previous inline 32×32
+                line-art tick. The bigger illustration carries more
+                of the celebratory beat — visitor's reward for
+                getting through the email step. */}
             <div className="ec-handoff__successIcon" aria-hidden="true">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                <circle cx="16" cy="16" r="15" stroke="currentColor" strokeWidth="2"/>
-                <path d="m10 16 4 4 8-8" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+              <img src="/images/doodles/done.svg"
+                   alt=""
+                   width="96" height="96"
+                   style={{ display: "block" }} />
             </div>
             <h2 id="ec-handoff-title" className="ec-modal__title">{t("ec.handoff.sent.title")}</h2>
             <p className="ec-handoff__lead">{t("ec.handoff.sent.lead", { email })}</p>

@@ -593,6 +593,24 @@
        result-page design (Eligibility Checker.html in the design archive). */
     .ec-content--wide { max-width: 880px; }
 
+    /* Intro screen — relative container so the absolute-positioned
+       brand doodle in the top-right anchors to the card edge.
+       .ec-intro inherits .ec-content layout; we just add the wrapper
+       and corner placement. */
+    .ec-intro { position: relative; }
+    .ec-intro__doodle {
+      position: absolute;
+      top: 0;
+      right: 0;
+      opacity: .85;
+      pointer-events: none;
+    }
+    @media (max-width: 480px) {
+      /* Mobile keeps the intro text-first — the doodle would crowd
+         the title and push the CTA below the fold. */
+      .ec-intro__doodle { display: none; }
+    }
+
     .ec-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
       font-size: 12px; font-weight: 600; letter-spacing: 0.06em;
@@ -1176,6 +1194,47 @@
         0 2px 6px rgba(0, 5, 55, 0.12),
         0 16px 48px rgba(0, 39, 128, 0.22);
     }
+
+    /* Brand doodle utility — wraps an inline <img src="/images/doodles/…">
+       so callers don't have to repeat size + alignment styles. Doodles
+       are 120×120 viewport; we scale by setting font-size / explicit
+       width on the wrapper. .ec-doodle--md is the default (96px); use
+       --sm (60px) for inline accents and --lg (144px) for hero
+       placements where the illustration carries the moment. Doodles
+       use --b (fill) and --c (stroke) CSS vars internally with white/
+       black defaults — override at the parent if you want them tinted
+       for a dark surface. */
+    .ec-doodle {
+      display: inline-block;
+      line-height: 0;
+      flex: 0 0 auto;
+    }
+    .ec-doodle img { display: block; width: 100%; height: 100%; }
+    .ec-doodle--sm { width: 60px;  height: 60px; }
+    .ec-doodle--md { width: 96px;  height: 96px; }
+    .ec-doodle--lg { width: 144px; height: 144px; }
+    /* On a dark surface (.ec-result__hero) the default white-fill /
+       black-stroke doodle reads as a "card on the navy". To go full
+       line-art on the navy, set ec-doodle--ghost and we flip the
+       internal vars: transparent fill + white stroke. */
+    .ec-doodle--ghost { --b: transparent; --c: #fff; }
+    /* Hero-doodle slot — top-right corner placement on the result hero.
+       Sits absolute so it overlaps the eyebrow / title without pushing
+       layout. On mobile (<640px) it shrinks and stays in the corner
+       rather than dominating. */
+    .ec-result__heroDoodle {
+      position: absolute;
+      top: 24px;
+      right: 24px;
+      opacity: .85;
+      z-index: 1;
+    }
+    @media (max-width: 640px) {
+      .ec-result__heroDoodle {
+        top: 16px; right: 16px;
+        width: 88px; height: 88px;
+      }
+    }
     /* Two gradient layers crossfading. State A: light from upper-RIGHT
        (165° angle, beige glow at 100%,0%). State B: light from
        upper-LEFT (215° angle, beige glow at 0%,0%) — mirrored. The
@@ -1689,12 +1748,11 @@
       text-align: center;
     }
     .ec-handoff__successIcon {
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      background: var(--c-success-soft, var(--c-bg));
-      color: var(--c-success, var(--c-primary));
-      display: inline-flex; align-items: center; justify-content: center;
-      margin: 4px 0 16px;
+      display: inline-flex;
+      align-items: center; justify-content: center;
+      margin: 4px 0 12px;
+      /* Sized by the inner <img> doodle (96×96) — no circle frame
+         needed; the doodle carries its own visual weight. */
     }
     /* Commit-stage icon — same size/shape as successIcon but in primary
        navy. Signals "qualified, ready to go" vs successIcon's "delivered". */
@@ -2386,6 +2444,23 @@
       position: relative; z-index: 1;
       padding: 36px 36px 32px;
       display: flex; flex-direction: column; gap: 16px;
+    }
+    /* Result hero's winner-doodle accent — top-right corner overlap,
+       subtle (.6 opacity) so it doesn't fight the entity name + savings
+       hero below for attention. Sits above the ::after grid via z-index. */
+    .ec-r__heroDoodle {
+      position: absolute;
+      top: 24px;
+      right: 28px;
+      opacity: .6;
+      z-index: 2;
+      pointer-events: none;
+    }
+    @media (max-width: 640px) {
+      .ec-r__heroDoodle {
+        top: 16px; right: 16px;
+        width: 72px; height: 72px;
+      }
     }
     .ec-r__heroEyebrow {
       display: inline-flex; align-items: center; gap: 8px;
