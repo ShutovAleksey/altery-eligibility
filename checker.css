@@ -593,23 +593,6 @@
        result-page design (Eligibility Checker.html in the design archive). */
     .ec-content--wide { max-width: 880px; }
 
-    /* Intro screen — relative container so the absolute-positioned
-       brand doodle in the top-right anchors to the card edge.
-       .ec-intro inherits .ec-content layout; we just add the wrapper
-       and corner placement. */
-    .ec-intro { position: relative; }
-    .ec-intro__doodle {
-      position: absolute;
-      top: 0;
-      right: 0;
-      opacity: .85;
-      pointer-events: none;
-    }
-    @media (max-width: 480px) {
-      /* Mobile keeps the intro text-first — the doodle would crowd
-         the title and push the CTA below the fold. */
-      .ec-intro__doodle { display: none; }
-    }
 
     .ec-eyebrow {
       display: inline-flex; align-items: center; gap: 8px;
@@ -1218,22 +1201,20 @@
        line-art on the navy, set ec-doodle--ghost and we flip the
        internal vars: transparent fill + white stroke. */
     .ec-doodle--ghost { --b: transparent; --c: #fff; }
-    /* Hero-doodle slot — top-right corner placement on the result hero.
-       Sits absolute so it overlaps the eyebrow / title without pushing
-       layout. On mobile (<640px) it shrinks and stays in the corner
-       rather than dominating. */
-    .ec-result__heroDoodle {
-      position: absolute;
-      top: 24px;
-      right: 24px;
-      opacity: .85;
-      z-index: 1;
+    /* Block-level placement — onboarding-flow style. Doodle sits in
+       the natural content stack, top-LEFT aligned, above the title,
+       with margin-bottom for breathing room. Matches the Altery
+       Design System onboarding pattern (phone-input / OTP / etc.)
+       where the doodle introduces what step the user is on before
+       they read the heading. Default size 144px (lg), but caller can
+       combine with --md / --sm modifiers to shrink. */
+    .ec-doodle--block {
+      display: block;
+      width: 144px; height: 144px;
+      margin: 0 0 20px;
     }
-    @media (max-width: 640px) {
-      .ec-result__heroDoodle {
-        top: 16px; right: 16px;
-        width: 88px; height: 88px;
-      }
+    @media (max-width: 480px) {
+      .ec-doodle--block { width: 120px; height: 120px; margin-bottom: 16px; }
     }
     /* Two gradient layers crossfading. State A: light from upper-RIGHT
        (165° angle, beige glow at 100%,0%). State B: light from
@@ -2444,23 +2425,6 @@
       position: relative; z-index: 1;
       padding: 36px 36px 32px;
       display: flex; flex-direction: column; gap: 16px;
-    }
-    /* Result hero's winner-doodle accent — top-right corner overlap,
-       subtle (.6 opacity) so it doesn't fight the entity name + savings
-       hero below for attention. Sits above the ::after grid via z-index. */
-    .ec-r__heroDoodle {
-      position: absolute;
-      top: 24px;
-      right: 28px;
-      opacity: .6;
-      z-index: 2;
-      pointer-events: none;
-    }
-    @media (max-width: 640px) {
-      .ec-r__heroDoodle {
-        top: 16px; right: 16px;
-        width: 72px; height: 72px;
-      }
     }
     .ec-r__heroEyebrow {
       display: inline-flex; align-items: center; gap: 8px;

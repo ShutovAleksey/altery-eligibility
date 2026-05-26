@@ -396,13 +396,11 @@ function EcApp() {
 function EcIntro({ onStart }) {
   const t = useT();
   return (
-    <div className="ec-content ec-intro fade-in">
-      {/* Brand doodle in the top-right of the intro card — warmer
-          first impression vs a text-only landing. Sized small (96px)
-          and corner-positioned so it doesn't compete with the title
-          / value-cards / CTA stack below. Hidden under 480px to keep
-          the cramped mobile viewport text-first. */}
-      <span className="ec-doodle ec-doodle--md ec-intro__doodle">
+    <div className="ec-content fade-in">
+      {/* Brand doodle — Altery Design System onboarding pattern:
+          block-level above the title, top-left aligned, full size.
+          Sets the visual tone for the whole 90-second flow. */}
+      <span className="ec-doodle ec-doodle--block">
         <img src="/images/doodles/onboarding.svg" alt="" aria-hidden="true" />
       </span>
       {/* Eyebrow with an inline sparkle icon — visual "this is built
@@ -469,10 +467,19 @@ function EcIntro({ onStart }) {
   );
 }
 
-function EcQuestionHeader({ num, title, lead }) {
+function EcQuestionHeader({ num, title, lead, doodle }) {
   const t = useT();
   return (
     <>
+      {/* Optional brand doodle introducing the step — Altery Design
+          System onboarding pattern (block above the eyebrow / title).
+          Caller passes the doodle file basename without extension;
+          we resolve to /images/doodles/<name>.svg. */}
+      {doodle && (
+        <span className="ec-doodle ec-doodle--block">
+          <img src={`/images/doodles/${doodle}.svg`} alt="" aria-hidden="true" />
+        </span>
+      )}
       <div className="ec-eyebrow">
         <span className="ec-eyebrow__num">{num}</span>
         {t("ec.q.eyebrow", { n: num, total: TOTAL_STEPS })}
@@ -761,7 +768,8 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
       </button>
-      <EcQuestionHeader num="1" title={t("ec.q2.title")} lead={t("ec.q2.lead")} />
+      <EcQuestionHeader num="1" title={t("ec.q2.title")} lead={t("ec.q2.lead")}
+                        doodle="searching" />
 
       <EcCountrySelect
         label={t("ec.q2.input.label")}
@@ -792,7 +800,8 @@ function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked 
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
       </button>
-      <EcQuestionHeader num="2" title={t("ec.q1.title")} lead={t("ec.q1.lead")} />
+      <EcQuestionHeader num="2" title={t("ec.q1.title")} lead={t("ec.q1.lead")}
+                        doodle="problem-solving" />
 
       <Select
         label={t("ec.q1.field.industry")}
@@ -876,7 +885,8 @@ function EcServices({ services, setServices, onBack, onNext }) {
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
       </button>
-      <EcQuestionHeader num="3" title={t("ec.q3.title")} lead={t("ec.q3.lead")} />
+      <EcQuestionHeader num="3" title={t("ec.q3.title")} lead={t("ec.q3.lead")}
+                        doodle="file-check" />
 
       <div className="ec-services" role="group" aria-label={t("ec.q3.title")}>
         {EC_SERVICES.map((s) => {
@@ -1520,15 +1530,14 @@ function EcResultApproved({ rec, onBack, onReset }) {
             title (entity in white, "is built for the X plan" in light
             blue accent) + lead paragraph + 2 pills (entity status, +
             crypto-fluent for crypto users) + IBAN preview chip. */}
+        {/* Conversion-peak brand doodle — block-level above the navy
+            hero, matching the Altery onboarding pattern. Full colour,
+            top-left, sets the celebratory tone before the eyebrow
+            reads "Recommended for your business". */}
+        <span className="ec-doodle ec-doodle--block">
+          <img src="/images/doodles/winner.svg" alt="" aria-hidden="true" />
+        </span>
         <header className="ec-r__hero">
-          {/* Brand doodle — the result moment is the conversion peak;
-              winner illustration in the top-right corner reinforces
-              the brand at the celebration. Ghost variant (line-art
-              only) keeps it from competing with the entity name +
-              savings hero below. */}
-          <span className="ec-doodle ec-doodle--md ec-doodle--ghost ec-r__heroDoodle">
-            <img src="/images/doodles/winner.svg" alt="" aria-hidden="true" />
-          </span>
           <div className="ec-r__hero__inner">
             <div className="ec-r__heroEyebrow">
               <span className="ec-r__heroEyebrow__dot" />
@@ -1971,16 +1980,15 @@ function EcResultBlocked({ rec, onBack, onReset }) {
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.editAnswers")}
       </button>
+      {/* Brand doodle softens the soft-decline moment — block-level
+          above the dark hero, matching the Altery onboarding pattern
+          (back → doodle → title). Visitor's first frame is the warm
+          illustration before they read 'we can't open accounts'. */}
+      <span className="ec-doodle ec-doodle--block">
+        <img src="/images/doodles/refusal.svg" alt="" aria-hidden="true" />
+      </span>
       <div className="ec-result ec-result--guarded">
         <div className="ec-result__hero">
-          {/* Brand doodle softens the soft-decline moment — visitor's
-              first impression of "we said no" lands on the warm
-              illustration before they read the title. Ghost variant
-              (line-art only) fits the dark navy hero without a
-              white card-on-navy contrast clash. */}
-          <span className="ec-doodle ec-doodle--lg ec-doodle--ghost ec-result__heroDoodle">
-            <img src="/images/doodles/refusal.svg" alt="" aria-hidden="true" />
-          </span>
           <div className="ec-result__heroEyebrow">{t("ec.b.eyebrow")}</div>
           <h1 className="ec-result__heroTitle">
             {titleA}{" "}
