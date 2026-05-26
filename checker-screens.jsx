@@ -844,8 +844,14 @@ function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked 
         </Alert>
       )}
 
-      {/* UAE free-zone reassurance — country-conditional. */}
-      {showFreezone && !isBlocked && (
+      {/* UAE free-zone reassurance — country-conditional, AND only
+          when no industry banner is already showing. Two stacked
+          info-tone banners read as over-reassurance / wall-of-text;
+          the industry banner is more specific to what the user just
+          picked, so it takes priority. Freezone still fires alone
+          for UAE users on segments that don't have an industry-
+          specific banner (e-commerce, professional services, other). */}
+      {showFreezone && !isBlocked && !ind?.crypto && !ind?.reassureKey && (
         <Alert tone="info" title={t("ec.q1.alert.freezone.title")}>
           {t("ec.q1.alert.freezone.body")}
         </Alert>
