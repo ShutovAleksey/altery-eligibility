@@ -2804,6 +2804,19 @@
     }
     .ec-r__planAlt__switch:hover { text-decoration: underline; }
 
+    /* Perks list — flush-left under the plan head (default <ul> padding
+       pushed every bullet ~40px right, making the list look like an
+       inset block instead of part of the card's left-aligned content
+       stack). Gap-based row spacing gives the bullets breathing room
+       without making them feel disconnected. */
+    .ec-r__perks {
+      list-style: none;
+      margin: 16px 0 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
     .ec-r__perk {
       display: flex; align-items: flex-start; gap: 10px;
     }

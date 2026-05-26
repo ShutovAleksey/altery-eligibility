@@ -1605,9 +1605,96 @@ function EcResultApproved({ rec, onBack, onReset }) {
           </div>
         </header>
 
-        {/* ───── Savings + Plan, side by side ────────────────────────
-            Two equal cards on desktop; stack on narrow screens. */}
-        <div className="ec-r__grid">
+        {/* ───── Plan → Savings, stacked full-width ─────────────
+            Reordered from the side-by-side grid: visitor reads
+            (1) what entity/account we'll open (hero) → (2) what
+            plan suits them at what price (plan card) → (3) what
+            it saves vs a typical bank (savings card). Linear
+            decision narrative instead of forcing the eye to
+            choose between two cards. */}
+          <section className="ec-r__card ec-r__plan2">
+            <div className="ec-r__planHead">
+              <div>
+                <div className="ec-r__cardEyebrow">{t("ec.r.plan.eyebrow", { plan: planName })}</div>
+                <div className="ec-r__planFit">{t(activePlan.fitKey)}</div>
+              </div>
+              <div className="ec-r__planPrice">
+                <span className="ec-r__planPrice__amount">
+                  {activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}
+                </span>
+                <span className="ec-r__planPrice__cycle">{t(activePlan.cycleKey)}</span>
+              </div>
+            </div>
+            {/* Soft notice — shown only when the user has switched away
+                from the algorithm's recommendation via the comparison
+                modal. Contextual ("this plan you're reading is not the
+                best fit"), reassuring tone (info icon, not warning),
+                with a one-click revert to the originally recommended
+                plan. The savings card above and the perks list below
+                are already recalculated against the active plan, so
+                the user can compare apples-to-apples before deciding. */}
+            {!isOnRecommended && (
+              <div className="ec-r__planAlt" role="status">
+                <span className="ec-r__planAlt__icon" aria-hidden="true">
+                  <EcIco.info style={{ width: 14, height: 14 }} />
+                </span>
+                <div className="ec-r__planAlt__body">
+                  <div className="ec-r__planAlt__title">
+                    {t("ec.r.plan.notRecommended." + altDirection + ".title", {
+                      recommended: t(recommendedPlan.nameKey),
+                      selected:    planName,
+                    })}
+                  </div>
+                  <div className="ec-r__planAlt__text">
+                    {t("ec.r.plan.notRecommended." + altDirection + ".body", {
+                      recommended: t(recommendedPlan.nameKey),
+                      selected:    planName,
+                    })}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="ec-r__planAlt__switch"
+                  onClick={() => setSelectedPlanId(null)}
+                >
+                  {t("ec.r.plan.notRecommended.switchBack", { recommended: t(recommendedPlan.nameKey) })}
+                </button>
+              </div>
+            )}
+            <ul className="ec-r__perks">
+              {activePlan.perkKeys.slice(0, 5).map((k, i) => {
+                // The "Everything in <prev plan>" perk (Pro.p1, Ultra.p1)
+                // referenced a plan the user hadn't seen — read as upsell
+                // trick. Make it a button that opens the comparison modal,
+                // so the user can verify what's actually included rather
+                // than take it on faith.
+                const isInheritedFromPrev =
+                  k === "ec.plan.pro.p1" || k === "ec.plan.ultra.p1";
+                return (
+                  <li className="ec-r__perk" key={i}>
+                    <span className="ec-r__perk__tick" aria-hidden="true">
+                      <EcIco.check style={{ width: 11, height: 11 }} />
+                    </span>
+                    {isInheritedFromPrev ? (
+                      <button type="button" className="ec-r__perk__link"
+                              onClick={() => setComparisonOpen(true)}>
+                        {t(k)}
+                      </button>
+                    ) : (
+                      <span>{t(k)}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="ec-r__planFoot">
+              <button type="button" className="ec-r__planFoot__link" onClick={() => setComparisonOpen(true)}>
+                {t("ec.r.plan.compareAll")}
+              </button>
+              <span className="ec-r__planFoot__sub">{t("ec.r.plan.switch")}</span>
+            </div>
+          </section>
+
           {cost && cost.savings && cost.savings.monthly >= 100 && (
             <section className="ec-r__card ec-r__savings">
               <div className="ec-r__cardEyebrow">
@@ -1720,90 +1807,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
               </details>
             </section>
           )}
-
-          <section className="ec-r__card ec-r__plan2">
-            <div className="ec-r__planHead">
-              <div>
-                <div className="ec-r__cardEyebrow">{t("ec.r.plan.eyebrow", { plan: planName })}</div>
-                <div className="ec-r__planFit">{t(activePlan.fitKey)}</div>
-              </div>
-              <div className="ec-r__planPrice">
-                <span className="ec-r__planPrice__amount">
-                  {activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}
-                </span>
-                <span className="ec-r__planPrice__cycle">{t(activePlan.cycleKey)}</span>
-              </div>
-            </div>
-            {/* Soft notice — shown only when the user has switched away
-                from the algorithm's recommendation via the comparison
-                modal. Contextual ("this plan you're reading is not the
-                best fit"), reassuring tone (info icon, not warning),
-                with a one-click revert to the originally recommended
-                plan. The savings card above and the perks list below
-                are already recalculated against the active plan, so
-                the user can compare apples-to-apples before deciding. */}
-            {!isOnRecommended && (
-              <div className="ec-r__planAlt" role="status">
-                <span className="ec-r__planAlt__icon" aria-hidden="true">
-                  <EcIco.info style={{ width: 14, height: 14 }} />
-                </span>
-                <div className="ec-r__planAlt__body">
-                  <div className="ec-r__planAlt__title">
-                    {t("ec.r.plan.notRecommended." + altDirection + ".title", {
-                      recommended: t(recommendedPlan.nameKey),
-                      selected:    planName,
-                    })}
-                  </div>
-                  <div className="ec-r__planAlt__text">
-                    {t("ec.r.plan.notRecommended." + altDirection + ".body", {
-                      recommended: t(recommendedPlan.nameKey),
-                      selected:    planName,
-                    })}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="ec-r__planAlt__switch"
-                  onClick={() => setSelectedPlanId(null)}
-                >
-                  {t("ec.r.plan.notRecommended.switchBack", { recommended: t(recommendedPlan.nameKey) })}
-                </button>
-              </div>
-            )}
-            <ul className="ec-r__perks">
-              {activePlan.perkKeys.slice(0, 5).map((k, i) => {
-                // The "Everything in <prev plan>" perk (Pro.p1, Ultra.p1)
-                // referenced a plan the user hadn't seen — read as upsell
-                // trick. Make it a button that opens the comparison modal,
-                // so the user can verify what's actually included rather
-                // than take it on faith.
-                const isInheritedFromPrev =
-                  k === "ec.plan.pro.p1" || k === "ec.plan.ultra.p1";
-                return (
-                  <li className="ec-r__perk" key={i}>
-                    <span className="ec-r__perk__tick" aria-hidden="true">
-                      <EcIco.check style={{ width: 11, height: 11 }} />
-                    </span>
-                    {isInheritedFromPrev ? (
-                      <button type="button" className="ec-r__perk__link"
-                              onClick={() => setComparisonOpen(true)}>
-                        {t(k)}
-                      </button>
-                    ) : (
-                      <span>{t(k)}</span>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="ec-r__planFoot">
-              <button type="button" className="ec-r__planFoot__link" onClick={() => setComparisonOpen(true)}>
-                {t("ec.r.plan.compareAll")}
-              </button>
-              <span className="ec-r__planFoot__sub">{t("ec.r.plan.switch")}</span>
-            </div>
-          </section>
-        </div>
 
         {/* The product-showcase slider that used to sit here moved to
             the intro screen (EcIntro) — it serves as a pre-quiz teaser
