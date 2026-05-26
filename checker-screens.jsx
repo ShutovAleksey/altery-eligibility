@@ -768,8 +768,7 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
       </button>
-      <EcQuestionHeader num="1" title={t("ec.q2.title")} lead={t("ec.q2.lead")}
-                        doodle="searching" />
+      <EcQuestionHeader num="1" title={t("ec.q2.title")} lead={t("ec.q2.lead")} />
 
       <EcCountrySelect
         label={t("ec.q2.input.label")}
@@ -800,8 +799,7 @@ function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked 
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
       </button>
-      <EcQuestionHeader num="2" title={t("ec.q1.title")} lead={t("ec.q1.lead")}
-                        doodle="problem-solving" />
+      <EcQuestionHeader num="2" title={t("ec.q1.title")} lead={t("ec.q1.lead")} />
 
       <Select
         label={t("ec.q1.field.industry")}
@@ -885,8 +883,7 @@ function EcServices({ services, setServices, onBack, onNext }) {
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.back")}
       </button>
-      <EcQuestionHeader num="3" title={t("ec.q3.title")} lead={t("ec.q3.lead")}
-                        doodle="file-check" />
+      <EcQuestionHeader num="3" title={t("ec.q3.title")} lead={t("ec.q3.lead")} />
 
       <div className="ec-services" role="group" aria-label={t("ec.q3.title")}>
         {EC_SERVICES.map((s) => {
@@ -1530,13 +1527,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
             title (entity in white, "is built for the X plan" in light
             blue accent) + lead paragraph + 2 pills (entity status, +
             crypto-fluent for crypto users) + IBAN preview chip. */}
-        {/* Conversion-peak brand doodle — block-level above the navy
-            hero, matching the Altery onboarding pattern. Full colour,
-            top-left, sets the celebratory tone before the eyebrow
-            reads "Recommended for your business". */}
-        <span className="ec-doodle ec-doodle--block">
-          <img src="/images/doodles/winner.svg" alt="" aria-hidden="true" />
-        </span>
         <header className="ec-r__hero">
           <div className="ec-r__hero__inner">
             <div className="ec-r__heroEyebrow">
@@ -1980,13 +1970,6 @@ function EcResultBlocked({ rec, onBack, onReset }) {
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
         <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.editAnswers")}
       </button>
-      {/* Brand doodle softens the soft-decline moment — block-level
-          above the dark hero, matching the Altery onboarding pattern
-          (back → doodle → title). Visitor's first frame is the warm
-          illustration before they read 'we can't open accounts'. */}
-      <span className="ec-doodle ec-doodle--block">
-        <img src="/images/doodles/refusal.svg" alt="" aria-hidden="true" />
-      </span>
       <div className="ec-result ec-result--guarded">
         <div className="ec-result__hero">
           <div className="ec-result__heroEyebrow">{t("ec.b.eyebrow")}</div>

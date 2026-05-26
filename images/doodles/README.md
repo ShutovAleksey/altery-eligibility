@@ -3,7 +3,12 @@
 Brand doodle illustrations copied from the Altery Design System
 ([Storybook](https://design.altery.com/?path=/story/corporate-design-library-images-doodleimages--default)),
 fetched 2026-05-26 from the built assets bundle (`/assets/doodle-image-*.svg`).
-Filenames cleaned of Vite hash suffixes; otherwise unchanged.
+Filenames cleaned of Vite hash suffixes.
+
+**Blue accent baked to `#002780`** (Altery primary navy) — the source SVGs
+expose `var(--a, blue)` as the accent colour, but `<img>` tags don't pick
+up CSS variables from the parent. Bake-in lets us use the doodles via
+plain `<img src="...">` without an inline-SVG wrapper.
 
 ## Available doodles (33)
 

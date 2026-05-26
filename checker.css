@@ -1729,11 +1729,12 @@
       text-align: center;
     }
     .ec-handoff__successIcon {
-      display: inline-flex;
-      align-items: center; justify-content: center;
-      margin: 4px 0 12px;
-      /* Sized by the inner <img> doodle (96×96) — no circle frame
-         needed; the doodle carries its own visual weight. */
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: var(--c-success-soft, var(--c-bg));
+      color: var(--c-success, var(--c-primary));
+      display: inline-flex; align-items: center; justify-content: center;
+      margin: 4px 0 16px;
     }
     /* Commit-stage icon — same size/shape as successIcon but in primary
        navy. Signals "qualified, ready to go" vs successIcon's "delivered". */
