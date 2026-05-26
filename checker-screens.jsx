@@ -748,20 +748,11 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
     [collator, t], // t identity changes per language → re-sort
   );
 
-  // Auto-advance: picking a country sets the value AND moves on. React
-  // 18 batches both updates in the same render so the recommendation
-  // memo sees the new country before Q2 mounts.
-  //
-  // Short-circuit if the picked jurisdiction is on the blocked list
-  // (sanctions / FATF / scope). Mirrors EcIndustry's onBlocked path —
-  // straight to the soft-decline result, no point asking the remaining
-  // four questions when the answer is already "no".
-  const handleSelect = (code) => {
-    const c = EC_COUNTRIES.find((x) => x.code === code);
-    onChange(code);
-    if (c?.risk === "blocked") onBlocked();
-    else onNext();
-  };
+  // Picked country object — drives Continue button's routing decision
+  // (blocked jurisdictions short-circuit to EcResultBlocked, the same
+  // path EcIndustry uses for blocked industries).
+  const picked = EC_COUNTRIES.find((x) => x.code === value);
+  const isBlocked = picked?.risk === "blocked";
 
   return (
     <div className="ec-content fade-in">
@@ -773,10 +764,22 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
       <EcCountrySelect
         label={t("ec.q2.input.label")}
         value={value}
-        onChange={handleSelect}
+        onChange={onChange}
         options={options}
         nameOf={nameOf}
       />
+
+      <div className="ob-actions">
+        <Button
+          variant="primary"
+          size="xl"
+          onClick={isBlocked ? onBlocked : onNext}
+          iconRight="arrowRight"
+          disabled={!value}
+        >
+          {t("common.continue")}
+        </Button>
+      </div>
     </div>
   );
 }
