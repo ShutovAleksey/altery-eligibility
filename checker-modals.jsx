@@ -389,19 +389,19 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
     if (!isValid) return;
     setSubmitting(true);
     setSubmitError(null);
+    // Register the lead in HubSpot FIRST and independently of the PDF send.
+    // Round-robin rotation routes it to the next available salesperson.
+    // Decoupled on purpose: PDF delivery can fail (provider hiccup, large
+    // attachment, function timeout) and that must not cost us the lead —
+    // gating this behind the email await previously swallowed every lead
+    // whenever the send threw. Fire-and-forget; errors are logged inside.
+    ecSubmitHubspotLead({ email: email.trim(), rec }).catch(() => {});
     try {
       // Real email delivery: build the PDF locally, POST to
-      // /api/send-analysis, which uses Resend to ship a
-      // transactional email to the address the user entered.
-      // The PDF is attached; a brief HTML body provides the
-      // inbox greeting + setup CTA. See api/send-analysis.js
+      // /api/send-analysis, which ships a transactional email (PDF
+      // attached) to the address the user entered. See api/send-analysis.js
       // for server-side details (env vars, sender domain).
       await ecSendAnalysisEmail({ rec, email, t });
-      // Register the lead in HubSpot so round-robin rotation assigns it to
-      // the next available salesperson. Fire-and-forget — the PDF is the
-      // user's primary outcome and already succeeded; a HubSpot hiccup
-      // must not surface as a send failure.
-      ecSubmitHubspotLead({ email: email.trim(), rec }).catch(() => {});
       setStage("sent");
     } catch (err) {
       console.error("[EcHandoffModal] email send failed:", err);
