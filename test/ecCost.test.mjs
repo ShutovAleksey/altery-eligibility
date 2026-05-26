@@ -23,29 +23,58 @@ function rec(overrides = {}) {
 }
 
 // ────────────────────────────────────────────────────────────────
-// ecBaselineFor — entity → comparator-bank lookup
+// ecBaselineFor — entity → synthetic baseline composed from the
+// region's bank PANEL (median of fees, all source URLs combined).
+// `id` preserves the legacy lead-bank id for back-compat; `name`
+// is the generic "Typical X business bank" label; `panelMembers`
+// enumerates the banks that fed the median.
 // ────────────────────────────────────────────────────────────────
-test("UK entity → Barclays Business baseline", () => {
+test("UK entity → UK panel baseline (Barclays among panel members)", () => {
   const b = w.ecBaselineFor("uk");
   assert.equal(b.id, "uk_traditional");
-  assert.equal(b.name, "Barclays Business");
+  assert.match(b.name, /typical uk business bank/i);
+  assert.ok(b.panelMembers.includes("Barclays Business"));
+  assert.ok(b.panelMembers.length >= 3, "UK panel should be at least 3 banks");
 });
-test("EU entity → BNP Paribas Business baseline", () => {
+test("EU entity → EU panel baseline (BNP among panel members)", () => {
   const b = w.ecBaselineFor("eu");
   assert.equal(b.id, "eu_traditional");
-  assert.equal(b.name, "BNP Paribas Business");
+  assert.match(b.name, /typical eu business bank/i);
+  assert.ok(b.panelMembers.includes("BNP Paribas Business"));
+  assert.ok(b.panelMembers.length >= 3, "EU panel should be at least 3 banks");
 });
-test("MENA entity → Mashreq Business baseline", () => {
+test("MENA entity → MENA panel baseline (Mashreq among panel members)", () => {
   const b = w.ecBaselineFor("mena");
   assert.equal(b.id, "mena_traditional");
+  assert.ok(b.panelMembers.includes("Mashreq Business"));
 });
-test("ROW entity → UK fallback (Barclays)", () => {
+test("ROW entity → UK panel fallback", () => {
   const b = w.ecBaselineFor("row");
   assert.equal(b.id, "uk_traditional");
+  assert.match(b.name, /typical uk business bank/i);
 });
-test("Unknown entity id → safe UK fallback", () => {
+test("Unknown entity id → safe UK panel fallback", () => {
   const b = w.ecBaselineFor("does-not-exist");
   assert.equal(b.id, "uk_traditional");
+});
+
+test("Baseline fees are the MEDIAN of the panel's per-bank fees", () => {
+  const b = w.ecBaselineFor("uk");
+  const cmp = w.EC_COMPARATORS;
+  const panel = Object.values(cmp).filter((c) => c.type === "traditional" && c.panel === "uk");
+  // subscription median check
+  const subs = panel.map((m) => m.fees.subscriptionGbp).sort((a, x) => a - x);
+  const mid = Math.floor(subs.length / 2);
+  const expected = subs.length % 2 ? subs[mid] : (subs[mid - 1] + subs[mid]) / 2;
+  assert.equal(b.fees.subscriptionGbp, expected);
+});
+
+test("Baseline sources is the union of every panel member's URLs", () => {
+  const b = w.ecBaselineFor("uk");
+  const cmp = w.EC_COMPARATORS;
+  const panel = Object.values(cmp).filter((c) => c.type === "traditional" && c.panel === "uk");
+  const totalSourceCount = panel.reduce((n, m) => n + (m.sources?.length || 0), 0);
+  assert.equal(b.sources.length, totalSourceCount);
 });
 
 // ────────────────────────────────────────────────────────────────
@@ -107,25 +136,28 @@ test("Savings range is ±15% of midpoint", () => {
   assert.equal(c.savings.annualHigh, Math.round(c.savings.annual * 1.15 / 100) * 100);
 });
 
-test("Methodology block exposes baseline + sources + asof", () => {
+test("Methodology block exposes baseline + sources + asof + panel", () => {
   const c = w.ecComputeCostBreakdown(rec({ countryCode: "GB" }));
-  assert.equal(c.methodology.baseline, "Barclays Business");
+  assert.match(c.methodology.baseline, /typical uk business bank/i);
   assert.ok(Array.isArray(c.methodology.baselineSources));
-  assert.ok(c.methodology.baselineSources.length > 0);
+  assert.ok(c.methodology.baselineSources.length > 1, "panel = multi-bank sources");
+  assert.ok(Array.isArray(c.methodology.baselinePanel));
+  assert.ok(c.methodology.baselinePanel.length >= 3, "UK panel ≥ 3 banks");
   assert.match(c.methodology.asof, /^\d{4}-\d{2}-\d{2}$/);
   assert.ok(Array.isArray(c.methodology.assumptions));
   assert.ok(c.methodology.assumptions.length >= 3);
 });
 
-test("EU-incorporated business compared against BNP Paribas, not Barclays", () => {
+test("EU-incorporated business compared against EU panel (BNP among members)", () => {
   const c = w.ecComputeCostBreakdown(rec({ countryCode: "DE" }));
-  assert.equal(c.methodology.baseline, "BNP Paribas Business");
+  assert.match(c.methodology.baseline, /typical eu business bank/i);
+  assert.ok(c.methodology.baselinePanel.includes("BNP Paribas Business"));
   assert.equal(c.meta.baseline, "eu_traditional");
 });
 
-test("MENA-incorporated business compared against Mashreq", () => {
+test("MENA-incorporated business compared against MENA panel (Mashreq among members)", () => {
   const c = w.ecComputeCostBreakdown(rec({ countryCode: "AE" }));
-  assert.equal(c.methodology.baseline, "Mashreq Business");
+  assert.ok(c.methodology.baselinePanel.includes("Mashreq Business"));
   assert.equal(c.meta.baseline, "mena_traditional");
 });
 
@@ -158,4 +190,69 @@ test("Altery SWIFT and local line items are GBP-denominated positive numbers", (
   assert.ok(c.altery.swift > 0, "swift cost should be positive");
   assert.ok(c.altery.local > 0, "local cost should be positive");
   assert.ok(c.altery.fx    > 0, "fx cost should be positive");
+});
+
+// ────────────────────────────────────────────────────────────────
+// Calibration helpers (B, C, D) — FX% from corridors, avg-tx from
+// industry, local/SWIFT split from home-region overlap.
+// ────────────────────────────────────────────────────────────────
+test("(B) Home-only corridors → low FX share (≤10%)", () => {
+  // UK entity + corridors only "uk-eea" (the home region) → ~5%
+  const c = w.ecComputeCostBreakdown(rec({
+    countryCode: "GB",
+    monthlyVolume: 750000,
+    corridorsIn:  ["uk-eea"],
+    corridorsOut: ["uk-eea"],
+  }));
+  assert.ok(c.meta.fxVolumePct <= 10, `home-only should be ≤10%, got ${c.meta.fxVolumePct}`);
+});
+test("(B) Multi-region corridors → high FX share (≥50%)", () => {
+  const c = w.ecComputeCostBreakdown(rec({
+    countryCode: "GB",
+    monthlyVolume: 750000,
+    corridorsIn:  ["uk-eea", "north-america", "apac"],
+    corridorsOut: ["uk-eea", "north-america", "apac"],
+  }));
+  assert.ok(c.meta.fxVolumePct >= 50, `multi-region should be ≥50%, got ${c.meta.fxVolumePct}`);
+});
+
+test("(C) tx count is driven by industry avg-tx-size", () => {
+  // SaaS = small tx (£500 avg). Marketplace = larger (£5000 avg). For
+  // the same monthly volume, SaaS produces ~10× the tx count of
+  // marketplace → much higher SWIFT cost on the bank baseline.
+  const saas = w.ecComputeCostBreakdown(rec({ industry: "saas",        monthlyVolume: 500000 }));
+  const mkt  = w.ecComputeCostBreakdown(rec({ industry: "marketplace", monthlyVolume: 500000 }));
+  assert.ok(saas.meta.txCount > mkt.meta.txCount * 3,
+           `SaaS tx count (${saas.meta.txCount}) should be >>3× marketplace (${mkt.meta.txCount})`);
+});
+
+test("(D) UK entity + UK corridors → mostly local payments (≥80%)", () => {
+  const c = w.ecComputeCostBreakdown(rec({
+    countryCode: "GB",
+    corridorsIn:  ["uk-eea"],
+    corridorsOut: ["uk-eea"],
+  }));
+  assert.ok(c.meta.localPct >= 80, `UK→UK should be ≥80% local, got ${c.meta.localPct}`);
+});
+test("(D) Cross-region heavy → mostly SWIFT (≥40%)", () => {
+  const c = w.ecComputeCostBreakdown(rec({
+    countryCode: "GB",
+    corridorsIn:  ["north-america", "apac", "latin-america"],
+    corridorsOut: ["north-america", "apac", "latin-america"],
+  }));
+  assert.ok(c.meta.swiftPct >= 40, `cross-region should be ≥40% SWIFT, got ${c.meta.swiftPct}`);
+});
+
+test("Calibration drives MORE savings for global vs home-only at same volume", () => {
+  const home = w.ecComputeCostBreakdown(rec({
+    countryCode: "GB", monthlyVolume: 1000000,
+    corridorsIn: ["uk-eea"], corridorsOut: ["uk-eea"],
+  }));
+  const global = w.ecComputeCostBreakdown(rec({
+    countryCode: "GB", monthlyVolume: 1000000,
+    corridorsIn:  ["uk-eea", "north-america", "apac", "latin-america"],
+    corridorsOut: ["uk-eea", "north-america", "apac", "latin-america"],
+  }));
+  assert.ok(global.savings.monthly > home.savings.monthly,
+           `global FX exposure should produce more savings than home-only`);
 });

@@ -248,19 +248,60 @@ function ecParseFee(raw) {
   };
 }
 
-// Pick the named traditional-bank baseline for an entity. Returns the
-// EC_COMPARATORS entry whose forEntities list includes the entity id,
-// or falls back to UK (Barclays) if no match (rare — guards against
-// unknown entity ids without throwing).
+// Compose a baseline object from the regional bank PANEL — median of
+// every fee field across all peer banks. More defensible than a single
+// cherry-picked bank: each cell is the median of N citation-backed
+// values, every panel member's source URL listed in `sources`. The
+// resulting `name` reads as a generic "Typical UK business bank" so
+// ad copy / methodology stays accurate regardless of which exact bank
+// the prospect happens to use.
+//
+// Entity → panel map: uk + row → uk panel; eu → eu panel; mena → mena.
+// Returns a synthetic object that quacks like the old single-bank
+// shape (same `fees` keys, same `qualitative`, `id` preserved for
+// downstream consumers that depended on it).
 function ecBaselineFor(entityId) {
   const cmp = window.EC_COMPARATORS || {};
-  for (const k of Object.keys(cmp)) {
-    const c = cmp[k];
-    if (c.type === "traditional" && Array.isArray(c.forEntities) && c.forEntities.includes(entityId)) {
-      return c;
-    }
+  const panel = (entityId === "eu") ? "eu"
+              : (entityId === "mena") ? "mena"
+              : "uk";  // uk + row + unknown → UK panel
+  const members = Object.values(cmp).filter(
+    (c) => c.type === "traditional" && c.panel === panel
+  );
+  if (members.length === 0) return cmp.uk_traditional;
+  if (members.length === 1) return members[0];
+
+  // Median across each fee field. Lead member's qualitative carries
+  // over since panel members share the same qualitative shape (slow
+  // onboarding, no crypto, etc.) — see EC_COMPARATORS.
+  const lead = members.find((m) => Array.isArray(m.forEntities)) || members[0];
+  const feeKeys = Object.keys(lead.fees || {});
+  const median = (xs) => {
+    const sorted = [...xs].sort((a, b) => a - b);
+    const mid = Math.floor(sorted.length / 2);
+    return sorted.length % 2
+      ? sorted[mid]
+      : (sorted[mid - 1] + sorted[mid]) / 2;
+  };
+  const mediaFees = {};
+  for (const key of feeKeys) {
+    const vals = members.map((m) => m.fees?.[key]).filter((v) => typeof v === "number");
+    if (vals.length > 0) mediaFees[key] = median(vals);
   }
-  return cmp.uk_traditional;
+
+  return {
+    id:           lead.id,
+    name:         { uk: "Typical UK business bank",
+                    eu: "Typical EU business bank",
+                    mena: "Typical MENA business bank" }[panel],
+    type:         "traditional",
+    panel,
+    panelMembers: members.map((m) => m.name),
+    asof:         lead.asof,
+    sources:      members.flatMap((m) => m.sources || []),
+    fees:         mediaFees,
+    qualitative:  lead.qualitative,
+  };
 }
 
 // FX rate constant for converting EUR-denominated Altery rail tariffs
@@ -307,15 +348,105 @@ function ecDisplayCurrencyFor(rec) {
   return primary?.currency || "GBP";
 }
 
+// ── Calibration helpers ────────────────────────────────────────────
+// The cost projection used to lean on three constants (60% FX share,
+// 60/40 local-SWIFT split, generic tx-count band). The user's Q2 and
+// Q5 answers carry enough signal to replace those constants with
+// derived values — same math, less hand-wave.
+
+// Home region per entity, used by the corridor-overlap math. Matches
+// EC_CHIP_REGION_ORDER ids from checker-data.js.
+const EC_HOME_REGION_OF = { uk: "uk-eea", eu: "uk-eea", mena: "middle-east" };
+
+// (B) FX share of monthly volume — driven by corridor breadth. A UK
+// business operating only in UK+EEA touches FX rarely (~5%); a global
+// business spans 4+ regions and routinely converts (~80%). Old code
+// used a flat 0.60 — accurate for the global case, badly overstated
+// for home-only businesses.
+function ecFxVolumeRatio(rec) {
+  const corridors = new Set([
+    ...(Array.isArray(rec?.corridorsIn) ? rec.corridorsIn : []),
+    ...(Array.isArray(rec?.corridorsOut) ? rec.corridorsOut : []),
+  ]);
+  const home = EC_HOME_REGION_OF[rec?.entity?.id] || "uk-eea";
+  // Anything that isn't the home region counts as foreign. ISO-code
+  // outliers (Set entries that don't match a region id) also count as
+  // foreign — each is one extra corridor of FX exposure.
+  let foreign = 0;
+  for (const code of corridors) if (code && code !== home) foreign += 1;
+  if (foreign === 0) return 0.05;
+  if (foreign === 1) return 0.30;
+  if (foreign === 2) return 0.50;
+  if (foreign === 3) return 0.65;
+  return 0.80;
+}
+
+// (C) Industry-derived average transaction size — converts monthly
+// volume into a realistic tx count. SaaS does many small recurring
+// charges; manufacturing does few large invoices. The same £750k/mo
+// volume produces 5× different SWIFT cost depending on which industry.
+// Values picked from typical archetype patterns; defaults at the
+// middle when the user hasn't picked an industry yet.
+const EC_INDUSTRY_AVG_TX_GBP = {
+  saas:        500,
+  apps:        1000,
+  games:       2000,
+  edtech:      3000,
+  marketplace: 5000,
+  ecom:        2500,
+  marketing:   8000,
+  freelance:   1200,
+  prof:        15000,
+  creator:     800,
+  affiliate:   1500,
+  vpn:         200,
+  crypto:      25000,
+  other:       2000,
+};
+function ecAvgTxGbp(rec) {
+  const ind = rec?.ind?.value;
+  return EC_INDUSTRY_AVG_TX_GBP[ind] || 2000;
+}
+function ecEstimateTxCountCalibrated(rec) {
+  const vol = rec?.monthlyVolume || 0;
+  const avg = ecAvgTxGbp(rec);
+  return Math.max(1, Math.round(vol / avg));
+}
+
+// (D) Local vs SWIFT split — home region dominates transaction VOLUME,
+// not just region COUNT. A UK SaaS that lists "UK+EEA" and "North
+// America" doesn't do half its transactions on SWIFT — it does most
+// in its home rails (subscriptions, payouts to home creators, etc.)
+// with NA as a smaller cross-border slice. Weight: home = ~95% at 0
+// foreign; each foreign region peels off ~20% (capped at 30% local).
+function ecLocalSwiftSplit(rec) {
+  const corridors = new Set([
+    ...(Array.isArray(rec?.corridorsIn) ? rec.corridorsIn : []),
+    ...(Array.isArray(rec?.corridorsOut) ? rec.corridorsOut : []),
+  ]);
+  if (corridors.size === 0) return { local: 0.90, swift: 0.10 };
+  const home = EC_HOME_REGION_OF[rec?.entity?.id] || "uk-eea";
+  const hasHome = corridors.has(home);
+  const foreignCount = [...corridors].filter((c) => c && c !== home).length;
+  if (!hasHome) {
+    // Cross-region-only flow — almost everything is SWIFT.
+    return { local: 0.10, swift: 0.90 };
+  }
+  // Home present + N foreign regions:
+  //   0 → 95/5, 1 → 75/25, 2 → 55/45, 3 → 35/65, 4+ → 30/70
+  const localPct = Math.max(0.30, 0.95 - 0.20 * foreignCount);
+  return { local: localPct, swift: 1 - localPct };
+}
+
 function ecComputeCostBreakdown(rec) {
   const vol = rec?.monthlyVolume || 0;
   if (vol < 1000) return null;  // not enough to project credibly
 
-  // Volume is treated as GBP throughout this calc — band midpoints in
-  // EC_VOLUME_BANDS are the user's declared monthly throughput (in £
-  // since the page anchor currency is £). 60% assumed FX-touching —
-  // conservative for digital businesses with multi-currency clients.
-  const fxVolume = vol * 0.60;
+  // FX share now derived from Q5 corridor breadth (was flat 0.60).
+  // Volume itself is GBP throughout this calc — band midpoints in
+  // EC_VOLUME_BANDS are the user's declared monthly throughput (£).
+  const fxRatio = ecFxVolumeRatio(rec);
+  const fxVolume = vol * fxRatio;
 
   // Altery rails — read the active plan's published fees so the
   // projection moves with plan tier. Each plan exposes a fees object:
@@ -338,13 +469,18 @@ function ecComputeCostBreakdown(rec) {
   const baseline = ecBaselineFor(rec?.entity?.id || "uk");
   const BANK_FEES = baseline.fees;
 
-  const txCount  = ecEstimateTxCount(vol);
+  // tx count is now derived from industry avg tx size (was a generic
+  // volume-band lookup that ignored Q2). avg tx size kept on the return
+  // so downstream (PDF assumptions, methodology block) shows it.
+  const txCount  = ecEstimateTxCountCalibrated(rec);
   const avgTxVal = vol / Math.max(txCount, 1);
 
-  // Local payments — assume 60% of tx are local SEPA/FPS, 40%
-  // cross-border SWIFT. Tunes the math toward digital businesses
-  // doing mostly EU↔EU and UK↔UK with cross-border on top.
-  const localTxCount = Math.round(txCount * 0.6);
+  // Local / SWIFT split derived from corridor overlap with the home
+  // region (was a flat 60/40). UK-only business → 95/5; cross-region
+  // heavy → inverted. Matches actual flow shape rather than averaging
+  // across all users.
+  const split = ecLocalSwiftSplit(rec);
+  const localTxCount = Math.round(txCount * split.local);
   const swiftTxCount = txCount - localTxCount;
 
   // Plan subscription — taken straight from rec.plan.price.
@@ -391,15 +527,20 @@ function ecComputeCostBreakdown(rec) {
 
   // Methodology — exposed via the result-page <details> block so a
   // skeptical CFO can audit assumptions and check the bank's tariff
-  // page directly. asof = data-validity stamp.
+  // page directly. asof = data-validity stamp. All percentages reflect
+  // the user's actual answers now (Q2 industry → avgTx, Q5 corridors
+  // → fxRatio and local/SWIFT split) instead of hand-wave constants.
   const methodology = {
     baseline:        baseline.name,
     baselineSources: baseline.sources,
+    baselinePanel:   baseline.panelMembers || [baseline.name],
     asof:            baseline.asof,
     assumptions: [
-      { key: "ec.r.method.fxRatio",   vars: { pct: 60 } },
-      { key: "ec.r.method.txMix",     vars: { localPct: 60, swiftPct: 40 } },
-      { key: "ec.r.method.txCount",   vars: { n: txCount, swift: swiftTxCount, local: localTxCount } },
+      { key: "ec.r.method.fxRatio",   vars: { pct: Math.round(fxRatio * 100) } },
+      { key: "ec.r.method.txMix",     vars: { localPct: Math.round(split.local * 100),
+                                               swiftPct: Math.round(split.swift * 100) } },
+      { key: "ec.r.method.txCount",   vars: { n: txCount, swift: swiftTxCount, local: localTxCount,
+                                               avg: Math.round(avgTxVal) } },
       { key: "ec.r.method.alteryFx",  vars: { pct: (ALTERY_FX_MARKUP * 100).toFixed(2) } },
       { key: "ec.r.method.bankFx",    vars: { pct: (BANK_FEES.fxMarkupBps / 100).toFixed(2), bank: baseline.name } },
     ],
@@ -408,7 +549,15 @@ function ecComputeCostBreakdown(rec) {
   return {
     altery, bank,
     savings,
-    meta: { txCount, fxVolumePct: 60, fxVolume: Math.round(fxVolume), baseline: baseline.id },
+    meta: {
+      txCount, fxVolume: Math.round(fxVolume),
+      fxVolumePct: Math.round(fxRatio * 100),
+      localPct: Math.round(split.local * 100),
+      swiftPct: Math.round(split.swift * 100),
+      avgTxGbp: Math.round(avgTxVal),
+      baseline: baseline.id,
+      baselinePanel: baseline.panelMembers || [baseline.name],
+    },
     methodology,
   };
 }

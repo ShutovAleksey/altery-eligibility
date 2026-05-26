@@ -848,95 +848,162 @@ function maskTailDots(s, n = 4) {
 }
 
 const EC_COMPARATORS = {
-  // ── Traditional bank baselines (one per entity region) ──────────
+  // ── Traditional bank baselines (peer panels per entity region) ─────
+  // Each region has 3-4 peer banks. ecBaselineFor() composes a synthetic
+  // baseline from the panel by taking the median of each fee field —
+  // more defensible than a single picked-bank baseline and citation-
+  // backed by every panel member's pricing page. `panel: "uk|eu|mena"`
+  // is the membership tag; `forEntities` on the lead bank preserves the
+  // legacy single-bank lookup (test back-compat) but most consumers
+  // should use the synthetic baseline.
+  //
+  // Values are approximate as of 2026-05; reverify quarterly against
+  // each `sources[]` URL.
+
+  // ── UK panel (median for entity.id = "uk" / "row") ───────────────
   uk_traditional: {
     id: "uk_traditional",
     name: "Barclays Business",
     type: "traditional",
-    forEntities: ["uk", "row"],
+    panel: "uk",
+    forEntities: ["uk", "row"],   // lead — used for legacy back-compat
     asof: "2026-05-23",
-    sources: [
-      "https://www.barclays.co.uk/business-banking/accounts/pricing/",
-    ],
-    // Money — native GBP (Barclays publishes in £).
+    sources: ["https://www.barclays.co.uk/business-banking/accounts/pricing/"],
     fees: {
-      subscriptionGbp:    8.50,   // £8.50 monthly fee
-      localOutGbp:        0.35,   // £0.35 per electronic payment
-      sepaOutGbp:         20,     // £20 SEPA outgoing
-      swiftOutGbp:        25,     // £25 SWIFT outgoing
-      transferInGbp:      6,      // £6 incoming
-      fxMarkupBps:        275,    // 2.75% standard variable spread
-      cardMonthlyGbp:     3,      // £3 per card
-      cardFxMarkupBps:    275,
-      massBatchGbp:       25,     // £25 estimated per batch
+      subscriptionGbp: 8.50, localOutGbp: 0.35, sepaOutGbp: 20,
+      swiftOutGbp: 25, transferInGbp: 6, fxMarkupBps: 275,
+      cardMonthlyGbp: 3, cardFxMarkupBps: 275, massBatchGbp: 25,
     },
     qualitative: {
-      onboardingKey:   "ec.cmp.q.onboarding.weeks",
-      digitalNative:   false,
-      affiliate:       "caseByCase",
-      cryptoNative:    false,
-      multiEntity:     false,
-      docFriction:     "high",
+      onboardingKey: "ec.cmp.q.onboarding.weeks",
+      digitalNative: false, affiliate: "caseByCase",
+      cryptoNative: false, multiEntity: false, docFriction: "high",
     },
   },
+  uk_hsbc: {
+    id: "uk_hsbc", name: "HSBC Kinetic", type: "traditional", panel: "uk",
+    asof: "2026-05-23",
+    sources: ["https://www.business.hsbc.uk/en-gb/everyday-banking/charges/our-charges"],
+    fees: {
+      subscriptionGbp: 6.50, localOutGbp: 0.40, sepaOutGbp: 18,
+      swiftOutGbp: 24, transferInGbp: 5, fxMarkupBps: 250,
+      cardMonthlyGbp: 4, cardFxMarkupBps: 250, massBatchGbp: 22,
+    },
+  },
+  uk_lloyds: {
+    id: "uk_lloyds", name: "Lloyds Business", type: "traditional", panel: "uk",
+    asof: "2026-05-23",
+    sources: ["https://www.lloydsbank.com/business/business-banking-charges.html"],
+    fees: {
+      subscriptionGbp: 7.50, localOutGbp: 0.35, sepaOutGbp: 22,
+      swiftOutGbp: 25, transferInGbp: 7, fxMarkupBps: 275,
+      cardMonthlyGbp: 3, cardFxMarkupBps: 275, massBatchGbp: 25,
+    },
+  },
+  uk_natwest: {
+    id: "uk_natwest", name: "NatWest Business", type: "traditional", panel: "uk",
+    asof: "2026-05-23",
+    sources: ["https://www.natwest.com/business/banking/business-account-fees.html"],
+    fees: {
+      subscriptionGbp: 8.00, localOutGbp: 0.35, sepaOutGbp: 22,
+      swiftOutGbp: 22, transferInGbp: 6, fxMarkupBps: 260,
+      cardMonthlyGbp: 3, cardFxMarkupBps: 260, massBatchGbp: 24,
+    },
+  },
+
+  // ── EU panel (median for entity.id = "eu") ───────────────────────
+  // BNP, Société Générale, Crédit Agricole, Deutsche Bank.
+  // Native EUR → GBP via 1 EUR ≈ £0.85 (2026 mid).
   eu_traditional: {
-    id: "eu_traditional",
-    name: "BNP Paribas Business",
-    type: "traditional",
-    forEntities: ["eu"],
+    id: "eu_traditional", name: "BNP Paribas Business",
+    type: "traditional", panel: "eu",
+    forEntities: ["eu"],   // lead — legacy back-compat
     asof: "2026-05-23",
-    sources: [
-      "https://group.bnpparibas/uploads/file/business_tarif.pdf",
-    ],
-    // BNP native EUR — converted to GBP via 1 EUR ≈ £0.85 (2026 mid).
+    sources: ["https://group.bnpparibas/uploads/file/business_tarif.pdf"],
     fees: {
-      subscriptionGbp:    21,     // €25 → £21
-      localOutGbp:        0.43,   // €0.50 → £0.43
-      sepaOutGbp:         0.43,
-      swiftOutGbp:        21,     // €25 flat
-      transferInGbp:      0,      // SEPA in free
-      fxMarkupBps:        275,    // 2.75% average
-      cardMonthlyGbp:     7,      // €8 → £7
-      cardFxMarkupBps:    250,
-      massBatchGbp:       30,     // €35 → £30
+      subscriptionGbp: 21, localOutGbp: 0.43, sepaOutGbp: 0.43,
+      swiftOutGbp: 21, transferInGbp: 0, fxMarkupBps: 275,
+      cardMonthlyGbp: 7, cardFxMarkupBps: 250, massBatchGbp: 30,
     },
     qualitative: {
-      onboardingKey:   "ec.cmp.q.onboarding.weeks",
-      digitalNative:   false,
-      affiliate:       "no",
-      cryptoNative:    false,
-      multiEntity:     false,
-      docFriction:     "high",
+      onboardingKey: "ec.cmp.q.onboarding.weeks",
+      digitalNative: false, affiliate: "no",
+      cryptoNative: false, multiEntity: false, docFriction: "high",
     },
   },
-  mena_traditional: {
-    id: "mena_traditional",
-    name: "Mashreq Business",
-    type: "traditional",
-    forEntities: ["mena"],
+  eu_socgen: {
+    id: "eu_socgen", name: "Société Générale Business",
+    type: "traditional", panel: "eu",
     asof: "2026-05-23",
-    sources: [
-      "https://www.mashreqbank.com/uae/en/business/sme/business-banking",
-    ],
-    // Mashreq native AED — converted to GBP via 1 AED ≈ £0.21 (2026 mid).
+    sources: ["https://entreprises.societegenerale.fr/tarifs-bancaires"],
     fees: {
-      subscriptionGbp:    42,     // AED 200 → £42
-      localOutGbp:        1.05,   // AED 5 → £1.05
-      sepaOutGbp:         21,     // International ≈ AED 100 → £21
-      swiftOutGbp:        26,     // AED 125 → £26
-      transferInGbp:      4,      // AED 20 → £4
-      fxMarkupBps:        300,    // 3.00% — MENA traditional spread
-      cardMonthlyGbp:     11,     // AED 50 → £11
-      cardFxMarkupBps:    300,
-      massBatchGbp:       42,     // AED 200 → £42
+      subscriptionGbp: 18, localOutGbp: 0.50, sepaOutGbp: 0.50,
+      swiftOutGbp: 19, transferInGbp: 0, fxMarkupBps: 260,
+      cardMonthlyGbp: 7, cardFxMarkupBps: 260, massBatchGbp: 28,
+    },
+  },
+  eu_creditag: {
+    id: "eu_creditag", name: "Crédit Agricole Business",
+    type: "traditional", panel: "eu",
+    asof: "2026-05-23",
+    sources: ["https://www.credit-agricole.fr/professionnels/tarifs.html"],
+    fees: {
+      subscriptionGbp: 17, localOutGbp: 0.45, sepaOutGbp: 0.45,
+      swiftOutGbp: 18, transferInGbp: 0, fxMarkupBps: 250,
+      cardMonthlyGbp: 6, cardFxMarkupBps: 250, massBatchGbp: 25,
+    },
+  },
+  eu_deutsche: {
+    id: "eu_deutsche", name: "Deutsche Bank Business",
+    type: "traditional", panel: "eu",
+    asof: "2026-05-23",
+    sources: ["https://www.deutsche-bank.de/gk/preise-und-zinsen.html"],
+    fees: {
+      subscriptionGbp: 23, localOutGbp: 0.40, sepaOutGbp: 0.40,
+      swiftOutGbp: 22, transferInGbp: 0, fxMarkupBps: 280,
+      cardMonthlyGbp: 8, cardFxMarkupBps: 280, massBatchGbp: 32,
+    },
+  },
+
+  // ── MENA panel (median for entity.id = "mena") ───────────────────
+  // Mashreq, Emirates NBD, FAB. Native AED → GBP via 1 AED ≈ £0.21.
+  mena_traditional: {
+    id: "mena_traditional", name: "Mashreq Business",
+    type: "traditional", panel: "mena",
+    forEntities: ["mena"],   // lead — legacy back-compat
+    asof: "2026-05-23",
+    sources: ["https://www.mashreqbank.com/uae/en/business/sme/business-banking"],
+    fees: {
+      subscriptionGbp: 42, localOutGbp: 1.05, sepaOutGbp: 21,
+      swiftOutGbp: 26, transferInGbp: 4, fxMarkupBps: 300,
+      cardMonthlyGbp: 11, cardFxMarkupBps: 300, massBatchGbp: 42,
     },
     qualitative: {
-      onboardingKey:   "ec.cmp.q.onboarding.weeks",
-      digitalNative:   false,
-      affiliate:       "no",
-      cryptoNative:    false,
-      multiEntity:     false,
-      docFriction:     "high",
+      onboardingKey: "ec.cmp.q.onboarding.weeks",
+      digitalNative: false, affiliate: "no",
+      cryptoNative: false, multiEntity: false, docFriction: "high",
+    },
+  },
+  mena_enbd: {
+    id: "mena_enbd", name: "Emirates NBD Business",
+    type: "traditional", panel: "mena",
+    asof: "2026-05-23",
+    sources: ["https://www.emiratesnbd.com/en/business-banking/business-banking-services-and-charges"],
+    fees: {
+      subscriptionGbp: 37, localOutGbp: 0.85, sepaOutGbp: 19,
+      swiftOutGbp: 25, transferInGbp: 4, fxMarkupBps: 285,
+      cardMonthlyGbp: 10, cardFxMarkupBps: 285, massBatchGbp: 38,
+    },
+  },
+  mena_fab: {
+    id: "mena_fab", name: "First Abu Dhabi Bank (FAB) Business",
+    type: "traditional", panel: "mena",
+    asof: "2026-05-23",
+    sources: ["https://www.bankfab.com/en-ae/business/charges-rates"],
+    fees: {
+      subscriptionGbp: 32, localOutGbp: 1.00, sepaOutGbp: 20,
+      swiftOutGbp: 24, transferInGbp: 4, fxMarkupBps: 290,
+      cardMonthlyGbp: 9, cardFxMarkupBps: 290, massBatchGbp: 36,
     },
   },
   // ── Neobank / cross-border-fintech comparators ─────────────────
