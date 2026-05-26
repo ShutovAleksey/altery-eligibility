@@ -125,15 +125,68 @@ test("Savings is bank.total - altery.total, rounded to nearest £100", () => {
   assert.equal(c.savings.annual, rounded * 12);
 });
 
-test("Savings range is ±15% of midpoint", () => {
-  const c = w.ecComputeCostBreakdown(rec());
-  const expLow  = Math.round(c.savings.monthly * 0.85 / 100) * 100;
-  const expHigh = Math.round(c.savings.monthly * 1.15 / 100) * 100;
-  assert.equal(c.savings.monthlyLow,  expLow);
-  assert.equal(c.savings.monthlyHigh, expHigh);
-  // Annuals consistent with monthlies × 12
-  assert.equal(c.savings.annualLow,  Math.round(c.savings.annual * 0.85 / 100) * 100);
-  assert.equal(c.savings.annualHigh, Math.round(c.savings.annual * 1.15 / 100) * 100);
+test("Savings range respects adaptive confidence band", () => {
+  // All three drivers present (industry, corridors, volume) → high conf → ±10%.
+  const c = w.ecComputeCostBreakdown(rec({
+    corridorsIn: ["uk-eea"], corridorsOut: ["uk-eea"],
+  }));
+  assert.equal(c.savings.confidence, "high");
+  assert.equal(c.savings.confidenceBand, 0.10);
+  const lo = 1 - c.savings.confidenceBand;
+  const hi = 1 + c.savings.confidenceBand;
+  assert.equal(c.savings.monthlyLow,  Math.round(c.savings.monthly * lo / 100) * 100);
+  assert.equal(c.savings.monthlyHigh, Math.round(c.savings.monthly * hi / 100) * 100);
+  assert.equal(c.savings.annualLow,   Math.round(c.savings.annual  * lo / 100) * 100);
+  assert.equal(c.savings.annualHigh,  Math.round(c.savings.annual  * hi / 100) * 100);
+});
+
+test("Confidence drops to medium when corridors are empty", () => {
+  const c = w.ecComputeCostBreakdown(rec({ corridorsIn: [], corridorsOut: [] }));
+  assert.equal(c.savings.confidence, "medium");
+  assert.equal(c.savings.confidenceBand, 0.20);
+  assert.ok(c.savings.confidenceMissing.includes("corridors"));
+});
+
+test("Capability matrix returns three sections with bank name in bankWins header", () => {
+  const r = w.ecRecommend({
+    countryCode: "GB", industry: "saas", monthlyVolume: 500000,
+    corridorsIn: ["uk-eea"], corridorsOut: ["uk-eea"], services: [],
+  });
+  const cap = w.ecCapabilityMatrix(r);
+  assert.match(cap.bankName, /typical uk business bank/i);
+  assert.ok(cap.alteryWins.length >= 4, "wins ≥ 4 rows");
+  assert.ok(cap.comparable.length >= 2, "comparable ≥ 2 rows");
+  assert.ok(cap.bankWins.length   >= 3, "bankWins ≥ 3 rows — concession block");
+});
+
+test("Capability matrix: crypto row hidden for non-crypto biz", () => {
+  const r = w.ecRecommend({
+    countryCode: "GB", industry: "saas", monthlyVolume: 500000,
+    corridorsIn: [], corridorsOut: [], services: [],
+  });
+  const cap = w.ecCapabilityMatrix(r);
+  const hasCryptoRow = cap.alteryWins.some((x) => x.titleKey === "ec.cap.win.crypto");
+  assert.equal(hasCryptoRow, false);
+});
+
+test("Capability matrix: crypto row visible for crypto biz", () => {
+  const r = w.ecRecommend({
+    countryCode: "GB", industry: "crypto", monthlyVolume: 500000,
+    corridorsIn: [], corridorsOut: [], services: [],
+  });
+  const cap = w.ecCapabilityMatrix(r);
+  const hasCryptoRow = cap.alteryWins.some((x) => x.titleKey === "ec.cap.win.crypto");
+  assert.equal(hasCryptoRow, true);
+});
+
+test("Apples-to-apples: bank subscription scales with Altery plan tier", () => {
+  // Same volume, different plans → different bank subscription line.
+  const proRec = rec({ monthlyVolume: 200000 });          // → Pro
+  const ultraRec = rec({ monthlyVolume: 2000000 });       // → Ultra
+  const proCost   = w.ecComputeCostBreakdown(proRec);
+  const ultraCost = w.ecComputeCostBreakdown(ultraRec);
+  assert.ok(ultraCost.bank.subscription > proCost.bank.subscription * 2,
+           "Ultra-tier bank subscription should be materially higher than Pro-tier");
 });
 
 test("Methodology block exposes baseline + sources + asof + panel", () => {

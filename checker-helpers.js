@@ -413,6 +413,27 @@ function ecEstimateTxCountCalibrated(rec) {
   return Math.max(1, Math.round(vol / avg));
 }
 
+// Confidence in the savings projection — function of how many of the
+// three quality-driving inputs (industry, corridors, volume) the user
+// actually provided. High confidence = tight ±10% band; low confidence
+// widens to ±35% so the displayed range stays honest. Each downstream
+// surface (result page, methodology, PDF) reads `savings.confidence`
+// and `savings.confidenceBand` to label the projection accordingly.
+function ecConfidenceLevel(rec) {
+  const corridorsSize = (rec?.corridorsIn?.size ?? rec?.corridorsIn?.length ?? 0)
+                      + (rec?.corridorsOut?.size ?? rec?.corridorsOut?.length ?? 0);
+  const have = {
+    industry:  !!rec?.ind?.value,
+    corridors: corridorsSize > 0,
+    volume:    (rec?.monthlyVolume || 0) >= 1000,
+  };
+  const filled = Object.values(have).filter(Boolean).length;
+  const missing = Object.keys(have).filter((k) => !have[k]);
+  if (filled === 3) return { level: "high",   band: 0.10, missing };
+  if (filled === 2) return { level: "medium", band: 0.20, missing };
+  return                  { level: "low",    band: 0.35, missing };
+}
+
 // (D) Local vs SWIFT split — home region dominates transaction VOLUME,
 // not just region COUNT. A UK SaaS that lists "UK+EEA" and "North
 // America" doesn't do half its transactions on SWIFT — it does most
@@ -497,11 +518,24 @@ function ecComputeCostBreakdown(rec) {
   };
   altery.total = altery.subscription + altery.fx + altery.swift + altery.local;
 
+  // Apples-to-apples plan matching: pick the bank tier whose feature
+  // set is closest to the Altery plan we'd open for this user. Without
+  // this, the projection always compared Altery's mid/top plans
+  // (£100/£300) against the bank's CHEAPEST account (£8.50 base) —
+  // unfair, and bait for "you're comparing apples to oranges" pushback.
+  // Each panel bank now stores three tier prices; we pick the
+  // matching one. Falls back to base if a panel member is missing the
+  // new fields (defensive — keeps shape on incomplete data).
+  const planId = rec.plan?.id || "starter";
+  const bankSubscription =
+      (planId === "ultra" && BANK_FEES.subscriptionUltraGbp != null) ? BANK_FEES.subscriptionUltraGbp
+    : (planId === "pro"   && BANK_FEES.subscriptionProGbp   != null) ? BANK_FEES.subscriptionProGbp
+    : BANK_FEES.subscriptionGbp;
+
   // Baseline bank cost — same operational profile, GBP-denominated
-  // tariffs from EC_COMPARATORS (native for Barclays, converted from
-  // EUR for BNP, from AED for Mashreq).
+  // median tariffs from EC_COMPARATORS panel.
   const bank = {
-    subscription: BANK_FEES.subscriptionGbp,
+    subscription: bankSubscription,
     fx:           Math.round(fxVolume * (BANK_FEES.fxMarkupBps / 10000)),
     swift:        Math.round(swiftTxCount * BANK_FEES.swiftOutGbp),
     local:        Math.round(localTxCount * BANK_FEES.localOutGbp),
@@ -513,16 +547,23 @@ function ecComputeCostBreakdown(rec) {
   const monthly    = Math.round(rawMonthly / 100) * 100;
   const annual     = monthly * 12;
 
-  // ±15% confidence band — savings depend on actual cross-border mix
-  // and FX exposure, which we estimate from volume rather than measure.
-  // Showing the range is more honest than a snap point estimate.
+  // Adaptive confidence band — tighter when the user supplied a full
+  // set of inputs (industry + corridors + volume), wider when one or
+  // more are missing. Replaces the previous flat ±15% which lied in
+  // both directions: too narrow for low-input cases (false precision)
+  // and unnecessarily wide for high-input cases (sandbags the number).
+  const conf = ecConfidenceLevel(rec);
+  const lo = 1 - conf.band, hi = 1 + conf.band;
   const savings = {
     monthly,
     annual,
-    monthlyLow:  Math.round(monthly * 0.85 / 100) * 100,
-    monthlyHigh: Math.round(monthly * 1.15 / 100) * 100,
-    annualLow:   Math.round(annual  * 0.85 / 100) * 100,
-    annualHigh:  Math.round(annual  * 1.15 / 100) * 100,
+    monthlyLow:  Math.round(monthly * lo / 100) * 100,
+    monthlyHigh: Math.round(monthly * hi / 100) * 100,
+    annualLow:   Math.round(annual  * lo / 100) * 100,
+    annualHigh:  Math.round(annual  * hi / 100) * 100,
+    confidence:        conf.level,
+    confidenceBand:    conf.band,
+    confidenceMissing: conf.missing,
   };
 
   // Methodology — exposed via the result-page <details> block so a
@@ -559,6 +600,25 @@ function ecComputeCostBreakdown(rec) {
       baselinePanel: baseline.panelMembers || [baseline.name],
     },
     methodology,
+  };
+}
+
+// Build the three-section "where Altery wins / equal / bank wins"
+// capability matrix for the result page. Reads the static structure
+// from EC_CAPABILITY_MATRIX (data layer) and filters conditional rows
+// (e.g. crypto-rails only when rec.cryptoActive). Returns the synthetic
+// baseline.name so the bankWins-section header can read "Where Typical
+// UK business bank may still win" instead of a generic label.
+function ecCapabilityMatrix(rec) {
+  const m = window.EC_CAPABILITY_MATRIX || {};
+  const baseline = ecBaselineFor(rec?.entity?.id || "uk");
+  const filter = (rows) =>
+    (rows || []).filter((r) => !r.showIf || !!rec?.[r.showIf]);
+  return {
+    bankName:   baseline.name,
+    alteryWins: filter(m.alteryWins),
+    comparable: filter(m.comparable),
+    bankWins:   filter(m.bankWins),
   };
 }
 
@@ -890,7 +950,8 @@ function ecAppendUtmsToURL(url, utms) {
 Object.assign(window, {
   ecCurrencyFlag, ecCurrencyName, ecRecommend,
   ecEstimateTxCount, ecComputeCostBreakdown, ecOutcomesForSavings,
-  ecBaselineFor, ecQualitativeMatrix,
+  ecBaselineFor, ecQualitativeMatrix, ecCapabilityMatrix,
+  ecConfidenceLevel, ecFxVolumeRatio, ecLocalSwiftSplit, ecAvgTxGbp,
   ecVolumeHintKey, ecFormatVolume, ecEstimateSavings, ecGenProposalRef,
   ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
   ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,

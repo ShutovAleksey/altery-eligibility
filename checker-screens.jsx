@@ -1748,11 +1748,43 @@ function EcResultApproved({ rec, onBack, onReset }) {
             redundant reassurance that ate ~120px of vertical real estate
             without contributing to the conversion path. */}
 
-        {/* The qualitative comparison matrix used to render here. Moved
-            to the PDF (ecBuildAnalysisHTML): a six-column table reads
-            as page-density overload on the live result screen, but
-            lives well in the considered-evaluation context of a PDF
-            opened by a CFO who's set aside time to study it. */}
+        {/* ───── Capability matrix — Altery wins / equal / bank wins ─
+            Three-section honest read of where Altery is clearly better,
+            where we're comparable, and where a traditional bank may
+            still serve the user better. The bank-wins section is the
+            trust-driver: conceding 3-4 areas where the bank does
+            something we don't makes the entire page read as honest
+            comparison rather than marketing. Built via ecCapabilityMatrix
+            so the rows can be made conditional (crypto-rails only fires
+            when rec.cryptoActive). */}
+        {(() => {
+          const cap = ecCapabilityMatrix(rec);
+          const Block = ({ kind, head, rows }) => (
+            <div className={`ec-r__cap__col ec-r__cap__col--${kind}`}>
+              <h3 className="ec-r__cap__colHead">{head}</h3>
+              <ul className="ec-r__cap__list">
+                {rows.map((r, i) => (
+                  <li className="ec-r__cap__row" key={i}>
+                    <div className="ec-r__cap__rowTitle">{t(r.titleKey)}</div>
+                    <div className="ec-r__cap__rowDetail">{t(r.detailKey)}</div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+          return (
+            <section className="ec-r__cap">
+              <div className="ec-r__cardEyebrow">{t("ec.cap.eyebrow")}</div>
+              <h2 className="ec-r__cap__title">{t("ec.cap.title")}</h2>
+              <p className="ec-r__cap__lead">{t("ec.cap.lead")}</p>
+              <div className="ec-r__cap__grid">
+                <Block kind="wins"  head={t("ec.cap.section.wins")}       rows={cap.alteryWins} />
+                <Block kind="equal" head={t("ec.cap.section.comparable")} rows={cap.comparable} />
+                <Block kind="bank"  head={t("ec.cap.section.bankWins", { bank: cap.bankName })} rows={cap.bankWins} />
+              </div>
+            </section>
+          );
+        })()}
 
         {/* ───── Caveats (only if any) ──────────────────────────── */}
         {caveats.length > 0 && (

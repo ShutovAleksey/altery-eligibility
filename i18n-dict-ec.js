@@ -301,6 +301,44 @@
     "ec.plan.ultra.p4":   "FX markup up to 0.5%",
     "ec.plan.ultra.p5":   "Priority operations support",
 
+    // Capability matrix — wins / comparable / bank-wins.
+    // Three-section honest comparison on the result page. The
+    // bank-wins section is the trust-driver: conceding 3-4 areas
+    // where the bank does something we don't makes the rest of the
+    // page read as honest analysis, not marketing.
+    "ec.cap.eyebrow":              "Beyond cost",
+    "ec.cap.title":                "What changes when you move to Altery",
+    "ec.cap.lead":                 "Cost is one axis. Here's how Altery compares to a typical bank on the operational dimensions that matter day-to-day.",
+    "ec.cap.section.wins":         "Where Altery wins",
+    "ec.cap.section.comparable":   "Roughly equal",
+    "ec.cap.section.bankWins":     "Where {bank} may still serve you better",
+    "ec.cap.win.fx":               "FX rates",
+    "ec.cap.win.fx.detail":        "Markup up to 0.65% vs typical 2.75% — roughly 4× cheaper on every cross-border conversion.",
+    "ec.cap.win.swift":            "SWIFT outgoing",
+    "ec.cap.win.swift.detail":     "€10 + 0.25% with same-day SLA vs typical £25–40 flat with 2–3 day delivery.",
+    "ec.cap.win.onboarding":       "Onboarding speed",
+    "ec.cap.win.onboarding.detail":"1–2 days digital KYB vs 3–6 weeks at high-street banks.",
+    "ec.cap.win.transparency":     "Transparent pricing",
+    "ec.cap.win.transparency.detail":"Every fee published. No hidden FX spread, no surprise correspondent charges.",
+    "ec.cap.win.kybSpecialist":    "Digital-business KYB",
+    "ec.cap.win.kybSpecialist.detail":"Structured review by a team that understands SaaS, marketplaces, creator platforms and crypto-native operations.",
+    "ec.cap.win.crypto":           "Crypto-native rails",
+    "ec.cap.win.crypto.detail":    "We onboard crypto exchanges and OTC desks regularly via our specialist lane. Most banks decline.",
+    "ec.cap.equal.localPay":       "Local payments",
+    "ec.cap.equal.localPay.detail":"Faster Payments / SEPA / FedWire — both work fine for standard local rails.",
+    "ec.cap.equal.cards":          "Business cards",
+    "ec.cap.equal.cards.detail":   "Physical and virtual cards issued in 2–5 days from either side.",
+    "ec.cap.equal.multiUser":      "Multi-user permissions",
+    "ec.cap.equal.multiUser.detail":"Role-based access and approval workflows are standard on both at scale.",
+    "ec.cap.bank.cash":            "Cash deposits",
+    "ec.cap.bank.cash.detail":     "We're online-only. If you handle physical cash regularly, a branch network beats us.",
+    "ec.cap.bank.credit":          "Large revolving credit",
+    "ec.cap.bank.credit.detail":   "£5M+ credit facilities still require a long-standing bank relationship — not our product.",
+    "ec.cap.bank.assetFin":        "Specialised lending",
+    "ec.cap.bank.assetFin.detail": "Asset finance, invoice discounting and trade finance remain bank strengths.",
+    "ec.cap.bank.branches":        "Branch access",
+    "ec.cap.bank.branches.detail": "For cash-heavy or paperwork-heavy operations, physical branches still help.",
+
     // Caveats
     "ec.cav.crypto.tag": "Crypto-fluent",
     "ec.cav.crypto.text": "Crypto-native KYB is handled by our specialist team, not the generalist queue. Synterra Connect — our partner-network for direct exchange settlement — routes funds in and out of regulated venues; fiat in/out via SEPA, Faster Payments and SWIFT.",

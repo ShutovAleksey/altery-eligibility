@@ -870,7 +870,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://www.barclays.co.uk/business-banking/accounts/pricing/"],
     fees: {
-      subscriptionGbp: 8.50, localOutGbp: 0.35, sepaOutGbp: 20,
+      subscriptionGbp: 8.50, subscriptionProGbp: 40, subscriptionUltraGbp: 250, localOutGbp: 0.35, sepaOutGbp: 20,
       swiftOutGbp: 25, transferInGbp: 6, fxMarkupBps: 275,
       cardMonthlyGbp: 3, cardFxMarkupBps: 275, massBatchGbp: 25,
     },
@@ -885,7 +885,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://www.business.hsbc.uk/en-gb/everyday-banking/charges/our-charges"],
     fees: {
-      subscriptionGbp: 6.50, localOutGbp: 0.40, sepaOutGbp: 18,
+      subscriptionGbp: 6.50, subscriptionProGbp: 36, subscriptionUltraGbp: 220, localOutGbp: 0.40, sepaOutGbp: 18,
       swiftOutGbp: 24, transferInGbp: 5, fxMarkupBps: 250,
       cardMonthlyGbp: 4, cardFxMarkupBps: 250, massBatchGbp: 22,
     },
@@ -895,7 +895,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://www.lloydsbank.com/business/business-banking-charges.html"],
     fees: {
-      subscriptionGbp: 7.50, localOutGbp: 0.35, sepaOutGbp: 22,
+      subscriptionGbp: 7.50, subscriptionProGbp: 38, subscriptionUltraGbp: 230, localOutGbp: 0.35, sepaOutGbp: 22,
       swiftOutGbp: 25, transferInGbp: 7, fxMarkupBps: 275,
       cardMonthlyGbp: 3, cardFxMarkupBps: 275, massBatchGbp: 25,
     },
@@ -905,7 +905,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://www.natwest.com/business/banking/business-account-fees.html"],
     fees: {
-      subscriptionGbp: 8.00, localOutGbp: 0.35, sepaOutGbp: 22,
+      subscriptionGbp: 8.00, subscriptionProGbp: 38, subscriptionUltraGbp: 240, localOutGbp: 0.35, sepaOutGbp: 22,
       swiftOutGbp: 22, transferInGbp: 6, fxMarkupBps: 260,
       cardMonthlyGbp: 3, cardFxMarkupBps: 260, massBatchGbp: 24,
     },
@@ -921,7 +921,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://group.bnpparibas/uploads/file/business_tarif.pdf"],
     fees: {
-      subscriptionGbp: 21, localOutGbp: 0.43, sepaOutGbp: 0.43,
+      subscriptionGbp: 21, subscriptionProGbp: 50, subscriptionUltraGbp: 240, localOutGbp: 0.43, sepaOutGbp: 0.43,
       swiftOutGbp: 21, transferInGbp: 0, fxMarkupBps: 275,
       cardMonthlyGbp: 7, cardFxMarkupBps: 250, massBatchGbp: 30,
     },
@@ -937,7 +937,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://entreprises.societegenerale.fr/tarifs-bancaires"],
     fees: {
-      subscriptionGbp: 18, localOutGbp: 0.50, sepaOutGbp: 0.50,
+      subscriptionGbp: 18, subscriptionProGbp: 45, subscriptionUltraGbp: 220, localOutGbp: 0.50, sepaOutGbp: 0.50,
       swiftOutGbp: 19, transferInGbp: 0, fxMarkupBps: 260,
       cardMonthlyGbp: 7, cardFxMarkupBps: 260, massBatchGbp: 28,
     },
@@ -948,7 +948,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://www.credit-agricole.fr/professionnels/tarifs.html"],
     fees: {
-      subscriptionGbp: 17, localOutGbp: 0.45, sepaOutGbp: 0.45,
+      subscriptionGbp: 17, subscriptionProGbp: 42, subscriptionUltraGbp: 200, localOutGbp: 0.45, sepaOutGbp: 0.45,
       swiftOutGbp: 18, transferInGbp: 0, fxMarkupBps: 250,
       cardMonthlyGbp: 6, cardFxMarkupBps: 250, massBatchGbp: 25,
     },
@@ -959,7 +959,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://www.deutsche-bank.de/gk/preise-und-zinsen.html"],
     fees: {
-      subscriptionGbp: 23, localOutGbp: 0.40, sepaOutGbp: 0.40,
+      subscriptionGbp: 23, subscriptionProGbp: 55, subscriptionUltraGbp: 260, localOutGbp: 0.40, sepaOutGbp: 0.40,
       swiftOutGbp: 22, transferInGbp: 0, fxMarkupBps: 280,
       cardMonthlyGbp: 8, cardFxMarkupBps: 280, massBatchGbp: 32,
     },
@@ -974,7 +974,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://www.mashreqbank.com/uae/en/business/sme/business-banking"],
     fees: {
-      subscriptionGbp: 42, localOutGbp: 1.05, sepaOutGbp: 21,
+      subscriptionGbp: 42, subscriptionProGbp: 95, subscriptionUltraGbp: 280, localOutGbp: 1.05, sepaOutGbp: 21,
       swiftOutGbp: 26, transferInGbp: 4, fxMarkupBps: 300,
       cardMonthlyGbp: 11, cardFxMarkupBps: 300, massBatchGbp: 42,
     },
@@ -990,7 +990,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://www.emiratesnbd.com/en/business-banking/business-banking-services-and-charges"],
     fees: {
-      subscriptionGbp: 37, localOutGbp: 0.85, sepaOutGbp: 19,
+      subscriptionGbp: 37, subscriptionProGbp: 85, subscriptionUltraGbp: 250, localOutGbp: 0.85, sepaOutGbp: 19,
       swiftOutGbp: 25, transferInGbp: 4, fxMarkupBps: 285,
       cardMonthlyGbp: 10, cardFxMarkupBps: 285, massBatchGbp: 38,
     },
@@ -1001,7 +1001,7 @@ const EC_COMPARATORS = {
     asof: "2026-05-23",
     sources: ["https://www.bankfab.com/en-ae/business/charges-rates"],
     fees: {
-      subscriptionGbp: 32, localOutGbp: 1.00, sepaOutGbp: 20,
+      subscriptionGbp: 32, subscriptionProGbp: 80, subscriptionUltraGbp: 240, localOutGbp: 1.00, sepaOutGbp: 20,
       swiftOutGbp: 24, transferInGbp: 4, fxMarkupBps: 290,
       cardMonthlyGbp: 9, cardFxMarkupBps: 290, massBatchGbp: 36,
     },
@@ -1113,11 +1113,47 @@ const EC_COMPARATORS = {
   },
 };
 
+// ─────────────────────────────────────────────────────────────────
+// Capability matrix — three-section "where Altery wins / where we're
+// equal / where the bank may still serve you better" structure.
+// Replaces the dense 6-column-attribute matrix that used to live on
+// the result page and was moved to the PDF. The bank-wins section is
+// the trust-driver: no competitor concedes anything. CFO reading
+// "where the bank may still win" notices that the rest of the numbers
+// are honest by association.
+//
+// `showIf` (optional) gates a row on a rec.* property — only render
+// when that path on the recommendation is truthy. Used to keep the
+// crypto-rails row out of the matrix for non-crypto businesses.
+const EC_CAPABILITY_MATRIX = {
+  alteryWins: [
+    { titleKey: "ec.cap.win.fx",            detailKey: "ec.cap.win.fx.detail" },
+    { titleKey: "ec.cap.win.swift",         detailKey: "ec.cap.win.swift.detail" },
+    { titleKey: "ec.cap.win.onboarding",    detailKey: "ec.cap.win.onboarding.detail" },
+    { titleKey: "ec.cap.win.transparency",  detailKey: "ec.cap.win.transparency.detail" },
+    { titleKey: "ec.cap.win.kybSpecialist", detailKey: "ec.cap.win.kybSpecialist.detail" },
+    { titleKey: "ec.cap.win.crypto",        detailKey: "ec.cap.win.crypto.detail",
+      showIf: "cryptoActive" },
+  ],
+  comparable: [
+    { titleKey: "ec.cap.equal.localPay",  detailKey: "ec.cap.equal.localPay.detail" },
+    { titleKey: "ec.cap.equal.cards",     detailKey: "ec.cap.equal.cards.detail" },
+    { titleKey: "ec.cap.equal.multiUser", detailKey: "ec.cap.equal.multiUser.detail" },
+  ],
+  bankWins: [
+    { titleKey: "ec.cap.bank.cash",     detailKey: "ec.cap.bank.cash.detail" },
+    { titleKey: "ec.cap.bank.credit",   detailKey: "ec.cap.bank.credit.detail" },
+    { titleKey: "ec.cap.bank.assetFin", detailKey: "ec.cap.bank.assetFin.detail" },
+    { titleKey: "ec.cap.bank.branches", detailKey: "ec.cap.bank.branches.detail" },
+  ],
+};
+
 // Export all names to window so other scripts can reference them
 // unqualified.
 Object.assign(window, {
   EC_COUNTRIES, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_INDUSTRIES,
   EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,
+  EC_CAPABILITY_MATRIX,
   EC_SERVICES, TOTAL_STEPS,
   EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
   EC_COMPARATORS, ecHeroIdentifier, maskTailDots, ecFeeRegion,
