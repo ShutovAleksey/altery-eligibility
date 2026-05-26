@@ -892,7 +892,7 @@ const Modal = ({ open, onClose, title, children, footer, width = 480, style, "ar
             <IconButton icon="close" onClick={onClose} size="sm" title="Close dialog" />
           </div>
         }
-        <div style={{ padding: "0 20px 20px", overflow: "auto", flex: 1 }}>{children}</div>
+        <div style={{ padding: "0 20px 20px", overflow: "auto", flex: 1, overscrollBehavior: "contain" }}>{children}</div>
         {footer &&
         <div style={{ padding: "16px 20px", borderTop: "1px solid var(--c-border-soft)", display: "flex", gap: "var(--s-2)", justifyContent: "flex-end" }}>
             {footer}
@@ -1039,6 +1039,12 @@ const Select = ({ label, value, onChange, options, placeholder, error, disabled,
           position: "absolute", top: panelTop, left: 0, right: 0, zIndex: 40,
           background: "var(--c-surface)", borderRadius: "var(--r-md)", border: "1px solid var(--c-border-soft)",
           boxShadow: "var(--sh-3)", padding: 4, maxHeight: 300, overflow: "auto",
+          // Prevents macOS rubber-band bounce from chaining the scroll
+          // up to the page body — without `contain`, hitting the end of
+          // the list with a trackpad flick scrolls the page underneath
+          // the open dropdown, leaving a visible gap where the dropdown
+          // was positioned a moment ago.
+          overscrollBehavior: "contain",
           margin: 0, listStyle: "none"
         }}>
           {options.map((o, i) => {
