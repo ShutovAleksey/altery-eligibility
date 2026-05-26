@@ -960,6 +960,28 @@ const Select = ({ label, value, onChange, options, placeholder, error, disabled,
     return () => document.removeEventListener("mousedown", handler);
   }, [open]);
 
+  // Body scroll lock while the dropdown is open. `overscroll-behavior:
+  // contain` on the ul alone isn't enough on macOS: trackpad inertia
+  // past the end of the list still propagates through ancestor scroll
+  // contexts up to the document, body rubber-bands, the wrapper moves
+  // a few px and the absolute-positioned panel visually detaches from
+  // its trigger — leaving a strip where you can see content behind it.
+  // Same approach Modal uses (via backdrop). Compensates for scrollbar
+  // width so layout doesn't jump when overflow flips to hidden.
+  React.useEffect(() => {
+    if (!open) return;
+    const { body, documentElement } = document;
+    const scrollbarWidth = window.innerWidth - documentElement.clientWidth;
+    const prevOverflow = body.style.overflow;
+    const prevPaddingRight = body.style.paddingRight;
+    body.style.overflow = "hidden";
+    if (scrollbarWidth > 0) body.style.paddingRight = `${scrollbarWidth}px`;
+    return () => {
+      body.style.overflow = prevOverflow;
+      body.style.paddingRight = prevPaddingRight;
+    };
+  }, [open]);
+
   // Keep activeIdx scrolled into view
   React.useEffect(() => {
     if (!open || !listRef.current) return;
