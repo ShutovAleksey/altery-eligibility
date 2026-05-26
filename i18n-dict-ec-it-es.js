@@ -100,8 +100,8 @@
     "ec.q4.vol.4": "£1M – £5M",
     "ec.q4.vol.5": "£5M+",
 
-    "ec.q5.title": "Da dove arrivano e dove vanno i fondi?",
-    "ec.q5.lead": "Seleziona ogni regione con cui lavori — in entrata e in uscita. Ti abbineremo all'entità con la migliore copertura sui corridoi.",
+    "ec.q5.title": "Con quali regioni lavori?",
+    "ec.q5.lead": "Tocca ogni regione con cui operi — in entrata e in uscita insieme. Ti abbineremo all'entità con la migliore copertura dei corridoi.",
     "ec.q5.selected_count": "{n} selezionati",
     "ec.q5.placeholder": "Seleziona paesi",
     "ec.region.africa": "Africa",
@@ -384,6 +384,19 @@
     "ec.r.persona.affiliate.line": "Per reti affiliate che pagano su larga scala",
     "ec.r.persona.creator.line": "Per piattaforme creator che pagano su larga scala",
     "ec.r.persona.crypto.line": "Per operazioni crypto-native su binari licenziati",
+    "ec.q5.asymmetric.toggle": "Mix diverso tra entrata e uscita?",
+    "ec.q5.regions.aria": "Regioni con cui operi",
+    "ec.q5.regions.outAria": "Destinazioni in uscita",
+    "ec.q5.addCountry": "Aggiungi paese specifico",
+    "ec.q5.addCountry.placeholder": "Cerca e seleziona un paese",
+    "ec.q5.outliers.aria": "Paesi specifici oltre le regioni",
+    "ec.q5.outliers.remove": "Rimuovi {country}",
+    "ec.region.uk-eea": "Regno Unito + SEE",
+    "ec.region.middle-east": "Medio Oriente",
+    "ec.region.south-asia": "India e Asia meridionale",
+    "ec.region.apac": "Asia-Pacifico",
+    "ec.region.north-america": "Nord America",
+    "ec.region.latin-america": "America Latina",
 });
 
   // ─────────────────────────── ESPAÑOL (ES) ───────────────────────────
@@ -485,8 +498,8 @@
     "ec.q4.vol.4": "£1M – £5M",
     "ec.q4.vol.5": "£5M+",
 
-    "ec.q5.title": "Da dove arrivano e dove vanno i fondi?",
-    "ec.q5.lead": "Selecciona cada región con la que trabajas — entrante y saliente. Te asignaremos a la entidad con mejor cobertura de corredores.",
+    "ec.q5.title": "¿Con qué regiones trabajas?",
+    "ec.q5.lead": "Toca cada región con la que operas — entrada y salida juntas. Te emparejaremos con la entidad con la mejor cobertura de corredores.",
     "ec.q5.selected_count": "{n} seleccionados",
     "ec.q5.placeholder": "Selecciona países",
     "ec.region.africa": "África",
@@ -770,6 +783,19 @@
     "ec.r.persona.affiliate.line": "Para redes de afiliados que pagan a escala",
     "ec.r.persona.creator.line": "Para plataformas de creadores que pagan a escala",
     "ec.r.persona.crypto.line": "Para operaciones cripto-nativas con rieles licenciados",
+    "ec.q5.asymmetric.toggle": "¿Mezcla diferente para entrada vs salida?",
+    "ec.q5.regions.aria": "Regiones con las que operas",
+    "ec.q5.regions.outAria": "Destinos de salida",
+    "ec.q5.addCountry": "Agregar país específico",
+    "ec.q5.addCountry.placeholder": "Busca y selecciona un país",
+    "ec.q5.outliers.aria": "Países específicos además de las regiones",
+    "ec.q5.outliers.remove": "Quitar {country}",
+    "ec.region.uk-eea": "Reino Unido + EEE",
+    "ec.region.middle-east": "Medio Oriente",
+    "ec.region.south-asia": "India y Asia del Sur",
+    "ec.region.apac": "Asia-Pacífico",
+    "ec.region.north-america": "América del Norte",
+    "ec.region.latin-america": "América Latina",
 });
 
 })();

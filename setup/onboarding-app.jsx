@@ -216,11 +216,13 @@ function deriveChannelsFromChecker(checkerParams) {
   if (entity === "uk") channels.add("fps");
   if (entity === "eu") channels.add("sepa");
 
-  // Any corridor that isn't the user's own home region implies SWIFT.
-  // Codes like "GB" / "EU" / region tags like "APAC" / "AFRICA" appear
-  // in the checker corridors list.
-  const homeRegion = entity === "uk" ? "GB"
-                   : entity === "eu" ? "EU"
+  // Any corridor that isn't the user's home region implies SWIFT.
+  // Checker now ships region IDs from the 7-chip taxonomy (e.g.
+  // "uk-eea", "apac", "middle-east") plus optional ISO codes for
+  // outliers (e.g. "TR"). Each entity maps to one of those region IDs.
+  const homeRegion = entity === "uk"   ? "uk-eea"
+                   : entity === "eu"   ? "uk-eea"
+                   : entity === "mena" ? "middle-east"
                    : null;
   if (corridors.some((c) => c !== homeRegion)) channels.add("swift");
 

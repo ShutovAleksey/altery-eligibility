@@ -1,6 +1,7 @@
 /* global React, useT, Button, Tag, Alert, SelectableListItem, Input, Select,
           Icon, Flag, Title, Field, WhyWeAsk,
           EC_COUNTRIES, EC_INDUSTRIES, EC_SERVICES,
+          EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,
           EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
@@ -1200,9 +1201,156 @@ function EcCountryMultiSelect({ value, onChange, label, placeholder }) {
   );
 }
 
+// ── Region chip picker (Q5) ────────────────────────────────────────
+// Each chip is a region (UK+EEA / Middle East / South Asia / APAC /
+// North America / Latin America / Africa). Selection is a `Set<string>`
+// of region IDs and/or ISO-country codes — outlier countries (added via
+// "+ Add specific country") live in the same set so downstream logic
+// (ecRecommend's corridor-breadth signal) just counts entries.
+function EcRegionChips({ value, onChange, label, ariaLabel }) {
+  const t = useT();
+  const [adding, setAdding] = useState(false);
+
+  const toggleRegion = (regionId) => {
+    const next = new Set(value);
+    next.has(regionId) ? next.delete(regionId) : next.add(regionId);
+    onChange(next);
+  };
+  const addOutlier = (code) => {
+    const next = new Set(value);
+    next.add(code);
+    onChange(next);
+    setAdding(false);
+  };
+  const removeOutlier = (code) => {
+    const next = new Set(value);
+    next.delete(code);
+    onChange(next);
+  };
+
+  // Selected items split into regions vs individual outlier countries.
+  // Regions are keys of EC_CHIP_REGIONS; ISO codes are 2-letter strings
+  // that match an EC_COUNTRIES entry. Anything else is ignored.
+  const isRegionId = (id) => Object.prototype.hasOwnProperty.call(EC_CHIP_REGIONS, id);
+  const outliers = [...value].filter((id) => !isRegionId(id));
+
+  // Search-add countries: full EC_COUNTRIES list minus sanctioned and
+  // minus countries already covered by selected regions (no double-add).
+  const coveredByRegions = useMemo(() => {
+    const set = new Set();
+    for (const regionId of value) {
+      if (isRegionId(regionId)) {
+        for (const code of (EC_CHIP_REGIONS[regionId] || [])) set.add(code);
+      }
+    }
+    return set;
+  }, [value]);
+  const addOptions = useMemo(() => {
+    return EC_COUNTRIES
+      .filter((c) => c.risk !== "blocked")
+      .filter((c) => !coveredByRegions.has(c.code))
+      .filter((c) => !value.has(c.code));
+  }, [coveredByRegions, value]);
+
+  const nameOf = (c) => {
+    const localized = t("ec.country." + c.code);
+    return localized === c.code ? c.name : localized;
+  };
+
+  return (
+    <div className="ec-region-chips" role="group" aria-label={ariaLabel}>
+      {label && <div className="ec-region-chips__label">{label}</div>}
+
+      <div className="ec-region-chips__grid">
+        {EC_CHIP_REGION_ORDER.map((regionId) => {
+          const on = value.has(regionId);
+          return (
+            <button
+              key={regionId}
+              type="button"
+              className={"ec-region-chip" + (on ? " is-on" : "")}
+              onClick={() => toggleRegion(regionId)}
+              aria-pressed={on}
+            >
+              <span className="ec-region-chip__flag" aria-hidden="true">
+                <Flag code={EC_CHIP_REGION_FLAG[regionId]} size={22} />
+              </span>
+              <span className="ec-region-chip__label">{t("ec.region." + regionId)}</span>
+              {on && (
+                <span className="ec-region-chip__check" aria-hidden="true">
+                  <EcIco.check style={{ width: 12, height: 12 }} />
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {outliers.length > 0 && (
+        <div className="ec-region-chips__outliers" aria-label={t("ec.q5.outliers.aria")}>
+          {outliers.map((code) => {
+            const c = EC_COUNTRIES.find((x) => x.code === code);
+            const label = c ? nameOf(c) : code;
+            return (
+              <span key={code} className="ec-outlier-chip">
+                <Flag code={code} size={14} />
+                <span>{label}</span>
+                <button type="button" onClick={() => removeOutlier(code)}
+                        aria-label={t("ec.q5.outliers.remove", { country: label })}>
+                  <EcIco.close style={{ width: 11, height: 11 }} />
+                </button>
+              </span>
+            );
+          })}
+        </div>
+      )}
+
+      {adding ? (
+        <div className="ec-region-chips__addPicker">
+          <EcCountrySelect
+            value=""
+            onChange={addOutlier}
+            options={addOptions}
+            nameOf={nameOf}
+            label=""
+            placeholder={t("ec.q5.addCountry.placeholder")}
+          />
+          <button type="button" className="ec-region-chips__addCancel"
+                  onClick={() => setAdding(false)}>
+            {t("common.cancel")}
+          </button>
+        </div>
+      ) : (
+        <button type="button" className="ec-region-chips__addBtn"
+                onClick={() => setAdding(true)}>
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true">
+            <path d="M8 3v10M3 8h10" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+          </svg>
+          <span>{t("ec.q5.addCountry")}</span>
+        </button>
+      )}
+    </div>
+  );
+}
+
 function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOut, onBack, onNext }) {
   const t = useT();
-  const canContinue = corridorsIn.size > 0 || corridorsOut.size > 0;
+  // Asymmetric in/out mode — off by default. 90% of businesses operate
+  // symmetrically (or the union is what ecRecommend uses anyway), so we
+  // ask one combined question. Power users with crypto-OTC / split-flow
+  // marketplaces flip the toggle to flag asymmetric flows.
+  const [asymmetric, setAsymmetric] = useState(false);
+
+  // Sync corridorsOut to corridorsIn whenever asymmetric is off — this
+  // way the handoff payload always carries both even though the UI
+  // only asked once. ecRecommend's corridor-breadth signal reads union,
+  // so duplication is harmless.
+  useEffect(() => {
+    if (!asymmetric) setCorridorsOut(new Set(corridorsIn));
+  }, [asymmetric, corridorsIn, setCorridorsOut]);
+
+  const canContinue = corridorsIn.size > 0;
+
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -1210,15 +1358,28 @@ function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOu
       </button>
       <EcQuestionHeader num="5" title={t("ec.q5.title")} lead={t("ec.q5.lead")} />
 
-      <div className="ec-flow-section">
-        <h3 className="ec-flow-section__head">{t("ec.q5.section.in")}</h3>
-        <EcCountryMultiSelect value={corridorsIn} onChange={setCorridorsIn} />
-      </div>
+      <EcRegionChips
+        value={corridorsIn}
+        onChange={setCorridorsIn}
+        label={asymmetric ? t("ec.q5.section.in") : null}
+        ariaLabel={t("ec.q5.regions.aria")}
+      />
 
-      <div className="ec-flow-section">
-        <h3 className="ec-flow-section__head">{t("ec.q5.section.out")}</h3>
-        <EcCountryMultiSelect value={corridorsOut} onChange={setCorridorsOut} />
-      </div>
+      <label className="ec-q5-asym">
+        <input type="checkbox"
+               checked={asymmetric}
+               onChange={(e) => setAsymmetric(e.target.checked)} />
+        <span>{t("ec.q5.asymmetric.toggle")}</span>
+      </label>
+
+      {asymmetric && (
+        <EcRegionChips
+          value={corridorsOut}
+          onChange={setCorridorsOut}
+          label={t("ec.q5.section.out")}
+          ariaLabel={t("ec.q5.regions.outAria")}
+        />
+      )}
 
       <div className="ob-actions">
         <Button variant="primary" size="xl" onClick={onNext} iconRight="arrowRight"

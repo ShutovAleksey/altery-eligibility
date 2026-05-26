@@ -313,6 +313,97 @@ const EC_COUNTRY_TO_REGION = (() => {
 // Display order for region sections inside the picker.
 const EC_REGION_ORDER = ["europe", "apac_me", "americas", "africa"];
 
+// ─────────────────────────────────────────────────────────────────
+// Chip-region taxonomy — Q5 corridor picker (region chips + outlier
+// country add). Finer-grained than EC_DISPLAY_REGIONS (which stays
+// 4-bucket for the country-search dropdown grouping). Seven chips
+// because that's the breadth users mentally distinguish in fintech:
+// UK+EEA stays one bloc; Middle East separates from APAC because of
+// DFSA / Gulf compliance specifics; South Asia separates from APAC
+// because of RBI / FEMA distinctness; APAC stays a single chip
+// (SEA + East Asia + ANZ — fintech-standard usage); North America
+// and Latin America split because their risk profiles diverge; Africa
+// remains one bucket. Sanctioned countries (KP, IR, SY, CU, RU, BY,
+// MM, AF, SD) appear in their geographic regions for completeness,
+// but are filtered out of the outlier search picker so users can't
+// add them individually.
+const EC_CHIP_REGIONS = {
+  "uk-eea": [
+    // British Isles
+    "GB", "IE", "GG", "JE", "IM", "GI",
+    // EU 27
+    "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR",
+    "DE", "GR", "HU", "IT", "LV", "LT", "LU", "MT", "NL", "PL",
+    "PT", "RO", "SK", "SI", "ES", "SE",
+    // EEA non-EU + Switzerland (fintech-grouped with EEA)
+    "IS", "LI", "NO", "FO", "SJ", "AX", "CH",
+    // European microstates
+    "AD", "MC", "SM", "VA",
+    // Non-EEA continental Europe (Eastern + Balkans)
+    "UA", "MD", "AL", "BA", "ME", "MK", "RS",
+    "RU", "BY",
+  ],
+  "middle-east": [
+    "AE", "SA", "QA", "BH", "KW", "OM",
+    "IL", "JO", "LB", "PS", "SY",
+    "TR", "IR", "IQ", "YE",
+    "AM", "AZ", "GE",
+  ],
+  "south-asia": [
+    "IN", "PK", "BD", "LK", "NP", "BT", "MV", "AF",
+    "KZ", "UZ", "KG", "TJ", "TM",
+  ],
+  "apac": [
+    "CN", "JP", "KR", "TW", "HK", "MO", "MN", "KP",
+    "ID", "MY", "SG", "TH", "VN", "PH", "BN", "KH", "LA", "MM", "TL",
+    "AU", "NZ", "FJ", "PG", "NC", "PF", "WS", "TO", "VU", "SB",
+    "KI", "MH", "FM", "NR", "PW", "TV", "CK", "NU", "TK", "NF", "PN", "WF",
+    "AS", "GU", "MP",
+    "AQ", "BV", "CX", "CC", "HM", "IO", "TF", "GS", "UM",
+  ],
+  "north-america": [
+    "US", "CA", "GL", "PM",
+  ],
+  "latin-america": [
+    "MX", "GT", "BZ", "SV", "HN", "NI", "CR", "PA",
+    "CO", "VE", "GY", "SR", "GF", "EC", "PE", "BO", "PY", "CL",
+    "AR", "UY", "BR", "FK",
+    "CU", "DO", "HT", "JM", "BS", "PR", "VI", "TT", "BB",
+    "GD", "LC", "VC", "DM", "AG", "KN", "BM", "KY",
+    "AI", "MS", "VG", "TC", "AW", "CW", "SX", "BQ",
+    "MQ", "GP", "BL", "MF",
+  ],
+  "africa": [
+    "EG", "LY", "TN", "DZ", "MA", "EH", "SD",
+    "NG", "ZA", "KE", "GH", "ET", "TZ", "UG", "RW", "CI", "SN",
+    "ZM", "ZW", "AO", "BF", "BI", "BJ", "BW",
+    "CD", "CF", "CG", "CM", "CV", "DJ", "ER", "GA", "GM", "GN",
+    "GQ", "GW", "KM", "LR", "LS", "MG", "ML", "MR", "MU", "MW",
+    "MZ", "NA", "NE", "RE", "SC", "SH", "SL", "SO", "SS", "ST",
+    "SZ", "TD", "TG", "YT",
+  ],
+};
+
+// Order chips render in. Mobile lays out 2-per-row, so the order also
+// drives visual rhythm — anchors (UK+EEA, NA) lead each row.
+const EC_CHIP_REGION_ORDER = [
+  "uk-eea", "middle-east", "south-asia", "apac",
+  "north-america", "latin-america", "africa",
+];
+
+// Representative country flag for each chip (visual anchor inside the
+// chip — saves having to render a multi-flag stack). Picked the most
+// recognisable / fintech-anchor country per region.
+const EC_CHIP_REGION_FLAG = {
+  "uk-eea":        "GB",
+  "middle-east":   "AE",
+  "south-asia":    "IN",
+  "apac":          "SG",
+  "north-america": "US",
+  "latin-america": "BR",
+  "africa":        "ZA",
+};
+
 // ── Q2 industries ─────────────────────────────────────────────────
 // Categories Altery actually serves per altery.com/business — plus
 // explicit crypto sub-types (we onboard crypto-native businesses,
@@ -959,6 +1050,7 @@ const EC_COMPARATORS = {
 // unqualified.
 Object.assign(window, {
   EC_COUNTRIES, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_INDUSTRIES,
+  EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,
   EC_SERVICES, TOTAL_STEPS,
   EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
   EC_COMPARATORS, ecHeroIdentifier, maskTailDots, ecFeeRegion,

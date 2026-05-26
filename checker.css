@@ -650,6 +650,150 @@
       margin: 0;
     }
 
+    /* ── Q5 region chips ─────────────────────────────────────────────
+       Seven region chips in a responsive grid. Mobile-first: 2-column
+       full-width (thumb-target ≥56px tall). Desktop: flex-wrap with
+       natural sizing so each chip hugs its label. Selected state uses
+       accent-soft bg + accent border + a leading check icon. */
+    .ec-region-chips {
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .ec-region-chips__label {
+      font-size: 13px; font-weight: 500; color: var(--c-ink-2);
+    }
+    .ec-region-chips__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (min-width: 720px) {
+      /* Desktop / tablet: let chips size to content so the row hosts
+         all seven without overflowing on common widths. */
+      .ec-region-chips__grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+    }
+    .ec-region-chip {
+      appearance: none;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 999px;
+      padding: 10px 16px;
+      min-height: 56px;
+      display: inline-flex; align-items: center;
+      gap: 10px;
+      font: inherit;
+      font-size: var(--fs-body);
+      font-weight: 500;
+      color: var(--c-ink);
+      cursor: pointer;
+      transition: background-color .12s, border-color .12s, box-shadow .12s;
+      text-align: left;
+    }
+    @media (min-width: 720px) {
+      .ec-region-chip {
+        min-height: 44px;
+        padding: 8px 14px;
+        font-size: 14px;
+      }
+    }
+    .ec-region-chip:hover {
+      border-color: var(--c-muted-2);
+    }
+    .ec-region-chip:focus-visible {
+      outline: 0;
+      box-shadow: var(--sh-focus);
+    }
+    .ec-region-chip.is-on {
+      background: var(--c-accent-soft);
+      border-color: var(--c-accent);
+      color: var(--c-primary);
+      font-weight: 600;
+    }
+    .ec-region-chip__flag {
+      display: inline-flex;
+      width: 22px; height: 22px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: var(--c-border-soft);
+      align-items: center; justify-content: center;
+      flex: 0 0 22px;
+    }
+    .ec-region-chip__label {
+      flex: 1; min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ec-region-chip__check {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 16px; height: 16px;
+      border-radius: 999px;
+      background: var(--c-accent);
+      color: #fff;
+      flex: 0 0 16px;
+    }
+
+    /* Outlier chips — individual countries the user added beyond
+       region selection. Smaller and removable; sit just below the
+       region grid. */
+    .ec-region-chips__outliers {
+      display: flex; flex-wrap: wrap; gap: 6px;
+    }
+    .ec-outlier-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 8px 4px 6px;
+      border-radius: 999px;
+      background: var(--c-accent-soft);
+      color: var(--c-primary);
+      font-size: 12px; font-weight: 500;
+    }
+    .ec-outlier-chip button {
+      appearance: none; border: 0; background: transparent;
+      padding: 0; margin: 0;
+      color: var(--c-primary);
+      cursor: pointer;
+      display: inline-flex;
+    }
+
+    /* "+ Add specific country" affordance — text-button styling so it
+       reads as inline action without competing with the chips. */
+    .ec-region-chips__addBtn {
+      align-self: flex-start;
+      appearance: none; border: 0; background: transparent;
+      padding: 6px 0; margin: 0;
+      color: var(--c-accent);
+      font: inherit; font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .ec-region-chips__addBtn:hover { text-decoration: underline; }
+    .ec-region-chips__addPicker {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .ec-region-chips__addCancel {
+      align-self: flex-start;
+      appearance: none; border: 0; background: transparent;
+      padding: 4px 0; margin: 0;
+      color: var(--c-muted);
+      font: inherit; font-size: 12px;
+      cursor: pointer;
+    }
+    .ec-region-chips__addCancel:hover { color: var(--c-ink); }
+
+    /* "Different mix for in vs out?" toggle row. */
+    .ec-q5-asym {
+      display: inline-flex; align-items: center; gap: 8px;
+      align-self: flex-start;
+      font-size: 13px;
+      color: var(--c-ink-2);
+      cursor: pointer;
+      padding: 4px 0;
+    }
+    .ec-q5-asym input { margin: 0; }
+
     .ec-slider { display: flex; flex-direction: column; gap: 10px; }
     .ec-slider__head {
       display: flex; justify-content: space-between; align-items: baseline;

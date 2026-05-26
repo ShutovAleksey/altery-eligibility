@@ -161,16 +161,32 @@
     "ec.q4.vol.5": "£5M+",
 
     // Q4 corridors
-    "ec.q5.lead": "Mark every region you work with — on inbound and outbound. We'll match you to the entity with the best corridor coverage.",
+    "ec.q5.title": "Which regions do you work with?",
+    "ec.q5.lead": "Tap every region you operate with — incoming and outgoing combined. We'll match you to the entity with the best corridor coverage.",
+    "ec.q5.section.in": "Where funds come from",
+    "ec.q5.section.out": "Where funds go",
+    "ec.q5.asymmetric.toggle": "Different mix for incoming vs outgoing?",
+    "ec.q5.regions.aria": "Regions you operate with",
+    "ec.q5.regions.outAria": "Outgoing destinations",
+    "ec.q5.addCountry": "Add specific country",
+    "ec.q5.addCountry.placeholder": "Search and pick a country",
+    "ec.q5.outliers.aria": "Specific countries added beyond regions",
+    "ec.q5.outliers.remove": "Remove {country}",
     "ec.q5.selected_count": "{n} selected",
     "ec.q5.placeholder": "Select countries",
-    "ec.region.africa": "Africa",
+    /* Legacy 4-region grouping still used by the country-search dropdown
+       inside the multi-select (browsable groupings for the search list). */
+    "ec.region.africa":   "Africa",
     "ec.region.americas": "Americas",
-    "ec.region.apac_me": "Asia-Pacific & Middle East",
-    "ec.region.europe": "Europe",
-    "ec.q5.section.out": "Where funds go",
-    "ec.q5.section.in": "Where funds come from",
-    "ec.q5.title": "Where do funds come from and go?",
+    "ec.region.apac_me":  "Asia-Pacific & Middle East",
+    "ec.region.europe":   "Europe",
+    /* New 7-chip region labels for the Q5 picker. */
+    "ec.region.uk-eea":        "UK + EEA",
+    "ec.region.middle-east":   "Middle East",
+    "ec.region.south-asia":    "India & South Asia",
+    "ec.region.apac":          "Asia-Pacific",
+    "ec.region.north-america": "North America",
+    "ec.region.latin-america": "Latin America",
 
         // Account preview — operational identifiers shown on result.
         // Other languages fall back to EN until translated.
