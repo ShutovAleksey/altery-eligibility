@@ -360,7 +360,15 @@ function EcApp() {
   // straight to step 6 (result); ecRecommend returns kind:"blocked"
   // regardless of the unanswered later questions, so EcResultBlocked
   // renders cleanly with just the industry context.
-  const jumpToResult = () => { setDirection("forward"); setStep(6); setMaxStep((m) => Math.max(m, 6)); };
+  // Short-circuit to the result screen from a gating question
+  // (blocked country on Q1, blocked industry on Q2). We do NOT
+  // advance `maxStep` here — the user has not actually answered the
+  // intervening questions, and bumping maxStep to 6 would make the
+  // sidebar mark Q2-Q5 as "done" when the user navigates back from
+  // the blocked result. On the result screen itself, the sidebar
+  // uses the `blockedAt` branch (not maxStep) so the visual still
+  // shows the gating question's badge correctly.
+  const jumpToResult = () => { setDirection("forward"); setStep(6); };
 
   // Which question caused a soft-decline, if any. Used by EcSidebar to
   // avoid marking all 5 steps as done when the user actually only
