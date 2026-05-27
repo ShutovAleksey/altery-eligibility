@@ -638,6 +638,19 @@
       color: var(--c-muted);
       letter-spacing: 0.005em;
     }
+    /* Indicative-result caveat under the regulatory disclosure — slightly
+       smaller, hairline-separated, so the two legal lines read as a stack
+       of fine print rather than one block. */
+    .ec-intro__disclaimer {
+      margin: 10px 0 0;
+      padding-top: 10px;
+      border-top: 1px solid var(--c-border-soft);
+      text-align: left;
+      font-size: 11px;
+      line-height: 16px;
+      color: var(--c-muted);
+      max-width: 56ch;
+    }
 
     /* Q4 grouping — Incoming / Outgoing payment-flow sections. Volume
        slider + tx-count Select sit inside each section under a small

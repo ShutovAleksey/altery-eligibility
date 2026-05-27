@@ -500,6 +500,10 @@ function EcIntro({ onStart }) {
           conversion path without adding signal beyond what's already
           above. */}
       <div className="ec-intro__trust">{t("ec.intro.trust")}</div>
+      {/* Indicative-result caveat — same line shown on the result page;
+          surfaced up front so the user knows the outcome is subject to
+          onboarding/compliance review before they invest the 90 seconds. */}
+      <p className="ec-intro__disclaimer">{t("ec.r.disclaimer")}</p>
     </div>
   );
 }
