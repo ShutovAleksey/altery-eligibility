@@ -957,8 +957,6 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
     }
 
     const blob = pdf.output("blob");
-    console.info("[ecSendAnalysisEmail] PDF blob:", blob.size, "bytes,", "canvas:", canvas.width + "×" + canvas.height, "pages:", totalPages);
-
     const pdfBase64 = await ecBlobToBase64(blob);
 
     // Display fields the server template needs for the email body.

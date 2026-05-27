@@ -822,11 +822,6 @@ function EcPaymentModal({ activePlan, onClose }) {
       const amount = STRIPE_DEMO_AMOUNTS[activePlan.id] || STRIPE_DEMO_AMOUNTS.pro;
       const stripe = StripeCtor(publishableKey);
       stripeRef.current = stripe;
-      // Diagnostic: confirm which Stripe key actually got used. The
-      // suffix should match the key in your Vercel env vars + Stripe
-      // Dashboard. If it doesn't, /api/config isn't returning the
-      // right key (env var missing / wrong project / cached deploy).
-      console.log("[Altery] Stripe initialised. Key prefix:", publishableKey.slice(0, 14), "suffix:", publishableKey.slice(-8));
 
       const elements = stripe.elements({
         mode: "payment",
@@ -901,21 +896,6 @@ function EcPaymentModal({ activePlan, onClose }) {
           if (cancelled) return;
           const methods = event && event.availablePaymentMethods;
           const hasAny = methods && Object.values(methods).some(Boolean);
-          // Diagnostic: shows EXACTLY which wallets Stripe will render
-          // for this browser + Stripe account combo. If methods is
-          // null/undefined/empty — no wallets will appear, and you
-          // need to fix the account (activate in Dashboard) and/or
-          // browser (Chrome with Google Pay setup, Safari with Apple
-          // Pay + verified domain).
-          console.log("[Altery] ExpressCheckout ready. Available wallets:", methods, "→ hasAny:", hasAny);
-          if (!hasAny) {
-            console.warn(
-              "[Altery] No wallets available. Common causes:\n" +
-              "  • Apple Pay: domain not verified in Stripe Dashboard → Settings → Payment method domains\n" +
-              "  • Google Pay: testing in Safari/Firefox (Chrome/Edge only) OR account not activated\n" +
-              "  • Link/PayPal: not activated in Stripe Dashboard → Settings → Payment methods"
-            );
-          }
           setExpressAvailable(!!hasAny);
         });
 
