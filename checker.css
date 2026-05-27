@@ -3122,7 +3122,12 @@
       .ec-r__compare__amount { font-size: 18px; }
       .ec-r__savingsHero__amount { font-size: 36px; }
       .ec-r__planPrice__amount { font-size: 24px; }
-      .ec-r__action__primary { flex-direction: column; }
+      /* Stack the CTAs and let each fill the container's full width.
+         align-items:stretch overrides the desktop row's align-items:center
+         (which would otherwise size each button to its content), and
+         dropping the desktop 220px min-width lets them span edge to edge. */
+      .ec-r__action__primary { flex-direction: column; align-items: stretch; }
       .ec-r__action__primary > * { width: 100%; flex: none; }
-      .ec-r__action__secondary { justify-content: center; }
+      .ec-r__action__primary > button:first-child { min-width: 0; }
+      .ec-r__action__secondary { justify-content: center; width: 100%; }
     }
