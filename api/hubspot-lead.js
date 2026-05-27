@@ -22,6 +22,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // unauthenticated endpoint — prevents arbitrary property injection.
 const ALLOWED_PROPS = [
   "email",
+  "firstname",
+  "lastname",
   "checker_entity",
   "checker_plan",
   "checker_monthly_volume_gbp",

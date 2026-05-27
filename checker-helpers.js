@@ -844,6 +844,26 @@ function ecBookingUrl(rec, email) {
   return qs ? base + "?" + qs : base;
 }
 
+// Deep-link for the PDF/email "request a callback" button. Points back to
+// the checker with ?contact=1 plus the visitor's email and checker context
+// carried as params. EcApp detects this on load and renders the standalone
+// callback-request form (prefilled) — a confirmation step, so an email
+// client prefetching the link can't create a lead on its own. The lead is
+// only written when the user submits the form.
+function ecContactRequestUrl(rec, email) {
+  const origin = (typeof window !== "undefined" && window.location && window.location.origin)
+    ? window.location.origin + "/"
+    : "https://altery-eligibility.vercel.app/";
+  const params = new URLSearchParams({ contact: "1" });
+  if (email) params.set("email", String(email).trim());
+  const ctx = ecCheckerContext(rec);
+  if (ctx.checker_entity)                  params.set("entity",  ctx.checker_entity);
+  if (ctx.checker_plan)                    params.set("plan",    ctx.checker_plan);
+  if (ctx.checker_monthly_volume_gbp)      params.set("volume",  ctx.checker_monthly_volume_gbp);
+  if (ctx.checker_est_annual_savings_gbp)  params.set("savings", ctx.checker_est_annual_savings_gbp);
+  return origin + "?" + params.toString();
+}
+
 // HubSpot lead capture — POSTs email + checker context to our own
 // /api/hubspot-lead serverless function, which upserts the contact via
 // the CRM Contacts API using a server-held Service Key. Once
@@ -856,9 +876,14 @@ function ecBookingUrl(rec, email) {
 // (creates the contact + fires the workflow, but loses entity/plan/volume/
 // savings). Routing through our backend keeps the token off the client and
 // writes every property reliably.
-async function ecSubmitHubspotLead({ email, rec }) {
+async function ecSubmitHubspotLead({ email, firstname, lastname, rec, context }) {
   if (!email) return { ok: false };
-  const properties = Object.assign({ email: String(email).trim() }, ecCheckerContext(rec));
+  // `context` lets callers pass the 4 checker values directly (e.g. the
+  // PDF/email deep-link, which carries them in the URL and has no full
+  // rec to rebuild); otherwise derive them from rec.
+  const properties = Object.assign({ email: String(email).trim() }, context || ecCheckerContext(rec));
+  if (firstname) properties.firstname = String(firstname).trim();
+  if (lastname)  properties.lastname  = String(lastname).trim();
   try {
     const res = await fetch("/api/hubspot-lead", {
       method: "POST",
@@ -1057,7 +1082,7 @@ Object.assign(window, {
   ecBaselineFor, ecQualitativeMatrix, ecCapabilityMatrix,
   ecConfidenceLevel, ecFxVolumeRatio, ecLocalSwiftSplit, ecAvgTxGbp,
   ecVolumeHintKey, ecFormatVolume, ecEstimateSavings,
-  ecCheckerContext, ecBookingUrl, ecSubmitHubspotLead, ecGenProposalRef,
+  ecCheckerContext, ecBookingUrl, ecContactRequestUrl, ecSubmitHubspotLead, ecGenProposalRef,
   ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
   ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,
   ecCaptureAndStoreUtms, ecAppendUtmsToURL,

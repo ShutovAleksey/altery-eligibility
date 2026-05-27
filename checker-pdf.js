@@ -590,7 +590,7 @@ ${checklistHTML}
   <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">${t("ec.pdf.team.head")}</div>
   <div style="font-size:13px;line-height:19px;color:${C.ink};margin-bottom:10px;">${t("ec.pdf.signature.body")}</div>
   <div style="font-size:12.5px;line-height:18px;color:${C.inkSoft};margin-bottom:12px;">${t("ec.pdf.team.body")}</div>
-  <a href="${ecBookingUrl(rec, email)}" style="display:inline-block;font-size:12.5px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.team.booking")} →</a>
+  <a href="${ecContactRequestUrl(rec, email)}" style="display:inline-block;font-size:12.5px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.team.booking")} →</a>
 </div>
 
 <!-- Validity notice — soft urgency, commercial-proposal convention -->
@@ -1080,7 +1080,7 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
         personaLine,
         sessionLink,
         langCode,
-        bookingURL: ecBookingUrl(rec, email),
+        bookingURL: ecContactRequestUrl(rec, email),
         emailStrings,
         forwardedBy: safeForwarder,
       }),

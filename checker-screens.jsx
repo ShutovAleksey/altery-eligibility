@@ -6,7 +6,7 @@
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount, ecBookingUrl,
-          EcFeesModal, EcPlanComparisonModal, EcHandoffModal, EcPaymentModal */
+          EcFeesModal, EcPlanComparisonModal, EcHandoffModal, EcPaymentModal, EcCallbackForm */
 // checker-screens.jsx — the eligibility-checker question screens, result
 // screens, and the supporting EcIco decorative-icon set.
 //
@@ -287,6 +287,28 @@ function EcApp() {
   // payload. Stored value is read again at email/handoff time so we
   // don't need to thread it through component state.
   useEffect(() => { ecCaptureAndStoreUtms(); }, []);
+
+  // Deep-link entry: the PDF/email "request a callback" button links to
+  // /?contact=1 with the visitor's email + checker context as params. When
+  // present we skip the quiz entirely and render the standalone callback
+  // form (prefilled) — a confirmation step, so an email client prefetching
+  // the link can't create a lead; only submitting the form writes it.
+  const contactEntry = useMemo(() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get("contact") !== "1") return null;
+      return {
+        email: p.get("email") || "",
+        context: {
+          checker_entity:                 p.get("entity")  || undefined,
+          checker_plan:                   p.get("plan")    || undefined,
+          checker_monthly_volume_gbp:     p.get("volume")  || undefined,
+          checker_est_annual_savings_gbp: p.get("savings") || undefined,
+        },
+      };
+    } catch (e) { return null; }
+  }, []);
+
   const [country, setCountry] = useState(null);
   // Flat ICP-aligned industry list — see EC_INDUSTRIES. Business type
   // dropped on purpose: KYB captures legal form during onboarding where
@@ -376,6 +398,19 @@ function EcApp() {
   const blockedAt = recommendation.kind === "blocked"
     ? (recommendation.reason === "country" ? 1 : 2)
     : null;
+
+  if (contactEntry) {
+    return (
+      <div className="ec-app ec-app--contact">
+        <main className="ec-main">
+          <div className="ec-content fade-in ec-callback-standalone">
+            <Title display title={t("ec.callback.title")} lead={t("ec.callback.standaloneLead")} />
+            <EcCallbackForm email={contactEntry.email} context={contactEntry.context} />
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="ec-app">

@@ -1918,6 +1918,47 @@
       .ec-handoff__colleague__btn { width: 100%; }
     }
 
+    /* Request-a-callback form — first/last name + submit, used inline on the
+       handoff sent stage and standalone on the ?contact deep-link entry. */
+    .ec-callback { display: flex; flex-direction: column; gap: 8px; }
+    .ec-callback__sla {
+      font-size: 12px; color: var(--c-muted); line-height: 16px;
+      margin-bottom: 2px;
+    }
+    .ec-callback__row { display: flex; gap: 8px; align-items: stretch; }
+    .ec-callback__input {
+      flex: 1; min-width: 0;
+      padding: 10px 12px;
+      font-size: 14px; font-family: inherit;
+      border: 1px solid var(--c-border);
+      border-radius: 8px;
+      background: #fff; color: var(--c-ink);
+      outline: none;
+      transition: border-color .15s ease;
+    }
+    .ec-callback__input:focus { border-color: var(--c-primary); }
+    .ec-callback__input--full { width: 100%; }
+    .ec-callback__btn {
+      align-self: flex-start;
+      padding: 10px 16px;
+      font-size: 13px; font-family: inherit; font-weight: 500;
+      color: #fff; background: var(--c-primary);
+      border: 0; border-radius: 8px; cursor: pointer;
+      transition: opacity .15s ease;
+      white-space: nowrap;
+    }
+    .ec-callback__btn:hover { opacity: 0.85; }
+    .ec-callback__btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .ec-callback__success {
+      font-size: 13px; color: #18A058; font-weight: 500; padding: 4px 0;
+    }
+    /* Standalone deep-link view — centered card, away from the quiz chrome. */
+    .ec-callback-standalone { max-width: 460px; margin: 0 auto; }
+    @media (max-width: 640px) {
+      .ec-callback__row { flex-direction: column; }
+      .ec-callback__btn { width: 100%; }
+    }
+
     @media (max-width: 640px) {
       .ec-modal--handoff { padding: 24px 20px 20px; }
       .ec-modal--handoff .ec-modal__title { font-size: 20px; line-height: 26px; }

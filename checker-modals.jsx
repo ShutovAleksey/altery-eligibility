@@ -340,6 +340,100 @@ function EcPlanCompareCard({ plan, onSelect }) {
   );
 }
 
+// Request-a-callback form — the explicit, opt-in path to sales contact.
+// This is now the ONLY thing that creates a HubSpot lead: requesting the
+// PDF no longer does. Collects first + last name (email is known on the
+// modal's sent stage, or carried in the PDF/email deep-link), writes the
+// contact via ecSubmitHubspotLead, and promises a 2-hour response.
+//
+// `email` prefills + hides the email field when known. `rec` supplies the
+// checker context on-screen; `context` carries it directly for the
+// deep-link entry (which has no full rec to rebuild).
+function EcCallbackForm({ email: emailProp, rec, context }) {
+  const t = useT();
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname]   = useState("");
+  const [email, setEmail]         = useState(emailProp || "");
+  const [submitting, setSubmitting] = useState(false);
+  const [touched, setTouched]     = useState(false);
+  const [error, setError]         = useState(null);
+  const [done, setDone]           = useState(false);
+
+  const needEmail  = !emailProp;
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
+  const valid      = firstname.trim().length > 0 && lastname.trim().length > 0 && emailValid;
+
+  const submit = async () => {
+    setTouched(true);
+    if (!valid) return;
+    setSubmitting(true);
+    setError(null);
+    const res = await ecSubmitHubspotLead({
+      email: email.trim(),
+      firstname: firstname.trim(),
+      lastname: lastname.trim(),
+      rec,
+      context,
+    });
+    setSubmitting(false);
+    if (res && res.ok) setDone(true);
+    else setError(t("ec.handoff.error"));
+  };
+
+  if (done) {
+    return <div className="ec-callback__success">✓ {t("ec.callback.success")}</div>;
+  }
+
+  return (
+    <div className="ec-callback">
+      <div className="ec-callback__sla">{t("ec.callback.sla")}</div>
+      <div className="ec-callback__row">
+        <input
+          type="text"
+          className="ec-callback__input"
+          placeholder={t("ec.callback.firstname")}
+          value={firstname}
+          onChange={(e) => setFirstname(e.target.value)}
+          disabled={submitting}
+          autoComplete="given-name"
+        />
+        <input
+          type="text"
+          className="ec-callback__input"
+          placeholder={t("ec.callback.lastname")}
+          value={lastname}
+          onChange={(e) => setLastname(e.target.value)}
+          disabled={submitting}
+          autoComplete="family-name"
+        />
+      </div>
+      {needEmail && (
+        <input
+          type="email"
+          inputMode="email"
+          className="ec-callback__input ec-callback__input--full"
+          placeholder={t("ec.handoff.email.label")}
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          disabled={submitting}
+          autoComplete="email"
+        />
+      )}
+      {((touched && !valid) || error) && (
+        <div className="ec-handoff__error" role="alert">{error || t("ec.callback.error")}</div>
+      )}
+      <button
+        type="button"
+        className="ec-callback__btn"
+        onClick={submit}
+        disabled={submitting || (touched && !valid)}
+      >
+        {submitting ? t("ec.handoff.submitting") : t("ec.callback.submit")}
+      </button>
+    </div>
+  );
+}
+
 function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
   const t = useT();
   // Three-state machine, not a boolean — keeps the JSX readable and
@@ -389,13 +483,6 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
     if (!isValid) return;
     setSubmitting(true);
     setSubmitError(null);
-    // Register the lead in HubSpot FIRST and independently of the PDF send.
-    // Round-robin rotation routes it to the next available salesperson.
-    // Decoupled on purpose: PDF delivery can fail (provider hiccup, large
-    // attachment, function timeout) and that must not cost us the lead —
-    // gating this behind the email await previously swallowed every lead
-    // whenever the send threw. Fire-and-forget; errors are logged inside.
-    ecSubmitHubspotLead({ email: email.trim(), rec }).catch(() => {});
     try {
       // Real email delivery: build the PDF locally, POST to
       // /api/send-analysis, which ships a transactional email (PDF
@@ -616,11 +703,13 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                     <div className="ec-handoff__nextSteps__body">{t("ec.handoff.sent.step2.body")}</div>
                   </div>
                 </li>
-                <li className="ec-handoff__nextSteps__item is-done">
-                  <span className="ec-handoff__nextSteps__num" aria-hidden="true">✓</span>
+                <li className="ec-handoff__nextSteps__item">
+                  <span className="ec-handoff__nextSteps__num" aria-hidden="true">3</span>
                   <div>
-                    <div className="ec-handoff__nextSteps__title">{t("ec.handoff.sent.step3.title")}</div>
-                    <div className="ec-handoff__nextSteps__body">{t("ec.handoff.sent.step3.body")}</div>
+                    <div className="ec-handoff__nextSteps__title">{t("ec.callback.title")}</div>
+                    <div className="ec-handoff__nextSteps__body">
+                      <EcCallbackForm email={email} rec={rec} />
+                    </div>
                   </div>
                 </li>
               </ol>
@@ -1238,5 +1327,5 @@ function EcPaymentModal({ activePlan, onClose }) {
 Object.assign(window, {
   EcFeesModal,
   EcPlanComparisonModal, EcPlanIcon, EcPlanCompareCard,
-  EcHandoffModal, EcPaymentModal,
+  EcHandoffModal, EcPaymentModal, EcCallbackForm,
 });
