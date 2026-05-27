@@ -43,7 +43,7 @@
     "ec.q.eyebrow": "z {total} pytań",
 
     "ec.q2.title": "Gdzie zarejestrowana jest spółka?",
-    "ec.q2.lead": "Wybierz kraj wskazany w odpisie z rejestru spółek. Resztą zajmiemy się my.",
+    "ec.q2.lead": "Wybierz kraj wskazany w Twoich dokumentach rejestracyjnych. Pomaga nam to dobrać właściwą konfigurację dla Twojej firmy.",
     "ec.q2.input.label": "Kraj rejestracji",
     "ec.q2.input.placeholder": "Szukaj kraju",
     "ec.q2.empty.title": "Brak wyników",
@@ -476,7 +476,7 @@
     "ec.q.eyebrow": "de {total} perguntas",
 
     "ec.q2.title": "Onde está constituída a sua empresa?",
-    "ec.q2.lead": "Selecione o país indicado no certificado de registo. Cuidamos do resto.",
+    "ec.q2.lead": "Selecione o país indicado nos seus documentos de registo. Isto ajuda-nos a determinar a configuração certa para o seu negócio.",
     "ec.q2.input.label": "País de constituição",
     "ec.q2.input.placeholder": "Procurar país",
     "ec.q2.empty.title": "Sem resultados",
@@ -911,7 +911,7 @@
     "ec.q.eyebrow": "sur {total} questions",
 
     "ec.q2.title": "Où votre société est-elle immatriculée ?",
-    "ec.q2.lead": "Sélectionnez le pays figurant sur votre certificat d'immatriculation. Nous nous occupons du reste.",
+    "ec.q2.lead": "Sélectionnez le pays indiqué sur vos documents d'immatriculation. Cela nous aide à déterminer la configuration adaptée à votre entreprise.",
     "ec.q2.input.label": "Pays d'immatriculation",
     "ec.q2.input.placeholder": "Rechercher un pays",
     "ec.q2.empty.title": "Aucun pays trouvé",

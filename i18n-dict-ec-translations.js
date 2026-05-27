@@ -46,7 +46,7 @@
     "ec.q.eyebrow": "von {total} Fragen",
 
     "ec.q2.title": "Wo ist Ihr Unternehmen eingetragen?",
-    "ec.q2.lead": "Wählen Sie das Land, das auf Ihrer Handelsregisterurkunde steht. Den Rest übernehmen wir.",
+    "ec.q2.lead": "Wählen Sie das Land aus, das auf Ihren Registrierungsunterlagen angegeben ist. So ermitteln wir das richtige Setup für Ihr Unternehmen.",
     "ec.q2.input.label": "Land der Eintragung",
     "ec.q2.input.placeholder": "Land suchen",
     "ec.q2.empty.title": "Keine Treffer für Ihre Suche",
@@ -479,7 +479,7 @@
     "ec.q.eyebrow": "из {total} вопросов",
 
     "ec.q2.title": "Где зарегистрирована ваша компания?",
-    "ec.q2.lead": "Укажите страну из вашего свидетельства о регистрации — дальше мы всё настроим.",
+    "ec.q2.lead": "Выберите страну, указанную в ваших регистрационных документах. Это поможет нам подобрать правильную настройку для вашего бизнеса.",
     "ec.q2.input.label": "Страна регистрации",
     "ec.q2.input.placeholder": "Поиск страны",
     "ec.q2.empty.title": "Совпадений не найдено",

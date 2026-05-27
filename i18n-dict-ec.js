@@ -49,7 +49,7 @@
 
     // Q1 country
     "ec.q2.title": "Where is your company incorporated?",
-    "ec.q2.lead": "Pick the country shown on your registration certificate. We'll route the application from there.",
+    "ec.q2.lead": "Select the country shown on your registration documents. This helps us determine the right setup for your business.",
     "ec.q2.input.label": "Country of incorporation",
     "ec.q2.input.placeholder": "Search country",
     "ec.q2.empty.title": "No countries match your search",

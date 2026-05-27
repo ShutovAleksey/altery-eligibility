@@ -42,7 +42,7 @@
     "ec.q.eyebrow": "di {total} domande",
 
     "ec.q2.title": "Dove è costituita la tua società?",
-    "ec.q2.lead": "Seleziona il paese indicato sul certificato di registrazione. Al resto pensiamo noi.",
+    "ec.q2.lead": "Seleziona il paese indicato sui tuoi documenti di registrazione. Ci aiuta a determinare la configurazione giusta per la tua azienda.",
     "ec.q2.input.label": "Paese di costituzione",
     "ec.q2.input.placeholder": "Cerca paese",
     "ec.q2.empty.title": "Nessun paese trovato",
@@ -475,7 +475,7 @@
     "ec.q.eyebrow": "de {total} preguntas",
 
     "ec.q2.title": "¿Dónde está constituida tu empresa?",
-    "ec.q2.lead": "Elige el país que aparece en tu certificado de registro. Nosotros nos encargamos del resto.",
+    "ec.q2.lead": "Selecciona el país que aparece en tus documentos de registro. Esto nos ayuda a determinar la configuración adecuada para tu empresa.",
     "ec.q2.input.label": "País de constitución",
     "ec.q2.input.placeholder": "Buscar país",
     "ec.q2.empty.title": "Sin resultados",

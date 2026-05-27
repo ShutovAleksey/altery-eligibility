@@ -42,7 +42,7 @@
     "ec.q.eyebrow": "van {total} vragen",
 
     "ec.q2.title": "Waar is je bedrijf gevestigd?",
-    "ec.q2.lead": "Kies het land dat op je registratiebewijs staat. De rest regelen wij.",
+    "ec.q2.lead": "Selecteer het land dat op uw registratiedocumenten staat. Zo bepalen we de juiste opzet voor uw bedrijf.",
     "ec.q2.input.label": "Land van vestiging",
     "ec.q2.input.placeholder": "Zoek land",
     "ec.q2.empty.title": "Geen landen gevonden",
@@ -475,7 +475,7 @@
     "ec.q.eyebrow": "/ {total}",
 
     "ec.q2.title": "Şirketiniz nerede tescil edilmiş?",
-    "ec.q2.lead": "Tescil belgenizdeki ülkeyi seçin. Gerisini biz hallederiz.",
+    "ec.q2.lead": "Kayıt belgelerinizde görünen ülkeyi seçin. Bu, işletmeniz için doğru kurulumu belirlememize yardımcı olur.",
     "ec.q2.input.label": "Tescil ülkesi",
     "ec.q2.input.placeholder": "Ülke ara",
     "ec.q2.empty.title": "Aramanızla eşleşen ülke yok",
