@@ -560,6 +560,7 @@
     "ec.r.savings.note": "Estimate based on your ~{volume} monthly volume, blended SEPA + SWIFT mix. Full line-by-line breakdown is in your proposal PDF.",
     "ec.r.iban.caption": "Example of your local {currency} format · allocated after KYB",
     "ec.r.cta.email": "Email this proposal as PDF",
+    "ec.r.disclaimer": "Eligibility, pricing, and product availability depend on onboarding, compliance, and jurisdictional review.",
     "ec.r.plan.eyebrow": "{plan} plan",
   });
 })();

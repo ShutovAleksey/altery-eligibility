@@ -3082,6 +3082,19 @@
     .ec-r__action__foot a { color: var(--c-accent); font-weight: 500; }
     .ec-r__action__foot a:hover { text-decoration: underline; }
 
+    /* Indicative-result caveat — quiet fine print closing the result page.
+       Separated from the action row by a hairline so it reads as a legal
+       footnote, not another CTA. */
+    .ec-r__disclaimer {
+      margin: 16px 0 0;
+      padding-top: 14px;
+      border-top: 1px solid var(--c-border-soft);
+      font-size: 11px;
+      line-height: 16px;
+      color: var(--c-muted);
+      max-width: 56ch;
+    }
+
     /* ── Mobile tuning ────────────────────────────────────────────── */
     @media (max-width: 640px) {
       .ec-r { gap: 16px; }

@@ -363,6 +363,7 @@
     "ec.r.savings.note": "Schätzung basierend auf Ihrem monatlichen Volumen von ~{volume}, gemischter SEPA + SWIFT-Mix. Die vollständige Aufschlüsselung Zeile für Zeile finden Sie in Ihrer Angebots-PDF.",
     "ec.r.iban.caption": "Beispiel Ihres lokalen {currency}-Formats · wird nach KYB zugewiesen",
     "ec.r.cta.email": "Diesen Vorschlag als PDF senden",
+    "ec.r.disclaimer": "Berechtigung, Preise und Produktverfügbarkeit hängen von Onboarding, Compliance und der Prüfung der Rechtsordnung ab.",
     "ec.r.plan.eyebrow": "Tarif {plan}",
     "ec.ind.marketing": "Marketing- & Werbeagentur",
     "ec.ind.freelance": "Freelance-Plattformen & Freiberufler",
@@ -798,6 +799,7 @@
     "ec.r.savings.note": "Оценка по вашему обороту ~{volume}/мес, смешанный мix SEPA + SWIFT. Полная построчная разбивка — в PDF-предложении.",
     "ec.r.iban.caption": "Пример формата вашего локального {currency} · присваивается после KYB",
     "ec.r.cta.email": "Прислать предложение PDF на email",
+    "ec.r.disclaimer": "Доступность услуг, цены и набор продуктов зависят от онбординга, комплаенс-проверки и оценки юрисдикции.",
     "ec.r.plan.eyebrow": "Тариф {plan}",
   
     "ec.ind.marketing": "Маркетинговое / рекламное агентство",
