@@ -1349,8 +1349,10 @@ function EcRegionChips({ value, onChange, label, ariaLabel }) {
                   <span className={"ec-region-chip__flag"
                                   + (codes.length > 1 ? " is-dual" : "")}
                         aria-hidden="true">
-                    {codes.map((code) => (
-                      <span key={code} className="ec-region-chip__flagItem">
+                    {codes.map((code, idx) => (
+                      <span key={code}
+                            className={"ec-region-chip__flagItem"
+                                      + (idx > 0 ? " is-secondary" : "")}>
                         <Flag code={code} size={22} />
                       </span>
                     ))}

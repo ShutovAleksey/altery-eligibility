@@ -731,12 +731,20 @@
       align-items: center; justify-content: center;
       flex: 0 0 22px;
     }
-    /* Dual-flag (UK + EEA chip) — both flags side by side at full size, so
-       the EU flag reads the same 22px as every other chip's flag. (Was an
-       avatar-stack with the second flag overlapped by 8px, which occluded
-       the EU flag and made it look smaller.) */
+    /* Dual-flag stack — used by UK+EEA chip. Second flag overlaps
+       the first by ~8px (avatar-stack pattern) with a thin background
+       outline so the boundary reads cleanly against either flag. */
     .ec-region-chip__flag.is-dual {
-      gap: 4px;
+      gap: 0;
+    }
+    .ec-region-chip__flagItem.is-secondary {
+      margin-left: -8px;
+      box-shadow: 0 0 0 1.5px var(--c-surface);
+    }
+    .ec-region-chip.is-on .ec-region-chip__flagItem.is-secondary {
+      /* Chip turns accent-soft when selected — match the outline so the
+         second flag's boundary keeps visual separation in either state. */
+      box-shadow: 0 0 0 1.5px var(--c-accent-soft);
     }
     .ec-region-chip__label {
       flex: 1; min-width: 0;
