@@ -844,34 +844,26 @@ function ecBookingUrl(rec, email) {
   return qs ? base + "?" + qs : base;
 }
 
-// HubSpot lead capture — a regular HubSpot Form (not the Meetings booking
-// form, whose custom fields are seat-gated). Submitting via the public
-// Forms API v3 endpoint creates/updates the contact by email, writes the
-// checker context, and fires any workflow listening on this form's
-// submission — which is where round-robin owner rotation routes the lead
-// to the next available salesperson. No auth token: portalId + formGuid
-// scope it. EU data-residency portal → api-eu1 host.
-const EC_HUBSPOT_PORTAL_ID = "26559519";
-const EC_HUBSPOT_FORM_GUID = "353936b1-175c-45bf-8e46-0604ddd7662a";
-const EC_HUBSPOT_SUBMIT_URL =
-  "https://api-eu1.hsforms.com/submissions/v3/integration/submit/" +
-  EC_HUBSPOT_PORTAL_ID + "/" + EC_HUBSPOT_FORM_GUID;
-
+// HubSpot lead capture — POSTs email + checker context to our own
+// /api/hubspot-lead serverless function, which upserts the contact via
+// the CRM Contacts API using a server-held Service Key. Once
+// checker_entity is set, HubSpot's owner-rotation workflow (enrollment
+// trigger "checker_entity is known") routes the lead to the next
+// available salesperson.
+//
+// We do NOT submit to the HubSpot Forms API: the legacy integration-submit
+// endpoint silently drops custom-property values for new-builder forms
+// (creates the contact + fires the workflow, but loses entity/plan/volume/
+// savings). Routing through our backend keeps the token off the client and
+// writes every property reliably.
 async function ecSubmitHubspotLead({ email, rec }) {
   if (!email) return { ok: false };
-  const fields = [{ objectTypeId: "0-1", name: "email", value: String(email).trim() }];
-  const ctx = ecCheckerContext(rec);
-  Object.keys(ctx).forEach((k) => fields.push({ objectTypeId: "0-1", name: k, value: ctx[k] }));
-  const context = { pageUri: location.href, pageName: document.title };
-  // HubSpot tracking cookie, when present, links the submission to the
-  // visitor's analytics session for first-touch attribution.
-  const hutk = (document.cookie.match(/hubspotutk=([^;]+)/) || [])[1];
-  if (hutk) context.hutk = hutk;
+  const properties = Object.assign({ email: String(email).trim() }, ecCheckerContext(rec));
   try {
-    const res = await fetch(EC_HUBSPOT_SUBMIT_URL, {
+    const res = await fetch("/api/hubspot-lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fields, context }),
+      body: JSON.stringify({ properties }),
     });
     if (!res.ok) {
       console.error("[ecSubmitHubspotLead] HTTP", res.status, await res.text().catch(() => ""));
