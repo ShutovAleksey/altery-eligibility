@@ -18,6 +18,7 @@
     "common.clear": "Leeren",
     "common.editAnswers": "Antworten bearbeiten",
     "common.contactTeam": "Team kontaktieren",
+    "common.cancel": "Abbrechen",
 
     "ec.intro.eyebrow": "In 90 Sekunden sehen, was zu Ihrem Unternehmen passt",
     "ec.intro.title": "Ein Altery-Plan, zugeschnitten darauf, wie Ihr Unternehmen Geld bewegt",
@@ -454,6 +455,7 @@
     "common.clear": "Очистить",
     "common.editAnswers": "Изменить ответы",
     "common.contactTeam": "Связаться с командой",
+    "common.cancel": "Отмена",
 
     "ec.intro.eyebrow": "За 90 секунд узнайте, что подходит вашему бизнесу",
     "ec.intro.title": "План Altery под то, как ваш бизнес проводит платежи",

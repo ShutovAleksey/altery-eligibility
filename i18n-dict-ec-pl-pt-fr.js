@@ -15,6 +15,7 @@
     "common.clear": "Wyczyść",
     "common.editAnswers": "Edytuj odpowiedzi",
     "common.contactTeam": "Kontakt z zespołem",
+    "common.cancel": "Anuluj",
 
     "ec.intro.eyebrow": "Zobacz w 90 sekund, co pasuje do Twojej firmy",
     "ec.intro.title": "Plan Altery zbudowany wokół tego, jak Twoja firma obraca pieniędzmi",
@@ -451,6 +452,7 @@
     "common.clear": "Limpar",
     "common.editAnswers": "Editar respostas",
     "common.contactTeam": "Contactar a equipa",
+    "common.cancel": "Cancelar",
 
     "ec.intro.eyebrow": "Veja em 90 segundos o que se adequa à sua empresa",
     "ec.intro.title": "Um plano Altery construído em torno de como a sua empresa movimenta dinheiro",
@@ -889,6 +891,7 @@
     "common.clear": "Effacer",
     "common.editAnswers": "Modifier mes réponses",
     "common.contactTeam": "Contacter l'équipe",
+    "common.cancel": "Annuler",
 
     "ec.intro.eyebrow": "Découvrez en 90 secondes ce qui convient à votre entreprise",
     "ec.intro.title": "Un plan Altery conçu autour de la façon dont votre entreprise gère ses paiements",

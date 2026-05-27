@@ -14,6 +14,7 @@
     "common.clear": "Cancella",
     "common.editAnswers": "Modifica le risposte",
     "common.contactTeam": "Contatta il team",
+    "common.cancel": "Annulla",
 
     "ec.intro.eyebrow": "Scopri in 90 secondi cosa si adatta alla tua azienda",
     "ec.intro.title": "Un piano Altery costruito su come la tua azienda muove il denaro",
@@ -450,6 +451,7 @@
     "common.clear": "Quitar",
     "common.editAnswers": "Editar respuestas",
     "common.contactTeam": "Contactar al equipo",
+    "common.cancel": "Cancelar",
 
     "ec.intro.eyebrow": "Descubre en 90 segundos qué se adapta a tu empresa",
     "ec.intro.title": "Un plan Altery basado en cómo tu empresa mueve el dinero",

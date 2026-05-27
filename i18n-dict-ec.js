@@ -19,6 +19,7 @@
     "ob.common.whyWeAsk": "Why we ask",
     "common.editAnswers": "Edit my answers",
     "common.contactTeam": "Contact our team",
+    "common.cancel": "Cancel",
 
     // Intro screen
     "ec.intro.eyebrow": "See what fits your business in 90 seconds",

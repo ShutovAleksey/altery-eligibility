@@ -14,6 +14,7 @@
     "common.clear": "Wissen",
     "common.editAnswers": "Antwoorden aanpassen",
     "common.contactTeam": "Contact opnemen",
+    "common.cancel": "Annuleren",
 
     "ec.intro.eyebrow": "Ontdek in 90 seconden wat bij uw bedrijf past",
     "ec.intro.title": "Een Altery-plan, afgestemd op hoe uw bedrijf geld verplaatst",
@@ -450,6 +451,7 @@
     "common.clear": "Temizle",
     "common.editAnswers": "Cevapları düzenle",
     "common.contactTeam": "Ekiple iletişim",
+    "common.cancel": "İptal",
 
     "ec.intro.eyebrow": "İşletmenize neyin uyduğunu 90 saniyede görün",
     "ec.intro.title": "İşletmenizin parayı nasıl hareket ettirdiğine göre kurulan bir Altery planı",
