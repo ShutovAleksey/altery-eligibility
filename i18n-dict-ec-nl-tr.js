@@ -300,9 +300,9 @@
     "ec.reasoning.upgrade.path": "Eenvoudige upgrade later — Pro voegt bulkbetalingen, zakelijke kaarten en betere FX-tarieven toe zonder her-onboarding.",
 
     "ec.b.eyebrow": "Geen match gevonden",
-    "ec.b.title.a": "We openen geen rekeningen voor",
+    "ec.b.industry.title": "We kunnen momenteel geen ondernemingen in de {industry}-sector ondersteunen.",
     "ec.b.title.b": "op dit moment.",
-    "ec.b.lead": "Geen van onze entiteiten (VK, EER, DIFC) ondersteunt deze sector momenteel. Beter dat we het hier zeggen dan na het uploaden van documenten.",
+    "ec.b.lead": "Op dit moment zijn Altery-diensten niet beschikbaar voor ondernemingen in deze sector. Dit is geen oordeel over uw bedrijf en de beschikbaarheid kan in de loop van de tijd veranderen.",
     "ec.b.country.title": "We kunnen op dit moment geen ondernemingen ondersteunen die zijn gevestigd in {country}.",
     "ec.b.country.lead": "Op dit moment zijn Altery-diensten niet beschikbaar in deze jurisdictie. Dit is geen oordeel over uw bedrijf en de beschikbaarheid kan in de loop van de tijd veranderen.",
     "ec.b.head": "Als uw bedrijfsopzet complexer is",
@@ -739,9 +739,9 @@
     "ec.reasoning.upgrade.path": "Sonradan kolay yükseltme — Pro yeniden onboarding yapmadan toplu ödemeler, kurumsal kartlar ve daha iyi FX oranları ekler.",
 
     "ec.b.eyebrow": "Eşleşme bulunamadı",
-    "ec.b.title.a": "Şu anda",
+    "ec.b.industry.title": "Şu anda {industry} sektöründe faaliyet gösteren işletmeleri destekleyemiyoruz.",
     "ec.b.title.b": "için hesap açamıyoruz.",
-    "ec.b.lead": "Şirketlerimizden hiçbiri (İngiltere, AEA, DIFC) bu sektörü şu anda desteklemiyor. Belge yüklendikten sonra değil, burada söylemek daha iyi.",
+    "ec.b.lead": "Şu anda Altery hizmetleri bu sektörde faaliyet gösteren işletmeler için mevcut değil. Bu, işletmenizle ilgili bir değerlendirme değildir ve kullanılabilirlik zamanla değişebilir.",
     "ec.b.country.title": "Şu anda {country} ülkesinde kurulu işletmeleri destekleyemiyoruz.",
     "ec.b.country.lead": "Şu anda Altery hizmetleri bu yargı bölgesinde mevcut değil. Bu, işletmenizle ilgili bir değerlendirme değildir ve kullanılabilirlik zamanla değişebilir.",
     "ec.b.head": "İşletme kurulumunuz daha karmaşıksa",

@@ -500,9 +500,9 @@
 
     // Result — blocked
     "ec.b.eyebrow": "Couldn't find a match",
-    "ec.b.title.a": "We can't open accounts for",
+    "ec.b.industry.title": "We're currently unable to support businesses operating in the {industry} industry.",
     "ec.b.title.b": "right now.",
-    "ec.b.lead": "None of our entities (UK, EEA, DIFC) currently support this industry. We'd rather tell you here than after you've uploaded company documents.",
+    "ec.b.lead": "At the moment, Altery services aren't available for businesses operating in this industry. This isn't a reflection on your business, and availability may change over time.",
     "ec.b.country.title": "We're currently unable to support businesses incorporated in {country}.",
     "ec.b.country.lead": "At the moment, Altery services aren't available in this jurisdiction. This isn't a reflection on your business, and availability may change over time.",
     "ec.b.head": "If your business setup is more complex",

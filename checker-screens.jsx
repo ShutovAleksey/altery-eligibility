@@ -1981,25 +1981,21 @@ function EcResultBlocked({ rec, onBack, onReset }) {
   // Two block reasons share the same screen scaffolding; only the
   // accent token, title fragments and lead copy differ.
   const isCountry = rec.reason === "country";
-  let accent, titleA, titleB, lead;
+  // Both reasons use a single interpolated title sentence (correct word
+  // order per language); the key noun is accented in the JSX by splitting
+  // on it. `accent` is the country name (title-case proper noun) or the
+  // lowercased industry label (reads naturally mid-sentence;
+  // toLocaleLowerCase handles non-Latin scripts incl. the Turkish İ→i case).
+  let accent, title, lead;
   if (isCountry) {
-    // Country names stay in title-case ("Russia", "Iran" — proper nouns)
-    // so we don't toLocaleLowerCase them; the rest is taken straight from
-    // the ec.country.XX dict (with c.name fallback for un-translated codes).
-    // The title is a single interpolated sentence (ec.b.country.title) so
-    // word order stays correct per language; the country is accented in
-    // the JSX by splitting on its name.
     const c = rec.country;
     const localized = t("ec.country." + c.code);
     accent = localized === c.code ? c.name : localized;
+    title  = t("ec.b.country.title", { country: accent });
     lead   = t("ec.b.country.lead");
   } else {
-    // Industry name lowercased so it reads naturally inside the sentence
-    // ("…can't open accounts for gambling right now"). toLocaleLowerCase
-    // handles non-Latin scripts safely (Turkish "İ"→"i" edge case).
     accent = t(rec.reasonKey).toLocaleLowerCase(lang);
-    titleA = t("ec.b.title.a");
-    titleB = t("ec.b.title.b");
+    title  = t("ec.b.industry.title", { industry: accent });
     lead   = t("ec.b.lead");
   }
   return (
@@ -2011,24 +2007,17 @@ function EcResultBlocked({ rec, onBack, onReset }) {
         <div className="ec-result__hero">
           <div className="ec-result__heroEyebrow">{t("ec.b.eyebrow")}</div>
           <h1 className="ec-result__heroTitle">
-            {isCountry ? (() => {
-              const text = t("ec.b.country.title", { country: accent });
-              const idx = text.indexOf(accent);
-              if (idx === -1) return text;
+            {(() => {
+              const idx = title.indexOf(accent);
+              if (idx === -1) return title;
               return (
                 <>
-                  {text.slice(0, idx)}
+                  {title.slice(0, idx)}
                   <span className="ec-result__hero__accent">{accent}</span>
-                  {text.slice(idx + accent.length)}
+                  {title.slice(idx + accent.length)}
                 </>
               );
-            })() : (
-              <>
-                {titleA}{" "}
-                <span className="ec-result__hero__accent">{accent}</span>{" "}
-                {titleB}
-              </>
-            )}
+            })()}
           </h1>
           <p className="ec-result__heroLead">{lead}</p>
         </div>

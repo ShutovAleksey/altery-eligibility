@@ -304,9 +304,9 @@
     "ec.reasoning.upgrade.path": "Einfaches Upgrade später — Pro fügt Sammelzahlungen, Firmenkarten und bessere FX-Raten hinzu, ohne Re-Onboarding.",
 
     "ec.b.eyebrow": "Keine Übereinstimmung",
-    "ec.b.title.a": "Wir können keine Konten für",
+    "ec.b.industry.title": "Derzeit können wir keine Unternehmen aus der {industry}-Branche unterstützen.",
     "ec.b.title.b": "eröffnen.",
-    "ec.b.lead": "Keine unserer Gesellschaften (UK, EWR, DIFC) unterstützt diese Branche derzeit. Besser, wir sagen es jetzt als nach dem Hochladen Ihrer Firmenunterlagen.",
+    "ec.b.lead": "Derzeit sind Altery-Dienste für Unternehmen aus dieser Branche nicht verfügbar. Das ist kein Urteil über Ihr Geschäft, und die Verfügbarkeit kann sich mit der Zeit ändern.",
     "ec.b.country.title": "Wir können Unternehmen mit Sitz in {country} derzeit nicht unterstützen.",
     "ec.b.country.lead": "Derzeit sind Altery-Dienste in dieser Jurisdiktion nicht verfügbar. Das ist kein Urteil über Ihr Geschäft, und die Verfügbarkeit kann sich mit der Zeit ändern.",
     "ec.b.head": "Wenn Ihr Unternehmens-Setup komplexer ist",
@@ -743,9 +743,9 @@
     "ec.reasoning.upgrade.path": "Лёгкий апгрейд позже — Pro добавляет массовые выплаты, карты и лучшие FX-курсы без повторного onboarding.",
 
     "ec.b.eyebrow": "Подходящего варианта нет",
-    "ec.b.title.a": "Мы не открываем счета для",
+    "ec.b.industry.title": "Сейчас мы не можем поддерживать компании из индустрии «{industry}».",
     "ec.b.title.b": "сейчас.",
-    "ec.b.lead": "Ни одно из подразделений (Великобритания, ЕЭП, DIFC) не работает с этой отраслью. Лучше скажем сейчас, чем после загрузки документов.",
+    "ec.b.lead": "В данный момент услуги Altery недоступны для компаний из этой индустрии. Это не оценка вашего бизнеса, и доступность может измениться со временем.",
     "ec.b.country.title": "Сейчас мы не можем поддерживать компании, зарегистрированные в стране {country}.",
     "ec.b.country.lead": "В данный момент услуги Altery недоступны в этой юрисдикции. Это не оценка вашего бизнеса, и доступность может измениться со временем.",
     "ec.b.head": "Если структура вашего бизнеса сложнее",

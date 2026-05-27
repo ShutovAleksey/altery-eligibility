@@ -300,9 +300,9 @@
     "ec.reasoning.upgrade.path": "Upgrade facile in seguito — Pro aggiunge pagamenti di massa, carte aziendali e migliori tariffe FX senza re-onboarding.",
 
     "ec.b.eyebrow": "Nessuna corrispondenza",
-    "ec.b.title.a": "Al momento non apriamo conti per",
+    "ec.b.industry.title": "Al momento non possiamo supportare le aziende che operano nel settore {industry}.",
     "ec.b.title.b": ".",
-    "ec.b.lead": "Nessuna delle nostre entità (UK, SEE, DIFC) supporta attualmente questo settore. Meglio dirlo qui che dopo aver caricato i documenti.",
+    "ec.b.lead": "Al momento i servizi Altery non sono disponibili per le aziende che operano in questo settore. Non è un giudizio sulla tua attività e la disponibilità potrebbe cambiare nel tempo.",
     "ec.b.country.title": "Al momento non possiamo supportare le aziende registrate in {country}.",
     "ec.b.country.lead": "Al momento i servizi Altery non sono disponibili in questa giurisdizione. Non è un giudizio sulla tua attività e la disponibilità potrebbe cambiare nel tempo.",
     "ec.b.head": "Se la struttura della tua azienda è più complessa",
@@ -739,9 +739,9 @@
     "ec.reasoning.upgrade.path": "Upgrade fácil más adelante — Pro añade pagos masivos, tarjetas corporativas y mejores tarifas FX sin re-onboarding.",
 
     "ec.b.eyebrow": "No encontramos una opción",
-    "ec.b.title.a": "Ahora mismo no abrimos cuentas para",
+    "ec.b.industry.title": "Por ahora no podemos dar soporte a empresas del sector {industry}.",
     "ec.b.title.b": ".",
-    "ec.b.lead": "Ninguna de nuestras entidades (Reino Unido, EEE, DIFC) admite este sector hoy. Mejor decirlo aquí que tras subir documentos de la empresa.",
+    "ec.b.lead": "Por el momento, los servicios de Altery no están disponibles para empresas que operan en este sector. Esto no es un juicio sobre tu negocio y la disponibilidad puede cambiar con el tiempo.",
     "ec.b.country.title": "Por ahora no podemos dar soporte a empresas constituidas en {country}.",
     "ec.b.country.lead": "Por el momento, los servicios de Altery no están disponibles en esta jurisdicción. Esto no es un juicio sobre tu negocio y la disponibilidad puede cambiar con el tiempo.",
     "ec.b.head": "Si la configuración de tu empresa es más compleja",
