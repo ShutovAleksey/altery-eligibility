@@ -774,14 +774,11 @@ const EC_ENTITIES = {
     noteKey: "ec.entity.mena.note",
     currencyPerkKey: "ec.entity.mena.currencyPerk",
     countries: ["AE", "SA", "EG", "TR"],
-    // DFSA's public-firm register doesn't expose an individual
-    // numeric ref through a stable deep link — the link goes to the
-    // searchable register where visitors can locate Altery MENA Ltd.
-    // Once DFSA publishes a stable firm-detail URL we should swap in
-    // the deep link here.
+    // Direct deep link to Altery MENA Ltd's firm-detail page on the
+    // DFSA public register.
     regulatory: {
       refLabel: "DFSA register",
-      registerUrl: "https://www.dfsa.ae/public-register/firms",
+      registerUrl: "https://www.dfsa.ae/public-register/firms/altery-mena-ltd",
     },
     accounts: [
       {
