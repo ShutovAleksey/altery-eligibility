@@ -262,6 +262,35 @@ const EC_COUNTRIES = [
   { code: "ZW", name: "Zimbabwe", region: "row" },
 ];
 
+// ── Serviceable jurisdictions (corporate KYB risk appetite) ──────────
+// Single source of truth aligned with the back-office compliance register
+// (Corporate column). Only "Operational" jurisdictions can onboard a
+// business; everything else — "Not operational", "Prohibited", sanctioned,
+// or any territory absent from the register — is a hard decline. We keep
+// the allow-list here (not a per-row flag) so a register refresh is a
+// one-list edit instead of touching 200+ country rows. The loop below
+// stamps risk:"blocked" on every country NOT in this set, which Q1
+// (incorporation) reads to short-circuit to the soft-decline result.
+//
+// IMPORTANT: when the compliance register changes, update THIS set. A
+// country moving to "Operational" → add its code; moving away → remove it.
+const EC_SERVICEABLE_CC = new Set([
+  "AD","AI","AG","AM","AW","AU","AT","AZ","BS","BB","BE","BZ","BM","BN","BG",
+  "CA","KY","CX","CC","CR","HR","CW","CY","CZ","DK","DM","DO","EE","FI","FR",
+  "GE","DE","GH","GI","GR","GD","GG","HN","HK","HU","IS","IE","IM","IL","IT",
+  "JP","JE","KZ","KG","LV","LI","LT","LU","MY","MT","MH","MU","MD","MC","MS",
+  "NR","NL","NZ","NG","NU","MK","NO","PW","PA","PL","PT","PR","RO","SM","SA",
+  "SC","SG","SX","SK","SI","ZA","ES","LK","KN","LC","VC","SE","CH","TH","TR",
+  "TC","UA","AE","GB","US","UZ","VG",
+]);
+
+// Stamp the corporate risk appetite onto every country. Mutating the
+// constant array's elements is fine — they're plain objects and nothing
+// has read them yet at module-eval time.
+EC_COUNTRIES.forEach((c) => {
+  if (!EC_SERVICEABLE_CC.has(c.code)) c.risk = "blocked";
+});
+
 // Q5 transactional corridors — country-level multi-select per direction.
 // Grouped at display time into 4 buckets matching altery.com's public
 // geographic taxonomy (Europe / Asia-Pacific & Middle East / Americas

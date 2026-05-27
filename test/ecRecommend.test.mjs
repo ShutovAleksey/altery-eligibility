@@ -46,7 +46,10 @@ test("UAE-incorporated business routes to MENA entity", () => {
 });
 
 test("ROW-incorporated business routes to UK (passport fallback)", () => {
-  const rec = w.ecRecommend(input({ countryCode: "BR" }));
+  // Canada: serviceable (corporate Operational) but outside UK/EU/MENA,
+  // so it falls back to the UK entity. (Brazil used to sit here, but the
+  // compliance-register alignment now blocks it — see EC_SERVICEABLE_CC.)
+  const rec = w.ecRecommend(input({ countryCode: "CA" }));
   assert.equal(rec.entity.id, "uk");
 });
 
