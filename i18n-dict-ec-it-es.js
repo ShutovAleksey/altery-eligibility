@@ -52,7 +52,7 @@
     "ec.q2.empty.lead": "Prova il nome in inglese o contatta il nostro team.",
 
     "ec.q1.title": "Che tipo di attività gestisci?",
-    "ec.q1.lead": "Alcuni settori al momento non possiamo seguirli — meglio saperlo prima del KYB. Scegli l'opzione più vicina; affineremo nella richiesta.",
+    "ec.q1.lead": "Scegli l'opzione che meglio descrive la tua azienda. La useremo per personalizzare la configurazione e l'accesso ai prodotti giusti per te.",
     "ec.q1.field.industry": "Settore",
     "ec.q1.field.industryPh": "Seleziona settore",
     "ec.q1.alert.blocked.title": "Per questo settore non apriamo conti",
@@ -488,7 +488,7 @@
     "ec.q2.empty.lead": "Prueba el nombre en inglés o contacta con nuestro equipo.",
 
     "ec.q1.title": "¿Qué tipo de negocio tienes?",
-    "ec.q1.lead": "Hay sectores que ahora mismo no podemos atender — mejor saberlo antes del KYB. Elige la opción más cercana; en la solicitud lo afinamos.",
+    "ec.q1.lead": "Elige la opción que mejor describa tu empresa. La usaremos para adaptar la configuración y el acceso a productos adecuados para ti.",
     "ec.q1.field.industry": "Sector",
     "ec.q1.field.industryPh": "Seleccionar sector",
     "ec.q1.alert.blocked.title": "No abrimos cuentas para este sector",

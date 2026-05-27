@@ -53,7 +53,7 @@
     "ec.q2.empty.lead": "Spróbuj nazwy po angielsku lub skontaktuj się z nami.",
 
     "ec.q1.title": "Jaki to rodzaj działalności?",
-    "ec.q1.lead": "Kilku branż obecnie nie obsługujemy — lepiej wiedzieć przed KYB. Wybierz najbliższą opcję; doprecyzujemy we wniosku.",
+    "ec.q1.lead": "Wybierz opcję, która najlepiej pasuje do Twojej firmy. Na tej podstawie dopasujemy właściwą konfigurację i dostęp do produktów.",
     "ec.q1.field.industry": "Branża",
     "ec.q1.field.industryPh": "Wybierz branżę",
     "ec.q1.alert.blocked.title": "Dla tej branży nie otwieramy kont",
@@ -489,7 +489,7 @@
     "ec.q2.empty.lead": "Tente o nome em inglês ou contacte a nossa equipa.",
 
     "ec.q1.title": "Que tipo de negócio tem?",
-    "ec.q1.lead": "Há setores que não conseguimos servir agora — melhor saber antes do KYB. Escolha o mais próximo; afinamos no pedido.",
+    "ec.q1.lead": "Escolha a opção que melhor corresponde ao seu negócio. Vamos usá-la para adaptar a configuração e o acesso a produtos certos para si.",
     "ec.q1.field.industry": "Setor",
     "ec.q1.field.industryPh": "Selecionar setor",
     "ec.q1.alert.blocked.title": "Não abrimos contas para este setor",
@@ -927,7 +927,7 @@
     "ec.q2.empty.lead": "Essayez le nom en anglais ou contactez notre équipe.",
 
     "ec.q1.title": "Quel type d'activité gérez-vous ?",
-    "ec.q1.lead": "Quelques secteurs ne sont pas pris en charge actuellement — autant le savoir avant le KYB. Choisissez l'option la plus proche ; nous affinerons dans la demande.",
+    "ec.q1.lead": "Choisissez l'option qui correspond le mieux à votre entreprise. Nous l'utiliserons pour adapter la configuration et l'accès aux produits qui vous conviennent.",
     "ec.q1.field.industry": "Secteur",
     "ec.q1.field.industryPh": "Sélectionner un secteur",
     "ec.q1.alert.blocked.title": "Nous n'ouvrons pas de comptes pour ce secteur",

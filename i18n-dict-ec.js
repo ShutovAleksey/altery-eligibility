@@ -60,7 +60,7 @@
 
     // Q2 industry
     "ec.q1.title": "What kind of business do you run?",
-    "ec.q1.lead": "A few industries we can't serve right now — better to know before you start KYB. Pick the closest match; we'll refine on the application.",
+    "ec.q1.lead": "Choose the option that best matches your business. We'll use this to tailor the right setup and product access for you.",
     "ec.q1.field.industry":   "Industry",
     "ec.q1.field.industryPh": "Select industry",
     "ec.q1.alert.blocked.title": "We can't open accounts for this industry",

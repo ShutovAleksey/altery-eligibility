@@ -56,7 +56,7 @@
     "ec.q2.empty.lead": "Versuchen Sie den Namen auf Englisch, oder kontaktieren Sie uns.",
 
     "ec.q1.title": "Welche Art von Geschäft betreiben Sie?",
-    "ec.q1.lead": "Es gibt einige Branchen, die wir derzeit nicht bedienen können — besser vor dem KYB klären. Wählen Sie die nächste Übereinstimmung; im Antrag verfeinern wir.",
+    "ec.q1.lead": "Wählen Sie die Option, die am besten zu Ihrem Unternehmen passt. Damit passen wir das richtige Setup und den Produktzugang für Sie an.",
     "ec.q1.field.industry": "Branche",
     "ec.q1.field.industryPh": "Branche wählen",
     "ec.q1.alert.blocked.title": "Für diese Branche eröffnen wir keine Konten",
@@ -492,7 +492,7 @@
     "ec.q2.empty.lead": "Попробуйте ввести название по-английски или свяжитесь с нами.",
 
     "ec.q1.title": "Чем занимается ваш бизнес?",
-    "ec.q1.lead": "Несколько отраслей мы пока не обслуживаем — лучше узнать до KYB. Выберите ближайший вариант; уточним в заявке.",
+    "ec.q1.lead": "Выберите вариант, который лучше всего описывает ваш бизнес. На его основе мы подберём правильную настройку и доступ к продуктам.",
     "ec.q1.field.industry": "Отрасль",
     "ec.q1.field.industryPh": "Выберите отрасль",
     "ec.q1.alert.blocked.title": "Счета для этой отрасли мы не открываем",

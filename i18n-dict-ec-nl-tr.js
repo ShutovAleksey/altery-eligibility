@@ -52,7 +52,7 @@
     "ec.q2.empty.lead": "Probeer de naam in het Engels of neem contact met ons op.",
 
     "ec.q1.title": "Wat voor bedrijf voer je?",
-    "ec.q1.lead": "Sommige sectoren kunnen we nu niet bedienen — beter te weten vóór de KYB. Kies de dichtstbijzijnde optie; we verfijnen in de aanvraag.",
+    "ec.q1.lead": "Kies de optie die het best bij uw bedrijf past. Hiermee stemmen we de juiste opzet en producttoegang voor u af.",
     "ec.q1.field.industry": "Sector",
     "ec.q1.field.industryPh": "Kies sector",
     "ec.q1.alert.blocked.title": "Voor deze sector openen we geen rekeningen",
@@ -488,7 +488,7 @@
     "ec.q2.empty.lead": "Ülke adını İngilizce deneyin veya ekibimizle iletişime geçin.",
 
     "ec.q1.title": "Ne tür bir iş yürütüyorsunuz?",
-    "ec.q1.lead": "Şu an hizmet veremediğimiz birkaç sektör var — KYB'den önce bilmek daha iyi. En yakın seçeneği işaretleyin; başvuruda inceltiriz.",
+    "ec.q1.lead": "İşletmenize en uygun seçeneği seçin. Bunu, sizin için doğru kurulumu ve ürün erişimini şekillendirmek için kullanırız.",
     "ec.q1.field.industry": "Sektör",
     "ec.q1.field.industryPh": "Sektör seçin",
     "ec.q1.alert.blocked.title": "Bu sektör için hesap açmıyoruz",
