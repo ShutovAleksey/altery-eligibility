@@ -44,6 +44,9 @@
 
     "ec.q2.title": "Gdzie zarejestrowana jest spółka?",
     "ec.q2.lead": "Wybierz kraj wskazany w Twoich dokumentach rejestracyjnych. Pomaga nam to dobrać właściwą konfigurację dla Twojej firmy.",
+    "ec.q2.alert.blocked.title": "Tam jeszcze nie działamy",
+    "ec.q2.alert.blocked.body": "Obecnie nie możemy otwierać kont dla firm zarejestrowanych w kraju {country}.",
+    "ec.blocked.cta": "Zobacz opcje",
     "ec.q2.input.label": "Kraj rejestracji",
     "ec.q2.input.placeholder": "Szukaj kraju",
     "ec.q2.empty.title": "Brak wyników",
@@ -477,6 +480,9 @@
 
     "ec.q2.title": "Onde está constituída a sua empresa?",
     "ec.q2.lead": "Selecione o país indicado nos seus documentos de registo. Isto ajuda-nos a determinar a configuração certa para o seu negócio.",
+    "ec.q2.alert.blocked.title": "Ainda não operamos aí",
+    "ec.q2.alert.blocked.body": "De momento não podemos abrir contas para empresas registadas em {country}.",
+    "ec.blocked.cta": "Ver as suas opções",
     "ec.q2.input.label": "País de constituição",
     "ec.q2.input.placeholder": "Procurar país",
     "ec.q2.empty.title": "Sem resultados",
@@ -912,6 +918,9 @@
 
     "ec.q2.title": "Où votre société est-elle immatriculée ?",
     "ec.q2.lead": "Sélectionnez le pays indiqué sur vos documents d'immatriculation. Cela nous aide à déterminer la configuration adaptée à votre entreprise.",
+    "ec.q2.alert.blocked.title": "Nous n'opérons pas encore là-bas",
+    "ec.q2.alert.blocked.body": "Nous ne pouvons pas actuellement ouvrir de comptes pour les entreprises immatriculées en {country}.",
+    "ec.blocked.cta": "Voir vos options",
     "ec.q2.input.label": "Pays d'immatriculation",
     "ec.q2.input.placeholder": "Rechercher un pays",
     "ec.q2.empty.title": "Aucun pays trouvé",

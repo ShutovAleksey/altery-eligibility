@@ -810,15 +810,24 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
         nameOf={nameOf}
       />
 
+      {/* Inline soft-decline — fires the instant a non-serviceable country
+          is picked, so the user learns why before acting. The primary
+          button below switches from "Continue" to a decline CTA. */}
+      {isBlocked && (
+        <Alert tone="danger" title={t("ec.q2.alert.blocked.title")}>
+          {t("ec.q2.alert.blocked.body", { country: nameOf(picked) })}
+        </Alert>
+      )}
+
       <div className="ob-actions">
         <Button
           variant="primary"
           size="xl"
           onClick={isBlocked ? onBlocked : onNext}
-          iconRight="arrowRight"
+          iconRight={isBlocked ? undefined : "arrowRight"}
           disabled={!value}
         >
-          {t("common.continue")}
+          {isBlocked ? t("ec.blocked.cta") : t("common.continue")}
         </Button>
       </div>
     </div>
@@ -895,10 +904,10 @@ function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked 
           variant="primary"
           size="xl"
           onClick={isBlocked ? onBlocked : onNext}
-          iconRight="arrowRight"
+          iconRight={isBlocked ? undefined : "arrowRight"}
           disabled={!industry}
         >
-          {t("common.continue")}
+          {isBlocked ? t("ec.blocked.cta") : t("common.continue")}
         </Button>
       </div>
     </div>

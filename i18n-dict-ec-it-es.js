@@ -43,6 +43,9 @@
 
     "ec.q2.title": "Dove è costituita la tua società?",
     "ec.q2.lead": "Seleziona il paese indicato sui tuoi documenti di registrazione. Ci aiuta a determinare la configurazione giusta per la tua azienda.",
+    "ec.q2.alert.blocked.title": "Lì non operiamo ancora",
+    "ec.q2.alert.blocked.body": "Al momento non possiamo aprire conti per aziende registrate in {country}.",
+    "ec.blocked.cta": "Vedi le opzioni",
     "ec.q2.input.label": "Paese di costituzione",
     "ec.q2.input.placeholder": "Cerca paese",
     "ec.q2.empty.title": "Nessun paese trovato",
@@ -476,6 +479,9 @@
 
     "ec.q2.title": "¿Dónde está constituida tu empresa?",
     "ec.q2.lead": "Selecciona el país que aparece en tus documentos de registro. Esto nos ayuda a determinar la configuración adecuada para tu empresa.",
+    "ec.q2.alert.blocked.title": "Aún no operamos allí",
+    "ec.q2.alert.blocked.body": "Por ahora no podemos abrir cuentas para empresas registradas en {country}.",
+    "ec.blocked.cta": "Ver tus opciones",
     "ec.q2.input.label": "País de constitución",
     "ec.q2.input.placeholder": "Buscar país",
     "ec.q2.empty.title": "Sin resultados",

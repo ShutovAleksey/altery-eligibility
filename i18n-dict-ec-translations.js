@@ -47,6 +47,9 @@
 
     "ec.q2.title": "Wo ist Ihr Unternehmen eingetragen?",
     "ec.q2.lead": "Wählen Sie das Land aus, das auf Ihren Registrierungsunterlagen angegeben ist. So ermitteln wir das richtige Setup für Ihr Unternehmen.",
+    "ec.q2.alert.blocked.title": "Dort sind wir noch nicht aktiv",
+    "ec.q2.alert.blocked.body": "Für in {country} registrierte Unternehmen können wir derzeit keine Konten eröffnen.",
+    "ec.blocked.cta": "Optionen ansehen",
     "ec.q2.input.label": "Land der Eintragung",
     "ec.q2.input.placeholder": "Land suchen",
     "ec.q2.empty.title": "Keine Treffer für Ihre Suche",
@@ -480,6 +483,9 @@
 
     "ec.q2.title": "Где зарегистрирована ваша компания?",
     "ec.q2.lead": "Выберите страну, указанную в ваших регистрационных документах. Это поможет нам подобрать правильную настройку для вашего бизнеса.",
+    "ec.q2.alert.blocked.title": "Мы пока там не работаем",
+    "ec.q2.alert.blocked.body": "Сейчас мы не можем открывать счета для компаний, зарегистрированных в стране: {country}.",
+    "ec.blocked.cta": "Посмотреть варианты",
     "ec.q2.input.label": "Страна регистрации",
     "ec.q2.input.placeholder": "Поиск страны",
     "ec.q2.empty.title": "Совпадений не найдено",
