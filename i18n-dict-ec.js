@@ -503,11 +503,11 @@
     "ec.b.title.a": "We can't open accounts for",
     "ec.b.title.b": "right now.",
     "ec.b.lead": "None of our entities (UK, EEA, DIFC) currently support this industry. We'd rather tell you here than after you've uploaded company documents.",
-    "ec.b.country.title.a": "We can't open accounts in",
+    "ec.b.country.title": "We're currently unable to support businesses incorporated in {country}.",
     "ec.b.country.lead": "Altery's licensing perimeter (UK FCA, Cyprus CBC, UAE DFSA) doesn't cover this jurisdiction. That's a regulatory limit, not a verdict on your business — sanctions and FATF guidance shift, so we'll update you if the situation changes.",
-    "ec.b.head": "If your business is more nuanced than the dropdown",
+    "ec.b.head": "If your business setup is more complex",
     "ec.b.row1.tag": "Talk to us",
-    "ec.b.row1.text": "Some industries are case-by-case. If you operate adjacent to one of these (e.g. compliance tooling for the gambling industry), we'd still like to hear from you. Email sales@altery.com with a 2-line description. The supported-industries list expands as new licences come online — we'll keep this page accurate.",
+    "ec.b.row1.text": "Some business models require additional review. If you think we may still be able to support your business, contact our team with a short description of your setup.",
 
     // Country regions/notes (for entity card)
     "ec.r.entity.regHint": "Open the regulator's public register in a new tab",

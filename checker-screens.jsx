@@ -5,7 +5,7 @@
           EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
-          ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount, ecBookingUrl,
+          ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
           EcFeesModal, EcPlanComparisonModal, EcHandoffModal, EcPaymentModal, EcCallbackForm */
 // checker-screens.jsx — the eligibility-checker question screens, result
 // screens, and the supporting EcIco decorative-icon set.
@@ -1986,11 +1986,12 @@ function EcResultBlocked({ rec, onBack, onReset }) {
     // Country names stay in title-case ("Russia", "Iran" — proper nouns)
     // so we don't toLocaleLowerCase them; the rest is taken straight from
     // the ec.country.XX dict (with c.name fallback for un-translated codes).
+    // The title is a single interpolated sentence (ec.b.country.title) so
+    // word order stays correct per language; the country is accented in
+    // the JSX by splitting on its name.
     const c = rec.country;
     const localized = t("ec.country." + c.code);
     accent = localized === c.code ? c.name : localized;
-    titleA = t("ec.b.country.title.a");
-    titleB = t("ec.b.title.b");
     lead   = t("ec.b.country.lead");
   } else {
     // Industry name lowercased so it reads naturally inside the sentence
@@ -2010,9 +2011,24 @@ function EcResultBlocked({ rec, onBack, onReset }) {
         <div className="ec-result__hero">
           <div className="ec-result__heroEyebrow">{t("ec.b.eyebrow")}</div>
           <h1 className="ec-result__heroTitle">
-            {titleA}{" "}
-            <span className="ec-result__hero__accent">{accent}</span>{" "}
-            {titleB}
+            {isCountry ? (() => {
+              const text = t("ec.b.country.title", { country: accent });
+              const idx = text.indexOf(accent);
+              if (idx === -1) return text;
+              return (
+                <>
+                  {text.slice(0, idx)}
+                  <span className="ec-result__hero__accent">{accent}</span>
+                  {text.slice(idx + accent.length)}
+                </>
+              );
+            })() : (
+              <>
+                {titleA}{" "}
+                <span className="ec-result__hero__accent">{accent}</span>{" "}
+                {titleB}
+              </>
+            )}
           </h1>
           <p className="ec-result__heroLead">{lead}</p>
         </div>
@@ -2021,34 +2037,17 @@ function EcResultBlocked({ rec, onBack, onReset }) {
           <ul className="ec-caveats__list">
             <li className="ec-caveats__row">
               <span className="ec-tagslot"><Tag tone="blue" size="sm">{t("ec.b.row1.tag")}</Tag></span>
-              <span>{(() => {
-                // Inline mailto: wrap the literal `sales@altery.com` in every
-                // translation as a clickable anchor. The address is verbatim
-                // across all 10 dict entries so a plain indexOf is safe.
-                const text = t("ec.b.row1.text");
-                const email = "sales@altery.com";
-                const idx = text.indexOf(email);
-                if (idx === -1) return text;
-                return (
-                  <>
-                    {text.slice(0, idx)}
-                    <a href={`mailto:${email}`}>{email}</a>
-                    {text.slice(idx + email.length)}
-                  </>
-                );
-              })()}</span>
+              <span>{t("ec.b.row1.text")}</span>
             </li>
           </ul>
         </div>
         <div className="ec-actions">
           <Button variant="primary" size="xl" onClick={onReset}>{t("common.startOver")}</Button>
-          {/* Soft-decline cohort: open the team's HubSpot Meetings booking
-              page so the visitor can request a conversation rather than
-              composing a mailto thread. ecBookingUrl carries whatever
-              context the blocked recommendation has; same surface the
-              PDF/email flow points at, so the team operates one calendar. */}
+          {/* Soft-decline cohort: open the user's mail client to sales@ so
+              they can describe their setup. Blocked businesses fall outside
+              the self-serve funnel, so a direct email beats a booking link. */}
           <Button variant="outline" size="xl"
-                  onClick={() => window.open(ecBookingUrl(rec), "_blank", "noopener,noreferrer")}>
+                  onClick={() => { window.location.href = "mailto:sales@altery.com"; }}>
             {t("common.contactTeam")}
           </Button>
         </div>
