@@ -632,7 +632,7 @@
        a paragraph would. */
     .ec-intro__trust {
       margin-top: 14px;
-      text-align: center;
+      text-align: left;
       font-size: 12px;
       line-height: 17px;
       color: var(--c-muted);

@@ -440,12 +440,6 @@ function EcIntro({ onStart }) {
   const t = useT();
   return (
     <div className="ec-content fade-in">
-      {/* Brand doodle — Altery Design System onboarding pattern:
-          block-level above the title, top-left aligned, full size.
-          Sets the visual tone for the whole 90-second flow. */}
-      <span className="ec-doodle ec-doodle--block">
-        <img src="/images/doodles/onboarding.svg" alt="" aria-hidden="true" />
-      </span>
       {/* Eyebrow with an inline sparkle icon — visual "this is built
           specifically for you" cue before the user reads the title.
           Title accepts JSX as `eyebrow`, so we compose a span here
