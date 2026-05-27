@@ -21,17 +21,17 @@
     "common.contactTeam": "Contact our team",
 
     // Intro screen
-    "ec.intro.eyebrow": "Personalised plan · 90 seconds",
-    "ec.intro.title": "Your Altery plan, built around your business",
-    "ec.intro.lead": "{total} questions. We come back with your plan — products, cost, and how it compares to a typical bank. Built for digital businesses banks don't quite get.",
-    "ec.intro.value1.title": "A plan tailored to your business",
-    "ec.intro.value1.body": "Not a tier from a public pricing page. Built from your industry, volume, corridors and currencies.",
-    "ec.intro.value2.title": "Every product we'd open for you",
-    "ec.intro.value2.body": "GBP, EUR and USD accounts from day one. Plus FX corridors, mass payouts, business cards, and crypto rails where they apply.",
-    "ec.intro.value3.title": "What you'd actually pay each month",
-    "ec.intro.value3.body": "Monthly fee, FX, SWIFT, SEPA — and what a typical bank would charge for the same flows. In pounds, not percentages.",
+    "ec.intro.eyebrow": "See what fits your business in 90 seconds",
+    "ec.intro.title": "Altery plan built around how your business moves money",
+    "ec.intro.lead": "Answer {total} quick questions and we'll show you the products, pricing, and payment setup that fit your business.",
+    "ec.intro.value1.title": "A payment setup built around how your business operates",
+    "ec.intro.value1.body": "Based on your business model, volumes, currencies, and payment corridors.",
+    "ec.intro.value2.title": "What your business could access",
+    "ec.intro.value2.body": "Including multi-currency accounts, FX, payouts, cards, and crypto-related payment support where available.",
+    "ec.intro.value3.title": "Clear view of your monthly costs",
+    "ec.intro.value3.body": "Estimated fees for FX, SWIFT, SEPA, and everyday payment activity based on your expected usage.",
     "ec.intro.cta": "Build my plan",
-    "ec.intro.trust": "No signup · No credit check · Licensed EMI (FCA · CBC · DFSA)",
+    "ec.intro.trust": "Services provided by Altery Ltd, authorised by the UK Financial Conduct Authority as an Electronic Money Institution (FRN 901037), and Altery EU Ltd, authorised and regulated by the Central Bank of Cyprus as an Electronic Money Institution (Licence No. 115.1.3.61).",
 
     // Sidebar step labels (desktop ≥900px). Kept to one word each
     // so the 240px column doesn't need to wrap.
