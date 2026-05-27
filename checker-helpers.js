@@ -78,42 +78,40 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
   const cryptoReroute = cryptoActive && country?.region === "eu";
   if (cryptoReroute) entity = EC_ENTITIES.uk;
 
-  // Plan tier decision — combines four signal sources:
-  //   (1) Volume   — €100k/mo and €1M/mo are the canonical thresholds
-  //   (2) Operational complexity — wide corridor mix or high tx count
-  //   (3) Services — mass payouts/cards push to Pro, API to Ultra
-  //   (4) Industry — affiliate/creator typically need Pro features
-  //
   // We track WHICH signals fired in `tierSignals` so the reasoning
-  // block can cite them by name ("Your €175k/mo volume crosses
-  // Starter's €100k limit" vs generic "Pro is recommended"). The
-  // signals also feed result-page caveats and perks ordering.
+  // block can cite them by name ("Your €375k/mo volume crosses
+  // Starter's ceiling" vs generic "Pro is recommended"). The signals
+  // also feed result-page caveats and perks ordering. See the decision
+  // rationale on the tierSignals object below.
   const svcSet = new Set(svcs);
+  // Tier decision — VOLUME is the primary driver; only one capability
+  // genuinely gates Starter. Earlier this fired Pro on five separate
+  // signals (volume, breadth, tx count, mass/cards, industry) summed from
+  // a two-slider in+out model, so almost every configuration landed on Pro
+  // and Starter was effectively unreachable — even at minimum volume a
+  // typical multi-market pick (3 regions in + 3 out) crossed the corridor
+  // threshold. We now:
+  //   • drive Pro by combined throughput > £250k (the default slider
+  //     position is £250k, so a small business defaults to Starter);
+  //   • keep mass payouts as the ONE non-volume Pro trigger — bulk/batch
+  //     transfers are a Pro-only capability, so Starter literally can't
+  //     serve a mass-payout business;
+  //   • demote corridor breadth, tx count, cards and industry to
+  //     reasoning-only signals (they colour the "why" bullets when the
+  //     plan is already Pro, but no longer force the tier on their own).
   const tierSignals = {
-    volumePro:        monthlyVolume >= 100000,
+    volumePro:        monthlyVolume > 250000,
     volumeUltra:      monthlyVolume >= 1000000,
-    // Now country-level (was region-level). ≥5 distinct countries
-    // across in+out reads as a multi-corridor business that benefits
-    // from Pro-tier rails — same intent as the prior 3-of-4-regions
-    // threshold, calibrated for the country granularity.
+    // Display-only signals (not part of needsPro) — surfaced in the
+    // reasoning bullets as supporting context when the plan is Pro/Ultra.
     corridorsBreadth: corridors.length >= 5,
-    // ≥300 monthly transactions = "high" — matches the prior "high" band
-    // (101–500) lower-edge intent, expressed against the new in+out total.
     txHigh:           monthlyTx >= 300,
-    // Pro-tier services: mass payouts and cards have always pushed
-    // to Pro; multiEntity is new — managing 2+ legal entities is
-    // operational complexity Starter isn't designed for.
-    servicesPro:      svcSet.has("mass") || svcSet.has("cards"),
-    // servicesUltra was driven by the now-removed "api" service. Ultra
-    // tier is now decided purely by volume (volumeUltra ≥ €1M/mo).
+    // Capability gate: bulk & batch transfers are Pro-only.
+    servicesPro:      svcSet.has("mass"),
     servicesUltra:    false,
-    // Affiliate and creator platforms historically need Pro tier — mass
-    // payouts, multi-currency settlements, sub-account reconciliation.
     industryPro:      industry === "affiliate" || industry === "creator",
   };
-  const needsPro = tierSignals.volumePro || tierSignals.corridorsBreadth ||
-                   tierSignals.txHigh || tierSignals.servicesPro ||
-                   tierSignals.industryPro;
+  const needsPro = tierSignals.volumePro || tierSignals.servicesPro;
   const needsUltra = tierSignals.volumeUltra || tierSignals.servicesUltra;
   let plan = EC_PLANS.starter;
   if (needsPro)   plan = EC_PLANS.pro;
@@ -197,7 +195,7 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     reasoning.push({ key: "ec.reasoning.industry.payouts", priority: 6 });
   }
   // Complexity
-  if (tierSignals.corridorsBreadth) {
+  if (tierSignals.corridorsBreadth && plan.id !== "starter") {
     reasoning.push({ key: "ec.reasoning.complexity.corridors", vars: { n: corridors.length }, priority: 5 });
   }
   if (tierSignals.txHigh && plan.id !== "starter") {

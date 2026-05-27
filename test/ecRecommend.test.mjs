@@ -91,13 +91,15 @@ test("Low volume + no advanced services → Starter", () => {
   assert.equal(rec.plan.id, "starter");
 });
 
-test("Volume ≥ 100k OR servicesPro → Pro", () => {
-  const recHighVol = w.ecRecommend(input({ monthlyVolume: 200000 }));
-  assert.equal(recHighVol.plan.id, "pro");
-  const recCards = w.ecRecommend(input({ services: ["cards"], monthlyVolume: 50000 }));
-  assert.equal(recCards.plan.id, "pro");
-  const recMass = w.ecRecommend(input({ services: ["mass"], monthlyVolume: 50000 }));
-  assert.equal(recMass.plan.id, "pro");
+test("Pro driven by volume > £250k or mass payouts (capability gate)", () => {
+  // Combined throughput above the Starter ceiling → Pro
+  assert.equal(w.ecRecommend(input({ monthlyVolume: 375000 })).plan.id, "pro");
+  // Mass payouts need Pro-only bulk/batch transfers → Pro regardless of volume
+  assert.equal(w.ecRecommend(input({ services: ["mass"], monthlyVolume: 50000 })).plan.id, "pro");
+  // Cards alone no longer forces Pro — a small business stays on Starter
+  assert.equal(w.ecRecommend(input({ services: ["cards"], monthlyVolume: 50000 })).plan.id, "starter");
+  // The default combined throughput (£250k) sits in Starter, not Pro
+  assert.equal(w.ecRecommend(input({ monthlyVolume: 250000 })).plan.id, "starter");
 });
 
 test("Volume ≥ 1M → Ultra", () => {
