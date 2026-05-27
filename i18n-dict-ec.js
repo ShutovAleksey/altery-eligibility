@@ -504,7 +504,7 @@
     "ec.b.title.b": "right now.",
     "ec.b.lead": "None of our entities (UK, EEA, DIFC) currently support this industry. We'd rather tell you here than after you've uploaded company documents.",
     "ec.b.country.title": "We're currently unable to support businesses incorporated in {country}.",
-    "ec.b.country.lead": "Altery's licensing perimeter (UK FCA, Cyprus CBC, UAE DFSA) doesn't cover this jurisdiction. That's a regulatory limit, not a verdict on your business — sanctions and FATF guidance shift, so we'll update you if the situation changes.",
+    "ec.b.country.lead": "At the moment, Altery services aren't available in this jurisdiction. This isn't a reflection on your business, and availability may change over time.",
     "ec.b.head": "If your business setup is more complex",
     "ec.b.row1.tag": "Talk to us",
     "ec.b.row1.text": "Some business models require additional review. If you think we may still be able to support your business, contact our team with a short description of your setup.",
