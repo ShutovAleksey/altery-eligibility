@@ -495,16 +495,16 @@
     "ec.q1.field.industryPh": "Seleccionar sector",
     "ec.q1.alert.blocked.title": "No abrimos cuentas para este sector",
     "ec.q1.alert.blocked.body": "Altery no admite {industry} en ninguna de sus entidades. Lo explicamos en la pantalla de resultado — también puedes escribir directamente al equipo.",
-    "ec.q1.alert.crypto.title": "¿Cripto-nativo? El lugar correcto.",
-    "ec.q1.alert.crypto.body": "Hacemos onboarding regular de {category}. Tu solicitud pasa por nuestro carril de especialistas cripto — equipo de cumplimiento competente, rieles fiat vía SEPA / Faster Payments / SWIFT, y Synterra Connect (nuestra red de socios para liquidación directa con exchanges) para mover fondos hacia y desde plataformas reguladas sin conciliación manual.",
+    "ec.q1.alert.crypto.title": "¿Cripto-nativo? Estás en el lugar correcto.",
+    "ec.q1.alert.crypto.body": "Trabajamos a menudo con {category}. Tu solicitud pasa por nuestra vía especializada en cripto — equipo de cumplimiento competente, rieles fiat con SEPA / Faster Payments / SWIFT, y Synterra Connect (nuestra red de socios para la liquidación directa con exchanges) que mueve fondos en ambos sentidos a través de plataformas reguladas, sin conciliación manual.",
     "ec.q1.alert.saas.title": "¿Digital-nativo? Estás en el lugar correcto.",
-    "ec.q1.alert.saas.body": "SaaS, apps AI-nativas, juegos y productos digitales son la mayoría de nuestros onboardings. Cobro multi-divisa, SEPA Direct Debit para suscriptores UE, corredores FX para mezclas de ingresos globales, pagos vía API desde Pro — todo activo desde el primer día.",
-    "ec.q1.alert.marketplace.title": "¿Flujos divididos? Lo vemos regularmente.",
+    "ec.q1.alert.saas.body": "SaaS, apps con IA, juegos y productos digitales son la mayor parte de nuestros clientes. Cobro multidivisa, adeudo SEPA para suscriptores de la UE, corredores FX para ingresos globales, pagos vía API desde Pro — todo activo desde el primer día.",
+    "ec.q1.alert.marketplace.title": "¿Flujos divididos? Lo vemos a menudo.",
     "ec.q1.alert.marketplace.body": "Marketplaces con cuentas de cobro y obligaciones de pago a vendedores se integran bien en nuestros rieles. Pagos masivos vía API en Pro y Ultra, sub-cuentas virtuales para conciliación, y corredores FX para pagos cross-divisa.",
-    "ec.q1.alert.creator.title": "¿Economía de creadores? Onboardeamos regularmente.",
-    "ec.q1.alert.creator.body": "Las plataformas de creadores e influencers con flujos de suscripción, patrocinio y propinas son un segmento central. Rieles de suscripción, pagos multi-divisa a creadores, y KYB estructurado — no una caja negra.",
+    "ec.q1.alert.creator.title": "¿Economía de creadores? Los incorporamos a menudo.",
+    "ec.q1.alert.creator.body": "Las plataformas de creadores e influencers con suscripciones, patrocinios y propinas son un segmento central. Vías de suscripción, pagos multidivisa a creadores y KYB estructurado — no una caja negra.",
     "ec.q1.alert.freezone.title": "DMCC, ADGM, JAFZA — todas bienvenidas.",
-    "ec.q1.alert.freezone.body": "Las incorporaciones en zona franca reciben el mismo trato que las entidades UAE mainland — Altery MENA está DFSA-licenciada y sirve a ambas. Indica tu zona franca durante el onboarding; la lista de documentos se adapta automáticamente.",
+    "ec.q1.alert.freezone.body": "Las empresas en zona franca reciben el mismo trato que las registradas en el territorio continental de los EAU — Altery MENA está autorizada por la DFSA y atiende a ambas. Indica tu zona franca durante el onboarding y la lista de documentos se adapta automáticamente.",
 
     
 
