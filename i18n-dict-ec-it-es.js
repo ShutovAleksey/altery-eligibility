@@ -80,6 +80,8 @@
     "ec.svc.mass.body": "Paga più destinatari contemporaneamente con elaborazione in batch",
     "ec.svc.cards.title": "Carte",
     "ec.svc.cards.body": "Emetti carte aziendali per le spese del tuo team",
+    "ec.svc.api.title": "Accesso API",
+    "ec.svc.api.body": "Pagamenti programmatici, webhook e dati del conto per il tuo prodotto o per il team finance",
     "ec.svc.crypto.title": "Trasferimenti crypto",
     "ec.svc.crypto.body": "Invia e ricevi pagamenti in criptovalute per la tua azienda",
 
@@ -295,6 +297,7 @@
     "ec.reasoning.volume.ultra": "A ~{volume}/mese sei sopra £1M — Ultra ha la capacità, le tariffe e il percorso di revisione dedicato che hanno senso a questa scala.",
     "ec.reasoning.services.mass": "I pagamenti di massa che hai selezionato richiedono Pro — caricamento CSV in massa, webhook di stato dei pagamenti, niente lavorazione manuale.",
     "ec.reasoning.services.cards": "Le carte aziendali con controlli di spesa del team partono da Pro — utili per separare le spese pubblicitarie dai costi operativi.",
+    "ec.reasoning.services.api": "L'accesso API che hai selezionato parte da Pro — chiavi sandbox e live, webhook per lo stato dei pagamenti e dati del conto via REST.",
     "ec.reasoning.industry.payouts": "Le piattaforme affiliate e creator gestiscono tipicamente payout partner ad alto volume. Pro gestisce questo senza cerimonie di batching.",
     "ec.reasoning.complexity.corridors": "Hai selezionato {n} corridoi di pagamento — Pro ha tariffe SEPA e SWIFT migliori di Starter, importante a questa ampiezza.",
     "ec.reasoning.complexity.tx": "L'alta frequenza di transazioni (100+/mese) tende a finire nella coda di review di Starter. Pro elabora più velocemente.",
@@ -519,6 +522,8 @@
     "ec.svc.mass.body": "Paga a varios destinatarios a la vez con procesamiento por lotes",
     "ec.svc.cards.title": "Tarjetas",
     "ec.svc.cards.body": "Emite tarjetas corporativas para los gastos de tu equipo",
+    "ec.svc.api.title": "Acceso API",
+    "ec.svc.api.body": "Pagos programáticos, webhooks y datos de la cuenta para tu producto o tu equipo financiero",
     "ec.svc.crypto.title": "Transferencias cripto",
     "ec.svc.crypto.body": "Envía y recibe pagos en criptomonedas para tu negocio",
 
@@ -734,6 +739,7 @@
     "ec.reasoning.volume.ultra": "A ~{volume}/mes estás por encima de £1M — Ultra tiene la capacidad, tarifas y vía de revisión dedicada que tienen sentido a esta escala.",
     "ec.reasoning.services.mass": "Los pagos masivos que seleccionaste requieren Pro — carga masiva CSV, webhooks de estado de pago, sin proceso manual.",
     "ec.reasoning.services.cards": "Las tarjetas corporativas con controles de gasto del equipo empiezan en Pro — útil para separar el gasto publicitario de los costes operativos.",
+    "ec.reasoning.services.api": "El acceso API que has seleccionado empieza en Pro — claves sandbox y live, webhooks para el estado de los pagos y datos de cuenta vía REST.",
     "ec.reasoning.industry.payouts": "Las plataformas de afiliación y creators suelen manejar payouts de partners de alto volumen. Pro gestiona esto sin ceremonia de batching.",
     "ec.reasoning.complexity.corridors": "Seleccionaste {n} corredores de pago — Pro tiene mejores tarifas SEPA y SWIFT que Starter, importante a esa amplitud.",
     "ec.reasoning.complexity.tx": "Alta frecuencia de transacciones (100+/mes) tiende a caer en la cola de revisión de Starter. Pro procesa más rápido.",

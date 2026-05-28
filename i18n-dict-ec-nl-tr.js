@@ -80,6 +80,8 @@
     "ec.svc.mass.body": "Betaal meerdere ontvangers tegelijk met bulkverwerking",
     "ec.svc.cards.title": "Kaarten",
     "ec.svc.cards.body": "Bedrijfskaarten voor de zakelijke uitgaven van je team",
+    "ec.svc.api.title": "API-toegang",
+    "ec.svc.api.body": "Programmatische betalingen, webhooks en accountdata voor je product of finance-team",
     "ec.svc.crypto.title": "Crypto-overschrijvingen",
     "ec.svc.crypto.body": "Verstuur en ontvang cryptobetalingen voor je bedrijf",
 
@@ -295,6 +297,7 @@
     "ec.reasoning.volume.ultra": "Bij ~{volume}/maand zit je boven £1M — Ultra heeft de capaciteit, tarieven en het toegewijde beoordelingstraject dat op deze schaal past.",
     "ec.reasoning.services.mass": "Bulkbetalingen die je hebt geselecteerd vereisen Pro — bulk CSV-upload, webhooks voor betalingsstatus, geen handmatige verwerking.",
     "ec.reasoning.services.cards": "Zakelijke kaarten met uitgavencontroles per team beginnen bij Pro — handig om advertentie-uitgaven te scheiden van operationele kosten.",
+    "ec.reasoning.services.api": "De API-toegang die je hebt geselecteerd start bij Pro — sandbox- en live-keys, webhooks voor betalingsstatus en accountdata via REST.",
     "ec.reasoning.industry.payouts": "Affiliate- en creator-platforms doen doorgaans hoogvolume partneruitbetalingen. Pro handelt dit af zonder batching-ceremonie.",
     "ec.reasoning.complexity.corridors": "Je hebt {n} betalingscorridors geselecteerd — Pro heeft betere SEPA- en SWIFT-tarieven dan Starter, wat telt bij die breedte.",
     "ec.reasoning.complexity.tx": "Hoge transactiefrequentie (100+/maand) komt vaak terecht in Starter's beoordelingswachtrij. Pro verwerkt sneller.",
@@ -519,6 +522,8 @@
     "ec.svc.mass.body": "Toplu işlemle aynı anda birden fazla alıcıya ödeme yapın",
     "ec.svc.cards.title": "Kartlar",
     "ec.svc.cards.body": "Ekibinizin iş harcamaları için kurumsal kartlar çıkarın",
+    "ec.svc.api.title": "API erişimi",
+    "ec.svc.api.body": "Ürününüz veya finans operasyonlarınız için programatik ödemeler, webhook'lar ve hesap verisi",
     "ec.svc.crypto.title": "Kripto transferleri",
     "ec.svc.crypto.body": "İşletmeniz için kripto para ödemeleri gönderin ve alın",
 
@@ -734,6 +739,7 @@
     "ec.reasoning.volume.ultra": "~{volume}/ay ile £1M üzerindesiniz — Ultra bu ölçekte mantıklı olan kapasite, ücret ve özel inceleme yoluna sahip.",
     "ec.reasoning.services.mass": "Seçtiğiniz toplu ödemeler Pro gerektirir — toplu CSV yükleme, ödeme durumu webhook'ları, manuel tek tek yok.",
     "ec.reasoning.services.cards": "Ekip harcama kontrollü kurumsal kartlar Pro ile başlar — reklam harcamasını operasyonel maliyetlerden ayırmak için yararlı.",
+    "ec.reasoning.services.api": "Seçtiğiniz API erişimi Pro'dan başlar — sandbox ve canlı anahtarlar, ödeme durumu webhook'ları ve REST üzerinden hesap verisi.",
     "ec.reasoning.industry.payouts": "Affiliate ve içerik üreticisi platformları genellikle yüksek hacimli ortak ödemeleri yapar. Pro bunu tek tek uğraşmadan, toplu işlemle halleder.",
     "ec.reasoning.complexity.corridors": "{n} ödeme koridoru seçtiniz — Pro'nun SEPA ve SWIFT tarifeleri Starter'dan daha iyidir, bu genişlikte önemli.",
     "ec.reasoning.complexity.tx": "Yüksek işlem sıklığı (100+/ay) Starter'ın inceleme kuyruğuna takılır. Pro daha hızlı işler.",

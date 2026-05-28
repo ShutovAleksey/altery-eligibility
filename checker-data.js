@@ -529,14 +529,14 @@ const EC_INDUSTRIES = [
 // `tier` field semantics:
 //   "core"       — available on all plans, doesn't push tier
 //   "starter"    — basic feature, doesn't push above Starter
-//   "pro"        — strongly hints Pro tier (mass, cards, multiEntity)
-//   "ultra"      — strongly hints Ultra tier (api)
+//   "pro"        — strongly hints Pro tier (mass, cards, api)
 //   "specialist" — triggers specialist review path (crypto rails)
 const EC_SERVICES = [
   { value: "crossBorder", titleKey: "ec.svc.crossBorder.title", bodyKey: "ec.svc.crossBorder.body", tier: "starter" },
   { value: "local",       titleKey: "ec.svc.local.title",       bodyKey: "ec.svc.local.body",       tier: "starter" },
   { value: "mass",        titleKey: "ec.svc.mass.title",        bodyKey: "ec.svc.mass.body",        tier: "pro" },
   { value: "cards",       titleKey: "ec.svc.cards.title",       bodyKey: "ec.svc.cards.body",       tier: "pro" },
+  { value: "api",         titleKey: "ec.svc.api.title",         bodyKey: "ec.svc.api.body",         tier: "pro" },
   { value: "crypto",      titleKey: "ec.svc.crypto.title",      bodyKey: "ec.svc.crypto.body",      tier: "specialist" },
 ];
 

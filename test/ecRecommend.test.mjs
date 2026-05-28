@@ -91,11 +91,13 @@ test("Low volume + no advanced services → Starter", () => {
   assert.equal(rec.plan.id, "starter");
 });
 
-test("Pro driven by volume > £250k or mass payouts (capability gate)", () => {
+test("Pro driven by volume > £250k or mass/api capability gates", () => {
   // Combined throughput above the Starter ceiling → Pro
   assert.equal(w.ecRecommend(input({ monthlyVolume: 375000 })).plan.id, "pro");
   // Mass payouts need Pro-only bulk/batch transfers → Pro regardless of volume
   assert.equal(w.ecRecommend(input({ services: ["mass"], monthlyVolume: 50000 })).plan.id, "pro");
+  // API access is Pro-only (sandbox + live keys, webhooks) → Pro regardless of volume
+  assert.equal(w.ecRecommend(input({ services: ["api"], monthlyVolume: 50000 })).plan.id, "pro");
   // Cards alone no longer forces Pro — a small business stays on Starter
   assert.equal(w.ecRecommend(input({ services: ["cards"], monthlyVolume: 50000 })).plan.id, "starter");
   // The default combined throughput (£250k) sits in Starter, not Pro

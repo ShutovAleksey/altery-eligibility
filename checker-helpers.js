@@ -106,8 +106,9 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     // reasoning bullets as supporting context when the plan is Pro/Ultra.
     corridorsBreadth: corridors.length >= 5,
     txHigh:           monthlyTx >= 300,
-    // Capability gate: bulk & batch transfers are Pro-only.
-    servicesPro:      svcSet.has("mass"),
+    // Capability gate: bulk & batch transfers and programmatic access
+    // are Pro-only (Starter has neither mass payouts nor API keys).
+    servicesPro:      svcSet.has("mass") || svcSet.has("api"),
     servicesUltra:    false,
     industryPro:      industry === "affiliate" || industry === "creator",
   };
@@ -189,6 +190,9 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
   }
   if (svcSet.has("cards") && plan.id !== "starter") {
     reasoning.push({ key: "ec.reasoning.services.cards", priority: 7 });
+  }
+  if (svcSet.has("api") && plan.id !== "starter") {
+    reasoning.push({ key: "ec.reasoning.services.api", priority: 7 });
   }
   // Industry-driven
   if (tierSignals.industryPro && plan.id !== "starter") {

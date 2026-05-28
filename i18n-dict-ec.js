@@ -139,6 +139,8 @@
     "ec.svc.mass.body": "Pay multiple recipients at once with bulk payment processing",
     "ec.svc.cards.title": "Cards",
     "ec.svc.cards.body": "Issue corporate cards for your team's business expenses",
+    "ec.svc.api.title": "API access",
+    "ec.svc.api.body": "Programmatic payments, webhooks and account data for your product or finance ops",
     "ec.svc.crypto.title": "Crypto transfers",
     "ec.svc.crypto.body": "Send and receive cryptocurrency payments for your business",
 
@@ -494,6 +496,7 @@
     "ec.reasoning.volume.ultra": "At ~{volume}/mo you're above £1M — Ultra has the capacity, fees and dedicated review path that makes sense at this scale.",
     "ec.reasoning.services.mass": "Mass payouts you selected require Pro — bulk CSV upload, payment status webhooks, no manual one-by-one.",
     "ec.reasoning.services.cards": "Business cards with team spend controls start at Pro — useful for separating ad spend from operating costs.",
+    "ec.reasoning.services.api": "API access you selected starts at Pro — sandbox and live keys, webhooks for payment status and account data over REST.",
     "ec.reasoning.industry.payouts": "Affiliate and creator platforms typically run high-volume partner payouts. Pro handles this without batching ceremony.",
     "ec.reasoning.complexity.corridors": "You selected {n} payment corridors — Pro has better SEPA and SWIFT rates than Starter, which matters at that breadth.",
     "ec.reasoning.complexity.tx": "High transaction frequency (100+/month) tends to hit Starter's review queue. Pro processes faster.",
