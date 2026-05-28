@@ -2796,12 +2796,11 @@
     .ec-r__plan2 { gap: 0; }
     .ec-r__planHead {
       display: flex; justify-content: space-between; align-items: flex-start;
-      gap: 12px; margin-bottom: 18px;
+      gap: 12px; margin-bottom: 14px;
     }
     .ec-r__planHead > div:first-child { min-width: 0; }
     .ec-r__planFit {
       font-size: 13px; color: var(--c-ink-2);
-      margin-top: 2px;
     }
     .ec-r__planPrice {
       display: inline-flex; align-items: baseline; gap: 4px;
