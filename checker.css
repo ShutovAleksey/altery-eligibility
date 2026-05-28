@@ -624,7 +624,7 @@
       display: inline-flex; align-items: center; justify-content: center;
     }
     .ec-value__art {
-      flex: 0 0 44px; width: 44px; height: 44px;
+      flex: 0 0 56px; width: 56px; height: 56px;
       object-fit: contain;
       display: block;
     }

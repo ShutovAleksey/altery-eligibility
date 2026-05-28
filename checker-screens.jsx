@@ -461,21 +461,21 @@ function EcIntro({ onStart }) {
             monthly cost. Illustrations are decorative; alt left empty
             so screen readers don't double-read the bullet titles. */}
         <div className="ec-value__row">
-          <img className="ec-value__art" src="images/intro/value-tailored.png" alt="" width="44" height="44" />
+          <img className="ec-value__art" src="images/intro/value-tailored.png" alt="" width="56" height="56" />
           <div>
             <div className="ec-value__title">{t("ec.intro.value1.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value1.body")}</div>
           </div>
         </div>
         <div className="ec-value__row">
-          <img className="ec-value__art" src="images/intro/value-features.png" alt="" width="44" height="44" />
+          <img className="ec-value__art" src="images/intro/value-features.png" alt="" width="56" height="56" />
           <div>
             <div className="ec-value__title">{t("ec.intro.value2.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value2.body")}</div>
           </div>
         </div>
         <div className="ec-value__row">
-          <img className="ec-value__art" src="images/intro/value-clarity.png" alt="" width="44" height="44" />
+          <img className="ec-value__art" src="images/intro/value-clarity.png" alt="" width="56" height="56" />
           <div>
             <div className="ec-value__title">{t("ec.intro.value3.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value3.body")}</div>
