@@ -130,8 +130,7 @@
     // accounts + crossBorder (universal needs for any digital business
     // looking at Altery), so users only tick specialist extras.
     "ec.q3.title": "Which Altery services would you like to use?",
-    "ec.q3.lead": "Select all that apply to your business",
-    "ec.q3.disclaimer": "Some products may not be available depending on your business profile and verification results.",
+    "ec.q3.lead": "Select all that apply to your business. Some products may not be available depending on your business profile and verification results.",
     "ec.q3.cryptoDisclosure": "Altery does not provide crypto-asset services. Cryptoassets are high-risk and may not be right for everyone. Crypto-related services are provided by Synterra Innovations Ltd, registered with the Financial Transactions and Reports Analysis Centre of Canada (FINTRAC) to offer virtual currency services (registration no. C100000635), and are subject to separate Terms & Conditions.",
     "ec.svc.crossBorder.title": "Cross-border payments",
     "ec.svc.crossBorder.body": "Send and receive international payments in multiple currencies",

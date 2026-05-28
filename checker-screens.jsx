@@ -942,8 +942,6 @@ function EcServices({ services, setServices, onBack, onNext }) {
       </button>
       <EcQuestionHeader num="3" title={t("ec.q3.title")} lead={t("ec.q3.lead")} />
 
-      <p className="ec-q3__disclaimer">{t("ec.q3.disclaimer")}</p>
-
       <div className="ec-services" role="group" aria-label={t("ec.q3.title")}>
         {EC_SERVICES.map((s) => {
           const on = services.has(s.value);

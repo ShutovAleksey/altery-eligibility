@@ -72,8 +72,7 @@
 
 
     "ec.q3.title": "Z jakich usług Altery chcesz korzystać?",
-    "ec.q3.lead": "Zaznacz wszystkie, które dotyczą Twojej firmy",
-    "ec.q3.disclaimer": "Niektóre produkty mogą być niedostępne w zależności od profilu firmy i wyników weryfikacji.",
+    "ec.q3.lead": "Zaznacz wszystkie, które dotyczą Twojej firmy. Niektóre produkty mogą być niedostępne w zależności od profilu firmy i wyników weryfikacji.",
     "ec.q3.cryptoDisclosure": "Altery nie świadczy usług dotyczących kryptoaktywów. Kryptoaktywa są wysokiego ryzyka i mogą nie być odpowiednie dla każdego. Usługi związane z crypto są świadczone przez Synterra Innovations Ltd, zarejestrowaną w Financial Transactions and Reports Analysis Centre of Canada (FINTRAC) w zakresie usług walut wirtualnych (nr rejestracji C100000635), i podlegają odrębnym Warunkom Świadczenia Usług.",
     "ec.svc.crossBorder.title": "Płatności międzynarodowe",
     "ec.svc.crossBorder.body": "Wysyłaj i odbieraj płatności międzynarodowe w wielu walutach",
@@ -521,8 +520,7 @@
 
 
     "ec.q3.title": "Que serviços da Altery quer usar?",
-    "ec.q3.lead": "Selecione todas as opções aplicáveis ao seu negócio",
-    "ec.q3.disclaimer": "Alguns produtos podem não estar disponíveis em função do perfil da empresa e dos resultados da verificação.",
+    "ec.q3.lead": "Selecione todas as opções aplicáveis ao seu negócio. Alguns produtos podem não estar disponíveis em função do perfil da empresa e dos resultados da verificação.",
     "ec.q3.cryptoDisclosure": "A Altery não presta serviços sobre criptoativos. Os criptoativos são de alto risco e podem não ser adequados a todos. Os serviços relacionados com crypto são prestados pela Synterra Innovations Ltd, registada no Financial Transactions and Reports Analysis Centre of Canada (FINTRAC) para oferecer serviços de moeda virtual (n.º de registo C100000635), e estão sujeitos a Termos e Condições separados.",
     "ec.svc.crossBorder.title": "Pagamentos internacionais",
     "ec.svc.crossBorder.body": "Envie e receba pagamentos internacionais em várias moedas",
@@ -968,8 +966,7 @@
 
 
     "ec.q3.title": "Quels services Altery souhaitez-vous utiliser ?",
-    "ec.q3.lead": "Sélectionnez toutes les options qui s'appliquent à votre entreprise",
-    "ec.q3.disclaimer": "Certains produits peuvent ne pas être disponibles selon votre profil d'entreprise et les résultats de la vérification.",
+    "ec.q3.lead": "Sélectionnez toutes les options qui s'appliquent à votre entreprise. Certains produits peuvent ne pas être disponibles selon votre profil d'entreprise et les résultats de la vérification.",
     "ec.q3.cryptoDisclosure": "Altery ne fournit pas de services sur crypto-actifs. Les crypto-actifs présentent un risque élevé et peuvent ne pas convenir à tout le monde. Les services liés aux crypto sont fournis par Synterra Innovations Ltd, enregistrée auprès du Financial Transactions and Reports Analysis Centre of Canada (FINTRAC) pour fournir des services de monnaie virtuelle (n° d'enregistrement C100000635), et sont soumis à des Conditions Générales distinctes.",
     "ec.svc.crossBorder.title": "Paiements transfrontaliers",
     "ec.svc.crossBorder.body": "Envoyez et recevez des paiements internationaux dans plusieurs devises",

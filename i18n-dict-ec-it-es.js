@@ -71,8 +71,7 @@
 
 
     "ec.q3.title": "Quali servizi di Altery vuoi utilizzare?",
-    "ec.q3.lead": "Seleziona tutte le opzioni che si applicano alla tua azienda",
-    "ec.q3.disclaimer": "Alcuni prodotti potrebbero non essere disponibili in base al profilo della tua azienda e all'esito della verifica.",
+    "ec.q3.lead": "Seleziona tutte le opzioni che si applicano alla tua azienda. Alcuni prodotti potrebbero non essere disponibili in base al profilo della tua azienda e all'esito della verifica.",
     "ec.q3.cryptoDisclosure": "Altery non fornisce servizi su crypto-asset. I cryptoasset sono ad alto rischio e potrebbero non essere adatti a tutti. I servizi crypto sono forniti da Synterra Innovations Ltd, registrata presso il Financial Transactions and Reports Analysis Centre of Canada (FINTRAC) per offrire servizi su valuta virtuale (n. di registrazione C100000635), e sono soggetti a Termini e Condizioni separati.",
     "ec.svc.crossBorder.title": "Pagamenti transfrontalieri",
     "ec.svc.crossBorder.body": "Invia e ricevi pagamenti internazionali in più valute",
@@ -520,8 +519,7 @@
 
 
     "ec.q3.title": "¿Qué servicios de Altery quieres usar?",
-    "ec.q3.lead": "Selecciona todas las opciones que apliquen a tu negocio",
-    "ec.q3.disclaimer": "Algunos productos pueden no estar disponibles según el perfil de tu negocio y el resultado de la verificación.",
+    "ec.q3.lead": "Selecciona todas las opciones que apliquen a tu negocio. Algunos productos pueden no estar disponibles según el perfil de tu negocio y el resultado de la verificación.",
     "ec.q3.cryptoDisclosure": "Altery no presta servicios sobre criptoactivos. Los criptoactivos son de alto riesgo y pueden no ser adecuados para todo el mundo. Los servicios relacionados con crypto son prestados por Synterra Innovations Ltd, registrada en el Financial Transactions and Reports Analysis Centre of Canada (FINTRAC) para ofrecer servicios de moneda virtual (n.º de registro C100000635), y están sujetos a Términos y Condiciones independientes.",
     "ec.svc.crossBorder.title": "Pagos internacionales",
     "ec.svc.crossBorder.body": "Envía y recibe pagos internacionales en varias divisas",
