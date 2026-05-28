@@ -1662,7 +1662,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
             <div className="ec-r__planHead">
               <div>
                 <div className="ec-r__cardEyebrow">{t("ec.r.plan.eyebrow", { plan: planName })}</div>
-                <div className="ec-r__planFit">{t(activePlan.fitKey)}</div>
               </div>
               <div className="ec-r__planPrice">
                 <span className="ec-r__planPrice__amount">
@@ -1671,6 +1670,10 @@ function EcResultApproved({ rec, onBack, onReset }) {
                 <span className="ec-r__planPrice__cycle">{t(activePlan.cycleKey)}</span>
               </div>
             </div>
+            {/* planFit hoisted out of .ec-r__planHead so the fit-description
+                line spans the full card width instead of being squeezed by
+                the price column on the right. */}
+            <div className="ec-r__planFit">{t(activePlan.fitKey)}</div>
             {/* Soft notice — shown only when the user has switched away
                 from the algorithm's recommendation via the comparison
                 modal. Contextual ("this plan you're reading is not the

@@ -2872,7 +2872,7 @@
        without making them feel disconnected. */
     .ec-r__perks {
       list-style: none;
-      margin: 16px 0 0;
+      margin: 16px 0;
       padding: 0;
       display: flex;
       flex-direction: column;
