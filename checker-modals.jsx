@@ -1,6 +1,6 @@
 /* global React, useT, Button, Tag, Alert, Input, Modal, Card, Spinner,
           Icon, Flag, Field, WhyWeAsk,
-          EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
+          EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, EC_SERVICES,
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,
           ecOutcomesForSavings, ecGenProposalRef, ecLoadStripe,
           ecBuildAnalysisHTML, ecSendAnalysisEmail, ecWaitForPdfLibs,
@@ -297,22 +297,33 @@ function EcPlanCompareCard({ plan, onSelect }) {
         ))}
       </div>
 
-      {/* Products included — mirrors the Q3 service selector so the user
-          can see which checkboxes they just ticked map to which tier.
-          Defensive against missing productKeys on legacy plan shapes. */}
-      {Array.isArray(plan.productKeys) && plan.productKeys.length > 0 && (
-        <div className="ec-plan-compare__section">
-          <div className="ec-plan-compare__sectionHead">{t("ec.r.plan.compare.productsHead")}</div>
-          <div className="ec-plan-compare__perks">
-            {plan.productKeys.map((k, i) => (
-              <div key={i} className="ec-plan-compare__perk">
-                <EcIco.check />
-                <span>{t(k)}</span>
+      {/* Products included — iterates the full EC_SERVICES list in
+          canonical order and shows a green tick for products the plan
+          covers / a red cross for ones it doesn't. Identical row count
+          across all three cards makes scan-comparison instant: eye
+          stays on the same vertical position and only the icon/colour
+          changes between Starter / Pro / Ultra. Inclusion is derived
+          from svc.tier vs plan.id — starter & specialist services are
+          on every plan, "pro" tier on Pro/Ultra, "ultra" only on Ultra. */}
+      <div className="ec-plan-compare__section">
+        <div className="ec-plan-compare__sectionHead">{t("ec.r.plan.compare.productsHead")}</div>
+        <div className="ec-plan-compare__perks">
+          {EC_SERVICES.map((svc, i) => {
+            const tier = svc.tier;
+            const included =
+              (tier === "starter" || tier === "specialist") ||
+              (tier === "pro"   && plan.id !== "starter") ||
+              (tier === "ultra" && plan.id === "ultra");
+            return (
+              <div key={i}
+                   className={"ec-plan-compare__perk" + (included ? "" : " ec-plan-compare__perk--off")}>
+                {included ? <EcIco.check /> : <EcIco.close />}
+                <span>{t(svc.titleKey)}</span>
               </div>
-            ))}
-          </div>
+            );
+          })}
         </div>
-      )}
+      </div>
 
       <div className="ec-plan-compare__section">
         <div className="ec-plan-compare__sectionHead">{t("ec.r.plan.compare.feesHead")}</div>

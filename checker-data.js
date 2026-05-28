@@ -653,17 +653,6 @@ const EC_PLANS = {
     // Currency/IBAN coverage is rendered at the entity level via
     // entity.currencyPerkKey, so it's not duplicated here.
     perkKeys: ["ec.plan.starter.p4", "ec.plan.starter.users"],
-    // Products covered by this tier — referenced by EcPlanCompareCard
-    // to render a "Products included" tick-list mirroring the Q3
-    // service selector. Re-uses existing ec.svc.*.title keys so no new
-    // translations needed for the product names themselves; the section
-    // header is ec.r.plan.compare.productsHead.
-    productKeys: [
-      "ec.svc.local.title",
-      "ec.svc.cards.title",
-      "ec.svc.crypto.title",
-      "ec.svc.crossBorder.title",
-    ],
     fees: {
       fasterPay: "£1",
       sepa:      "€2",
@@ -677,14 +666,6 @@ const EC_PLANS = {
     taglineKey: "ec.plan.pro.tagline",
     fitKey: "ec.plan.pro.fit",
     perkKeys: ["ec.plan.pro.p3", "ec.plan.pro.users"],
-    productKeys: [
-      "ec.svc.local.title",
-      "ec.svc.cards.title",
-      "ec.svc.crypto.title",
-      "ec.svc.crossBorder.title",
-      "ec.svc.mass.title",
-      "ec.svc.api.title",
-    ],
     fees: {
       fasterPay: "£1",
       sepa:      "€1",
@@ -698,15 +679,6 @@ const EC_PLANS = {
     taglineKey: "ec.plan.ultra.tagline",
     fitKey: "ec.plan.ultra.fit",
     perkKeys: ["ec.plan.ultra.p5", "ec.plan.ultra.negotiatedFx", "ec.plan.ultra.users"],
-    productKeys: [
-      "ec.svc.local.title",
-      "ec.svc.cards.title",
-      "ec.svc.crypto.title",
-      "ec.svc.crossBorder.title",
-      "ec.svc.mass.title",
-      "ec.svc.api.title",
-      "ec.svc.multiCompany.title",
-    ],
     fees: {
       fasterPay: "£0.5",
       sepa:      "€0.5",
