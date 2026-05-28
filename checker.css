@@ -654,7 +654,6 @@
       font-size: 11px;
       line-height: 16px;
       color: var(--c-muted);
-      max-width: 56ch;
     }
 
     /* Q4 grouping — Incoming / Outgoing payment-flow sections. Volume

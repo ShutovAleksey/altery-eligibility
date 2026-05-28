@@ -982,6 +982,12 @@ function EcServices({ services, setServices, onBack, onNext }) {
           {t("common.continue")}
         </Button>
       </div>
+      {/* Crypto-asset legal disclosure — Altery itself does not provide
+          crypto-asset services; the crypto Q3 option routes to Synterra
+          Innovations Ltd (FINTRAC-registered). Reuses the .ec-intro__disclaimer
+          style so it reads as the same kind of fine print as the regulatory
+          line on the intro screen. */}
+      <p className="ec-intro__disclaimer">{t("ec.q3.cryptoDisclosure")}</p>
     </div>
   );
 }
