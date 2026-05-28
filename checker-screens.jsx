@@ -872,7 +872,7 @@ function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked 
           segment, not an exception we tolerate. */}
       {!isBlocked && ind?.crypto && (
         <Alert tone="info" title={t("ec.q1.alert.crypto.title")}>
-          {t("ec.q1.alert.crypto.body", { category: t(ind.labelKey).toLowerCase() })}
+          {t("ec.q1.alert.crypto.body")}
         </Alert>
       )}
 
