@@ -210,6 +210,7 @@
         "ec.r.plan.compare.wasRecommended": "Originally recommended",
         "ec.r.plan.compare.switch":  "Switch to this plan",
         "ec.r.plan.compare.fitsHead":    "Suitable for",
+        "ec.r.plan.compare.productsHead": "Products included",
         "ec.r.plan.compare.feesHead":    "Fees & differentiators",
         "ec.r.plan.compare.fee.fasterPay": "UK Faster Payments",
         "ec.r.plan.compare.fee.sepa":      "Outgoing SEPA",

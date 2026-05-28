@@ -299,6 +299,23 @@ function EcPlanCompareCard({ plan, onSelect }) {
         ))}
       </div>
 
+      {/* Products included — mirrors the Q3 service selector so the user
+          can see which checkboxes they just ticked map to which tier.
+          Defensive against missing productKeys on legacy plan shapes. */}
+      {Array.isArray(plan.productKeys) && plan.productKeys.length > 0 && (
+        <div className="ec-plan-compare__section">
+          <div className="ec-plan-compare__sectionHead">{t("ec.r.plan.compare.productsHead")}</div>
+          <div className="ec-plan-compare__perks">
+            {plan.productKeys.map((k, i) => (
+              <div key={i} className="ec-plan-compare__perk">
+                <EcIco.check />
+                <span>{t(k)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="ec-plan-compare__section">
         <div className="ec-plan-compare__sectionHead">{t("ec.r.plan.compare.fitsHead")}</div>
         <div className="ec-plan-compare__fits">{t(plan.fitKey)}</div>
