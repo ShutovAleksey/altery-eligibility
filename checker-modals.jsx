@@ -239,9 +239,6 @@ function EcPlanComparisonModal({ activePlanId, recommendedPlanId, onSelect, onCl
           ))}
         </div>
 
-        <div className="ec-plan-compare__footnote">
-          {t("ec.r.plan.compare.fee.footnote")}
-        </div>
       </div>
     </div>
   );

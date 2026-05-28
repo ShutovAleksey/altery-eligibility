@@ -217,7 +217,6 @@
         "ec.r.plan.compare.fee.sepa":      "Outgoing SEPA",
         "ec.r.plan.compare.fee.swift":     "Outgoing SWIFT",
         "ec.r.plan.compare.fee.fxMarkup":  "FX markup (base currencies)",
-        "ec.r.plan.compare.fee.footnote":  "Pricing currency depends on country of incorporation (GBP / EUR / USD). Full price list available on the dashboard.",
         "ec.r.plan.compare.close":   "Close",
 
         // Payment modal — Stripe Payment Element opens from "Set up this

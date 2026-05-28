@@ -778,7 +778,6 @@
     "ec.r.plan.compare.fee.sepa": "SEPA ausgehend",
     "ec.r.plan.compare.fee.swift": "SWIFT ausgehend",
     "ec.r.plan.compare.fee.fxMarkup": "FX-Marge (Basiswährungen)",
-    "ec.r.plan.compare.fee.footnote": "Die Preiswährung hängt vom Land der Gründung ab (GBP / EUR / USD). Die vollständige Preisliste finden Sie im Dashboard.",
     "ec.r.plan.compare.close": "Schließen",
   });
   Object.assign(D.nl, {
@@ -793,7 +792,6 @@
     "ec.r.plan.compare.fee.sepa": "Uitgaande SEPA",
     "ec.r.plan.compare.fee.swift": "Uitgaande SWIFT",
     "ec.r.plan.compare.fee.fxMarkup": "FX-marge (basisvaluta's)",
-    "ec.r.plan.compare.fee.footnote": "De prijsvaluta hangt af van het land van oprichting (GBP / EUR / USD). De volledige prijslijst is beschikbaar in het dashboard.",
     "ec.r.plan.compare.close": "Sluiten",
   });
   Object.assign(D.ru, {
@@ -808,7 +806,6 @@
     "ec.r.plan.compare.fee.sepa": "Исходящие SEPA",
     "ec.r.plan.compare.fee.swift": "Исходящие SWIFT",
     "ec.r.plan.compare.fee.fxMarkup": "FX-маржа (базовые валюты)",
-    "ec.r.plan.compare.fee.footnote": "Валюта тарифа зависит от страны регистрации (GBP / EUR / USD). Полный прайс-лист доступен в личном кабинете.",
     "ec.r.plan.compare.close": "Закрыть",
   });
   Object.assign(D.tr, {
@@ -823,7 +820,6 @@
     "ec.r.plan.compare.fee.sepa": "Giden SEPA",
     "ec.r.plan.compare.fee.swift": "Giden SWIFT",
     "ec.r.plan.compare.fee.fxMarkup": "FX marjı (temel para birimleri)",
-    "ec.r.plan.compare.fee.footnote": "Fiyat para birimi tescil ülkesine bağlıdır (GBP / EUR / USD). Tam fiyat listesi panoda mevcuttur.",
     "ec.r.plan.compare.close": "Kapat",
   });
   Object.assign(D.it, {
@@ -838,7 +834,6 @@
     "ec.r.plan.compare.fee.sepa": "SEPA in uscita",
     "ec.r.plan.compare.fee.swift": "SWIFT in uscita",
     "ec.r.plan.compare.fee.fxMarkup": "Margine FX (valute base)",
-    "ec.r.plan.compare.fee.footnote": "La valuta dei prezzi dipende dal paese di costituzione (GBP / EUR / USD). Listino completo disponibile nella dashboard.",
     "ec.r.plan.compare.close": "Chiudi",
   });
   Object.assign(D.es, {
@@ -853,7 +848,6 @@
     "ec.r.plan.compare.fee.sepa": "SEPA salientes",
     "ec.r.plan.compare.fee.swift": "SWIFT salientes",
     "ec.r.plan.compare.fee.fxMarkup": "Margen FX (divisas base)",
-    "ec.r.plan.compare.fee.footnote": "La moneda de los precios depende del país de constitución (GBP / EUR / USD). Lista de precios completa disponible en el panel.",
     "ec.r.plan.compare.close": "Cerrar",
   });
   Object.assign(D.pl, {
@@ -868,7 +862,6 @@
     "ec.r.plan.compare.fee.sepa": "Wychodzące SEPA",
     "ec.r.plan.compare.fee.swift": "Wychodzące SWIFT",
     "ec.r.plan.compare.fee.fxMarkup": "Marża FX (waluty bazowe)",
-    "ec.r.plan.compare.fee.footnote": "Waluta cennika zależy od kraju rejestracji (GBP / EUR / USD). Pełny cennik dostępny w panelu.",
     "ec.r.plan.compare.close": "Zamknij",
   });
   Object.assign(D.pt, {
@@ -883,7 +876,6 @@
     "ec.r.plan.compare.fee.sepa": "SEPA enviado",
     "ec.r.plan.compare.fee.swift": "SWIFT enviado",
     "ec.r.plan.compare.fee.fxMarkup": "Margem FX (moedas base)",
-    "ec.r.plan.compare.fee.footnote": "A moeda do preço depende do país de constituição (GBP / EUR / USD). Lista de preços completa disponível no painel.",
     "ec.r.plan.compare.close": "Fechar",
   });
   Object.assign(D.fr, {
@@ -898,7 +890,6 @@
     "ec.r.plan.compare.fee.sepa": "SEPA sortants",
     "ec.r.plan.compare.fee.swift": "SWIFT sortants",
     "ec.r.plan.compare.fee.fxMarkup": "Marge de change (devises de base)",
-    "ec.r.plan.compare.fee.footnote": "La devise des prix dépend du pays d'immatriculation (GBP / EUR / USD). Liste de prix complète disponible sur le tableau de bord.",
     "ec.r.plan.compare.close": "Fermer",
   });
 

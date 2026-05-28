@@ -1591,16 +1591,6 @@
       font-size: 13px;
     }
     .ec-plan-compare__feeValue--muted { color: var(--c-muted); font-family: inherit; }
-    .ec-plan-compare__footnote {
-      font-size: 11px;
-      color: var(--c-muted);
-      line-height: 16px;
-      text-align: center;
-      padding: 16px 24px 0;
-      margin-top: 16px;
-      border-top: 1px solid var(--c-border-soft);
-    }
-
     /* "Originally recommended" badge — appears on the recommended plan's
        card when the user has switched away from it. Sits at the very top
        of the card, breadcrumb back to the algorithm's suggestion. Uses
