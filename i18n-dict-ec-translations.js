@@ -75,7 +75,8 @@
 
 
     "ec.q3.title": "Welche Altery-Services möchtest du nutzen?",
-    "ec.q3.lead": "Wähle alle zutreffenden Optionen",
+    "ec.q3.lead": "Wähle alles, was auf dein Unternehmen zutrifft",
+    "ec.q3.disclaimer": "Manche Produkte sind je nach Geschäftsprofil und Prüfungsergebnis nicht verfügbar.",
     "ec.svc.crossBorder.title": "Grenzüberschreitende Zahlungen",
     "ec.svc.crossBorder.body": "Sende und empfange internationale Zahlungen in mehreren Währungen",
     "ec.svc.local.title": "Lokale Zahlungen",
@@ -522,7 +523,8 @@
 
 
     "ec.q3.title": "Какие сервисы Altery вы хотите использовать?",
-    "ec.q3.lead": "Выберите все подходящие варианты",
+    "ec.q3.lead": "Выберите всё, что относится к вашему бизнесу",
+    "ec.q3.disclaimer": "Доступность отдельных продуктов зависит от профиля бизнеса и результатов проверки.",
     "ec.svc.crossBorder.title": "Трансграничные платежи",
     "ec.svc.crossBorder.body": "Отправляйте и принимайте международные платежи в нескольких валютах",
     "ec.svc.local.title": "Локальные платежи",

@@ -130,7 +130,8 @@
     // accounts + crossBorder (universal needs for any digital business
     // looking at Altery), so users only tick specialist extras.
     "ec.q3.title": "Which Altery services would you like to use?",
-    "ec.q3.lead": "Select all that apply",
+    "ec.q3.lead": "Select all that apply to your business",
+    "ec.q3.disclaimer": "Some products may not be available depending on your business profile and verification results.",
     "ec.svc.crossBorder.title": "Cross-border payments",
     "ec.svc.crossBorder.body": "Send and receive international payments in multiple currencies",
     "ec.svc.local.title": "Local payments",

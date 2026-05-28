@@ -72,7 +72,8 @@
 
 
     "ec.q3.title": "Z jakich usług Altery chcesz korzystać?",
-    "ec.q3.lead": "Zaznacz wszystkie, które dotyczą",
+    "ec.q3.lead": "Zaznacz wszystkie, które dotyczą Twojej firmy",
+    "ec.q3.disclaimer": "Niektóre produkty mogą być niedostępne w zależności od profilu firmy i wyników weryfikacji.",
     "ec.svc.crossBorder.title": "Płatności międzynarodowe",
     "ec.svc.crossBorder.body": "Wysyłaj i odbieraj płatności międzynarodowe w wielu walutach",
     "ec.svc.local.title": "Płatności krajowe",
@@ -519,7 +520,8 @@
 
 
     "ec.q3.title": "Que serviços da Altery quer usar?",
-    "ec.q3.lead": "Selecione todas as opções aplicáveis",
+    "ec.q3.lead": "Selecione todas as opções aplicáveis ao seu negócio",
+    "ec.q3.disclaimer": "Alguns produtos podem não estar disponíveis em função do perfil da empresa e dos resultados da verificação.",
     "ec.svc.crossBorder.title": "Pagamentos internacionais",
     "ec.svc.crossBorder.body": "Envie e receba pagamentos internacionais em várias moedas",
     "ec.svc.local.title": "Pagamentos locais",
@@ -964,7 +966,8 @@
 
 
     "ec.q3.title": "Quels services Altery souhaitez-vous utiliser ?",
-    "ec.q3.lead": "Sélectionnez toutes les options applicables",
+    "ec.q3.lead": "Sélectionnez toutes les options qui s'appliquent à votre entreprise",
+    "ec.q3.disclaimer": "Certains produits peuvent ne pas être disponibles selon votre profil d'entreprise et les résultats de la vérification.",
     "ec.svc.crossBorder.title": "Paiements transfrontaliers",
     "ec.svc.crossBorder.body": "Envoyez et recevez des paiements internationaux dans plusieurs devises",
     "ec.svc.local.title": "Paiements locaux",

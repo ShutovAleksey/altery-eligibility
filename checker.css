@@ -1025,6 +1025,17 @@
       display: flex; flex-direction: column;
       gap: 4px;
     }
+    /* Compliance/eligibility footnote shown between the Q3 lead and the
+       services list — small muted line that sets honest expectations
+       (some products gated by KYB outcome) without competing with the
+       checkbox affordance. */
+    .ec-q3__disclaimer {
+      margin: 4px 0 12px;
+      font-size: 12px;
+      line-height: 16px;
+      color: var(--c-muted);
+      max-width: 60ch;
+    }
     .ec-service {
       display: flex; align-items: flex-start; gap: 14px;
       padding: 14px 12px;

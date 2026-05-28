@@ -71,7 +71,8 @@
 
 
     "ec.q3.title": "Quali servizi di Altery vuoi utilizzare?",
-    "ec.q3.lead": "Seleziona tutte le opzioni applicabili",
+    "ec.q3.lead": "Seleziona tutte le opzioni che si applicano alla tua azienda",
+    "ec.q3.disclaimer": "Alcuni prodotti potrebbero non essere disponibili in base al profilo della tua azienda e all'esito della verifica.",
     "ec.svc.crossBorder.title": "Pagamenti transfrontalieri",
     "ec.svc.crossBorder.body": "Invia e ricevi pagamenti internazionali in più valute",
     "ec.svc.local.title": "Pagamenti locali",
@@ -518,7 +519,8 @@
 
 
     "ec.q3.title": "¿Qué servicios de Altery quieres usar?",
-    "ec.q3.lead": "Selecciona todas las opciones que correspondan",
+    "ec.q3.lead": "Selecciona todas las opciones que apliquen a tu negocio",
+    "ec.q3.disclaimer": "Algunos productos pueden no estar disponibles según el perfil de tu negocio y el resultado de la verificación.",
     "ec.svc.crossBorder.title": "Pagos internacionales",
     "ec.svc.crossBorder.body": "Envía y recibe pagos internacionales en varias divisas",
     "ec.svc.local.title": "Pagos locales",

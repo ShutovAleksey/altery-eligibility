@@ -71,7 +71,8 @@
 
 
     "ec.q3.title": "Welke Altery-diensten wil je gebruiken?",
-    "ec.q3.lead": "Selecteer alles wat van toepassing is",
+    "ec.q3.lead": "Selecteer alles wat van toepassing is op je bedrijf",
+    "ec.q3.disclaimer": "Sommige producten zijn mogelijk niet beschikbaar, afhankelijk van je bedrijfsprofiel en de uitkomst van de verificatie.",
     "ec.svc.crossBorder.title": "Grensoverschrijdende betalingen",
     "ec.svc.crossBorder.body": "Verstuur en ontvang internationale betalingen in meerdere valuta's",
     "ec.svc.local.title": "Lokale betalingen",
@@ -518,7 +519,8 @@
 
 
     "ec.q3.title": "Altery'nin hangi servislerini kullanmak istiyorsunuz?",
-    "ec.q3.lead": "Geçerli olanların tümünü seçin",
+    "ec.q3.lead": "İşletmeniz için geçerli olanların tümünü seçin",
+    "ec.q3.disclaimer": "Bazı ürünler, işletme profilinize ve doğrulama sonuçlarınıza bağlı olarak kullanılamayabilir.",
     "ec.svc.crossBorder.title": "Sınır ötesi ödemeler",
     "ec.svc.crossBorder.body": "Birden fazla para biriminde uluslararası ödemeler gönderin ve alın",
     "ec.svc.local.title": "Yerel ödemeler",
