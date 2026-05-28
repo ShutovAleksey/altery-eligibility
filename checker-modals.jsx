@@ -28,6 +28,18 @@
 // `const useState = …` would collide in the per-realm lexical slot
 // (SyntaxError: Identifier 'useState' has already been declared).
 
+// Canonical plan-features list shown identically on every plan card
+// inside EcPlanComparisonModal. Each row is a binary capability; the
+// {starter,pro,ultra} flags decide green-check vs red-cross per card.
+// Row labels reuse existing perk i18n strings (no new translations
+// added for the feature names themselves).
+const PLAN_CAPABILITIES = [
+  { labelKey: "ec.plan.pro.p3",             on: { starter: false, pro: true,  ultra: true  } },
+  { labelKey: "ec.plan.ultra.p5",           on: { starter: false, pro: false, ultra: true  } },
+  { labelKey: "ec.plan.ultra.negotiatedFx", on: { starter: false, pro: false, ultra: true  } },
+  { labelKey: "ec.plan.ultra.users",        on: { starter: false, pro: false, ultra: true  } },
+];
+
 function EcFeesModal({ plan, entity, onClose }) {
   const t = useT();
   const region = ecFeeRegion(entity);
@@ -288,13 +300,25 @@ function EcPlanCompareCard({ plan, onSelect }) {
 
       <div className="ec-plan-compare__divider" />
 
-      <div className="ec-plan-compare__perks">
-        {plan.perkKeys.map((k, i) => (
-          <div key={i} className="ec-plan-compare__perk">
-            <EcIco.check />
-            <span>{t(k)}</span>
-          </div>
-        ))}
+      {/* Plan features — canonical 4-row binary list of qualitative
+          capabilities, shown identically on every card so the eye can
+          scan line-by-line: same vertical position = same feature,
+          only the green-check / red-cross changes between Starter /
+          Pro / Ultra. Reuses existing perk strings as row labels. */}
+      <div className="ec-plan-compare__section">
+        <div className="ec-plan-compare__sectionHead">{t("ec.r.plan.compare.featuresHead")}</div>
+        <div className="ec-plan-compare__perks">
+          {PLAN_CAPABILITIES.map((cap, i) => {
+            const on = cap.on[plan.id];
+            return (
+              <div key={i}
+                   className={"ec-plan-compare__perk" + (on ? "" : " ec-plan-compare__perk--off")}>
+                {on ? <EcIco.check /> : <EcIco.close />}
+                <span>{t(cap.labelKey)}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Products included — iterates the full EC_SERVICES list in

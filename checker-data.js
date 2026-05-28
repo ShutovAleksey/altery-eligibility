@@ -648,10 +648,9 @@ const EC_PLANS = {
     price: "£50", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.starter.tagline",
     fitKey: "ec.plan.starter.fit",
-    // Capability perks (qualitative only — pricing claims live in the
-    // Fees & differentiators table, products in the Products list).
-    // Currency/IBAN coverage is rendered at the entity level via
-    // entity.currencyPerkKey, so it's not duplicated here.
+    // Plan-card perks for the result-page recommendation hero (NOT the
+    // compare modal — the modal uses the unified PLAN_CAPABILITIES list
+    // in checker-modals.jsx for row-by-row scan-comparability).
     perkKeys: ["ec.plan.starter.p4", "ec.plan.starter.users"],
     fees: {
       fasterPay: "£1",

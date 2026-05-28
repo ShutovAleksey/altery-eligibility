@@ -210,6 +210,7 @@
         "ec.r.plan.compare.recommended": "Recommended for you",
         "ec.r.plan.compare.wasRecommended": "Originally recommended",
         "ec.r.plan.compare.switch":  "Switch to this plan",
+        "ec.r.plan.compare.featuresHead": "Features",
         "ec.r.plan.compare.productsHead": "Products included",
         "ec.r.plan.compare.feesHead":    "Fees & differentiators",
         "ec.r.plan.compare.fee.fasterPay": "UK Faster Payments",
