@@ -95,6 +95,12 @@ const Button = (props) => {
   const onClick = props.onClick;
   const type = props.type || "button";
   const ariaLabelProp = props["aria-label"] || props.ariaLabel;
+  // When href is provided, render as <a> instead of <button>. Used for
+  // mailto:/tel:/external links where native anchor behaviour is more
+  // robust than window.location.href reassignment (which silently no-ops
+  // in some browsers when no protocol handler is registered).
+  const href = props.href;
+  const target = props.target;
 
   const [h, setH] = React.useState(false);
   const [a, setA] = React.useState(false);
@@ -113,6 +119,31 @@ const Button = (props) => {
     ...style
   };
   const labelFromChildren = typeof children === "string" ? children : undefined;
+  const ariaLabelComputed = ariaLabelProp || (!labelFromChildren && (iconLeft || iconRight) ? iconLeft || iconRight : undefined);
+  const inner = (
+    <>
+      {loading ? <Spinner size={sz.iconSize} /> : iconLeft && <Icon name={iconLeft} size={sz.iconSize} aria-hidden="true" />}
+      {children && <span>{children}</span>}
+      {iconRight && !loading && <Icon name={iconRight} size={sz.iconSize} aria-hidden="true" />}
+    </>
+  );
+  if (href) {
+    return (
+      <a
+        href={href}
+        target={target}
+        rel={target === "_blank" ? "noopener noreferrer" : undefined}
+        style={{ ...s, textDecoration: "none", display: "inline-flex" }}
+        aria-label={ariaLabelComputed}
+        onMouseEnter={() => setH(true)}
+        onMouseLeave={() => {setH(false);setA(false);}}
+        onMouseDown={() => setA(true)}
+        onMouseUp={() => setA(false)}
+        onClick={onClick}>
+        {inner}
+      </a>
+    );
+  }
   return (
     <button
       type={type}
@@ -120,16 +151,13 @@ const Button = (props) => {
       disabled={isDisabled}
       aria-disabled={isDisabled || undefined}
       aria-busy={loading || undefined}
-      aria-label={ariaLabelProp || (!labelFromChildren && (iconLeft || iconRight) ? iconLeft || iconRight : undefined)}
+      aria-label={ariaLabelComputed}
       onMouseEnter={() => setH(true)}
       onMouseLeave={() => {setH(false);setA(false);}}
       onMouseDown={() => setA(true)}
       onMouseUp={() => setA(false)}
       onClick={onClick}>
-
-      {loading ? <Spinner size={sz.iconSize} /> : iconLeft && <Icon name={iconLeft} size={sz.iconSize} aria-hidden="true" />}
-      {children && <span>{children}</span>}
-      {iconRight && !loading && <Icon name={iconRight} size={sz.iconSize} aria-hidden="true" />}
+      {inner}
     </button>);
 
 };

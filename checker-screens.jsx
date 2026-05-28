@@ -2032,9 +2032,10 @@ function EcResultBlocked({ rec, onBack, onReset }) {
           <Button variant="primary" size="xl" onClick={onReset}>{t("common.startOver")}</Button>
           {/* Soft-decline cohort: open the user's mail client to sales@ so
               they can describe their setup. Blocked businesses fall outside
-              the self-serve funnel, so a direct email beats a booking link. */}
-          <Button variant="outline" size="xl"
-                  onClick={() => { window.location.href = "mailto:sales@altery.com"; }}>
+              the self-serve funnel, so a direct email beats a booking link.
+              Native anchor (href) instead of window.location.href so the
+              mailto handler fires reliably across browsers. */}
+          <Button variant="outline" size="xl" href="mailto:sales@altery.com">
             {t("common.contactTeam")}
           </Button>
         </div>

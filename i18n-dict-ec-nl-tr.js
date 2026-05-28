@@ -5,7 +5,7 @@
 
   // ─────────────────────────── NEDERLANDS (NL) ───────────────────────────
   Object.assign(D.nl, {
-    "ec.header.eyebrow": "Geschiktheidscheck · 90 sec",
+    "ec.header.eyebrow": "Zie in 90 seconden wat bij je bedrijf past",
 
     "common.continue": "Doorgaan",
     "common.back": "Terug",
@@ -450,7 +450,7 @@
 
   // ─────────────────────────── TÜRKÇE (TR) ───────────────────────────
   Object.assign(D.tr, {
-    "ec.header.eyebrow": "Uygunluk kontrolü · 90 sn",
+    "ec.header.eyebrow": "İşletmenize neyin uyduğunu 90 saniyede görün",
 
     "common.continue": "Devam",
     "common.back": "Geri",

@@ -6,7 +6,7 @@
 
   // ─────────────────────────── POLSKI (PL) ───────────────────────────
   Object.assign(D.pl, {
-    "ec.header.eyebrow": "Sprawdzenie kwalifikacji · 90 sek",
+    "ec.header.eyebrow": "Zobacz w 90 sekund, co pasuje do Twojego biznesu",
 
     "common.continue": "Dalej",
     "common.back": "Wstecz",
@@ -451,7 +451,7 @@
 
   // ─────────────────────────── PORTUGUÊS (PT) ───────────────────────────
   Object.assign(D.pt, {
-    "ec.header.eyebrow": "Verificação de elegibilidade · 90 seg",
+    "ec.header.eyebrow": "Veja em 90 segundos o que se ajusta ao seu negócio",
 
     "common.continue": "Continuar",
     "common.back": "Voltar",
@@ -898,7 +898,7 @@
 
   // ─────────────────────────── FRANÇAIS (FR) ───────────────────────────
   Object.assign(D.fr, {
-    "ec.header.eyebrow": "Test d'éligibilité · 90 sec",
+    "ec.header.eyebrow": "Découvrez en 90 secondes ce qui correspond à votre entreprise",
 
     "common.continue": "Continuer",
     "common.back": "Retour",

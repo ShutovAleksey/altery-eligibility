@@ -9,7 +9,7 @@
 
   // ─────────────────────────── DEUTSCH (DE) ───────────────────────────
   Object.assign(D.de, {
-    "ec.header.eyebrow": "Eignungsprüfung · 90 Sek.",
+    "ec.header.eyebrow": "Sieh in 90 Sekunden, was zu deinem Unternehmen passt",
 
     "common.continue": "Weiter",
     "common.back": "Zurück",
@@ -454,7 +454,7 @@
 
   // ─────────────────────────── РУССКИЙ (RU) ───────────────────────────
   Object.assign(D.ru, {
-    "ec.header.eyebrow": "Проверка соответствия · 90 секунд",
+    "ec.header.eyebrow": "Узнайте за 90 секунд, что подходит вашему бизнесу",
 
     "common.continue": "Продолжить",
     "common.back": "Назад",
