@@ -164,6 +164,10 @@
     "ec.plan.ultra.p3": "Złożone / multi-entity struktury",
     "ec.plan.ultra.p4": "Bez limitu użytkowników konta",
     "ec.plan.ultra.p5": "Priorytetowe wsparcie operacyjne",
+    "ec.plan.starter.users": "Do 2 użytkowników konta",
+    "ec.plan.pro.users":     "Do 5 użytkowników konta",
+    "ec.plan.ultra.users":   "Nieograniczona liczba użytkowników konta",
+    "ec.plan.ultra.negotiatedFx": "Negocjowane stawki FX i prowizje transakcyjne",
 
     "ec.cav.crypto.tag": "Znamy krypto",
     "ec.cav.crypto.text": "KYB krypto-natywne obsługuje nasz zespół specjalistyczny, nie ogólna kolejka. Synterra Connect — nasza sieć partnerska do bezpośredniego rozliczania z giełdami — przenosi środki do i z regulowanych platform; fiat in/out przez SEPA, Faster Payments i SWIFT.",
@@ -612,6 +616,10 @@
     "ec.plan.ultra.p3": "Estruturas complexas / multi-entity",
     "ec.plan.ultra.p4": "Utilizadores da conta ilimitados",
     "ec.plan.ultra.p5": "Suporte operacional prioritário",
+    "ec.plan.starter.users": "Até 2 utilizadores da conta",
+    "ec.plan.pro.users":     "Até 5 utilizadores da conta",
+    "ec.plan.ultra.users":   "Utilizadores da conta ilimitados",
+    "ec.plan.ultra.negotiatedFx": "Taxas de FX e de transação negociadas",
 
     "ec.cav.crypto.tag": "Crypto-fluente",
     "ec.cav.crypto.text": "O KYB crypto-nativo é gerido pela nossa equipa especialista, não pela fila geral. Synterra Connect — a nossa rede de parceiros para liquidação direta com exchanges — movimenta fundos de e para plataformas reguladas; fiat in/out via SEPA, Faster Payments e SWIFT.",
@@ -1058,6 +1066,10 @@
     "ec.plan.ultra.p3": "Structures complexes / multi-entity",
     "ec.plan.ultra.p4": "Utilisateurs du compte illimités",
     "ec.plan.ultra.p5": "Support opérationnel prioritaire",
+    "ec.plan.starter.users": "Jusqu'à 2 utilisateurs du compte",
+    "ec.plan.pro.users":     "Jusqu'à 5 utilisateurs du compte",
+    "ec.plan.ultra.users":   "Utilisateurs du compte illimités",
+    "ec.plan.ultra.negotiatedFx": "FX et frais de transaction négociés",
 
     "ec.cav.crypto.tag": "Crypto-experts",
     "ec.cav.crypto.text": "Le KYB crypto-natif est géré par notre équipe spécialiste, pas la file généraliste. Synterra Connect — notre réseau partenaire pour le règlement direct avec les exchanges — déplace des fonds vers et depuis des plateformes régulées ; fiat entrée/sortie via SEPA, Faster Payments et SWIFT.",

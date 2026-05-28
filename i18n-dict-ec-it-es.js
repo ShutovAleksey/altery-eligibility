@@ -163,6 +163,10 @@
     "ec.plan.ultra.p3": "Strutture complesse / multi-entity",
     "ec.plan.ultra.p4": "Utenti del conto illimitati",
     "ec.plan.ultra.p5": "Supporto operativo prioritario",
+    "ec.plan.starter.users": "Fino a 2 utenti dell'account",
+    "ec.plan.pro.users":     "Fino a 5 utenti dell'account",
+    "ec.plan.ultra.users":   "Utenti dell'account illimitati",
+    "ec.plan.ultra.negotiatedFx": "Pricing FX e commissioni di transazione negoziati",
 
     "ec.cav.crypto.tag": "Crypto-esperti",
     "ec.cav.crypto.text": "Il KYB crypto-nativo è gestito dal nostro team specialista, non dalla coda generalista. Synterra Connect — la nostra rete partner per regolamento diretto con exchange — movimenta fondi da e verso piattaforme regolamentate; fiat in/out via SEPA, Faster Payments e SWIFT.",
@@ -611,6 +615,10 @@
     "ec.plan.ultra.p3": "Estructuras complejas / multi-entity",
     "ec.plan.ultra.p4": "Usuarios de la cuenta ilimitados",
     "ec.plan.ultra.p5": "Soporte operativo prioritario",
+    "ec.plan.starter.users": "Hasta 2 usuarios de cuenta",
+    "ec.plan.pro.users":     "Hasta 5 usuarios de cuenta",
+    "ec.plan.ultra.users":   "Usuarios de cuenta ilimitados",
+    "ec.plan.ultra.negotiatedFx": "FX y comisiones de transacción negociadas",
 
     "ec.cav.crypto.tag": "Cripto-experto",
     "ec.cav.crypto.text": "El KYB cripto-nativo lo gestiona nuestro equipo especialista, no la cola general. Synterra Connect — nuestra red de socios para liquidación directa con exchanges — mueve fondos hacia y desde plataformas reguladas; fiat entrada/salida vía SEPA, Faster Payments y SWIFT.",

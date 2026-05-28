@@ -163,6 +163,10 @@
     "ec.plan.ultra.p3": "Complexe / multi-entity structuren",
     "ec.plan.ultra.p4": "Onbeperkt rekeninggebruikers",
     "ec.plan.ultra.p5": "Priority operations support",
+    "ec.plan.starter.users": "Tot 2 accountgebruikers",
+    "ec.plan.pro.users":     "Tot 5 accountgebruikers",
+    "ec.plan.ultra.users":   "Onbeperkt aantal accountgebruikers",
+    "ec.plan.ultra.negotiatedFx": "Onderhandelde FX en transactiekosten",
 
     "ec.cav.crypto.tag": "Crypto-ervaren",
     "ec.cav.crypto.text": "Crypto-native KYB wordt afgehandeld door ons specialistenteam, niet de algemene wachtrij. Synterra Connect — ons partner-netwerk voor directe exchange-afwikkeling — verplaatst middelen van en naar gereguleerde platforms; fiat in/uit via SEPA, Faster Payments en SWIFT.",
@@ -611,6 +615,10 @@
     "ec.plan.ultra.p3": "Karmaşık / multi-entity yapılar kabul edilir",
     "ec.plan.ultra.p4": "Sınırsız hesap kullanıcısı",
     "ec.plan.ultra.p5": "Öncelikli operasyon desteği",
+    "ec.plan.starter.users": "2 hesap kullanıcısına kadar",
+    "ec.plan.pro.users":     "5 hesap kullanıcısına kadar",
+    "ec.plan.ultra.users":   "Sınırsız hesap kullanıcısı",
+    "ec.plan.ultra.negotiatedFx": "Müzakereli FX ve işlem ücretleri",
 
     "ec.cav.crypto.tag": "Kripto-uzmanlık",
     "ec.cav.crypto.text": "Kripto-yerli KYB, genel kuyrukta değil, uzman ekibimizde yürütülür. Synterra Connect — doğrudan borsa mutabakatı için ortak ağımız — düzenlenmiş platformlara fon giriş-çıkışını yönetir; fiat giriş/çıkış SEPA, Faster Payments ve SWIFT üzerinden.",

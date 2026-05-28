@@ -648,12 +648,11 @@ const EC_PLANS = {
     price: "£50", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.starter.tagline",
     fitKey: "ec.plan.starter.fit",
-    // First perk (currency/IBAN coverage) is now rendered at the
-    // entity level via entity.currencyPerkKey — entity-specific copy
-    // is more accurate than the generic "Local IBANs in all base
-    // currencies" we used to ship here. Remaining perks are the
-    // plan-tier differentiators (SWIFT breadth, FX markup, trial).
-    perkKeys: ["ec.plan.starter.p2", "ec.plan.starter.p3", "ec.plan.starter.p4"],
+    // Capability perks (qualitative only — pricing claims live in the
+    // Fees & differentiators table, products in the Products list).
+    // Currency/IBAN coverage is rendered at the entity level via
+    // entity.currencyPerkKey, so it's not duplicated here.
+    perkKeys: ["ec.plan.starter.p4", "ec.plan.starter.users"],
     // Products covered by this tier — referenced by EcPlanCompareCard
     // to render a "Products included" tick-list mirroring the Q3
     // service selector. Re-uses existing ec.svc.*.title keys so no new
@@ -670,7 +669,6 @@ const EC_PLANS = {
       sepa:      "€2",
       swift:     "€15 + 0.5%",
       fxMarkup:  "up to 0.8%",
-      bulk:      false,
     },
   },
   pro: {
@@ -678,7 +676,7 @@ const EC_PLANS = {
     price: "£100", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.pro.tagline",
     fitKey: "ec.plan.pro.fit",
-    perkKeys: ["ec.plan.pro.p1", "ec.plan.pro.p2", "ec.plan.pro.p3", "ec.plan.pro.p4", "ec.plan.pro.p5"],
+    perkKeys: ["ec.plan.pro.p3", "ec.plan.pro.users"],
     productKeys: [
       "ec.svc.local.title",
       "ec.svc.cards.title",
@@ -692,7 +690,6 @@ const EC_PLANS = {
       sepa:      "€1",
       swift:     "€10 + 0.25%",
       fxMarkup:  "up to 0.7%",
-      bulk:      true,
     },
   },
   ultra: {
@@ -700,7 +697,7 @@ const EC_PLANS = {
     price: "£300", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.ultra.tagline",
     fitKey: "ec.plan.ultra.fit",
-    perkKeys: ["ec.plan.ultra.p1", "ec.plan.ultra.p2", "ec.plan.ultra.p3", "ec.plan.ultra.p4", "ec.plan.ultra.p5"],
+    perkKeys: ["ec.plan.ultra.p5", "ec.plan.ultra.negotiatedFx", "ec.plan.ultra.users"],
     productKeys: [
       "ec.svc.local.title",
       "ec.svc.cards.title",
@@ -715,7 +712,6 @@ const EC_PLANS = {
       sepa:      "€0.5",
       swift:     "€10 + 0.15%",
       fxMarkup:  "up to 0.5%",
-      bulk:      true,
     },
   },
 };

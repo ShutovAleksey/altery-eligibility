@@ -210,15 +210,12 @@
         "ec.r.plan.compare.recommended": "Recommended for you",
         "ec.r.plan.compare.wasRecommended": "Originally recommended",
         "ec.r.plan.compare.switch":  "Switch to this plan",
-        "ec.r.plan.compare.fitsHead":    "Suitable for",
         "ec.r.plan.compare.productsHead": "Products included",
         "ec.r.plan.compare.feesHead":    "Fees & differentiators",
         "ec.r.plan.compare.fee.fasterPay": "UK Faster Payments",
         "ec.r.plan.compare.fee.sepa":      "Outgoing SEPA",
         "ec.r.plan.compare.fee.swift":     "Outgoing SWIFT",
         "ec.r.plan.compare.fee.fxMarkup":  "FX markup (base currencies)",
-        "ec.r.plan.compare.fee.bulk":      "Bulk & batch transfers",
-        "ec.r.plan.compare.fee.notIncluded": "—",
         "ec.r.plan.compare.fee.footnote":  "Pricing currency depends on country of incorporation (GBP / EUR / USD). Full price list available on the dashboard.",
         "ec.r.plan.compare.close":   "Close",
 
@@ -310,6 +307,10 @@
     "ec.plan.ultra.p3":   "SWIFT fee cap at £300",
     "ec.plan.ultra.p4":   "FX markup up to 0.5%",
     "ec.plan.ultra.p5":   "Priority operations support",
+    "ec.plan.starter.users": "Up to 2 account users",
+    "ec.plan.pro.users":     "Up to 5 account users",
+    "ec.plan.ultra.users":   "Unlimited account users",
+    "ec.plan.ultra.negotiatedFx": "Negotiated FX & transaction fees",
 
     // Realistic-track savings callout — bank-side hidden costs added
     // on top of the published-rates headline. Hint cites the two

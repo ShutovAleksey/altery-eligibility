@@ -250,18 +250,16 @@ function EcPlanCompareCard({ plan, onSelect }) {
   const priceValue = plan.priceKey ? t(plan.priceKey) : plan.price;
   const cycleText = t(plan.cycleKey);
 
-  // Fee rows — real numbers + binary differentiators from Altery's
-  // public comparison table. UK Faster Pay, SEPA and SWIFT are the
-  // transaction-fee differentiators; FX markup is the spread-side;
-  // bulk transfers is a binary capability gate (Starter doesn't get
-  // it). Compound SWIFT pricing ("€10 + 0.25%") renders as-is in
-  // mono — that's how Altery shows it on the real page.
+  // Fee rows — numeric transaction-fee differentiators from Altery's
+  // public table. The Mass-payments capability used to live here as a
+  // binary "tick / —" row, but it's already shown in the Products
+  // section, so it's been removed. Compound SWIFT pricing
+  // ("€10 + 0.25%") renders as-is in mono — same as Altery's page.
   const feeRows = [
-    { labelKey: "ec.r.plan.compare.fee.fasterPay", value: plan.fees.fasterPay, kind: "value" },
-    { labelKey: "ec.r.plan.compare.fee.sepa",      value: plan.fees.sepa,      kind: "value" },
-    { labelKey: "ec.r.plan.compare.fee.swift",     value: plan.fees.swift,     kind: "value" },
-    { labelKey: "ec.r.plan.compare.fee.fxMarkup",  value: plan.fees.fxMarkup,  kind: "value" },
-    { labelKey: "ec.r.plan.compare.fee.bulk",      value: plan.fees.bulk,      kind: "binary" },
+    { labelKey: "ec.r.plan.compare.fee.fasterPay", value: plan.fees.fasterPay },
+    { labelKey: "ec.r.plan.compare.fee.sepa",      value: plan.fees.sepa      },
+    { labelKey: "ec.r.plan.compare.fee.swift",     value: plan.fees.swift     },
+    { labelKey: "ec.r.plan.compare.fee.fxMarkup",  value: plan.fees.fxMarkup  },
   ];
 
   return (
@@ -317,29 +315,12 @@ function EcPlanCompareCard({ plan, onSelect }) {
       )}
 
       <div className="ec-plan-compare__section">
-        <div className="ec-plan-compare__sectionHead">{t("ec.r.plan.compare.fitsHead")}</div>
-        <div className="ec-plan-compare__fits">{t(plan.fitKey)}</div>
-      </div>
-
-      <div className="ec-plan-compare__section">
         <div className="ec-plan-compare__sectionHead">{t("ec.r.plan.compare.feesHead")}</div>
         <div className="ec-plan-compare__fees">
           {feeRows.map((row, i) => (
             <div key={i} className="ec-plan-compare__feeRow">
               <span className="ec-plan-compare__feeLabel">{t(row.labelKey)}</span>
-              {row.kind === "binary" ? (
-                row.value ? (
-                  <span className="ec-plan-compare__feeValue ec-plan-compare__feeValue--tick">
-                    <EcIco.check style={{ width: 14, height: 14 }} />
-                  </span>
-                ) : (
-                  <span className="ec-plan-compare__feeValue ec-plan-compare__feeValue--muted">
-                    {t("ec.r.plan.compare.fee.notIncluded")}
-                  </span>
-                )
-              ) : (
-                <span className="ec-plan-compare__feeValue">{row.value}</span>
-              )}
+              <span className="ec-plan-compare__feeValue">{row.value}</span>
             </div>
           ))}
         </div>
