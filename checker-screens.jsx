@@ -458,26 +458,24 @@ function EcIntro({ onStart }) {
         {/* Sales-led ordering — three claims, narrowing from setup to
             wallet: (1) we tailor a plan to you, (2) here is what we
             would open and which products you'd get, (3) here is the
-            monthly cost. Row 3 (cost) carries the success-green
-            accent because that's the line that closes the sale.
-            Icons: target = calibrated to you, stack = kit of products,
-            banknote = money. */}
+            monthly cost. Illustrations are decorative; alt left empty
+            so screen readers don't double-read the bullet titles. */}
         <div className="ec-value__row">
-          <span className="ec-value__icon"><EcIco.target style={{ width: 18, height: 18 }} /></span>
+          <img className="ec-value__art" src="images/intro/value-tailored.png" alt="" width="44" height="44" />
           <div>
             <div className="ec-value__title">{t("ec.intro.value1.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value1.body")}</div>
           </div>
         </div>
         <div className="ec-value__row">
-          <span className="ec-value__icon" style={{ background: "var(--c-warning-soft)", color: "var(--c-warning)" }}><EcIco.stack style={{ width: 18, height: 18 }} /></span>
+          <img className="ec-value__art" src="images/intro/value-features.png" alt="" width="44" height="44" />
           <div>
             <div className="ec-value__title">{t("ec.intro.value2.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value2.body")}</div>
           </div>
         </div>
         <div className="ec-value__row">
-          <span className="ec-value__icon" style={{ background: "var(--c-success-soft)", color: "var(--c-success)" }}><EcIco.banknote style={{ width: 18, height: 18 }} /></span>
+          <img className="ec-value__art" src="images/intro/value-clarity.png" alt="" width="44" height="44" />
           <div>
             <div className="ec-value__title">{t("ec.intro.value3.title")}</div>
             <div className="ec-value__body">{t("ec.intro.value3.body")}</div>

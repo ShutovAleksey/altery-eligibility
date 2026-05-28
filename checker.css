@@ -623,6 +623,11 @@
       background: var(--c-accent-soft); color: var(--c-primary);
       display: inline-flex; align-items: center; justify-content: center;
     }
+    .ec-value__art {
+      flex: 0 0 44px; width: 44px; height: 44px;
+      object-fit: contain;
+      display: block;
+    }
     .ec-value__title { font-size: 14px; font-weight: 600; color: var(--c-ink); margin-bottom: 2px; }
     .ec-value__body { font-size: 13px; line-height: 18px; color: var(--c-muted); }
 
