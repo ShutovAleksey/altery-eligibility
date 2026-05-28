@@ -1687,19 +1687,17 @@ function EcResultApproved({ rec, onBack, onReset }) {
                 <span className="ec-r__planAlt__icon" aria-hidden="true">
                   <EcIco.info style={{ width: 14, height: 14 }} />
                 </span>
-                <div className="ec-r__planAlt__body">
-                  <div className="ec-r__planAlt__title">
-                    {t("ec.r.plan.notRecommended." + altDirection + ".title", {
-                      recommended: t(recommendedPlan.nameKey),
-                      selected:    planName,
-                    })}
-                  </div>
-                  <div className="ec-r__planAlt__text">
-                    {t("ec.r.plan.notRecommended." + altDirection + ".body", {
-                      recommended: t(recommendedPlan.nameKey),
-                      selected:    planName,
-                    })}
-                  </div>
+                <div className="ec-r__planAlt__title">
+                  {t("ec.r.plan.notRecommended." + altDirection + ".title", {
+                    recommended: t(recommendedPlan.nameKey),
+                    selected:    planName,
+                  })}
+                </div>
+                <div className="ec-r__planAlt__text">
+                  {t("ec.r.plan.notRecommended." + altDirection + ".body", {
+                    recommended: t(recommendedPlan.nameKey),
+                    selected:    planName,
+                  })}
                 </div>
                 <button
                   type="button"

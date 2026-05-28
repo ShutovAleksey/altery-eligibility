@@ -2839,23 +2839,30 @@
       display: inline-flex; align-items: center; justify-content: center;
       margin-top: 1px;
     }
-    .ec-r__planAlt__body { flex: 1 1 100%; min-width: 0; }
+    /* Row 1: title sits next to the icon, fills the remaining width. */
     .ec-r__planAlt__title {
+      flex: 1 1 0; min-width: 0;
       font-size: 13px; font-weight: 600; color: var(--c-ink);
-      line-height: 18px; margin-bottom: 2px;
+      line-height: 18px;
     }
+    /* Rows 2 & 3: text and switch each break onto their own full-width
+       row (flex-basis: 100% forces wrap), flush with the box's left
+       padding instead of indenting under the title. */
     .ec-r__planAlt__text {
+      flex: 0 0 100%;
+      margin-top: 6px;
       font-size: 12px; line-height: 17px; color: var(--c-muted);
     }
     .ec-r__planAlt__switch {
-      flex: 0 0 auto;
-      margin: 8px 0 0 32px;
+      flex: 0 0 100%;
+      margin-top: 10px;
       appearance: none; border: 0; background: transparent;
       padding: 0;
       font: inherit;
-      font-size: 12px; font-weight: 600; line-height: 18px;
+      font-size: 13px; font-weight: 600; line-height: 18px;
       color: var(--c-primary);
       cursor: pointer;
+      text-align: left;
       letter-spacing: 0.005em;
     }
     .ec-r__planAlt__switch:hover { text-decoration: underline; }
