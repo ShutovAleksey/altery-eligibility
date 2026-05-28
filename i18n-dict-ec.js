@@ -148,8 +148,8 @@
     "ec.svc.crypto.body": "Access crypto on-ramp and off-ramp services through Synterra Connect where available.",
 
     // Q4 volumes
-    "ec.q4.title": "How much money flows through the account each month?",
-    "ec.q4.lead": "A rough figure is fine. We use this to recommend a plan and pre-set sensible limits — so legitimate payments don't sit waiting for review.",
+    "ec.q4.title": "How much money do you expect to move each month?",
+    "ec.q4.lead": "A rough estimate is fine. We use this to recommend the right setup and starting limits for your business.",
     "ec.q4.tx.4": "1000+",
     "ec.q4.tx.3": "301 – 1000",
     "ec.q4.tx.2": "101 – 300",
@@ -161,7 +161,7 @@
     "ec.q4.vol.in.label": "Average monthly incoming volume (in GBP)",
     "ec.q4.section.out": "Outgoing payments",
     "ec.q4.section.in": "Incoming payments",
-    "ec.q4.why": "Volume estimates aren't a commitment. They drive plan recommendation and starting limits — both adjustable any time. Under-estimate and a payment may sit for review; over-estimate and we'll just ask a couple more questions during KYB.",
+    "ec.q4.why": "These estimates don't need to be exact. We use them to tailor your setup and starting limits, and they can be adjusted as your business grows.",
     "ec.q4.vol.0": "Under £50k",
     "ec.q4.vol.1": "£50k – £200k",
     "ec.q4.vol.2": "£200k – £500k",
