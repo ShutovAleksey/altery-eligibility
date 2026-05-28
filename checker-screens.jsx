@@ -1935,11 +1935,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
               <a href={"mailto:" + t("ec.support.email")}>{t("ec.support.email")}</a>
             </span>
           </div>
-          {/* Indicative-result caveat — this page shows a recommendation,
-              not a binding offer. Quiet fine print so it qualifies the
-              eligibility/pricing/product claims above without competing
-              with the CTA. */}
-          <p className="ec-r__disclaimer">{t("ec.r.disclaimer")}</p>
         </section>
       </div>
 

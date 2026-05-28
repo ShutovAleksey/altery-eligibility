@@ -138,7 +138,7 @@
     "ec.r.plan.notRecommended.down.body": "{selected} ma niższy abonament, ale wyższe opłaty za transakcję i niższy limit wolumenu — wybrane przez Ciebie usługi (masowe wypłaty, korytarze FX, karty firmowe) mogą wypaść poza plan i stać się dodatkami płatnymi, których prognoza powyżej nie uwzględnia.",
     "ec.r.plan.notRecommended.switchBack": "Wróć do {recommended}",
     "ec.r.caveats.head": "Warto wiedzieć przed wnioskiem",
-    "ec.r.cta.continue": "Przejdź do wniosku — ok. 17 min",
+    "ec.r.cta.continue": "Przejdź do wniosku",
 
     "ec.plan.starter": "Starter",
     "ec.plan.pro": "Pro",
@@ -586,7 +586,7 @@
     "ec.r.plan.notRecommended.down.body": "{selected} tem uma assinatura mais baixa, mas taxas por transação mais altas e um limite de volume menor — serviços que selecionou (pagamentos em massa, corredores FX, cartões de empresa) podem ficar fora do plano e tornar-se extras pagos que a projeção acima não contempla.",
     "ec.r.plan.notRecommended.switchBack": "Voltar a {recommended}",
     "ec.r.caveats.head": "Bom saber antes de submeter",
-    "ec.r.cta.continue": "Continuar para o pedido — ≈ 17 min",
+    "ec.r.cta.continue": "Continuar para o pedido",
 
     "ec.plan.starter": "Starter",
     "ec.plan.pro": "Pro",
@@ -1032,7 +1032,7 @@
     "ec.r.plan.notRecommended.down.body": "{selected} a un abonnement plus bas, mais des frais par transaction plus élevés et un plafond de volume inférieur — les services que vous avez sélectionnés (paiements de masse, corridors FX, cartes professionnelles) peuvent sortir du plan et devenir des extras payants que la projection ci-dessus ne prend pas en compte.",
     "ec.r.plan.notRecommended.switchBack": "Revenir à {recommended}",
     "ec.r.caveats.head": "Bon à savoir avant de soumettre",
-    "ec.r.cta.continue": "Continuer vers la demande — ≈ 17 min",
+    "ec.r.cta.continue": "Continuer vers la demande",
 
     "ec.plan.starter": "Starter",
     "ec.plan.pro": "Pro",

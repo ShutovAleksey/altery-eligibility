@@ -137,7 +137,7 @@
     "ec.r.plan.notRecommended.down.body": "{selected} heeft een lager abonnement, maar hogere transactiekosten en een lager volumeplafond — diensten die je hebt gekozen (massabetalingen, FX-corridors, zakelijke kaarten) kunnen daardoor buiten het plan vallen en betaalde extra's worden die de projectie hierboven niet meeneemt.",
     "ec.r.plan.notRecommended.switchBack": "Terug naar {recommended}",
     "ec.r.caveats.head": "Goed om te weten vóór je aanvraagt",
-    "ec.r.cta.continue": "Door naar de aanvraag — ca. 17 min",
+    "ec.r.cta.continue": "Door naar de aanvraag",
 
     "ec.plan.starter": "Starter",
     "ec.plan.pro": "Pro",
@@ -585,7 +585,7 @@
     "ec.r.plan.notRecommended.down.body": "{selected} aboneliği daha düşük, ancak işlem başına ücretleri daha yüksek ve hacim limiti daha düşük — seçtiğiniz hizmetler (toplu ödemeler, FX koridorları, işletme kartları) plan dışında kalabilir ve yukarıdaki projeksiyona dahil edilmeyen ek ücretli hizmetlere dönüşebilir.",
     "ec.r.plan.notRecommended.switchBack": "{recommended} planına geri dön",
     "ec.r.caveats.head": "Başvurmadan önce bilmekte fayda var",
-    "ec.r.cta.continue": "Başvuruya geç — yaklaşık 17 dakika",
+    "ec.r.cta.continue": "Başvuruya geç",
 
     "ec.plan.starter": "Starter",
     "ec.plan.pro": "Pro",

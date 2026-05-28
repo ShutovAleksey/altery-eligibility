@@ -141,7 +141,7 @@
     "ec.r.plan.notRecommended.down.body": "{selected} hat ein günstigeres Abonnement, aber höhere Pro-Transaktions-Gebühren und ein niedrigeres Volumenlimit — Dienste, die du ausgewählt hast (Massenauszahlungen, FX-Korridore, Geschäftskarten), können dadurch außerhalb des Tarifs liegen und als kostenpflichtige Zusätze anfallen, die die obige Projektion nicht abbildet.",
     "ec.r.plan.notRecommended.switchBack": "Zurück zu {recommended}",
     "ec.r.caveats.head": "Wichtig vor dem Antrag",
-    "ec.r.cta.continue": "Weiter zum Antrag — ca. 17 Min.",
+    "ec.r.cta.continue": "Weiter zum Antrag",
 
     "ec.plan.starter": "Starter",
     "ec.plan.pro": "Pro",
@@ -589,7 +589,7 @@
     "ec.r.plan.notRecommended.down.body": "У {selected} подписка дешевле, но комиссии за транзакции выше и лимит оборота ниже — выбранные вами сервисы (массовые выплаты, FX-коридоры, бизнес-карты) могут оказаться за рамками тарифа и стать платными дополнениями, которых в расчёте выше нет.",
     "ec.r.plan.notRecommended.switchBack": "Вернуться к {recommended}",
     "ec.r.caveats.head": "Что важно знать до подачи",
-    "ec.r.cta.continue": "Перейти к заявке — около 17 минут",
+    "ec.r.cta.continue": "Перейти к заявке",
 
     "ec.plan.starter": "Starter",
     "ec.plan.pro": "Pro",
