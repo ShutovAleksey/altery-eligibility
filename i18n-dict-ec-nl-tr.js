@@ -82,6 +82,8 @@
     "ec.svc.cards.body": "Bedrijfskaarten voor de zakelijke uitgaven van je team",
     "ec.svc.api.title": "API-toegang",
     "ec.svc.api.body": "Programmatische betalingen, webhooks en accountdata voor je product of finance-team",
+    "ec.svc.multiEntity.title": "Multi-entity treasury (UK + EU + MENA)",
+    "ec.svc.multiEntity.body": "Eén finance-laag voor UK-, EU- en MENA-entiteiten — onderhandelde FX en toegewijde treasury-support",
     "ec.svc.crypto.title": "Crypto-overschrijvingen",
     "ec.svc.crypto.body": "Verstuur en ontvang cryptobetalingen voor je bedrijf",
 
@@ -165,6 +167,8 @@
     "ec.cav.crypto.text": "Crypto-native KYB wordt afgehandeld door ons specialistenteam, niet de algemene wachtrij. Synterra Connect — ons partner-netwerk voor directe exchange-afwikkeling — verplaatst middelen van en naar gereguleerde platforms; fiat in/uit via SEPA, Faster Payments en SWIFT.",
     "ec.cav.performance.tag": "Gespecialiseerde beoordeling",
     "ec.cav.performance.text": "Performance-marketing ({industry}) heeft duidelijker bewijs nodig van verkeerskwaliteit en uitbetalingen. Compliance werkt met een gestructureerde vragenlijst — typische doorlooptijd drie werkdagen. Bij afwijzing krijg je een concrete onderbouwing, geen black box.",
+    "ec.cav.ultraHint.tag": "15-min call is het waard",
+    "ec.cav.ultraHint.text": "Bij jouw volume met API + bulkbetalingen voegt Ultra toegewijde treasury en onderhandelde FX toe — de moeite waard om in een 15-min call te vergelijken vóór activatie van Pro.",
 
 
     "common.close": "Sluiten",
@@ -298,6 +302,7 @@
     "ec.reasoning.services.mass": "Bulkbetalingen die je hebt geselecteerd vereisen Pro — bulk CSV-upload, webhooks voor betalingsstatus, geen handmatige verwerking.",
     "ec.reasoning.services.cards": "Zakelijke kaarten met uitgavencontroles per team beginnen bij Pro — handig om advertentie-uitgaven te scheiden van operationele kosten.",
     "ec.reasoning.services.api": "De API-toegang die je hebt geselecteerd start bij Pro — sandbox- en live-keys, webhooks voor betalingsstatus en accountdata via REST.",
+    "ec.reasoning.services.multiEntity": "De multi-entity treasury die je hebt geselecteerd is Ultra — UK / EU / MENA accounts onder één finance-laag, met onderhandelde FX en toegewijde treasury-support.",
     "ec.reasoning.industry.payouts": "Affiliate- en creator-platforms doen doorgaans hoogvolume partneruitbetalingen. Pro handelt dit af zonder batching-ceremonie.",
     "ec.reasoning.complexity.corridors": "Je hebt {n} betalingscorridors geselecteerd — Pro heeft betere SEPA- en SWIFT-tarieven dan Starter, wat telt bij die breedte.",
     "ec.reasoning.complexity.tx": "Hoge transactiefrequentie (100+/maand) komt vaak terecht in Starter's beoordelingswachtrij. Pro verwerkt sneller.",
@@ -524,6 +529,8 @@
     "ec.svc.cards.body": "Ekibinizin iş harcamaları için kurumsal kartlar çıkarın",
     "ec.svc.api.title": "API erişimi",
     "ec.svc.api.body": "Ürününüz veya finans operasyonlarınız için programatik ödemeler, webhook'lar ve hesap verisi",
+    "ec.svc.multiEntity.title": "Multi-entity treasury (UK + EU + MENA)",
+    "ec.svc.multiEntity.body": "UK, EU ve MENA tüzel kişilikleri için tek finansal katman — müzakereli FX ve özel treasury desteği",
     "ec.svc.crypto.title": "Kripto transferleri",
     "ec.svc.crypto.body": "İşletmeniz için kripto para ödemeleri gönderin ve alın",
 
@@ -607,6 +614,8 @@
     "ec.cav.crypto.text": "Kripto-yerli KYB, genel kuyrukta değil, uzman ekibimizde yürütülür. Synterra Connect — doğrudan borsa mutabakatı için ortak ağımız — düzenlenmiş platformlara fon giriş-çıkışını yönetir; fiat giriş/çıkış SEPA, Faster Payments ve SWIFT üzerinden.",
     "ec.cav.performance.tag": "Uzman incelemesi",
     "ec.cav.performance.text": "Performans pazarlama ({industry}) trafik kalitesi ve ödemeler konusunda daha net kanıt gerektirir. Uyum, yapılandırılmış bir anket yürütür — tipik sonuç süresi üç iş günü. Reddedilirse, kara kutu değil, somut gerekçe alırsınız.",
+    "ec.cav.ultraHint.tag": "15 dakikalık görüşmeye değer",
+    "ec.cav.ultraHint.text": "Bu hacimde API ve toplu ödemelerle birlikte Ultra; özel treasury desteği ve müzakereli FX sunar — Pro'yu etkinleştirmeden önce 15 dakikalık bir görüşmede karşılaştırmaya değer.",
 
 
     "common.close": "Kapat",
@@ -740,6 +749,7 @@
     "ec.reasoning.services.mass": "Seçtiğiniz toplu ödemeler Pro gerektirir — toplu CSV yükleme, ödeme durumu webhook'ları, manuel tek tek yok.",
     "ec.reasoning.services.cards": "Ekip harcama kontrollü kurumsal kartlar Pro ile başlar — reklam harcamasını operasyonel maliyetlerden ayırmak için yararlı.",
     "ec.reasoning.services.api": "Seçtiğiniz API erişimi Pro'dan başlar — sandbox ve canlı anahtarlar, ödeme durumu webhook'ları ve REST üzerinden hesap verisi.",
+    "ec.reasoning.services.multiEntity": "Seçtiğiniz multi-entity treasury Ultra'ya özel — UK / EU / MENA hesapları tek finansal katmanda, müzakereli FX kurları ve özel treasury desteği ile.",
     "ec.reasoning.industry.payouts": "Affiliate ve içerik üreticisi platformları genellikle yüksek hacimli ortak ödemeleri yapar. Pro bunu tek tek uğraşmadan, toplu işlemle halleder.",
     "ec.reasoning.complexity.corridors": "{n} ödeme koridoru seçtiniz — Pro'nun SEPA ve SWIFT tarifeleri Starter'dan daha iyidir, bu genişlikte önemli.",
     "ec.reasoning.complexity.tx": "Yüksek işlem sıklığı (100+/ay) Starter'ın inceleme kuyruğuna takılır. Pro daha hızlı işler.",

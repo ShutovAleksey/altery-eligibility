@@ -141,6 +141,8 @@
     "ec.svc.cards.body": "Issue corporate cards for your team's business expenses",
     "ec.svc.api.title": "API access",
     "ec.svc.api.body": "Programmatic payments, webhooks and account data for your product or finance ops",
+    "ec.svc.multiEntity.title": "Multi-entity treasury (UK + EU + MENA)",
+    "ec.svc.multiEntity.body": "One finance layer for UK, EU and MENA legal entities — negotiated FX and dedicated treasury support",
     "ec.svc.crypto.title": "Crypto transfers",
     "ec.svc.crypto.body": "Send and receive cryptocurrency payments for your business",
 
@@ -358,6 +360,8 @@
     "ec.cav.crypto.text": "Crypto-native KYB is handled by our specialist team, not the generalist queue. Synterra Connect — our partner-network for direct exchange settlement — routes funds in and out of regulated venues; fiat in/out via SEPA, Faster Payments and SWIFT.",
     "ec.cav.performance.tag": "Specialist review",
     "ec.cav.performance.text": "Performance marketing ({industry}) needs clearer traffic and payout evidence. Compliance runs a structured questionnaire — typical resolution within three business days. If we decline, you'll get specific reasoning, not a black box.",
+    "ec.cav.ultraHint.tag": "Worth a 15-min call",
+    "ec.cav.ultraHint.text": "At your volume with API + mass payouts, Ultra adds dedicated treasury and negotiated FX — worth comparing in a 15-min call before activating Pro.",
 
     // Bank rejection history — optional inline question on result page
 
@@ -497,6 +501,7 @@
     "ec.reasoning.services.mass": "Mass payouts you selected require Pro — bulk CSV upload, payment status webhooks, no manual one-by-one.",
     "ec.reasoning.services.cards": "Business cards with team spend controls start at Pro — useful for separating ad spend from operating costs.",
     "ec.reasoning.services.api": "API access you selected starts at Pro — sandbox and live keys, webhooks for payment status and account data over REST.",
+    "ec.reasoning.services.multiEntity": "Multi-entity treasury you selected is Ultra — UK / EU / MENA accounts under one finance layer, with negotiated FX and dedicated treasury support.",
     "ec.reasoning.industry.payouts": "Affiliate and creator platforms typically run high-volume partner payouts. Pro handles this without batching ceremony.",
     "ec.reasoning.complexity.corridors": "You selected {n} payment corridors — Pro has better SEPA and SWIFT rates than Starter, which matters at that breadth.",
     "ec.reasoning.complexity.tx": "High transaction frequency (100+/month) tends to hit Starter's review queue. Pro processes faster.",

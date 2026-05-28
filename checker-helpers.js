@@ -109,7 +109,11 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     // Capability gate: bulk & batch transfers and programmatic access
     // are Pro-only (Starter has neither mass payouts nor API keys).
     servicesPro:      svcSet.has("mass") || svcSet.has("api"),
-    servicesUltra:    false,
+    // Capability gate: multi-entity treasury (UK + EU + MENA under one
+    // finance layer, with negotiated FX) is Ultra-only — closes the
+    // gap where Ultra was reachable only via raw volume ≥ £1M and a
+    // SMB group structure would otherwise wrongly land on Pro.
+    servicesUltra:    svcSet.has("multiEntity"),
     industryPro:      industry === "affiliate" || industry === "creator",
   };
   const needsPro = tierSignals.volumePro || tierSignals.servicesPro;
@@ -137,6 +141,21 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
       textKey: "ec.cav.performance.text",
       tone: "blue",
       vars: { industry: window.__I18N.t(ind.labelKey).toLowerCase() },
+    });
+  }
+  // Ultra-upsell hint — fires when the user lands on Pro but the
+  // combination of volume + capabilities (mass + api at >£500k) puts
+  // them squarely in Ultra-territory. Not a tier-forcer (we still
+  // recommend Pro), just an informational chip suggesting a short
+  // call to compare Ultra's treasury + negotiated FX before activating.
+  if (plan.id === "pro"
+      && monthlyVolume > 500000
+      && svcSet.has("mass")
+      && svcSet.has("api")) {
+    caveats.push({
+      tagKey: "ec.cav.ultraHint.tag",
+      textKey: "ec.cav.ultraHint.text",
+      tone: "blue",
     });
   }
   // Note: a wide "Specialist review" caveat used to fire for every
@@ -193,6 +212,9 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
   }
   if (svcSet.has("api") && plan.id !== "starter") {
     reasoning.push({ key: "ec.reasoning.services.api", priority: 7 });
+  }
+  if (svcSet.has("multiEntity") && plan.id === "ultra") {
+    reasoning.push({ key: "ec.reasoning.services.multiEntity", priority: 9 });
   }
   // Industry-driven
   if (tierSignals.industryPro && plan.id !== "starter") {

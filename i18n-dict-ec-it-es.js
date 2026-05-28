@@ -82,6 +82,8 @@
     "ec.svc.cards.body": "Emetti carte aziendali per le spese del tuo team",
     "ec.svc.api.title": "Accesso API",
     "ec.svc.api.body": "Pagamenti programmatici, webhook e dati del conto per il tuo prodotto o per il team finance",
+    "ec.svc.multiEntity.title": "Multi-entity treasury (UK + EU + MENA)",
+    "ec.svc.multiEntity.body": "Un unico livello finance per le entità UK, EU e MENA — pricing FX negoziato e supporto treasury dedicato",
     "ec.svc.crypto.title": "Trasferimenti crypto",
     "ec.svc.crypto.body": "Invia e ricevi pagamenti in criptovalute per la tua azienda",
 
@@ -165,6 +167,8 @@
     "ec.cav.crypto.text": "Il KYB crypto-nativo è gestito dal nostro team specialista, non dalla coda generalista. Synterra Connect — la nostra rete partner per regolamento diretto con exchange — movimenta fondi da e verso piattaforme regolamentate; fiat in/out via SEPA, Faster Payments e SWIFT.",
     "ec.cav.performance.tag": "Revisione specialistica",
     "ec.cav.performance.text": "Il performance marketing ({industry}) richiede prove più chiare sulla qualità del traffico e sui pagamenti. La compliance gestisce un questionario strutturato — tempo tipico di risoluzione tre giorni lavorativi. In caso di rifiuto, ricevi una motivazione concreta, non una scatola nera.",
+    "ec.cav.ultraHint.tag": "Vale una call di 15 min",
+    "ec.cav.ultraHint.text": "Al tuo volume con API + pagamenti di massa, Ultra aggiunge treasury dedicato e pricing FX negoziato — vale la pena confrontare in una call di 15 minuti prima di attivare Pro.",
 
 
     "common.close": "Chiudi",
@@ -298,6 +302,7 @@
     "ec.reasoning.services.mass": "I pagamenti di massa che hai selezionato richiedono Pro — caricamento CSV in massa, webhook di stato dei pagamenti, niente lavorazione manuale.",
     "ec.reasoning.services.cards": "Le carte aziendali con controlli di spesa del team partono da Pro — utili per separare le spese pubblicitarie dai costi operativi.",
     "ec.reasoning.services.api": "L'accesso API che hai selezionato parte da Pro — chiavi sandbox e live, webhook per lo stato dei pagamenti e dati del conto via REST.",
+    "ec.reasoning.services.multiEntity": "Il multi-entity treasury che hai selezionato è Ultra — conti UK / EU / MENA sotto un unico livello finance, con pricing FX negoziato e supporto treasury dedicato.",
     "ec.reasoning.industry.payouts": "Le piattaforme affiliate e creator gestiscono tipicamente payout partner ad alto volume. Pro gestisce questo senza cerimonie di batching.",
     "ec.reasoning.complexity.corridors": "Hai selezionato {n} corridoi di pagamento — Pro ha tariffe SEPA e SWIFT migliori di Starter, importante a questa ampiezza.",
     "ec.reasoning.complexity.tx": "L'alta frequenza di transazioni (100+/mese) tende a finire nella coda di review di Starter. Pro elabora più velocemente.",
@@ -524,6 +529,8 @@
     "ec.svc.cards.body": "Emite tarjetas corporativas para los gastos de tu equipo",
     "ec.svc.api.title": "Acceso API",
     "ec.svc.api.body": "Pagos programáticos, webhooks y datos de la cuenta para tu producto o tu equipo financiero",
+    "ec.svc.multiEntity.title": "Multi-entity treasury (UK + EU + MENA)",
+    "ec.svc.multiEntity.body": "Una sola capa financiera para entidades en UK, EU y MENA — FX negociado y soporte treasury dedicado",
     "ec.svc.crypto.title": "Transferencias cripto",
     "ec.svc.crypto.body": "Envía y recibe pagos en criptomonedas para tu negocio",
 
@@ -607,6 +614,8 @@
     "ec.cav.crypto.text": "El KYB cripto-nativo lo gestiona nuestro equipo especialista, no la cola general. Synterra Connect — nuestra red de socios para liquidación directa con exchanges — mueve fondos hacia y desde plataformas reguladas; fiat entrada/salida vía SEPA, Faster Payments y SWIFT.",
     "ec.cav.performance.tag": "Revisión especializada",
     "ec.cav.performance.text": "Performance marketing ({industry}) requiere pruebas más claras de calidad del tráfico y pagos. Compliance gestiona un cuestionario estructurado — resolución típica en tres días hábiles. Si rechazamos, recibirás una motivación concreta, no una caja negra.",
+    "ec.cav.ultraHint.tag": "Vale una llamada de 15 min",
+    "ec.cav.ultraHint.text": "Con tu volumen más API y pagos masivos, Ultra añade treasury dedicado y FX negociado — vale la pena compararlo en una llamada de 15 minutos antes de activar Pro.",
 
 
     "common.close": "Cerrar",
@@ -740,6 +749,7 @@
     "ec.reasoning.services.mass": "Los pagos masivos que seleccionaste requieren Pro — carga masiva CSV, webhooks de estado de pago, sin proceso manual.",
     "ec.reasoning.services.cards": "Las tarjetas corporativas con controles de gasto del equipo empiezan en Pro — útil para separar el gasto publicitario de los costes operativos.",
     "ec.reasoning.services.api": "El acceso API que has seleccionado empieza en Pro — claves sandbox y live, webhooks para el estado de los pagos y datos de cuenta vía REST.",
+    "ec.reasoning.services.multiEntity": "El multi-entity treasury que has seleccionado es Ultra — cuentas UK / EU / MENA bajo una sola capa financiera, con FX negociado y soporte treasury dedicado.",
     "ec.reasoning.industry.payouts": "Las plataformas de afiliación y creators suelen manejar payouts de partners de alto volumen. Pro gestiona esto sin ceremonia de batching.",
     "ec.reasoning.complexity.corridors": "Seleccionaste {n} corredores de pago — Pro tiene mejores tarifas SEPA y SWIFT que Starter, importante a esa amplitud.",
     "ec.reasoning.complexity.tx": "Alta frecuencia de transacciones (100+/mes) tiende a caer en la cola de revisión de Starter. Pro procesa más rápido.",

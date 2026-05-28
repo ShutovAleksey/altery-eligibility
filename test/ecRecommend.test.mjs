@@ -109,6 +109,33 @@ test("Volume ≥ 1M → Ultra", () => {
   assert.equal(rec.plan.id, "ultra");
 });
 
+test("Ultra driven by multi-entity treasury capability gate", () => {
+  // Multi-entity treasury (UK + EU + MENA under one finance layer) is
+  // Ultra-only — picking it should force Ultra even at small volume.
+  const rec = w.ecRecommend(input({ services: ["multiEntity"], monthlyVolume: 50000 }));
+  assert.equal(rec.plan.id, "ultra");
+  assert.equal(rec.tierSignals.servicesUltra, true);
+});
+
+test("Ultra-hint caveat fires for Pro at scale with mass + api", () => {
+  // Pro recommendation + volume > £500k + both mass and api selected →
+  // expect the informational ultraHint caveat suggesting a comparison call.
+  const rec = w.ecRecommend(input({
+    services:     ["mass", "api"],
+    monthlyVolume: 600000,
+  }));
+  assert.equal(rec.plan.id, "pro");
+  const hasHint = rec.caveats.some(c => c.tagKey === "ec.cav.ultraHint.tag");
+  assert.equal(hasHint, true, "ultraHint caveat should fire on Pro at >£500k + mass + api");
+  // Same combo BELOW the £500k threshold → no Ultra-hint
+  const rec2 = w.ecRecommend(input({
+    services:     ["mass", "api"],
+    monthlyVolume: 300000,
+  }));
+  const hasHint2 = rec2.caveats.some(c => c.tagKey === "ec.cav.ultraHint.tag");
+  assert.equal(hasHint2, false, "ultraHint should not fire below the £500k threshold");
+});
+
 test("tierSignals expose which signals fired", () => {
   const rec = w.ecRecommend(input({
     monthlyVolume: 1500000,

@@ -526,17 +526,19 @@ const EC_INDUSTRIES = [
 // Altery); local/fx/cards/multiUser are common; mass/multiEntity/api
 // are advanced; crypto is specialist.
 //
-// `tier` field semantics:
-//   "core"       — available on all plans, doesn't push tier
-//   "starter"    — basic feature, doesn't push above Starter
-//   "pro"        — strongly hints Pro tier (mass, cards, api)
+// `tier` field semantics (documentation only — not read at runtime, the
+// actual capability gates live in ecRecommend via svcSet.has(...)):
+//   "starter"    — available on Starter (and above), doesn't push tier
+//   "pro"        — Pro-only capability, forces Pro (mass, api)
+//   "ultra"      — Ultra-only capability, forces Ultra (multiEntity)
 //   "specialist" — triggers specialist review path (crypto rails)
 const EC_SERVICES = [
   { value: "crossBorder", titleKey: "ec.svc.crossBorder.title", bodyKey: "ec.svc.crossBorder.body", tier: "starter" },
   { value: "local",       titleKey: "ec.svc.local.title",       bodyKey: "ec.svc.local.body",       tier: "starter" },
   { value: "mass",        titleKey: "ec.svc.mass.title",        bodyKey: "ec.svc.mass.body",        tier: "pro" },
-  { value: "cards",       titleKey: "ec.svc.cards.title",       bodyKey: "ec.svc.cards.body",       tier: "pro" },
+  { value: "cards",       titleKey: "ec.svc.cards.title",       bodyKey: "ec.svc.cards.body",       tier: "starter" },
   { value: "api",         titleKey: "ec.svc.api.title",         bodyKey: "ec.svc.api.body",         tier: "pro" },
+  { value: "multiEntity", titleKey: "ec.svc.multiEntity.title", bodyKey: "ec.svc.multiEntity.body", tier: "ultra" },
   { value: "crypto",      titleKey: "ec.svc.crypto.title",      bodyKey: "ec.svc.crypto.body",      tier: "specialist" },
 ];
 
