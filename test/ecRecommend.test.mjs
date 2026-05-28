@@ -109,10 +109,11 @@ test("Volume ≥ 1M → Ultra", () => {
   assert.equal(rec.plan.id, "ultra");
 });
 
-test("Ultra driven by multi-entity treasury capability gate", () => {
-  // Multi-entity treasury (UK + EU + MENA under one finance layer) is
-  // Ultra-only — picking it should force Ultra even at small volume.
-  const rec = w.ecRecommend(input({ services: ["multiEntity"], monthlyVolume: 50000 }));
+test("Ultra driven by multi-company management capability gate", () => {
+  // Multi-Company Management (one login across multiple legal entities,
+  // separate balances/IBANs/cards per company) is Ultra-only — picking
+  // it should force Ultra even at small volume.
+  const rec = w.ecRecommend(input({ services: ["multiCompany"], monthlyVolume: 50000 }));
   assert.equal(rec.plan.id, "ultra");
   assert.equal(rec.tierSignals.servicesUltra, true);
 });

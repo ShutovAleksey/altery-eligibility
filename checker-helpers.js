@@ -109,11 +109,12 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     // Capability gate: bulk & batch transfers and programmatic access
     // are Pro-only (Starter has neither mass payouts nor API keys).
     servicesPro:      svcSet.has("mass") || svcSet.has("api"),
-    // Capability gate: multi-entity treasury (UK + EU + MENA under one
-    // finance layer, with negotiated FX) is Ultra-only — closes the
-    // gap where Ultra was reachable only via raw volume ≥ £1M and a
-    // SMB group structure would otherwise wrongly land on Pro.
-    servicesUltra:    svcSet.has("multiEntity"),
+    // Capability gate: Multi-Company Management (one login across
+    // several legal entities, separate balances/IBANs/cards per
+    // company) is Ultra-only — closes the gap where Ultra was
+    // reachable only via raw volume ≥ £1M and a multi-company SMB
+    // group structure would otherwise wrongly land on Pro.
+    servicesUltra:    svcSet.has("multiCompany"),
     industryPro:      industry === "affiliate" || industry === "creator",
   };
   const needsPro = tierSignals.volumePro || tierSignals.servicesPro;
@@ -213,8 +214,8 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
   if (svcSet.has("api") && plan.id !== "starter") {
     reasoning.push({ key: "ec.reasoning.services.api", priority: 7 });
   }
-  if (svcSet.has("multiEntity") && plan.id === "ultra") {
-    reasoning.push({ key: "ec.reasoning.services.multiEntity", priority: 9 });
+  if (svcSet.has("multiCompany") && plan.id === "ultra") {
+    reasoning.push({ key: "ec.reasoning.services.multiCompany", priority: 9 });
   }
   // Industry-driven
   if (tierSignals.industryPro && plan.id !== "starter") {

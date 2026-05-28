@@ -316,9 +316,9 @@ function EcApp() {
   // check was friction without conversion signal value.
   const [industry, setIndustry] = useState("");
   // services: multi-select of products/use-cases the user wants.
-  // Drives plan tier hint (Pro for mass/cards/multiEntity, Ultra for
-  // API, specialist review for crypto rails) and result page perk
-  // emphasis ordering. Starts empty — the user explicitly ticks what
+  // Drives plan tier hint (Pro for mass / api, Ultra for multiCompany,
+  // specialist review for crypto rails) and result page perk emphasis
+  // ordering. Starts empty — the user explicitly ticks what
   // applies. Pre-selecting "accounts"/"crossBorder" looked smart on
   // paper but biases the recommendation before any input, and leaves
   // a confusing "why are these already checked?" signal for fresh
