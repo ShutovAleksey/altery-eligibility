@@ -536,14 +536,19 @@ const EC_INDUSTRIES = [
 // (https://altery.com/business/solutions/multi-company-management/) —
 // one login across several legal entities, with separate balances /
 // IBANs / cards per company and role-based access.
+// Order is intentionally Starter → Pro → Ultra: the user scrolls top-to-
+// bottom and the list visually telegraphs tier escalation. Crypto sits
+// in the Starter block because picking it doesn't force a tier (it
+// triggers UK FCA routing instead) — same user-side effect as the other
+// Starter-eligible services. mass/api force Pro, multiCompany forces Ultra.
 const EC_SERVICES = [
-  { value: "crossBorder",  titleKey: "ec.svc.crossBorder.title",  bodyKey: "ec.svc.crossBorder.body",  tier: "starter" },
   { value: "local",        titleKey: "ec.svc.local.title",        bodyKey: "ec.svc.local.body",        tier: "starter" },
-  { value: "mass",         titleKey: "ec.svc.mass.title",         bodyKey: "ec.svc.mass.body",         tier: "pro" },
   { value: "cards",        titleKey: "ec.svc.cards.title",        bodyKey: "ec.svc.cards.body",        tier: "starter" },
+  { value: "crypto",       titleKey: "ec.svc.crypto.title",       bodyKey: "ec.svc.crypto.body",       tier: "specialist" },
+  { value: "crossBorder",  titleKey: "ec.svc.crossBorder.title",  bodyKey: "ec.svc.crossBorder.body",  tier: "starter" },
+  { value: "mass",         titleKey: "ec.svc.mass.title",         bodyKey: "ec.svc.mass.body",         tier: "pro" },
   { value: "api",          titleKey: "ec.svc.api.title",          bodyKey: "ec.svc.api.body",          tier: "pro" },
   { value: "multiCompany", titleKey: "ec.svc.multiCompany.title", bodyKey: "ec.svc.multiCompany.body", tier: "ultra" },
-  { value: "crypto",       titleKey: "ec.svc.crypto.title",       bodyKey: "ec.svc.crypto.body",       tier: "specialist" },
 ];
 
 // Single source of truth for the questionnaire length. Used by EcApp
