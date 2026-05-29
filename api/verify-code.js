@@ -17,6 +17,7 @@
 
 // Drop the "node:" prefix — see send-verify-code.js for rationale.
 import { createHmac, timingSafeEqual } from "crypto";
+import { rateLimitAll, clientIp, send429 } from "../lib/rate-limit.js";
 
 function b64urlDecode(s) {
   const pad = (4 - (s.length % 4)) % 4;
@@ -43,6 +44,25 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST")    return res.status(405).json({ error: "Method not allowed" });
+
+  // Brute-force defence: a 6-digit code in a 10-min window is only
+  // 1M combinations. Without throttling, ~167 guesses/sec finishes
+  // brute force in under 2 hours. Lock the email after 5 attempts
+  // in 10 minutes — legit users get 5 retries (the form usually
+  // succeeds on the first), attackers are blocked.
+  // Token is opaque (b64url JSON); attacker would need to feed the
+  // same token repeatedly so we limit per-token.
+  const ip = clientIp(req);
+  const tokenPart = typeof req.body?.token === "string"
+    ? req.body.token.slice(0, 64)  // truncate for stable cache key
+    : "";
+  const rl = await rateLimitAll([
+    { key: `verify-code:ip:${ip}`,         limit: 30, windowMs: 600_000 },   // 30 attempts / 10 min per IP
+    ...(tokenPart ? [
+      { key: `verify-code:token:${tokenPart}`, limit: 5,  windowMs: 600_000 }, // 5 per code (the actual lock)
+    ] : []),
+  ]);
+  if (!rl.allowed) return send429(res, rl.retryAfter, "Too many code attempts — request a new code or wait.");
 
   const secret = process.env.VERIFY_SECRET;
   if (!secret) {

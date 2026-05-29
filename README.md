@@ -105,13 +105,40 @@ CLI задаст несколько вопросов — отвечай так:
 |---|---|---|
 | `STRIPE_SECRET_KEY` | `sk_test_...` (со Stripe Dashboard) | All |
 | `STRIPE_PUBLISHABLE_KEY` | `pk_test_...` (со Stripe Dashboard) | All |
-| `RESEND_API_KEY` | `re_...` (см. шаг 5.5) | All |
+| `BREVO_API_KEY` | `xkeysib-...` (Brevo → SMTP & API → API Keys) | All |
+| `HUBSPOT_TOKEN` | Private app token from HubSpot Settings → Integrations | All |
+| `VERIFY_SECRET` | Random 32+ char string (used for HMAC-signing email verify codes + resume tokens) | All |
 | `FROM_EMAIL` (опционально) | `Altery <hello@altery.com>` после verify домена | All |
-| `REPLY_TO` (опционально) | `hello@altery.com` | All |
+| `REPLY_TO` (опционально) | `sales@altery.com` | All |
+| `UPSTASH_REDIS_REST_URL` (опционально) | Upstash Redis REST URL — for distributed rate-limiting | All |
+| `UPSTASH_REDIS_REST_TOKEN` (опционально) | Upstash Redis REST token | All |
 
 Для каждой:
 - Жми **Save**
 - Галочки на всех трёх Environment (Production / Preview / Development)
+
+### Rate-limit backend (Upstash) — настоятельно рекомендую для production
+
+API endpoints (`/api/send-analysis`, `/api/hubspot-lead`, `/api/save-progress`, `/api/send-verify-code`, `/api/verify-code`) защищены rate-limit'ом через `lib/rate-limit.js`.
+
+- **Без Upstash** — работает in-memory fallback. Cuts most spam from one source, но Vercel может запустить несколько serverless instances и атакующий может разделить трафик между ними.
+- **С Upstash** — глобально-консистентный rate limit через Redis. Free tier (10k команд/день) хватает на тысячи запросов/час.
+
+Setup (~5 минут):
+1. Регистрация: https://console.upstash.com (логин через GitHub)
+2. **Create Database** → Region: ближайший к Vercel (eu-west-1 для EU прод)
+3. После создания, в Database → **REST API** скопируй `UPSTASH_REDIS_REST_URL` и `UPSTASH_REDIS_REST_TOKEN`
+4. Добавь оба в Vercel Environment Variables (см. таблицу выше)
+5. Redeploy — rate-limit автоматически переключится на Upstash
+
+Лимиты сейчас:
+- `/api/send-analysis`: 10/min + 50/hour per IP, 5/hour per recipient
+- `/api/send-verify-code`: 3/min + 10/hour per IP, 5/hour per email
+- `/api/hubspot-lead`: 5/min + 30/hour per IP, 3/hour per email
+- `/api/save-progress`: 10/min + 60/hour per IP, 10/hour per email
+- `/api/verify-code`: 30 attempts/10min per IP, **5 attempts/10min per token** (brute-force lock)
+
+Подкрутить — в каждом endpoint `rateLimitAll([{ key, limit, windowMs }])`.
 
 ---
 

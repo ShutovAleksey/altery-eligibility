@@ -19,6 +19,7 @@
 //   4. Set FROM_EMAIL to "Altery <hello@send.altery.com>" or similar.
 
 import { sendEmail } from "../lib/email.js";
+import { rateLimitAll, clientIp, send429 } from "../lib/rate-limit.js";
 
 // Abuse limits — the endpoint is unauthenticated, so we cap input size
 // and validate format. A determined attacker can still send spam through
@@ -313,6 +314,20 @@ export default async function handler(req, res) {
   // BREVO_API_KEY presence is checked inside sendEmail(); we let the
   // helper surface the no_api_key code rather than duplicating the
   // check here. Lets us swap providers without touching this file.
+
+  // Rate-limit BEFORE parsing the body — cheaper to reject early.
+  // Per-IP caps catch scripted spammers; per-email-recipient caps
+  // prevent flooding any single mailbox via our verified domain.
+  const ip = clientIp(req);
+  const recipient = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  const rl = await rateLimitAll([
+    { key: `send-analysis:ip:${ip}`,      limit: 10, windowMs: 60_000      }, // 10/min per IP
+    { key: `send-analysis:ip:${ip}:h`,    limit: 50, windowMs: 3600_000    }, // 50/hour per IP
+    ...(recipient ? [
+      { key: `send-analysis:to:${recipient}`, limit: 5, windowMs: 3600_000 }, // 5/hour to any recipient
+    ] : []),
+  ]);
+  if (!rl.allowed) return send429(res, rl.retryAfter);
 
   try {
     const body = req.body || {};

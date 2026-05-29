@@ -16,6 +16,8 @@
 //   2. Vercel → Project Settings → Environment Variables → add
 //      HUBSPOT_TOKEN (and redeploy).
 
+import { rateLimitAll, clientIp, send429 } from "../lib/rate-limit.js";
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // Only these contact properties may be written through this public,
@@ -45,6 +47,22 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  // Rate-limit BEFORE talking to HubSpot. An unrestricted endpoint
+  // here would let an attacker dump thousands of fake leads into the
+  // sales pipeline — confusing Sales metrics and burning HubSpot
+  // contact quota.
+  const ip = clientIp(req);
+  const incomingEmail = typeof req.body?.properties?.email === "string"
+    ? req.body.properties.email.trim().toLowerCase() : "";
+  const rl = await rateLimitAll([
+    { key: `hubspot-lead:ip:${ip}:m`, limit: 5,  windowMs: 60_000   },  // 5/min per IP
+    { key: `hubspot-lead:ip:${ip}:h`, limit: 30, windowMs: 3600_000 },  // 30/hour per IP
+    ...(incomingEmail ? [
+      { key: `hubspot-lead:email:${incomingEmail}`, limit: 3, windowMs: 3600_000 }, // 3/hour per email
+    ] : []),
+  ]);
+  if (!rl.allowed) return send429(res, rl.retryAfter);
 
   const token = process.env.HUBSPOT_TOKEN;
   if (!token) {

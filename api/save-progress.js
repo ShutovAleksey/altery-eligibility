@@ -18,6 +18,7 @@
 // Drop the "node:" prefix — see send-verify-code.js for rationale.
 import { createHmac } from "crypto";
 import { sendEmail } from "../lib/email.js";
+import { rateLimitAll, clientIp, send429 } from "../lib/rate-limit.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -53,6 +54,21 @@ export default async function handler(req, res) {
 
   try {
 
+  // Rate-limit BEFORE encoding state + sending email. Save-progress
+  // is the smaller spam vector vs send-analysis (no PDF attachment,
+  // only a magic-link link in the body) but still gates an outbound
+  // email through our verified domain.
+  const ip = clientIp(req);
+  const recipient = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  const rl = await rateLimitAll([
+    { key: `save-progress:ip:${ip}:m`,  limit: 10, windowMs: 60_000   }, // 10/min per IP
+    { key: `save-progress:ip:${ip}:h`,  limit: 60, windowMs: 3600_000 }, // 60/hour per IP
+    ...(recipient ? [
+      { key: `save-progress:to:${recipient}`, limit: 10, windowMs: 3600_000 }, // 10/hour to one mailbox
+    ] : []),
+  ]);
+  if (!rl.allowed) return send429(res, rl.retryAfter);
+
   // BREVO_API_KEY presence is checked inside sendEmail(); we surface
   // its no_api_key code below if the helper rejects.
   const secret = process.env.VERIFY_SECRET;
@@ -65,16 +81,49 @@ export default async function handler(req, res) {
   if (!emailRaw || !EMAIL_RE.test(emailRaw)) {
     return res.status(400).json({ error: "Invalid email address", code: "bad_email" });
   }
-  if (!body.state || typeof body.state !== "object") {
+  if (!body.state || typeof body.state !== "object" || Array.isArray(body.state)) {
     return res.status(400).json({ error: "Missing state payload", code: "no_state" });
   }
-  if (typeof body.step !== "string" || !body.step) {
+  if (typeof body.step !== "string" || !body.step || body.step.length > 64) {
     return res.status(400).json({ error: "Missing step", code: "no_step" });
+  }
+
+  // SECURITY: restrict state to known onboarding slices. Without this
+  // an attacker could shove `__proto__`, function bodies, or arbitrary
+  // payload into the resume link — the HMAC then signs it and victim
+  // gets a prefilled form with bad data when they open the link.
+  // Top-level keys must match the INITIAL_FORM_STATE shape in
+  // setup/onboarding-app.jsx (any drift between code and this list
+  // means a save fails — intentional: forces the change to be
+  // reviewed together with this security check).
+  const ALLOWED_STATE_KEYS = new Set([
+    "_v", "auth", "contact", "business", "activity",
+    "ubos", "uboDraft", "plan", "meta",
+  ]);
+  const dangerousKeys = ["__proto__", "constructor", "prototype"];
+  const sanitized = {};
+  for (const key of Object.keys(body.state)) {
+    if (dangerousKeys.includes(key)) {
+      return res.status(400).json({ error: "Unsafe key in state", code: "unsafe_state" });
+    }
+    if (!ALLOWED_STATE_KEYS.has(key)) continue;  // drop unknown keys silently
+    sanitized[key] = body.state[key];
+  }
+
+  // Defence in depth: if the state has its own embedded email
+  // (auth.email), make sure it matches the recipient. Otherwise an
+  // attacker could craft a state with someone else's email and
+  // sneak it into the resume link payload. Same for top-level email.
+  const stateEmail = sanitized.auth && typeof sanitized.auth.email === "string"
+    ? sanitized.auth.email.trim().toLowerCase()
+    : null;
+  if (stateEmail && stateEmail !== emailRaw) {
+    return res.status(400).json({ error: "State email mismatch", code: "email_mismatch" });
   }
 
   const exp = Date.now() + RESUME_TTL_MS;
   const payload = {
-    state: body.state,
+    state: sanitized,
     step:  body.step,
     email: emailRaw,
     exp,

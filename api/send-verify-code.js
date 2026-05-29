@@ -22,6 +22,7 @@
 // present, and there's no benefit to the prefix in our usage.
 import { createHmac } from "crypto";
 import { sendEmail } from "../lib/email.js";
+import { rateLimitAll, clientIp, send429 } from "../lib/rate-limit.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const CODE_TTL_MS = 10 * 60 * 1000;  // 10 minutes — long enough to switch tabs, short enough to limit brute force
@@ -41,6 +42,21 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST")    return res.status(405).json({ error: "Method not allowed" });
+
+  // Rate-limit BEFORE doing any work (especially before sending an
+  // email through our verified domain). Conservative caps: a real
+  // user requests a code maybe twice per signup; anything more
+  // looks like an enumeration attack or a spam loop.
+  const ip = clientIp(req);
+  const recipient = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
+  const rl = await rateLimitAll([
+    { key: `send-verify:ip:${ip}:m`,   limit: 3,  windowMs: 60_000   },  // 3/min per IP
+    { key: `send-verify:ip:${ip}:h`,   limit: 10, windowMs: 3600_000 },  // 10/hour per IP
+    ...(recipient ? [
+      { key: `send-verify:to:${recipient}`, limit: 5, windowMs: 3600_000 }, // 5/hour per email
+    ] : []),
+  ]);
+  if (!rl.allowed) return send429(res, rl.retryAfter);
 
   // BREVO_API_KEY presence is checked inside sendEmail(); we surface
   // its no_api_key code below if the helper rejects.
