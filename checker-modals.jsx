@@ -580,6 +580,7 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
         full
         onClick={submit}
         disabled={submitting || (touched && !valid)}
+        style={{ height: 44 }}
       >
         {submitting ? t("ec.handoff.submitting") : t("ec.callback.submit")}
       </Button>
@@ -911,6 +912,7 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                     full
                     onClick={sendColleagueCopy}
                     disabled={colleagueSubmitting || !isColleagueValid}
+                    style={{ height: 44 }}
                   >
                     {colleagueSubmitting ? t("ec.handoff.submitting") : t("ec.handoff.sent.colleague.send")}
                   </Button>
