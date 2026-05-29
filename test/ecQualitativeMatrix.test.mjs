@@ -104,22 +104,33 @@ test("Altery row cells reflect the active plan's rail tariffs", () => {
   assert.match(swiftCell.value, /€/, "swift cell should surface plan-tariff (rail-native EUR)");
 });
 
-test("Altery is yes/true on the digital-native + crypto + multi-entity rows", () => {
+test("Altery is yes on the digital-native + crypto + affiliate rows", () => {
   const m = w.ecQualitativeMatrix(rec());
   const find = (k) => m.rows.find((r) => r.key === k).cells[0];
   assert.equal(find("digitalNative").kind, "yes");
   assert.equal(find("cryptoNative").kind, "yes");
-  assert.equal(find("multiEntity").kind,  "yes");
   assert.equal(find("affiliate").kind,    "yes");
+  // multiEntity on Altery is "linkedOnly" today — same shape as
+  // Wise/Revolut/Qonto (multiple businesses under one login, no
+  // consolidated group dashboard). Honesty update 2026-05-29.
+  assert.equal(find("multiEntity").kind, "state");
+  assert.equal(find("multiEntity").value, "linkedOnly");
 });
 
-test("Wise / Revolut / 3S Money are 'no' on crypto", () => {
+test("Wise / Revolut are 'no' on crypto; 3S Money is case-by-case", () => {
   const m = w.ecQualitativeMatrix(rec());
   const cryptoRow = m.rows.find((r) => r.key === "cryptoNative");
   const idx = (id) => m.comparators.findIndex((c) => c.id === id);
-  for (const id of ["wise", "revolut", "three_s_money"]) {
+  for (const id of ["wise", "revolut"]) {
     const i = idx(id);
     assert.notEqual(i, -1);
     assert.equal(cryptoRow.cells[i].kind, "no", `${id} crypto cell should be 'no'`);
   }
+  // 3S Money has no blanket crypto ban in their public AUP — they
+  // run an RM-led risk review. Treat as case-by-case ("state"
+  // cell), not "no". Verified via 3s.money/help-centre and
+  // independent reviews 2026-05-29.
+  const tsi = idx("three_s_money");
+  assert.notEqual(tsi, -1);
+  assert.equal(cryptoRow.cells[tsi].kind, "state");
 });

@@ -886,11 +886,21 @@ function ecCellFor(cmpObj, rowKey, planFees) {
     return { kind: "no" };
   }
   if (rowKey === "multiJurisdiction") {
-    // Altery is the only product with UK FCA + EU CBC + DIFC DFSA
-    // under one login. Others have multiple legal entities but each
-    // requires a separate account or partner integration.
+    // Retained for back-compat; the active capability panel no
+    // longer renders this row because 3S Money (DFSA + UK + LU + HK)
+    // and Wise (Wise Nuqud CBUAE) also have local UAE presence.
     if (cmpObj.id === "altery") return { kind: "yes" };
+    if (q.uaeLicence) return { kind: "yes" };
     return { kind: "no" };
+  }
+  if (rowKey === "tariffTransparency") {
+    // Altery publishes plan-tiered FX % and SWIFT formulas (Starter
+    // 0.8%, Pro 0.7%, Ultra 0.4% with explicit per-rail per-tier
+    // tariffs). Most competitors are "partial" (allowance/quote-
+    // dependent) or "quoted" (relationship pricing, in-app only).
+    if (cmpObj.id === "altery") return { kind: "state", value: "published" };
+    if (q.tariffTransparency) return { kind: "state", value: q.tariffTransparency };
+    return { kind: "state", value: "partial" };
   }
   // Generic boolean / tri-state row (crypto, affiliate, multiEntity,
   // digitalNative). Falls through to qualitative[rowKey].
@@ -928,28 +938,27 @@ function ecPricePanel(rec) {
 // Build the capability-focused comparison panel. For MENA returns
 // null — the PDF renderer surfaces a "unique in MENA" callout instead.
 //
-// The "multiEntity" row (Multi-company management) used to live here
-// but was removed 2026-05-29: Wise, Revolut and Qonto all support
-// linked-accounts multi-company on the user side (one login, several
-// businesses, account switcher). Altery does the same shape — none
-// of them ships a consolidated group treasury with cross-entity
-// approvals and unified analytics. So the binary ✓ / — claim was
-// dishonest. The "multiJurisdiction" row below carries the real
-// Altery-only advantage: three regulated entities (UK FCA, EU CBC,
-// DIFC DFSA) under one product. The competitors have multiple
-// businesses, but all those businesses live in one of their
-// licensing regions, not three.
+// History (2026-05-29 honesty pass):
+//  - "multiEntity" row dropped: Wise/Revolut/Qonto all do linked
+//    multi-company under one login. Altery does the same shape today.
+//  - "multiJurisdiction" row dropped: 3S Money has DIFC/DFSA + UK +
+//    Luxembourg + HK — genuinely matches Altery's UK+EU+UAE footprint.
+//    A binary ✓/— vs 3S Money was overstating Altery's uniqueness.
+//  - "tariffTransparency" row added: Altery publishes plan-tiered FX
+//    and SWIFT % (£50/100/300 plans). Wise/Revolut/Qonto are partial
+//    (live-quoted or plan-allowance complexity); 3S Money quotes per
+//    relationship. This is a defensible Altery win.
 function ecCapabilityPanel(rec) {
   const groups = ecComparatorGroups(rec);
   const comparators = groups.capability;
   if (!comparators || comparators.length === 0) return null;
   const planFees = rec?.plan?.fees || {};
   const rows = [
-    { key: "cryptoNative",      labelKey: "ec.cmp.row.crypto" },
-    { key: "multiJurisdiction", labelKey: "ec.cmp.row.multiJurisdiction" },
-    { key: "affiliate",         labelKey: "ec.cmp.row.affiliate" },
-    { key: "api",               labelKey: "ec.cmp.row.api" },
-    { key: "onboarding",        labelKey: "ec.cmp.row.onboarding" },
+    { key: "cryptoNative",       labelKey: "ec.cmp.row.crypto" },
+    { key: "affiliate",          labelKey: "ec.cmp.row.affiliate" },
+    { key: "tariffTransparency", labelKey: "ec.cmp.row.tariffTransparency" },
+    { key: "api",                labelKey: "ec.cmp.row.api" },
+    { key: "onboarding",         labelKey: "ec.cmp.row.onboarding" },
   ];
   return {
     comparators,

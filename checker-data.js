@@ -1052,12 +1052,17 @@ const EC_COMPARATORS = {
     name: "Wise Business",
     type: "neobank",
     asof: "2026-05-29",
-    sources: ["https://wise.com/gb/pricing/business"],
+    sources: [
+      "https://wise.com/gb/pricing/business",
+      "https://wise.com/acceptable-use-policy",
+      "https://wise.com/help/articles/2932693/how-is-wise-regulated-in-each-country-and-region",
+      "https://newsroom.wise.com/en-CEU/255401-wise-secures-central-bank-final-approval-for-stored-value-facilities-and-retail-payment-services-licenses-in-the-uae/",
+    ],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
       digitalNative: "partial",     // accepts SaaS but not high-risk
       affiliate:     "restricted",  // many affiliate niches restricted
-      cryptoNative:  false,         // explicitly banned
+      cryptoNative:  false,         // explicit ban in Acceptable Use Policy
       // Wise supports multiple Business accounts under one login,
       // one account per legal entity, account switcher between them.
       // Not consolidated treasury — separate data per entity, no
@@ -1066,6 +1071,13 @@ const EC_COMPARATORS = {
       docFriction:   "medium",
       fxMarkup:      "from 0.33%",  // verified against wise.com/gb/pricing/business 2026-05-29
       swiftOut:      "£5-15",
+      // Wise Nuqud Ltd has UAE Central Bank Retail Payment Services
+      // and Card Schemes licence (May 2025). That's CBUAE consumer-
+      // payments scope, not a DIFC/DFSA business-banking EMI — but
+      // it IS a regulated UAE presence, so we no longer claim Altery
+      // is "the only neobank with UAE licence".
+      uaeLicence: "CBUAE retail payments (Wise Nuqud Ltd)",
+      tariffTransparency: "partial", // pricing calculator live-quoted per route, no public corridor table
     },
   },
   revolut: {
@@ -1073,20 +1085,37 @@ const EC_COMPARATORS = {
     name: "Revolut Business",
     type: "neobank",
     asof: "2026-05-29",
-    sources: ["https://help.revolut.com/en-US/business/help/setting-up-an-account/is-my-business-eligible/"],
+    sources: [
+      "https://www.revolut.com/business/business-account-plans/",
+      "https://help.revolut.com/business/help/merchant-accounts/setting-up-a-merchant-account/prohibited-and-restricted-industries-business-models-for-a-merchant-account/business/",
+      "https://www.revolut.com/business/business-api/",
+      "https://www.revolut.com/blog/post/is-revolut-fca-regulated/",
+    ],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
       digitalNative: "partial",
-      affiliate:     "no",
+      // Crypto exchanges / mining / FX-signal businesses are
+      // prohibited on Revolut Business merchant accounts. (Revolut
+      // offers crypto trading TO its consumer customers — different
+      // product — but won't bank crypto-native operating companies.)
       cryptoNative:  false,
+      affiliate:     "restricted",
       // Revolut publishes a "Link multiple Revolut Business accounts"
       // feature — accounts can be linked under one login but Revolut
       // explicitly states the linking does NOT share banking data
       // between accounts. So same linkedOnly model as Wise / Qonto.
       multiEntity:   "linkedOnly",
       docFriction:   "medium",
-      fxMarkup:      "0-1.0%",     // free up to plan limit
+      // Allowance model: interbank rate within monthly cap (Basic
+      // £1k, Grow £15k, Scale £60k), then ~0.6% above allowance.
+      // 0% within cap can beat Altery any tier; over cap is closer.
+      fxMarkup:      "0% in-cap / 0.6% above",
       swiftOut:      "£1-15",
+      // Revolut Bank UK Ltd became a fully licensed UK bank in
+      // March 2026 (PRA+FCA). Stronger than EMI safeguarding for
+      // FSCS-protection messaging. No UAE presence.
+      uaeLicence: null,
+      tariffTransparency: "partial", // headline tiers public, in-cap/over-cap nuance varies by plan/country
     },
   },
   mercury: {
@@ -1112,17 +1141,30 @@ const EC_COMPARATORS = {
     name: "3S Money",
     type: "neobank",
     asof: "2026-05-29",
-    sources: ["https://3s.money/help-centre/getting-started/is-my-business-eligible-for-a-3s-money-international-business-account"],
+    sources: [
+      "https://3s.money/pricing",
+      "https://3s.money/dubai/",
+    ],
     qualitative: {
-      onboardingKey: "ec.cmp.q.onboarding.weeks",  // 2-3 weeks despite digital flow
+      // 3S Money is the closest direct peer to Altery: licensed
+      // EMI in UK (FCA), Luxembourg (CSSF), DIFC (DFSA — Branch
+      // F007004) and HK (CED). Multi-jurisdiction is genuinely
+      // theirs as much as ours. The honest Altery differentiation
+      // here is PRICE POINT (3S Money €100/mo Standard + 3× balance
+      // requirement vs Altery £50/mo Starter) and PUBLISHED tariff
+      // (3S Money quotes FX/SWIFT in-app per relationship, not
+      // public). Don't claim multi-jurisdiction as Altery-unique.
+      onboardingKey: "ec.cmp.q.onboarding.days",   // RM-assisted but typically days, not weeks
       digitalNative: "partial",
       affiliate:     "caseByCase",
-      cryptoNative:  false,                        // crypto prohibited
-      multiEntity:   false,
+      cryptoNative:  "caseByCase",                  // no blanket public ban; RM-gated risk review
+      multiEntity:   "linkedOnly",                  // admins access multiple entities under one login
       docFriction:   "medium",
-      restriction:   "£100k/yr min + opening fee", // hard barrier for early-stage
-      fxMarkup:      "1.0-1.5%",
-      swiftOut:      "£15-25",
+      restriction:   "€100/mo floor + 3× balance",
+      fxMarkup:      "On request",                  // not publicly disclosed
+      swiftOut:      "€25-30 + intermediary",        // approx outbound SWIFT per third-party reviews
+      uaeLicence: "DFSA Branch F007004 (DIFC)",
+      tariffTransparency: "quoted",                  // in-app per relationship, not public
     },
   },
   payset: {
@@ -1130,16 +1172,26 @@ const EC_COMPARATORS = {
     name: "Payset",
     type: "neobank",
     asof: "2026-05-29",
-    sources: ["https://www.payset.io/pricing"],
+    sources: [
+      "https://www.payset.io/pricing",
+      "https://service.payset.io/hc/en-us/articles/16190307357084-What-are-the-permitted-industries",
+    ],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
       digitalNative: "partial",
-      affiliate:     "restricted",
-      cryptoNative:  false,
+      // Payset publishes a permitted-industries page that
+      // EXPLICITLY lists Affiliates and Cryptocurrencies — they
+      // serve both, subject to compliance review. That makes them
+      // a more direct Altery competitor on high-risk willingness
+      // than the rest of the neobank field.
+      affiliate:     "caseByCase",
+      cryptoNative:  "caseByCase",
       multiEntity:   false,
       docFriction:   "medium",
       fxMarkup:      "On request",
       swiftOut:      "from £8 + 0.3%",
+      uaeLicence: null,
+      tariffTransparency: "quoted",
     },
   },
   // EU-strong neobank — France/DE/ES/IT/PT licenses, B2B focused.
@@ -1152,19 +1204,31 @@ const EC_COMPARATORS = {
     name: "Qonto",
     type: "neobank",
     asof: "2026-05-29",
-    sources: ["https://qonto.com/en/pricing"],
+    sources: [
+      "https://qonto.com/en/pricing",
+      "https://support-fr.qonto.com/hc/en-us/articles/23947637582609-What-activities-are-prohibited-at-Qonto",
+      "https://support-pt.qonto.com/hc/en-us/articles/38267512420369-Can-I-open-a-Qonto-account-if-my-main-business-is-cryptocurrencies",
+    ],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
       digitalNative: "partial",
       affiliate:     "caseByCase",
+      // Qonto: mining, staking, NFTs, decentralised exchange, and
+      // unregistered PSAN activity prohibited; regulated crypto
+      // intermediaries CAN open if registered (e.g. AMF PSAN).
+      // So bulk of crypto-native businesses are not served.
       cryptoNative:  false,
       // Qonto supports multi-organization on the user side — one
       // login, several orgs accessible via switcher. Same shape as
       // Wise / Revolut: linked but not consolidated.
       multiEntity:   "linkedOnly",
       docFriction:   "medium",
-      fxMarkup:      "0.65-1.5%",
-      swiftOut:      "€5-15",
+      // FX via Wise rails per public Qonto product pages (so
+      // effective FX inherits Wise's ~0.33% floor for routed pairs).
+      fxMarkup:      "via Wise (from 0.33%)",
+      swiftOut:      "€5",   // EUR outside SEPA fixed; SEPA bundled in plan allowance
+      uaeLicence: null,
+      tariffTransparency: "partial", // monthly plans transparent; in-cap/over-cap less obvious
     },
   },
   // ── Altery — the reference row in both panels ───────────────────
@@ -1177,8 +1241,14 @@ const EC_COMPARATORS = {
       digitalNative: true,
       affiliate:     true,
       cryptoNative:  true,
-      multiEntity:   true,
+      // Same linkedOnly shape as Wise/Revolut/Qonto today —
+      // separate balances/IBANs/cards per legal entity under one
+      // login. Consolidated group treasury (cross-entity audit
+      // log, group approvals) is future product. Don't overclaim.
+      multiEntity:   "linkedOnly",
       docFriction:   "low",
+      uaeLicence:    "DFSA EMI (DIFC)",
+      tariffTransparency: "published",  // plan-tiered £50/100/300 with explicit FX + SWIFT %
       // FX/SWIFT come from the active plan — rendered dynamically
     },
   },
