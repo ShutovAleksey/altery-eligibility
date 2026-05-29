@@ -744,18 +744,12 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
             </h2>
             <p className="ec-handoff__lead">{t("ec.handoff.email.lead")}</p>
 
-            {/* Single concrete value bullet — the prep checklist. The
-                cost-breakdown and bank-comparison bullets used to live
-                here too, but those are content INSIDE the PDF and
-                listing them as features over-sold the artifact. The
-                checklist is genuinely actionable (here's what you'll
-                need before KYB) — that's worth surfacing. */}
-            <ul className="ec-handoff__value">
-              <li className="ec-handoff__value__item">
-                <span className="ec-handoff__value__tick" aria-hidden="true">✓</span>
-                <span>{t("ec.handoff.email.value.checklist")}</span>
-              </li>
-            </ul>
+            {/* Value-prop bullets used to live here (cost breakdown /
+                bank comparison / prep checklist). All removed: the
+                first two were content INSIDE the PDF, and the prep
+                checklist felt like marketing noise on top of an
+                already-clear lead. The "tailored to your business"
+                line above carries the value-prop on its own. */}
 
             <div className="ec-handoff__field">
               <Input

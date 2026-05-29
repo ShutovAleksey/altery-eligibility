@@ -453,7 +453,6 @@
     "ec.pdf.validity": "This proposal is valid for 30 days from issue. Pricing and terms confirmed at activation.",
     "ec.handoff.email.title": "Get your full proposal",
     "ec.handoff.email.lead": "A detailed PDF tailored to your business. Share with your team or take to your CFO.",
-    "ec.handoff.email.value.checklist": "5-minute prep checklist — what to gather before you start onboarding",
     "ec.handoff.trust": "No spam. No newsletter. Just your proposal PDF — once.",
     "ec.handoff.sent.nextHead": "Now do these 3 things",
     "ec.handoff.sent.step1.title": "Check your inbox",
