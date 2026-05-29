@@ -1582,6 +1582,11 @@ function EcResultApproved({ rec, onBack, onReset }) {
 
   const _displayCurrency = ecDisplayCurrencyFor(rec);
   const fmtNarrow = (n) => ecFmtFromGbp(n, _displayCurrency);
+  // Compact format used only on the savings card amounts (annual /
+  // monthly headline + Bank / Altery range cells) so 7-figure values
+  // render as "£2.6m" instead of "£2 598 000". Methodology modal +
+  // PDF / email keep the full-precision fmtNarrow.
+  const fmtCompact = (n) => ecFmtFromGbpCompact(n, _displayCurrency);
   // Top "Edit my answers" back-link removed — "Start over" in the
   // action footer covers the same use-case more visibly. Edit-vs-Start
   // pair was duplicating intent without giving the user a clearer
@@ -1766,13 +1771,13 @@ function EcResultApproved({ rec, onBack, onReset }) {
               <div className="ec-r__savingsHero">
                 <div className="ec-r__savingsHero__amount">
                   {cost.savings.rangeAnnualLow === 0
-                    ? t("ec.r.savings.yearUpTo", { high: fmtNarrow(cost.savings.rangeAnnualHigh) })
-                    : t("ec.r.savings.yearRange", { low: fmtNarrow(cost.savings.rangeAnnualLow), high: fmtNarrow(cost.savings.rangeAnnualHigh) })}
+                    ? t("ec.r.savings.yearUpTo", { high: fmtCompact(cost.savings.rangeAnnualHigh) })
+                    : t("ec.r.savings.yearRange", { low: fmtCompact(cost.savings.rangeAnnualLow), high: fmtCompact(cost.savings.rangeAnnualHigh) })}
                 </div>
                 <div className="ec-r__savingsHero__year">
                   {cost.savings.rangeMonthlyLow === 0
-                    ? t("ec.r.savings.monthlyUpTo", { high: fmtNarrow(cost.savings.rangeMonthlyHigh) })
-                    : t("ec.r.savings.monthlyRange", { low: fmtNarrow(cost.savings.rangeMonthlyLow), high: fmtNarrow(cost.savings.rangeMonthlyHigh) })}
+                    ? t("ec.r.savings.monthlyUpTo", { high: fmtCompact(cost.savings.rangeMonthlyHigh) })
+                    : t("ec.r.savings.monthlyRange", { low: fmtCompact(cost.savings.rangeMonthlyLow), high: fmtCompact(cost.savings.rangeMonthlyHigh) })}
                 </div>
               </div>
 
@@ -1781,7 +1786,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
                   <div className="ec-r__compare__label">{cost.methodology.baseline}</div>
                   <div className="ec-r__compare__priceLine">
                     <span className="ec-r__compare__amount ec-r__compare__amount--strike">
-                      {fmtNarrow(cost.bank.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.bank.totalHigh)}
+                      {fmtCompact(cost.bank.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtCompact(cost.bank.totalHigh)}
                     </span>
                     <span className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</span>
                   </div>
@@ -1793,7 +1798,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
                   <div className="ec-r__compare__label">{t("ec.r.savings.altery")}</div>
                   <div className="ec-r__compare__priceLine">
                     <span className="ec-r__compare__amount">
-                      {fmtNarrow(cost.altery.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.altery.totalHigh)}
+                      {fmtCompact(cost.altery.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtCompact(cost.altery.totalHigh)}
                     </span>
                     <span className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</span>
                   </div>
@@ -1810,7 +1815,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
               )}
 
               <p className="ec-r__savings__note">
-                {t("ec.r.savings.note", { volume: fmtNarrow(rec.monthlyVolume) })}
+                {t("ec.r.savings.note", { volume: fmtCompact(rec.monthlyVolume) })}
               </p>
               {/* "How we calculated this" used to be an inline <details>
                   expander. Promoted to a modal trigger (same visual

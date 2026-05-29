@@ -369,6 +369,35 @@ function ecFmtFromGbp(gbpValue, currency) {
   return symbol + converted.toLocaleString("en-US").replace(/,/g, NBSP);
 }
 
+// Compact variant — used on the savings card where amounts can hit
+// 7-figure ranges (high-volume customers see "£2 598 000–£4 850 400 a
+// year" otherwise — overwhelming and hard to scan). Abbreviates with
+// k/m suffixes above the relevant thresholds, while the full-precision
+// `ecFmtFromGbp` stays in place for the methodology modal / PDF / email
+// where a CFO actually wants exact numbers.
+//
+//   £0 .. £999       → "£123"  (plain integer, sub-1k stays full)
+//   £1 000 .. £9 999 → "£3.5k" (one decimal at this scale is meaningful)
+//   £10 000 .. £999 999 → "£75k" (round to nearest k)
+//   £1 000 000+      → "£2.6m" (one decimal up to £10m, integer above)
+function ecFmtFromGbpCompact(gbpValue, currency) {
+  const rate = EC_FX_FROM_GBP[currency];
+  const symbol = EC_CURRENCY_SYMBOL[currency];
+  if (rate == null || symbol == null) return ecFmtFromGbpCompact(gbpValue, "GBP");
+  const converted = (gbpValue || 0) * rate;
+  if (converted >= 1_000_000) {
+    const m = converted / 1_000_000;
+    return symbol + (m >= 10 ? Math.round(m).toString() : m.toFixed(1).replace(/\.0$/, "")) + "m";
+  }
+  if (converted >= 10_000) {
+    return symbol + Math.round(converted / 1000) + "k";
+  }
+  if (converted >= 1_000) {
+    return symbol + (converted / 1000).toFixed(1).replace(/\.0$/, "") + "k";
+  }
+  return symbol + Math.round(converted).toLocaleString("en-US").replace(/,/g, " ");
+}
+
 // Pick the display currency for a recommendation — the primary
 // (first non-SWIFT-only) account on the entity, falling back to GBP.
 // "Primary" = first account in EC_ENTITIES[entity].accounts that has
@@ -1136,5 +1165,5 @@ Object.assign(window, {
   ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
   ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,
   ecCaptureAndStoreUtms, ecAppendUtmsToURL,
-  ecFmtFromGbp, ecDisplayCurrencyFor, EC_FX_FROM_GBP, EC_CURRENCY_SYMBOL,
+  ecFmtFromGbp, ecFmtFromGbpCompact, ecDisplayCurrencyFor, EC_FX_FROM_GBP, EC_CURRENCY_SYMBOL,
 });
