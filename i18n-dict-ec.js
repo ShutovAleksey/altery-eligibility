@@ -268,7 +268,7 @@
         "ec.r.persona.crypto.line": "For crypto-native operations with licensed rails",
         "ec.r.entity.status": "{licence}",
         "ec.r.plan.fit": "Best fit for your volume",
-        "ec.r.plan.switch": "You can switch plans any time from the dashboard.",
+        "ec.r.plan.switch": "Not a commitment — change your plan any month to match your needs.",
         "ec.r.plan.compareAll": "Compare all plans →",
         "ec.r.plan.notRecommended.up.title": "{selected} saves more per transaction — but you're paying for capacity you may not need",
         "ec.r.plan.notRecommended.up.body": "{selected}'s subscription buys lower FX and SWIFT rates plus features like dedicated treasury support and API access that {recommended} doesn't include. The projection above reflects only the rate discount — pick {selected} if you expect to grow into those extra services soon.",
