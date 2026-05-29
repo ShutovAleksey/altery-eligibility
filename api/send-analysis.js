@@ -36,9 +36,13 @@ const EMAIL_RE      = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // muted lead → beige entity pill with success dot → CTA. Recipients
 // who saw the result page should feel they're reading the same artifact.
 function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoURL, bookingURL, strings, langCode, forwardedBy }) {
+  // Light palette — used as the inline-style base. Every email client
+  // can render inline styles, so this is the lowest-common-denominator
+  // appearance. Dark-mode clients (Apple Mail, Outlook iOS/Android,
+  // Outlook.com auto-dark) override these via the <style> block below.
   const C = {
     primary:      "#002780",
-    headerBg:     "#000537",  // Midnight navy — same as on-screen .ec-header
+    headerBg:     "#000537",  // Midnight navy — always navy in both themes
     primaryLight: "#B3D1FF",
     ink:          "#14171F",
     inkSoft:      "#4B5063",
@@ -50,6 +54,25 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
     success:      "#18A058",
     white:        "#FFFFFF",
   };
+  // Dark-mode equivalents — applied via .t-* class overrides inside
+  // @media (prefers-color-scheme: dark) and [data-ogsc] / [data-ogsb]
+  // selectors. Primary text in dark mode uses the on-screen accent
+  // (light blue) so the entity / plan name reads on a dark card.
+  const D = {
+    surface:      "#0E0F14",
+    card:         "#1A1B22",
+    ink:          "#E8E9ED",
+    inkSoft:      "#B0B3BD",
+    muted:        "#8A8E99",
+    border:       "#2D2F38",
+    primary:      "#B3D1FF",
+    beige:        "#2C2620",
+    beigeBorder:  "#3D3530",
+  };
+  // System font stack — Inter is the brand face on-screen, but @font-face
+  // doesn't apply in most email clients. The fallback chain lands on a
+  // platform-native sans-serif everywhere (system-ui macOS/iOS/modern,
+  // Segoe UI on Windows, Roboto on Android, Helvetica Neue on macOS).
   const FF = "'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif";
   const lang = (langCode || "en").slice(0, 5);
   const s = strings || {};
@@ -57,7 +80,9 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
   // Wordmark PNG (rendered from the same SVG used in the on-screen
   // checker header). We use a PNG via URL rather than inline SVG
   // because Outlook desktop doesn't render inline SVG reliably — PNG
-  // ships across every major email client.
+  // ships across every major email client. The wordmark is white on
+  // transparent and always sits on the navy header pill, so the same
+  // image works in light and dark mode without swapping.
   const logoImg = logoURL ? `<img src="${logoURL}" alt="Altery" width="71" height="24" style="display:block;border:0;" />` : `<div style="font-size:22px;font-weight:700;color:${C.white};letter-spacing:-0.01em;line-height:1;">altery</div>`;
 
   // Booking secondary CTA — only rendered when a URL was provided
@@ -66,7 +91,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
   // path without competing with the self-serve CTA visually.
   const bookingBlock = bookingURL ? `
         <tr><td style="padding:14px 36px 0;">
-          <a href="${bookingURL}" style="display:inline-block;font-size:13px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${s.bookingCta || "Schedule a 15-min intro call"} →</a>
+          <a href="${bookingURL}" class="t-primary-text t-primary-border" style="display:inline-block;font-size:13px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${s.bookingCta || "Schedule a 15-min intro call"} →</a>
         </td></tr>` : "";
 
   // Forwarder banner — rendered only when this email is a forwarded copy
@@ -76,37 +101,82 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
   // it reads as a system note, not promotional copy.
   const forwarderBlock = forwardedBy ? `
         <tr><td style="padding:24px 24px 0;">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="t-beige" style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;">
             <tr><td style="padding:14px 18px;">
-              <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">
+              <div class="t-muted" style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">
                 ${s.forwardedByLabel || "Shared with you"}
               </div>
-              <div style="font-size:13px;line-height:19px;color:${C.ink};">
+              <div class="t-ink" style="font-size:13px;line-height:19px;color:${C.ink};">
                 ${s.forwardedByBanner || `<strong>${forwardedBy}</strong> shared this Altery Business banking analysis with you — they're exploring an account and thought you should see it too.`}
               </div>
             </td></tr>
           </table>
         </td></tr>` : "";
 
+  // Cross-client, dark-mode-aware <style> block. Loaded by every modern
+  // client (Apple Mail, Gmail web & mobile apps, Outlook 2019+, Outlook
+  // .com, Yahoo). Older Outlook desktop (2007-2016) strips it but those
+  // versions don't have auto-dark either, so the inline-style light
+  // base ships unchanged. Two override layers:
+  //   1. @media (prefers-color-scheme: dark) — Apple Mail, Outlook iOS/
+  //      Android, modern Gmail mobile, Yahoo iOS.
+  //   2. [data-ogsc] / [data-ogsb] — Outlook.com auto-dark hooks.
+  // The header navy pill stays navy in both themes (brand-fixed) — the
+  // white wordmark always sits on dark navy regardless of card mode.
+  const headStyle = `
+    :root { color-scheme: light dark; supported-color-schemes: light dark; }
+    a { color: ${C.primary}; }
+    @media (prefers-color-scheme: dark) {
+      .t-surface { background-color: ${D.surface} !important; }
+      .t-card { background-color: ${D.card} !important; box-shadow: 0 8px 28px rgba(0,0,0,0.45) !important; }
+      .t-ink { color: ${D.ink} !important; }
+      .t-ink-soft { color: ${D.inkSoft} !important; }
+      .t-muted { color: ${D.muted} !important; }
+      .t-primary-text { color: ${D.primary} !important; }
+      .t-primary-border { border-bottom-color: ${D.primary} !important; }
+      .t-border { border-color: ${D.border} !important; }
+      .t-beige { background-color: ${D.beige} !important; border-color: ${D.beigeBorder} !important; }
+      .t-footer-bg { background-color: ${D.surface} !important; }
+      a { color: ${D.primary} !important; }
+    }
+    [data-ogsc] .t-surface,
+    [data-ogsb] .t-surface { background-color: ${D.surface} !important; }
+    [data-ogsc] .t-card,
+    [data-ogsb] .t-card { background-color: ${D.card} !important; }
+    [data-ogsc] .t-ink { color: ${D.ink} !important; }
+    [data-ogsc] .t-ink-soft { color: ${D.inkSoft} !important; }
+    [data-ogsc] .t-muted { color: ${D.muted} !important; }
+    [data-ogsc] .t-primary-text { color: ${D.primary} !important; }
+    [data-ogsc] .t-primary-border { border-bottom-color: ${D.primary} !important; }
+    [data-ogsc] .t-border { border-color: ${D.border} !important; }
+    [data-ogsc] .t-beige { background-color: ${D.beige} !important; border-color: ${D.beigeBorder} !important; }
+    [data-ogsc] .t-footer-bg,
+    [data-ogsb] .t-footer-bg { background-color: ${D.surface} !important; }
+  `;
+
   return `<!doctype html>
-<html lang="${lang}">
+<html lang="${lang}" dir="ltr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="supported-color-schemes" content="light dark">
+<!--[if mso]><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml><![endif]-->
 <title>Altery</title>
+<style>${headStyle}</style>
 </head>
-<body style="margin:0;padding:0;background:${C.surface};font-family:${FF};-webkit-font-smoothing:antialiased;">
+<body class="t-surface" style="margin:0;padding:0;background:${C.surface};font-family:${FF};-webkit-font-smoothing:antialiased;">
   <!-- Hidden preheader: shows next to subject in inbox lists -->
   <div style="display:none;max-height:0;overflow:hidden;font-size:1px;line-height:1px;color:${C.surface};">
     ${s.preheader || `Your ${planName} plan recommendation on ${entityName} — full PDF attached.`}
   </div>
 
-  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${C.surface};">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="t-surface" style="background:${C.surface};">
     <tr><td align="center" style="padding:32px 16px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" style="max-width:600px;background:${C.white};border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(0,6,57,0.08);">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="600" class="t-card" style="max-width:600px;background:${C.white};border-radius:16px;overflow:hidden;box-shadow:0 8px 28px rgba(0,6,57,0.08);">
 
-        <!-- Header pill — midnight navy, rounded. Mirrors .ec-header
-             from the on-screen checker. -->
+        <!-- Header pill — midnight navy, rounded. Brand-fixed in both
+             themes; the white wordmark always lands on dark navy. -->
         <tr><td style="padding:24px 24px 0;">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${C.headerBg};border-radius:16px;">
             <tr>
@@ -124,23 +194,25 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
              those, and the email reads as a clean wrapper. -->
         <tr><td style="padding:32px 36px 24px;">
 
-          ${personaLine ? `<div style="font-size:13px;font-weight:500;line-height:19px;color:${C.primary};margin:0 0 10px;letter-spacing:-0.005em;">${personaLine}</div>` : ""}
+          ${personaLine ? `<div class="t-primary-text" style="font-size:13px;font-weight:500;line-height:19px;color:${C.primary};margin:0 0 10px;letter-spacing:-0.005em;">${personaLine}</div>` : ""}
 
-          <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 12px;">
+          <div class="t-muted" style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 12px;">
             ${s.eyebrow || "Recommended for your business"}
           </div>
 
-          <h1 style="font-size:24px;font-weight:700;letter-spacing:-0.02em;line-height:30px;color:${C.ink};margin:0 0 14px;">
-            <span style="color:${C.primary};">${entityName}</span> ${s.titleMid || "is built for your"} <span style="color:${C.primary};">${planName}</span>${s.titleEnd || " account."}
+          <h1 class="t-ink" style="font-size:24px;font-weight:700;letter-spacing:-0.02em;line-height:30px;color:${C.ink};margin:0 0 14px;">
+            <span class="t-primary-text" style="color:${C.primary};">${entityName}</span> ${s.titleMid || "is built for your"} <span class="t-primary-text" style="color:${C.primary};">${planName}</span>${s.titleEnd || " account."}
           </h1>
 
-          <p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0;">
+          <p class="t-ink-soft" style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0;">
             ${s.lead || "We've put together a full eligibility analysis covering our reasoning, your selected services, fees, and your personal setup link. It's attached as a PDF — open it whenever you're ready."}
           </p>
 
         </td></tr>
 
-        <!-- CTA block — pill button with arrow, matches checker primary CTA -->
+        <!-- CTA block — pill button with arrow, matches checker primary
+             CTA. Brand color stays navy + white in both themes — the
+             button is the most theme-stable element of the email. -->
         <tr><td style="padding:0 36px 0;">
           <a href="${sessionLink}" style="display:inline-block;background:${C.primary};color:${C.white};text-decoration:none;padding:15px 28px;border-radius:12px;font-size:15px;font-weight:500;letter-spacing:0.005em;line-height:1;">
             ${s.cta || "Continue to setup"} &nbsp;→
@@ -151,19 +223,19 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
 
         <!-- Tail copy -->
         <tr><td style="padding:24px 36px 32px;">
-          <p style="font-size:13px;line-height:20px;color:${C.inkSoft};margin:0 0 12px;">
+          <p class="t-ink-soft" style="font-size:13px;line-height:20px;color:${C.inkSoft};margin:0 0 12px;">
             ${s.tail1 || "Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off."}
           </p>
-          <p style="font-size:13px;line-height:20px;color:${C.muted};margin:0;">
-            ${s.tail2 || `Questions? Just reply to this email or write to <a href="mailto:sales@altery.com" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a> — we're here to help.`}
+          <p class="t-muted" style="font-size:13px;line-height:20px;color:${C.muted};margin:0;">
+            ${s.tail2 || `Questions? Just reply to this email or write to <a href="mailto:sales@altery.com" class="t-primary-text" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a> — we're here to help.`}
           </p>
         </td></tr>
 
         <!-- Footer -->
-        <tr><td style="background:${C.surface};padding:22px 36px;border-top:1px solid ${C.border};font-size:11px;line-height:16px;color:${C.muted};">
-          <div style="color:${C.ink};font-weight:600;margin-bottom:4px;">Altery</div>
-          <div>${s.footerTagline || "Business finance for digital companies banks struggle to understand."}</div>
-          <div style="margin-top:8px;">${s.footerEntities || "Altery Ltd (UK · FCA-licensed EMI) · Altery EU (CY · Central Bank of Cyprus EMI) · Altery MENA (DIFC · DFSA)"}</div>
+        <tr><td class="t-footer-bg t-border" style="background:${C.surface};padding:22px 36px;border-top:1px solid ${C.border};font-size:11px;line-height:16px;color:${C.muted};">
+          <div class="t-ink" style="color:${C.ink};font-weight:600;margin-bottom:4px;">Altery</div>
+          <div class="t-muted" style="color:${C.muted};">${s.footerTagline || "Business finance for digital companies banks struggle to understand."}</div>
+          <div class="t-muted" style="margin-top:8px;color:${C.muted};">${s.footerEntities || "Altery Ltd (UK · FCA-licensed EMI) · Altery EU (CY · Central Bank of Cyprus EMI) · Altery MENA (DIFC · DFSA)"}</div>
         </td></tr>
 
       </table>
