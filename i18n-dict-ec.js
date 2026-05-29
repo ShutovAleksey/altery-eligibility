@@ -421,6 +421,7 @@
     "ec.pdf.atGlance.savings": "Projected savings",
     "ec.pdf.atGlance.savingsVs": "vs typical business bank",
     "ec.pdf.included.head": "What's included in your plan",
+    "ec.pdf.allPlans": "See all plans and full pricing table",
     "ec.pdf.costMath.head": "Your monthly cost — side by side",
     "ec.pdf.costMath.altery": "Altery",
     "ec.pdf.costMath.bank": "Typical business bank",

@@ -293,16 +293,22 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // panel — same visual idiom as the onboarding checklist below, so
   // the document has a consistent "things you get / things to bring"
   // affordance pair.
+  // Table-based row layout (not flex) because html2canvas occasionally
+  // mis-aligns flex items vertically during rasterisation — the bullet
+  // circle drifts above or below its row's text baseline. Table cells
+  // hold their vertical-align:top contract reliably.
   const includedItemsHTML = (rec.plan.perkKeys || []).map((k) => `
-    <div style="display:flex;gap:12px;align-items:flex-start;padding:6px 0;">
-      <div style="flex-shrink:0;width:18px;height:18px;border-radius:50%;background:${C.primary};color:${C.white};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;line-height:1;margin-top:1px;">✓</div>
-      <div style="font-size:13px;color:${C.ink};line-height:19px;">${t(k)}</div>
-    </div>`).join("");
+    <tr>
+      <td style="width:22px;padding:6px 12px 6px 0;vertical-align:top;">
+        <div style="width:18px;height:18px;border-radius:50%;background:${C.primary};color:${C.white};text-align:center;font-size:11px;font-weight:700;line-height:18px;">✓</div>
+      </td>
+      <td style="padding:6px 0;vertical-align:top;font-size:13px;color:${C.ink};line-height:19px;">${t(k)}</td>
+    </tr>`).join("");
   const includedHTML = `
     <div style="margin:0 0 30px;">
       <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 14px;">${t("ec.pdf.included.head")}</div>
-      <div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:14px 20px;">
-        ${includedItemsHTML}
+      <div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:8px 20px;">
+        <table style="width:100%;border-collapse:collapse;">${includedItemsHTML}</table>
       </div>
     </div>`;
 
@@ -366,7 +372,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         <td style="width:1px;background:${C.border};padding:18px 0;"></td>
         <td style="vertical-align:top;padding:18px 22px;width:33%;">
           <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.pdf.atGlance.savings")}</div>
-          <div style="font-size:17px;font-weight:700;color:${C.savings};line-height:22px;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${annualSavings || "—"}<span style="font-size:12px;font-weight:500;color:${C.savings};margin-left:2px;">${cost ? ` ${t("ec.pdf.costMath.perYear")}` : ""}</span></div>
+          <div style="font-size:17px;font-weight:700;color:${C.primary};line-height:22px;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${annualSavings || "—"}<span style="font-size:12px;font-weight:500;color:${C.muted};margin-left:2px;">${cost ? ` ${t("ec.pdf.costMath.perYear")}` : ""}</span></div>
           <div style="font-size:12px;color:${C.muted};margin-top:4px;">${t("ec.pdf.atGlance.savingsVs")}</div>
         </td>
       </tr>
@@ -414,12 +420,17 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         </tr>
       </table>
 
-      <!-- Savings band — loss-framed: "you're leaving on the table" -->
-      <div style="background:${C.savingsBg};border:1.5px solid ${C.savings};border-radius:12px;padding:18px 22px;margin-top:14px;">
-        <div style="font-size:11px;color:${C.savings};font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">${t("ec.pdf.costMath.savings.label")}</div>
+      <!-- Savings band — brand-clean: beige bg, 1px navy border, ink + navy
+           text. Replaces the previous warm-orange treatment that read too
+           close to red on print and clashed with the rest of the document
+           which uses the brand navy + beige palette throughout. The number
+           still carries the emphasis via type weight and size, no colour
+           shout needed. -->
+      <div style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;padding:18px 22px;margin-top:14px;">
+        <div style="font-size:11px;color:${C.muted};font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">${t("ec.pdf.costMath.savings.label")}</div>
         <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <div style="font-size:24px;font-weight:700;color:${C.savings};font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${fmtEUR(cost.savings.monthly)}<span style="font-size:14px;color:${C.savings};font-weight:500;"> ${t("ec.pdf.costMath.perMonth")}</span></div>
-          <div style="font-size:14px;color:${C.savings};font-weight:600;font-variant-numeric:tabular-nums;">${fmtEUR(cost.savings.annual)} ${t("ec.pdf.costMath.perYear")}</div>
+          <div style="font-size:24px;font-weight:700;color:${C.primary};font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${fmtEUR(cost.savings.monthly)}<span style="font-size:14px;color:${C.inkSoft};font-weight:500;"> ${t("ec.pdf.costMath.perMonth")}</span></div>
+          <div style="font-size:14px;color:${C.inkSoft};font-weight:600;font-variant-numeric:tabular-nums;">${fmtEUR(cost.savings.annual)} ${t("ec.pdf.costMath.perYear")}</div>
         </div>
       </div>
 
@@ -546,14 +557,18 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // calibrated to set realistic expectations (10 min setup, 48h to
   // live, 5 days for cards). Numbers in navy circles for visual
   // anchor and easy scanning.
-  const stepsHTML = [1, 2, 3, 4].map((n) => `
-    <div style="display:flex;gap:14px;margin-bottom:14px;align-items:flex-start;">
-      <div style="flex-shrink:0;width:28px;height:28px;border-radius:50%;background:${C.beige};border:1.5px solid ${C.primary};color:${C.primary};display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;">${n}</div>
-      <div style="flex:1;">
+  // Table-row layout for the same html2canvas alignment reason as the
+  // included list above — flex circles drift vertically during raster.
+  const stepsHTML = `<table style="width:100%;border-collapse:collapse;">` + [1, 2, 3, 4].map((n) => `
+    <tr>
+      <td style="width:42px;padding:0 14px 14px 0;vertical-align:top;">
+        <div style="width:28px;height:28px;border-radius:50%;background:${C.beige};border:1.5px solid ${C.primary};color:${C.primary};text-align:center;font-size:13px;font-weight:700;line-height:25px;font-variant-numeric:tabular-nums;">${n}</div>
+      </td>
+      <td style="padding:0 0 14px;vertical-align:top;">
         <div style="font-size:13.5px;font-weight:600;color:${C.ink};line-height:19px;">${t(`ec.pdf.steps.${n}.title`)}</div>
         <div style="font-size:12px;color:${C.muted};line-height:18px;margin-top:2px;">${t(`ec.pdf.steps.${n}.body`)}</div>
-      </div>
-    </div>`).join("");
+      </td>
+    </tr>`).join("") + `</table>`;
 
   // Self-contained handoff URL — all checker answers travel inside the
   // ?p=<base64url> payload, so this PDF link works for the original
@@ -615,9 +630,10 @@ ${personaLine ? `<div style="font-size:13px;font-weight:500;color:${C.primary};m
 
 ${entityHeroHTML}
 
-${cryptoRerouteHTML}
-
-<!-- Section 1: At-a-glance TLDR card -->
+<!-- Section 1: At-a-glance TLDR card. Crypto-reroute callout used to
+     sit above this; removed 2026-05-29 — the reasoning bullets already
+     explain crypto-fluent routing where relevant, and the standalone
+     callout read as filler. -->
 ${atGlanceHTML}
 
 <!-- Section 2: Why this plan — reasoning bullets citing the user's
@@ -632,12 +648,17 @@ ${atGlanceHTML}
      before pricing so the reader sees value before cost. -->
 ${includedHTML}
 
-<!-- Section 4: Pricing detail — per-rail tariff table. -->
+<!-- Section 4: Pricing detail — per-rail tariff table + a quiet
+     link out to the full pricing page so anyone curious about other
+     tiers can see the whole grid without leaving the checker context. -->
 <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
   ${t("ec.pdf.pricing.head", { plan: planName })}
 </div>
-<div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:14px 20px;margin-bottom:32px;">
+<div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:14px 20px;margin-bottom:14px;">
   <table style="width:100%;border-collapse:collapse;">${feeTableHTML}</table>
+</div>
+<div style="margin:0 0 32px;">
+  <a href="https://altery.com/fees/business/" style="display:inline-block;font-size:12.5px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.allPlans")} →</a>
 </div>
 
 <!-- Section 5: Cost math — Altery vs typical bank with savings band. -->
@@ -646,13 +667,13 @@ ${costMathHTML}
 <!-- Section 6: Outcomes — what the annual saving buys. -->
 ${outcomesHTML}
 
-<!-- Section 7: Comparison vs other banks — multi-comparator matrix. -->
+<!-- Section 7: Comparison vs other banks — multi-comparator matrix.
+     Capability matrix ("Beyond cost / Where Altery wins") that used
+     to follow was removed 2026-05-29 — bulky three-column read that
+     restated the comparison-table information in prose. -->
 ${comparisonHTML}
 
-<!-- Section 8: Capability matrix — wins / equal / bank wins. -->
-${capabilityHTML}
-
-<!-- Section 9: Selected services — the rails the user picked, for
+<!-- Section 8: Selected services — the rails the user picked, for
      reference during onboarding. -->
 <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
   ${t("ec.pdf.services.head")}

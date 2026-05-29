@@ -735,8 +735,15 @@ function ecQualitativeMatrix(rec) {
     }
     if (rowKey === "swiftOut") {
       if (cmpObj.id === "altery") return { kind: "text", value: planFees.swift || "€10 + 0.25%" };
-      if (cmpObj.fees) return { kind: "text", value: `€${cmpObj.fees.swiftOutEur}` };
-      return { kind: "text", value: q.swiftOut || "—" };
+      // Neobank comparators have no `fees` block — their tariff is a
+      // qualitative band string ("£5-15"). Baseline (synthesised median
+      // across the panel) has `fees.swiftOutGbp` only; the older code
+      // tried to read `swiftOutEur` and rendered literal "€undefined".
+      if (q.swiftOut) return { kind: "text", value: q.swiftOut };
+      if (cmpObj.fees && typeof cmpObj.fees.swiftOutGbp === "number") {
+        return { kind: "text", value: `£${cmpObj.fees.swiftOutGbp}` };
+      }
+      return { kind: "text", value: "—" };
     }
     if (rowKey === "docFriction") {
       return { kind: "state", value: q.docFriction || "high" }; // low / medium / high
