@@ -658,16 +658,18 @@ function ecComputeCostBreakdown(rec) {
     baselineSources: baseline.sources,
     baselinePanel:   baseline.panelMembers || [baseline.name],
     asof:            baseline.asof,
+    // Headline FX-margin comparison only — keeps the methodology
+    // modal focused on the one number that actually explains the
+    // savings delta. Derivation bullets (corridor mix, tx count,
+    // FX ratio) lived here historically; they duplicated info that
+    // the cost table above already shows, and the hidden-cost
+    // citations (wholesale FX spread, correspondent SWIFT fee)
+    // are already disclosed in the savings-card inline footnote.
+    // The underlying math still applies those — only the citation
+    // bullets are gone.
     assumptions: [
-      { key: "ec.r.method.fxRatio",   vars: { pct: Math.round(fxRatio * 100) } },
-      { key: "ec.r.method.txMix",     vars: { localPct: Math.round(split.local * 100),
-                                               swiftPct: Math.round(split.swift * 100) } },
-      { key: "ec.r.method.txCount",   vars: { n: txCount, swift: swiftTxCount, local: localTxCount,
-                                               avg: Math.round(avgTxVal) } },
-      { key: "ec.r.method.alteryFx",  vars: { pct: (ALTERY_FX_MARKUP * 100).toFixed(2) } },
-      { key: "ec.r.method.bankFx",    vars: { pct: (BANK_FEES.fxMarkupBps / 100).toFixed(2), bank: baseline.name } },
-      { key: "ec.r.method.hiddenFxSpread", vars: { pct: ((hidden.fxAdditionalBps || 0) / 100).toFixed(2) } },
-      { key: "ec.r.method.hiddenSwiftCorr", vars: { gbp: hidden.swiftCorrespondentGbp || 0 } },
+      { key: "ec.r.method.alteryFx", vars: { pct: (ALTERY_FX_MARKUP * 100).toFixed(2) } },
+      { key: "ec.r.method.bankFx",   vars: { pct: (BANK_FEES.fxMarkupBps / 100).toFixed(2), bank: baseline.name } },
     ],
   };
 

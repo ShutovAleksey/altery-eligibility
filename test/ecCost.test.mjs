@@ -217,11 +217,16 @@ test("Hidden cost components break down into FX + SWIFT", () => {
   assert.equal(c.bank.totalRealistic, c.bank.total + c.bank.hiddenFx + c.bank.hiddenSwift);
 });
 
-test("Methodology block now exposes hidden-cost assumptions", () => {
+test("Methodology assumptions are the FX-margin headline comparison", () => {
+  // Previously documented hidden FX/SWIFT calibration inline; that's
+  // now disclosed in the savings-card footnote, so the methodology
+  // modal only lists the actual Altery-vs-bank rate comparison —
+  // the one number that explains the delta. Hidden-cost math still
+  // applies inside bank.totalRealistic / savings.hiddenTotal.
   const c = w.ecComputeCostBreakdown(rec());
   const keys = c.methodology.assumptions.map((a) => a.key);
-  assert.ok(keys.includes("ec.r.method.hiddenFxSpread"));
-  assert.ok(keys.includes("ec.r.method.hiddenSwiftCorr"));
+  assert.ok(keys.includes("ec.r.method.alteryFx"));
+  assert.ok(keys.includes("ec.r.method.bankFx"));
 });
 
 test("Apples-to-apples: bank subscription scales with Altery plan tier", () => {
@@ -243,7 +248,7 @@ test("Methodology block exposes baseline + sources + asof + panel", () => {
   assert.ok(c.methodology.baselinePanel.length >= 3, "UK panel ≥ 3 banks");
   assert.match(c.methodology.asof, /^\d{4}-\d{2}-\d{2}$/);
   assert.ok(Array.isArray(c.methodology.assumptions));
-  assert.ok(c.methodology.assumptions.length >= 3);
+  assert.ok(c.methodology.assumptions.length >= 2);
 });
 
 test("EU-incorporated business compared against EU panel (BNP among members)", () => {
