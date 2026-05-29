@@ -992,7 +992,7 @@ const EC_COMPARATORS = {
     id: "eu_deutsche", name: "Deutsche Bank Business",
     type: "traditional", panel: "eu",
     asof: "2026-05-29",
-    sources: ["https://www.deutsche-bank.de/ms/geschaeftskunden.html"],
+    sources: ["https://www.deutsche-bank.de/ub.html"],
     fees: {
       subscriptionGbp: 23, subscriptionProGbp: 55, subscriptionUltraGbp: 260, localOutGbp: 0.40, sepaOutGbp: 0.40,
       swiftOutGbp: 22, transferInGbp: 0, fxMarkupBps: 280,
