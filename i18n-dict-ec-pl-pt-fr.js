@@ -137,7 +137,6 @@
     "ec.r.plan.notRecommended.down.title": "{selected} wygląda taniej, ale może nie obejmować wszystkiego, co wskazałeś",
     "ec.r.plan.notRecommended.down.body": "{selected} ma niższy abonament, ale wyższe opłaty za transakcję i niższy limit wolumenu — wybrane przez Ciebie usługi (masowe wypłaty, korytarze FX, karty firmowe) mogą wypaść poza plan i stać się dodatkami płatnymi, których prognoza powyżej nie uwzględnia.",
     "ec.r.plan.notRecommended.switchBack": "Wróć do {recommended}",
-    "ec.r.caveats.head": "Warto wiedzieć przed wnioskiem",
     "ec.r.cta.continue": "Przejdź do wniosku",
 
     "ec.plan.starter": "Starter",
@@ -174,12 +173,6 @@
     "ec.plan.ultra.am":      "Dedykowany account manager",
     "ec.plan.cap.am":        "Dedykowany account manager",
 
-    "ec.cav.crypto.tag": "Znamy krypto",
-    "ec.cav.crypto.text": "KYB krypto-natywne obsługuje nasz zespół specjalistyczny, nie ogólna kolejka. Synterra Connect — nasza sieć partnerska do bezpośredniego rozliczania z giełdami — przenosi środki do i z regulowanych platform; fiat in/out przez SEPA, Faster Payments i SWIFT.",
-    "ec.cav.performance.tag": "Przegląd specjalistyczny",
-    "ec.cav.performance.text": "Performance marketing ({industry}) wymaga jaśniejszych dowodów jakości ruchu i wypłat. Compliance prowadzi ustrukturyzowany kwestionariusz — typowy czas rozstrzygnięcia do trzech dni roboczych. W razie odmowy otrzymasz konkretne uzasadnienie, a nie czarną skrzynkę.",
-    "ec.cav.ultraHint.tag": "15-min rozmowa się opłaca",
-    "ec.cav.ultraHint.text": "Przy Twoim wolumenie wraz z API i wypłatami masowymi Ultra dodaje dedykowane treasury i negocjowany FX — warto porównać na 15-minutowej rozmowie przed aktywacją Pro.",
 
 
     "common.close": "Zamknij",
@@ -590,7 +583,6 @@
     "ec.r.plan.notRecommended.down.title": "{selected} parece mais barato, mas pode não cobrir o que indicou precisar",
     "ec.r.plan.notRecommended.down.body": "{selected} tem uma assinatura mais baixa, mas taxas por transação mais altas e um limite de volume menor — serviços que selecionou (pagamentos em massa, corredores FX, cartões de empresa) podem ficar fora do plano e tornar-se extras pagos que a projeção acima não contempla.",
     "ec.r.plan.notRecommended.switchBack": "Voltar a {recommended}",
-    "ec.r.caveats.head": "Bom saber antes de submeter",
     "ec.r.cta.continue": "Continuar para o pedido",
 
     "ec.plan.starter": "Starter",
@@ -627,12 +619,6 @@
     "ec.plan.ultra.am":      "Account manager dedicado",
     "ec.plan.cap.am":        "Account manager dedicado",
 
-    "ec.cav.crypto.tag": "Crypto-fluente",
-    "ec.cav.crypto.text": "O KYB crypto-nativo é gerido pela nossa equipa especialista, não pela fila geral. Synterra Connect — a nossa rede de parceiros para liquidação direta com exchanges — movimenta fundos de e para plataformas reguladas; fiat in/out via SEPA, Faster Payments e SWIFT.",
-    "ec.cav.performance.tag": "Análise especializada",
-    "ec.cav.performance.text": "Performance marketing ({industry}) exige evidências mais claras de qualidade de tráfego e pagamentos. A compliance gere um questionário estruturado — tempo típico de resolução três dias úteis. Se recusarmos, receberá uma justificação concreta, não uma caixa preta.",
-    "ec.cav.ultraHint.tag": "Vale uma chamada de 15 min",
-    "ec.cav.ultraHint.text": "Com o seu volume aliado a API e pagamentos em massa, o Ultra acrescenta treasury dedicado e FX negociado — vale a pena comparar numa chamada de 15 minutos antes de ativar o Pro.",
 
 
     "common.close": "Fechar",
@@ -1041,7 +1027,6 @@
     "ec.r.plan.notRecommended.down.title": "{selected} paraît moins cher, mais peut ne pas couvrir ce que vous avez indiqué",
     "ec.r.plan.notRecommended.down.body": "{selected} a un abonnement plus bas, mais des frais par transaction plus élevés et un plafond de volume inférieur — les services que vous avez sélectionnés (paiements de masse, corridors FX, cartes professionnelles) peuvent sortir du plan et devenir des extras payants que la projection ci-dessus ne prend pas en compte.",
     "ec.r.plan.notRecommended.switchBack": "Revenir à {recommended}",
-    "ec.r.caveats.head": "Bon à savoir avant de soumettre",
     "ec.r.cta.continue": "Continuer vers la demande",
 
     "ec.plan.starter": "Starter",
@@ -1078,12 +1063,6 @@
     "ec.plan.ultra.am":      "Account manager dédié",
     "ec.plan.cap.am":        "Account manager dédié",
 
-    "ec.cav.crypto.tag": "Crypto-experts",
-    "ec.cav.crypto.text": "Le KYB crypto-natif est géré par notre équipe spécialiste, pas la file généraliste. Synterra Connect — notre réseau partenaire pour le règlement direct avec les exchanges — déplace des fonds vers et depuis des plateformes régulées ; fiat entrée/sortie via SEPA, Faster Payments et SWIFT.",
-    "ec.cav.performance.tag": "Examen spécialisé",
-    "ec.cav.performance.text": "Le marketing à la performance ({industry}) nécessite des preuves plus claires de qualité du trafic et des paiements. La conformité conduit un questionnaire structuré — délai habituel de trois jours ouvrés. En cas de refus, vous recevez une motivation concrète, pas une boîte noire.",
-    "ec.cav.ultraHint.tag": "Un appel de 15 min en vaut la peine",
-    "ec.cav.ultraHint.text": "À votre volume, avec API et paiements de masse, Ultra ajoute un support treasury dédié et un FX négocié — à comparer lors d'un appel de 15 min avant d'activer Pro.",
 
 
     "common.close": "Fermer",

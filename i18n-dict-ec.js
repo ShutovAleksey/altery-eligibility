@@ -275,7 +275,6 @@
         "ec.r.plan.notRecommended.down.title": "{selected} looks cheaper, but may not cover what you said you'd need",
         "ec.r.plan.notRecommended.down.body": "{selected} has a lower subscription, but its higher per-transaction fees and lower volume cap can leave services you selected (mass payouts, FX corridors, business cards) outside the plan — those become paid extras the projection above doesn't account for.",
         "ec.r.plan.notRecommended.switchBack": "Switch back to {recommended}",
-        "ec.r.caveats.head": "Worth knowing before you apply",
         "ec.r.cta.continue": "Set up your account",
 
     // Plan names
@@ -363,12 +362,6 @@
     "ec.cap.bank.branches.detail": "For cash-heavy or paperwork-heavy operations, physical branches still help.",
 
     // Caveats
-    "ec.cav.crypto.tag": "Crypto-fluent",
-    "ec.cav.crypto.text": "Crypto-native KYB is handled by our specialist team, not the generalist queue. Synterra Connect — our partner-network for direct exchange settlement — routes funds in and out of regulated venues; fiat in/out via SEPA, Faster Payments and SWIFT.",
-    "ec.cav.performance.tag": "Specialist review",
-    "ec.cav.performance.text": "Performance marketing ({industry}) needs clearer traffic and payout evidence. Compliance runs a structured questionnaire — typical resolution within three business days. If we decline, you'll get specific reasoning, not a black box.",
-    "ec.cav.ultraHint.tag": "Worth a 15-min call",
-    "ec.cav.ultraHint.text": "At your volume with API + mass payouts, Ultra adds dedicated treasury and negotiated FX — worth comparing in a 15-min call before activating Pro.",
 
     // Bank rejection history — optional inline question on result page
 

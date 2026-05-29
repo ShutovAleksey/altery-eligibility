@@ -136,7 +136,6 @@
     "ec.r.plan.notRecommended.down.title": "{selected} lijkt goedkoper, maar dekt mogelijk niet wat je hebt aangegeven",
     "ec.r.plan.notRecommended.down.body": "{selected} heeft een lager abonnement, maar hogere transactiekosten en een lager volumeplafond — diensten die je hebt gekozen (massabetalingen, FX-corridors, zakelijke kaarten) kunnen daardoor buiten het plan vallen en betaalde extra's worden die de projectie hierboven niet meeneemt.",
     "ec.r.plan.notRecommended.switchBack": "Terug naar {recommended}",
-    "ec.r.caveats.head": "Goed om te weten vóór je aanvraagt",
     "ec.r.cta.continue": "Door naar de aanvraag",
 
     "ec.plan.starter": "Starter",
@@ -173,12 +172,6 @@
     "ec.plan.ultra.am":      "Toegewezen accountmanager",
     "ec.plan.cap.am":        "Toegewezen accountmanager",
 
-    "ec.cav.crypto.tag": "Crypto-ervaren",
-    "ec.cav.crypto.text": "Crypto-native KYB wordt afgehandeld door ons specialistenteam, niet de algemene wachtrij. Synterra Connect — ons partner-netwerk voor directe exchange-afwikkeling — verplaatst middelen van en naar gereguleerde platforms; fiat in/uit via SEPA, Faster Payments en SWIFT.",
-    "ec.cav.performance.tag": "Gespecialiseerde beoordeling",
-    "ec.cav.performance.text": "Performance-marketing ({industry}) heeft duidelijker bewijs nodig van verkeerskwaliteit en uitbetalingen. Compliance werkt met een gestructureerde vragenlijst — typische doorlooptijd drie werkdagen. Bij afwijzing krijg je een concrete onderbouwing, geen black box.",
-    "ec.cav.ultraHint.tag": "15-min call is het waard",
-    "ec.cav.ultraHint.text": "Bij jouw volume met API + bulkbetalingen voegt Ultra toegewijde treasury en onderhandelde FX toe — de moeite waard om in een 15-min call te vergelijken vóór activatie van Pro.",
 
 
     "common.close": "Sluiten",
@@ -589,7 +582,6 @@
     "ec.r.plan.notRecommended.down.title": "{selected} daha ucuz görünüyor ama belirttiğiniz ihtiyaçları karşılamayabilir",
     "ec.r.plan.notRecommended.down.body": "{selected} aboneliği daha düşük, ancak işlem başına ücretleri daha yüksek ve hacim limiti daha düşük — seçtiğiniz hizmetler (toplu ödemeler, FX koridorları, işletme kartları) plan dışında kalabilir ve yukarıdaki projeksiyona dahil edilmeyen ek ücretli hizmetlere dönüşebilir.",
     "ec.r.plan.notRecommended.switchBack": "{recommended} planına geri dön",
-    "ec.r.caveats.head": "Başvurmadan önce bilmekte fayda var",
     "ec.r.cta.continue": "Başvuruya geç",
 
     "ec.plan.starter": "Starter",
@@ -626,12 +618,6 @@
     "ec.plan.ultra.am":      "Özel hesap yöneticisi",
     "ec.plan.cap.am":        "Özel hesap yöneticisi",
 
-    "ec.cav.crypto.tag": "Kripto-uzmanlık",
-    "ec.cav.crypto.text": "Kripto-yerli KYB, genel kuyrukta değil, uzman ekibimizde yürütülür. Synterra Connect — doğrudan borsa mutabakatı için ortak ağımız — düzenlenmiş platformlara fon giriş-çıkışını yönetir; fiat giriş/çıkış SEPA, Faster Payments ve SWIFT üzerinden.",
-    "ec.cav.performance.tag": "Uzman incelemesi",
-    "ec.cav.performance.text": "Performans pazarlama ({industry}) trafik kalitesi ve ödemeler konusunda daha net kanıt gerektirir. Uyum, yapılandırılmış bir anket yürütür — tipik sonuç süresi üç iş günü. Reddedilirse, kara kutu değil, somut gerekçe alırsınız.",
-    "ec.cav.ultraHint.tag": "15 dakikalık görüşmeye değer",
-    "ec.cav.ultraHint.text": "Bu hacimde API ve toplu ödemelerle birlikte Ultra; özel treasury desteği ve müzakereli FX sunar — Pro'yu etkinleştirmeden önce 15 dakikalık bir görüşmede karşılaştırmaya değer.",
 
 
     "common.close": "Kapat",

@@ -125,62 +125,13 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
   if (needsPro)   plan = EC_PLANS.pro;
   if (needsUltra) plan = EC_PLANS.ultra;
 
-  const caveats = [];
-  // Crypto-fluent caveat — fires for any crypto-native category. Tone
-  // switched from "orange" (warning/conditional) to "blue" (informational/
-  // confident) because Altery actively onboards these businesses. Copy
-  // signals operational specifics ("specialist KYB lane, Synterra Connect")
-  // instead of the old "we'll review individually" hedge.
-  if (ind?.crypto) {
-    caveats.push({ tagKey: "ec.cav.crypto.tag", textKey: "ec.cav.crypto.text", tone: "blue" });
-  }
-  // Performance-marketing caveat — affiliate networks and creator
-  // platforms need a structured-review explanation. Copy from the
-  // Tone of Voice doc: "Performance marketing businesses need clearer
-  // traffic and payout evidence" — confident, specific, not gatekeeping.
-  if (industry === "affiliate" || industry === "creator") {
-    caveats.push({
-      tagKey: "ec.cav.performance.tag",
-      textKey: "ec.cav.performance.text",
-      tone: "blue",
-      vars: { industry: window.__I18N.t(ind.labelKey).toLowerCase() },
-    });
-  }
-  // Ultra-upsell hint — fires when the user lands on Pro but the
-  // combination of volume + capabilities (mass + api at >£500k) puts
-  // them squarely in Ultra-territory. Not a tier-forcer (we still
-  // recommend Pro), just an informational chip suggesting a short
-  // call to compare Ultra's treasury + negotiated FX before activating.
-  if (plan.id === "pro"
-      && monthlyVolume > 500000
-      && svcSet.has("mass")
-      && svcSet.has("api")) {
-    caveats.push({
-      tagKey: "ec.cav.ultraHint.tag",
-      textKey: "ec.cav.ultraHint.text",
-      tone: "blue",
-    });
-  }
-  // Note: a wide "Specialist review" caveat used to fire for every
-  // non-EU/UK/MENA/US country in the row bucket (~220 countries). It
-  // misfired on mature jurisdictions (Singapore, Japan, Canada,
-  // Switzerland, Crown Dependencies, EU-adjacent micro-states like
-  // Åland) where no specialist review actually happens. Removed in
-  // favour of letting the KYB stage catch real edge cases. If we
-  // later want a targeted version, add a `requiresSpecialistReview:
-  // true` flag on the genuinely affected countries in EC_COUNTRIES
-  // and fire a caveat only for those.
-  // Note: there used to be a MENA-specific 'Account opens today,
-  // corridors come online as each bank-to-bank integration lands'
-  // caveat. Removed — it implied a partial-service state at the
-  // moment a user is reading 'Recommended for your business', which
-  // creates more doubt than reassurance. Corridor onboarding details
-  // belong in /setup/ once the user is past commitment.
-  // Ultra pricing is firm now (£300/mo with a full fee schedule in
-  // EC_PLANS.ultra). The previous "Ultra prices set after a call"
-  // caveat contradicted the public price so it's been removed. If
-  // Ultra ever moves back to bespoke pricing, drop the price field
-  // from EC_PLANS.ultra and restore the caveat together.
+  // Caveats array dropped 2026-05-29. We used to push three flavours
+  // here (crypto-fluent, performance-marketing structured review,
+  // Pro→Ultra upsell hint) and render them in a "Worth knowing before
+  // you apply" section on the result page. The block added noise to
+  // an otherwise focused recommendation, and the upsell hint in
+  // particular muddled the recommendation itself. If a future surface
+  // needs conditional flags, expose them on `tierSignals` instead.
 
   // ── Reasoning bullets — "Why we recommend this plan" ──────────────
   // The single most important addition for conversion: instead of just
@@ -239,7 +190,7 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     .sort((a, b) => b.priority - a.priority)
     .slice(0, 3);
 
-  return { kind: "approved", entity, plan, caveats, country, ind, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoReroute, cryptoActive, services: svcs, tierSignals, reasoning: reasoningTop };
+  return { kind: "approved", entity, plan, country, ind, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoReroute, cryptoActive, services: svcs, tierSignals, reasoning: reasoningTop };
 }
 
 // Derive a transaction-count assumption from the monthly volume

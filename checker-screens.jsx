@@ -1493,7 +1493,7 @@ function EcResult({ rec, onBack, onReset }) {
 
 function EcResultApproved({ rec, onBack, onReset }) {
   const t = useT();
-  const { entity, caveats } = rec;
+  const { entity } = rec;
   const recommendedPlan = rec.plan;
 
   // Plan comparison modal — local state, opens on "Compare all plans →"
@@ -1854,24 +1854,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
             for the PDF render and buildEmailHTML in api/send-analysis
             for the email render. UI keeps the savings card + plan
             card + caveats only. */}
-
-        {/* ───── Caveats (only if any) ──────────────────────────── */}
-        {caveats.length > 0 && (
-          <section className="ec-r__caveats">
-            <div className="ec-r__cardEyebrow">
-              <EcIco.alert style={{ width: 14, height: 14, marginRight: 6, verticalAlign: -2 }} aria-hidden="true" />
-              {t("ec.r.caveats.head")}
-            </div>
-            <ul className="ec-r__caveatsList">
-              {caveats.map((c, i) => (
-                <li className="ec-r__caveatsRow" key={i}>
-                  <Tag tone={c.tone} size="sm">{t(c.tagKey)}</Tag>
-                  <span>{t(c.textKey, c.vars || {})}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
 
         {/* ───── Action bar — primary CTA goes DIRECTLY to onboarding
             (no commit-stage interstitial modal). Secondary button opens

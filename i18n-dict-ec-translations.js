@@ -140,7 +140,6 @@
     "ec.r.plan.notRecommended.down.title": "{selected} sieht günstiger aus, deckt aber möglicherweise nicht alles ab, was du angegeben hast",
     "ec.r.plan.notRecommended.down.body": "{selected} hat ein günstigeres Abonnement, aber höhere Pro-Transaktions-Gebühren und ein niedrigeres Volumenlimit — Dienste, die du ausgewählt hast (Massenauszahlungen, FX-Korridore, Geschäftskarten), können dadurch außerhalb des Tarifs liegen und als kostenpflichtige Zusätze anfallen, die die obige Projektion nicht abbildet.",
     "ec.r.plan.notRecommended.switchBack": "Zurück zu {recommended}",
-    "ec.r.caveats.head": "Wichtig vor dem Antrag",
     "ec.r.cta.continue": "Weiter zum Antrag",
 
     "ec.plan.starter": "Starter",
@@ -177,12 +176,6 @@
     "ec.plan.ultra.am":      "Persönlicher Account Manager",
     "ec.plan.cap.am":        "Persönlicher Account Manager",
 
-    "ec.cav.crypto.tag": "Krypto-erprobt",
-    "ec.cav.crypto.text": "Krypto-natives KYB läuft über unser Spezialistenteam, nicht die allgemeine Warteschlange. Synterra Connect — unser Partner-Netzwerk für direkte Exchange-Abwicklung — leitet Mittel zu und von regulierten Plattformen; Fiat-Ein-/-Auszahlungen via SEPA, Faster Payments und SWIFT.",
-    "ec.cav.performance.tag": "Spezialprüfung",
-    "ec.cav.performance.text": "Performance-Marketing ({industry}) braucht klare Nachweise zu Traffic-Qualität und Auszahlungen. Compliance führt einen strukturierten Fragebogen durch — übliche Bearbeitungszeit drei Werktage. Bei Ablehnung bekommst du eine konkrete Begründung, keine Blackbox.",
-    "ec.cav.ultraHint.tag": "15-Min-Call lohnt sich",
-    "ec.cav.ultraHint.text": "Bei deinem Volumen mit API + Mass-Payouts ergänzt Ultra dediziertes Treasury und verhandelte FX-Konditionen — ein 15-Min-Call zum Vergleich lohnt sich vor der Pro-Aktivierung.",
 
 
     "common.close": "Schließen",
@@ -593,7 +586,6 @@
     "ec.r.plan.notRecommended.down.title": "{selected} кажется дешевле, но может не покрыть всё, что вам нужно",
     "ec.r.plan.notRecommended.down.body": "У {selected} подписка дешевле, но комиссии за транзакции выше и лимит оборота ниже — выбранные вами сервисы (массовые выплаты, FX-коридоры, бизнес-карты) могут оказаться за рамками тарифа и стать платными дополнениями, которых в расчёте выше нет.",
     "ec.r.plan.notRecommended.switchBack": "Вернуться к {recommended}",
-    "ec.r.caveats.head": "Что важно знать до подачи",
     "ec.r.cta.continue": "Перейти к заявке",
 
     "ec.plan.starter": "Starter",
@@ -630,12 +622,6 @@
     "ec.plan.ultra.am":      "Персональный менеджер",
     "ec.plan.cap.am":        "Персональный менеджер",
 
-    "ec.cav.crypto.tag": "Знаем крипту",
-    "ec.cav.crypto.text": "KYB крипто-нативного бизнеса проходит через специализированную команду, не общую очередь. Synterra Connect — наша партнёрская сеть для прямых расчётов с биржами — проводит средства в обе стороны через регулируемые площадки; фиат через SEPA, Faster Payments и SWIFT.",
-    "ec.cav.performance.tag": "Специализированная проверка",
-    "ec.cav.performance.text": "Performance-маркетинг ({industry}) требует чёткого подтверждения качества трафика и выплат. Комплаенс проводит структурированную анкету — стандартный срок до трёх рабочих дней. При отказе вы получите конкретное обоснование, а не чёрный ящик.",
-    "ec.cav.ultraHint.tag": "15-минутный созвон не помешает",
-    "ec.cav.ultraHint.text": "При вашем обороте плюс API и mass payouts Ultra даёт выделенный treasury и индивидуальные FX-условия — стоит сравнить за 15-минутный созвон до активации Pro.",
 
 
     "common.close": "Закрыть",
