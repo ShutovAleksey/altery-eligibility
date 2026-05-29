@@ -256,6 +256,37 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <div style="font-size:12px;line-height:17px;color:${C.muted};">${t(s.bodyKey)}</div>
     </div>`).join("");
 
+  // Entity hero — mirrors the on-screen result page's hero block:
+  // licence pill + regulator-reference pill + (optional) crypto-fluent
+  // pill, then an IBAN/sort-code preview chip with masked tail and a
+  // caption. Replaces the single beige status pill that used to sit
+  // here: the on-screen block carries more trust signals (FRN deep
+  // link, account-format preview) which belong in a printable
+  // proposal even more than on the screen.
+  const heroIban = (typeof ecHeroIdentifier === "function") ? ecHeroIdentifier(rec.entity) : null;
+  const heroFlagCode = heroIban ? ecCurrencyFlag(heroIban.currency) : null;
+  const heroFlagSrc = (heroFlagCode && typeof window !== "undefined" && window.__FLAGS && window.__FLAGS[heroFlagCode]) || null;
+  const heroIbanMasked = heroIban ? maskTailDots(heroIban.value) : null;
+  const regulatory = rec.entity && rec.entity.regulatory;
+  const pillStyle = `display:inline-block;padding:5px 12px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;font-size:12px;color:${C.ink};margin:0 6px 6px 0;line-height:1.4;font-weight:500;`;
+  const entityHeroHTML = `
+    <div style="margin:0 0 28px;">
+      <div style="margin-bottom:${heroIban ? "14px" : "0"};">
+        <span style="${pillStyle}">${entityLicence}</span>
+        ${regulatory ? `<span style="${pillStyle}">${regulatory.refLabel}</span>` : ""}
+        ${rec.cryptoActive ? `<span style="${pillStyle}">${t("ec.r.crypto.fluent")}</span>` : ""}
+      </div>
+      ${heroIban ? `
+        <div style="display:inline-block;padding:10px 18px 10px 12px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;line-height:1;font-size:13.5px;color:${C.ink};">
+          ${heroFlagSrc ? `<img src="${heroFlagSrc}" alt="" width="22" height="22" style="display:inline-block;border-radius:50%;vertical-align:middle;margin-right:10px;border:1px solid ${C.beigeBorder};"/>` : ""}
+          <span style="font-weight:600;vertical-align:middle;letter-spacing:0.005em;">${heroIban.currency}</span>
+          <span style="display:inline-block;width:1px;height:14px;background:${C.beigeBorder};vertical-align:middle;margin:0 12px;"></span>
+          <span style="font-family:${FF_MONO};letter-spacing:0.04em;vertical-align:middle;">${heroIbanMasked}</span>
+        </div>
+        <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:8px;">${t("ec.r.iban.caption", { currency: heroIban.currency })}</div>
+      ` : ""}
+    </div>`;
+
   // "What's included in your plan" — perks list pulled straight from
   // rec.plan.perkKeys (the same list shown on the result-page card and
   // in the compare modal). Renders as a checked list inside a surface
@@ -571,11 +602,18 @@ ${personaLine ? `<div style="font-size:13px;font-weight:500;color:${C.primary};m
 
 <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin:0 0 10px;">${t("ec.pdf.recommendation")}</div>
 
-<h1 style="font-size:26px;font-weight:700;letter-spacing:normal;line-height:32px;color:${C.ink};margin:0 0 14px;">
-  <span style="color:${C.primary};">${entityName}</span> ${t("ec.r.title.middle")} <span style="color:${C.primary};">${planName}</span>${t("ec.r.title.after")}
+<!-- Title — html2canvas rasterises the bold space character narrower
+     than the on-screen browser does, so words visually merge in the
+     bitmap ("AlteryLtd · UK on theProplan."). Explicit word-spacing
+     widens the gap by ~3px at 26px which restores legible separation
+     without affecting the on-screen render this template also feeds. -->
+<h1 style="font-size:26px;font-weight:700;letter-spacing:0;word-spacing:0.12em;line-height:32px;color:${C.ink};margin:0 0 14px;">
+  <span style="color:${C.primary};">${entityName}</span> ${t("ec.r.title.middle")} <span style="color:${C.primary};">${planName}</span>${t("ec.r.title.after")}
 </h1>
 
-<p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0 0 26px;">${leadText}</p>
+<p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0 0 22px;">${leadText}</p>
+
+${entityHeroHTML}
 
 ${cryptoRerouteHTML}
 
