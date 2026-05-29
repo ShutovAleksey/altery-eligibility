@@ -531,50 +531,52 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
 
   return (
     <div className="ec-callback">
-      <div className="ec-callback__sla">{t("ec.callback.sla")}</div>
       <div className="ec-callback__row">
-        <input
+        <Input
           type="text"
-          className="ec-callback__input"
+          size="md"
+          autoComplete="given-name"
           placeholder={t("ec.callback.firstname")}
           value={firstname}
           onChange={(e) => setFirstname(e.target.value)}
           disabled={submitting}
-          autoComplete="given-name"
+          style={{ flex: "1 1 0", minWidth: 0 }}
         />
-        <input
+        <Input
           type="text"
-          className="ec-callback__input"
+          size="md"
+          autoComplete="family-name"
           placeholder={t("ec.callback.lastname")}
           value={lastname}
           onChange={(e) => setLastname(e.target.value)}
           disabled={submitting}
-          autoComplete="family-name"
+          style={{ flex: "1 1 0", minWidth: 0 }}
         />
       </div>
       {needEmail && (
-        <input
+        <Input
           type="email"
+          size="md"
           inputMode="email"
-          className="ec-callback__input ec-callback__input--full"
+          autoComplete="email"
           placeholder={t("ec.handoff.email.label")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={submitting}
-          autoComplete="email"
         />
       )}
       {((touched && !valid) || error) && (
         <div className="ec-handoff__error" role="alert">{error || t("ec.callback.error")}</div>
       )}
-      <button
-        type="button"
-        className="ec-callback__btn"
+      <Button
+        variant="primary"
+        size="md"
         onClick={submit}
         disabled={submitting || (touched && !valid)}
+        style={{ alignSelf: "flex-start" }}
       >
         {submitting ? t("ec.handoff.submitting") : t("ec.callback.submit")}
-      </button>
+      </Button>
     </div>
   );
 }
@@ -881,11 +883,11 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
             {!colleagueSent ? (
               <>
                 <div className="ec-handoff__colleague__row">
-                  <input
+                  <Input
                     type="email"
                     inputMode="email"
-                    autoComplete="off"
-                    className={"ec-handoff__colleague__input" + (showColleagueError ? " is-error" : "")}
+                    autoComplete="email"
+                    size="md"
                     placeholder={t("ec.handoff.sent.colleague.placeholder")}
                     value={colleagueEmail}
                     onChange={(e) => setColleagueEmail(e.target.value)}
@@ -895,19 +897,18 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                     }}
                     disabled={colleagueSubmitting}
                     autoFocus
+                    error={showColleagueError ? t("ec.handoff.email.error") : undefined}
+                    style={{ flex: "1 1 0", minWidth: 0 }}
                   />
-                  <button
-                    type="button"
-                    className="ec-handoff__colleague__btn"
+                  <Button
+                    variant="primary"
+                    size="md"
                     onClick={sendColleagueCopy}
                     disabled={colleagueSubmitting || !isColleagueValid}
                   >
                     {colleagueSubmitting ? t("ec.handoff.submitting") : t("ec.handoff.sent.colleague.send")}
-                  </button>
+                  </Button>
                 </div>
-                {showColleagueError && (
-                  <div className="ec-handoff__error" role="alert">{t("ec.handoff.email.error")}</div>
-                )}
                 {colleagueError && (
                   <div className="ec-handoff__error" role="alert">{colleagueError}</div>
                 )}
