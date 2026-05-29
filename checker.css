@@ -1386,6 +1386,12 @@
       align-items: center; justify-content: center;
       color: var(--c-muted);
       transition: background .12s, color .12s;
+      /* Subviews use a slide-in animation with animation-fill-mode:
+         both, which leaves transform applied even after the keyframe
+         ends — creating a stacking context that paints over the
+         absolutely-positioned close button and swallows the click.
+         z-index here puts X above any sibling stacking contexts. */
+      z-index: 2;
     }
     .ec-modal__close:hover { background: var(--c-bg); color: var(--c-ink); }
     .ec-modal__title {
