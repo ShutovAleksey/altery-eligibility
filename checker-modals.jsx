@@ -246,6 +246,121 @@ function EcPlanComparisonModal({ activePlanId, recommendedPlanId, onSelect, onCl
   return ReactDOM.createPortal(content, document.body);
 }
 
+// ────────────────────────────────────────────────────────────────
+// EcMethodologyModal — "How we calculated this" disclosure that
+// used to live as an inline <details> expander on the result page.
+// Shows the apples-to-apples line-by-line cost table (subscription /
+// FX / SWIFT / local / total), the per-user assumptions that fed
+// the projection (corridor mix, tx count, fxRatio, FX margins,
+// hidden-cost calibration), and the citation block with per-bank
+// tariff links.
+// ────────────────────────────────────────────────────────────────
+function EcMethodologyModal({ cost, fmtNarrow, onClose }) {
+  const t = useT();
+
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  const lang = (window.__I18N && window.__I18N.getLang && window.__I18N.getLang()) || "en";
+  const asofDisplay = (() => {
+    try {
+      return new Date(cost.methodology.asof).toLocaleDateString(lang, {
+        year: "numeric", month: "short", day: "numeric",
+      });
+    } catch { return cost.methodology.asof; }
+  })();
+
+  const content = (
+    <div className="ec-modal__backdrop" onClick={onClose} role="presentation">
+      <div
+        className="ec-modal ec-modal--method"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="ec-method-modal-title"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="ec-modal__close"
+          onClick={onClose}
+          aria-label={t("common.close")}
+        >
+          <EcIco.close style={{ width: 16, height: 16 }} />
+        </button>
+
+        <h2 id="ec-method-modal-title" className="ec-modal__title">
+          {t("ec.r.method.summary")}
+        </h2>
+
+        <div className="ec-r__method__body">
+          <div className="ec-r__method__lines">
+            <div className="ec-r__method__lineRow ec-r__method__lineRow--head">
+              <span></span>
+              <span>{t("ec.r.savings.altery")}</span>
+              <span>{cost.methodology.baseline}</span>
+            </div>
+            <div className="ec-r__method__lineRow">
+              <span>{t("ec.r.method.line.subscription")}</span>
+              <span>{fmtNarrow(cost.altery.subscription)}</span>
+              <span>{fmtNarrow(cost.bank.subscription || 0)}</span>
+            </div>
+            <div className="ec-r__method__lineRow">
+              <span>{t("ec.r.method.line.fx")}</span>
+              <span>{fmtNarrow(cost.altery.fx)}</span>
+              <span>{fmtNarrow(cost.bank.fx)}</span>
+            </div>
+            <div className="ec-r__method__lineRow">
+              <span>{t("ec.r.method.line.swift")}</span>
+              <span>{fmtNarrow(cost.altery.swift)}</span>
+              <span>{fmtNarrow(cost.bank.swift)}</span>
+            </div>
+            <div className="ec-r__method__lineRow">
+              <span>{t("ec.r.method.line.local")}</span>
+              <span>{fmtNarrow(cost.altery.local)}</span>
+              <span>{fmtNarrow(cost.bank.local)}</span>
+            </div>
+            <div className="ec-r__method__lineRow ec-r__method__lineRow--total">
+              <span>{t("ec.r.method.line.total")}</span>
+              <span>{fmtNarrow(cost.altery.total)}</span>
+              <span>{fmtNarrow(cost.bank.total)}</span>
+            </div>
+          </div>
+
+          <ul className="ec-r__method__assumptions">
+            {cost.methodology.assumptions.map((a, i) => (
+              <li key={i}>{t(a.key, a.vars)}</li>
+            ))}
+          </ul>
+
+          <div className="ec-r__method__sources">
+            {t("ec.r.method.asof", { date: asofDisplay })}
+            {cost.methodology.baselineSources.map((url, i) => (
+              <span key={i}>
+                {" · "}
+                <a href={url} target="_blank" rel="noopener noreferrer">
+                  {t("ec.r.method.sourceLink", {
+                    bank: cost.methodology.baselinePanel?.[i] || cost.methodology.baseline,
+                  })}
+                </a>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return ReactDOM.createPortal(content, document.body);
+}
+
 // Helper: renders the chess-piece icon for a plan tier given its iconKey.
 // Returns null if the icon doesn't exist — defensive against typos.
 function EcPlanIcon({ iconKey, size = 22 }) {
@@ -1356,6 +1471,6 @@ function EcPaymentModal({ activePlan, onClose }) {
 
 Object.assign(window, {
   EcFeesModal,
-  EcPlanComparisonModal, EcPlanIcon, EcPlanCompareCard,
+  EcPlanComparisonModal, EcMethodologyModal, EcPlanIcon, EcPlanCompareCard,
   EcHandoffModal, EcPaymentModal, EcCallbackForm,
 });

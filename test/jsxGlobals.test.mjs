@@ -32,8 +32,8 @@ const RUNTIME_PROVIDED = new Set([
   "Icon", "Flag", "Title", "Field", "WhyWeAsk", "Card", "Spinner", "Modal",
   "useT",
   // Loaded later by other modal/screen files at runtime:
-  "EcIco", "EcFeesModal", "EcPlanComparisonModal", "EcHandoffModal",
-  "EcPaymentModal", "EcCallbackForm",
+  "EcIco", "EcFeesModal", "EcPlanComparisonModal", "EcMethodologyModal",
+  "EcHandoffModal", "EcPaymentModal", "EcCallbackForm",
   // Booking URL lives in /checker-pdf-assets.js (loaded as a separate
   // <script> classic, exported to window). Sandbox doesn't load it.
   "EC_BOOKING_URL",

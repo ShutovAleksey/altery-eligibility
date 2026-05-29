@@ -1499,6 +1499,10 @@ function EcResultApproved({ rec, onBack, onReset }) {
   // Plan comparison modal — local state, opens on "Compare all plans →"
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [feesOpen, setFeesOpen] = useState(false);
+  // Methodology modal — opens on "How we calculated this →", shows the
+  // line-by-line table, assumptions, and tariff source links that
+  // previously lived inside an inline <details> expander.
+  const [methodOpen, setMethodOpen] = useState(false);
 
   // Handoff modal — used now only for the "Email this proposal as PDF"
   // path on the result page (mounts directly at the email stage).
@@ -1578,12 +1582,12 @@ function EcResultApproved({ rec, onBack, onReset }) {
 
   const _displayCurrency = ecDisplayCurrencyFor(rec);
   const fmtNarrow = (n) => ecFmtFromGbp(n, _displayCurrency);
+  // Top "Edit my answers" back-link removed — "Start over" in the
+  // action footer covers the same use-case more visibly. Edit-vs-Start
+  // pair was duplicating intent without giving the user a clearer
+  // way out.
   return (
     <div className="ec-content fade-in">
-      <button className="ob-link-back ec-r__backLink" onClick={onBack} type="button">
-        <EcIco.arrowLeft style={{ width: 14, height: 14 }} /> {t("common.editAnswers")}
-      </button>
-
       <div className="ec-r">
         {/* ───── Hero ─────────────────────────────────────────────────
             Dark gradient card (navy → midnight) with eyebrow + two-line
@@ -1755,12 +1759,20 @@ function EcResultApproved({ rec, onBack, onReset }) {
                   SWIFT fees, so the inline footnote below explains the
                   range rather than competing for headline attention with
                   a second "realistic savings" number. */}
+              {/* When the low-end of the range is 0, the range "£0–£X"
+                  reads as "savings might be zero" — true but bad pitch.
+                  Switch to "Up to £X" framing, which preserves the
+                  upper-bound honesty without anchoring on the floor. */}
               <div className="ec-r__savingsHero">
                 <div className="ec-r__savingsHero__amount">
-                  {t("ec.r.savings.yearRange", { low: fmtNarrow(cost.savings.rangeAnnualLow), high: fmtNarrow(cost.savings.rangeAnnualHigh) })}
+                  {cost.savings.rangeAnnualLow === 0
+                    ? t("ec.r.savings.yearUpTo", { high: fmtNarrow(cost.savings.rangeAnnualHigh) })
+                    : t("ec.r.savings.yearRange", { low: fmtNarrow(cost.savings.rangeAnnualLow), high: fmtNarrow(cost.savings.rangeAnnualHigh) })}
                 </div>
                 <div className="ec-r__savingsHero__year">
-                  {t("ec.r.savings.monthlyRange", { low: fmtNarrow(cost.savings.rangeMonthlyLow), high: fmtNarrow(cost.savings.rangeMonthlyHigh) })}
+                  {cost.savings.rangeMonthlyLow === 0
+                    ? t("ec.r.savings.monthlyUpTo", { high: fmtNarrow(cost.savings.rangeMonthlyHigh) })
+                    : t("ec.r.savings.monthlyRange", { low: fmtNarrow(cost.savings.rangeMonthlyLow), high: fmtNarrow(cost.savings.rangeMonthlyHigh) })}
                 </div>
               </div>
 
@@ -1800,70 +1812,17 @@ function EcResultApproved({ rec, onBack, onReset }) {
               <p className="ec-r__savings__note">
                 {t("ec.r.savings.note", { volume: fmtNarrow(rec.monthlyVolume) })}
               </p>
-              <details className="ec-r__method">
-                <summary className="ec-r__method__summary">{t("ec.r.method.summary")}</summary>
-                <div className="ec-r__method__body">
-                  <div className="ec-r__method__lines">
-                    <div className="ec-r__method__lineRow ec-r__method__lineRow--head">
-                      <span></span>
-                      <span>{t("ec.r.savings.altery")}</span>
-                      <span>{cost.methodology.baseline}</span>
-                    </div>
-                    <div className="ec-r__method__lineRow">
-                      <span>{t("ec.r.method.line.subscription")}</span>
-                      <span>{fmtNarrow(cost.altery.subscription)}</span>
-                      <span>{fmtNarrow(cost.bank.subscription || 0)}</span>
-                    </div>
-                    <div className="ec-r__method__lineRow">
-                      <span>{t("ec.r.method.line.fx")}</span>
-                      <span>{fmtNarrow(cost.altery.fx)}</span>
-                      <span>{fmtNarrow(cost.bank.fx)}</span>
-                    </div>
-                    <div className="ec-r__method__lineRow">
-                      <span>{t("ec.r.method.line.swift")}</span>
-                      <span>{fmtNarrow(cost.altery.swift)}</span>
-                      <span>{fmtNarrow(cost.bank.swift)}</span>
-                    </div>
-                    <div className="ec-r__method__lineRow">
-                      <span>{t("ec.r.method.line.local")}</span>
-                      <span>{fmtNarrow(cost.altery.local)}</span>
-                      <span>{fmtNarrow(cost.bank.local)}</span>
-                    </div>
-                    <div className="ec-r__method__lineRow ec-r__method__lineRow--total">
-                      <span>{t("ec.r.method.line.total")}</span>
-                      <span>{fmtNarrow(cost.altery.total)}</span>
-                      <span>{fmtNarrow(cost.bank.total)}</span>
-                    </div>
-                  </div>
-                  <ul className="ec-r__method__assumptions">
-                    {cost.methodology.assumptions.map((a, i) => (
-                      <li key={i}>{t(a.key, a.vars)}</li>
-                    ))}
-                  </ul>
-                  <div className="ec-r__method__sources">
-                    {t("ec.r.method.asof", {
-                      date: (() => {
-                        try {
-                          return new Date(cost.methodology.asof).toLocaleDateString(
-                            window.__I18N?.getLang?.() || "en",
-                            { year: "numeric", month: "short", day: "numeric" }
-                          );
-                        } catch { return cost.methodology.asof; }
-                      })(),
-                    })}
-                    {cost.methodology.baselineSources.map((url, i) => (
-                      <span key={i}>
-                        {" · "}
-                        <a href={url} target="_blank" rel="noopener noreferrer">
-                          {t("ec.r.method.sourceLink", {
-                            bank: cost.methodology.baselinePanel?.[i] || cost.methodology.baseline,
-                          })}
-                        </a>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </details>
+              {/* "How we calculated this" used to be an inline <details>
+                  expander. Promoted to a modal trigger (same visual
+                  pattern as "Compare all plans →") so the dense line-
+                  by-line table + assumptions + bank tariff sources
+                  don't extend the result page itself. */}
+              <div className="ec-r__method">
+                <button type="button" className="ec-r__planFoot__link"
+                        onClick={() => setMethodOpen(true)}>
+                  {t("ec.r.method.summary")} →
+                </button>
+              </div>
             </section>
           )}
 
@@ -1966,6 +1925,14 @@ function EcResultApproved({ rec, onBack, onReset }) {
           plan={activePlan}
           entity={entity}
           onClose={() => setFeesOpen(false)}
+        />
+      )}
+
+      {methodOpen && (
+        <EcMethodologyModal
+          cost={cost}
+          fmtNarrow={fmtNarrow}
+          onClose={() => setMethodOpen(false)}
         />
       )}
 
