@@ -1797,33 +1797,34 @@
        numbered rows keep momentum past the success state without
        making it feel like another task. First row is pre-completed
        (with a checkmark) to anchor a "you're 1/3 done" feeling. */
-    /* Sent-stage collapsible follow-ups (share-with-team, talk-to-team).
-       Both closed by default; click expands the form inline. Visually
-       calm tile pattern so they don't compete with the primary
-       "Start setup now" CTA above them. */
+    /* Sent-stage secondary actions — clickable tile cards sitting
+       between the lead text and the primary CTA. Click on a tile
+       slides the whole modal to the corresponding form view (forward
+       to colleague / request callback) via the slide-in animation on
+       .ec-handoff__subView below. Chevrons point right to telegraph
+       "this leads to another view", not "this expands here". */
     .ec-handoff__followups {
       display: flex; flex-direction: column;
       gap: 10px;
-      margin-top: 16px;
+      margin: 16px 0;
     }
     .ec-handoff__followup {
+      width: 100%;
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
       border: 1px solid var(--c-border);
       border-radius: 12px;
       background: var(--c-surface);
       text-align: left;
-      overflow: hidden;
-    }
-    .ec-handoff__followup__head {
-      width: 100%;
-      display: flex; align-items: center; gap: 12px;
-      padding: 14px 16px;
-      background: transparent;
-      border: 0;
-      cursor: pointer;
-      text-align: left;
       font: inherit;
+      cursor: pointer;
+      transition: border-color 0.15s var(--easing-out), background 0.15s var(--easing-out);
     }
-    .ec-handoff__followup__head > div { flex: 1 1 auto; min-width: 0; }
+    .ec-handoff__followup:hover {
+      border-color: var(--c-accent);
+      background: var(--c-accent-soft);
+    }
+    .ec-handoff__followup__text { flex: 1 1 auto; min-width: 0; }
     .ec-handoff__followup__title {
       font-size: 14px; font-weight: 600;
       color: var(--c-ink);
@@ -1837,15 +1838,31 @@
     .ec-handoff__followup__chev {
       flex: 0 0 14px;
       color: var(--c-muted);
-      transition: transform 0.18s var(--easing-out);
     }
-    .ec-handoff__followup.is-open .ec-handoff__followup__chev {
-      transform: rotate(180deg);
+    /* Slide-in animation when a sent-stage subview enters. React's
+       key={view} ensures the new node mounts fresh, so the keyframe
+       fires every transition. Height re-flows naturally (no fixed
+       height on the modal). */
+    .ec-handoff__subView {
+      animation: ec-handoff-slide 0.22s var(--easing-out) both;
     }
-    .ec-handoff__followup__panel {
-      padding: 4px 16px 16px;
-      border-top: 1px solid var(--c-border-soft);
+    @keyframes ec-handoff-slide {
+      from { transform: translateX(16px); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
     }
+    /* Back link at the top of forward / callback subviews. Quiet,
+       muted, sits above the title — same pattern as ob-link-back
+       used elsewhere on the checker. */
+    .ec-handoff__back {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: 0; padding: 0;
+      margin: 0 0 12px;
+      font: inherit;
+      font-size: 13px; font-weight: 500;
+      color: var(--c-muted);
+      cursor: pointer;
+    }
+    .ec-handoff__back:hover { color: var(--c-ink); }
     .ec-handoff__nextSteps {
       margin: 18px 0 6px;
       padding: 16px 18px;

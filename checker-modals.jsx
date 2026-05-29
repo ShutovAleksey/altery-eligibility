@@ -602,12 +602,12 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
   const [colleagueSubmitting, setColleagueSubmitting] = useState(false);
   const [colleagueSent, setColleagueSent] = useState(false);
   const [colleagueError, setColleagueError] = useState(null);
-  // Collapsible secondary actions on the sent stage. Both panels start
-  // closed — sent-stage primary CTA (Start setup now) is the conversion
-  // goal; share-to-colleague and request-callback are alternatives a
-  // user can deliberately open without competing for screen attention.
-  const [colleagueOpen, setColleagueOpen] = useState(false);
-  const [callbackOpen, setCallbackOpen] = useState(false);
+  // Sent-stage view router. "options" = success + two tile choices +
+  // primary CTA; "forward" = colleague-share form (back arrow returns
+  // to options); "callback" = callback-form (back arrow returns).
+  // Switching views slides content right; modal height re-flows
+  // naturally to fit the new view (no fixed height).
+  const [sentView, setSentView] = useState("options");
 
   // Engagement signal for the next-steps checklist on the sent stage.
   // colleagueSent → step 2 ("Forward to your CFO or co-founder") flips done.
@@ -808,8 +808,8 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
           );
         })()}
 
-        {stage === "sent" && (
-          <>
+        {stage === "sent" && sentView === "options" && (
+          <div key="options" className="ec-handoff__subView">
             <div className="ec-handoff__successIcon" aria-hidden="true">
               <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                 <circle cx="16" cy="16" r="15" stroke="currentColor" strokeWidth="2"/>
@@ -819,10 +819,39 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
             <h2 id="ec-handoff-title" className="ec-modal__title">{t("ec.handoff.sent.title")}</h2>
             <p className="ec-handoff__lead">{t("ec.handoff.sent.lead", { email })}</p>
 
-            {/* Primary CTA leads — head straight to setup. Sat at the
-                bottom in the old "do these 3 things" layout; promoted
-                here so the conversion path is the dominant first action
-                after the user reads the lead. */}
+            {/* Two secondary actions sit BETWEEN lead and primary CTA.
+                Each is a clickable tile with a right-pointing chevron;
+                click slides the modal to the corresponding form view.
+                Replaces the previous in-place accordion expansion. */}
+            <div className="ec-handoff__followups">
+              <button type="button"
+                      className="ec-handoff__followup"
+                      onClick={() => setSentView("forward")}>
+                <div className="ec-handoff__followup__text">
+                  <div className="ec-handoff__followup__title">{t("ec.handoff.sent.step2.title")}</div>
+                  <div className="ec-handoff__followup__body">{t("ec.handoff.sent.step2.body")}</div>
+                </div>
+                <svg className="ec-handoff__followup__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+
+              <button type="button"
+                      className="ec-handoff__followup"
+                      onClick={() => setSentView("callback")}>
+                <div className="ec-handoff__followup__text">
+                  <div className="ec-handoff__followup__title">{t("ec.callback.title")}</div>
+                  <div className="ec-handoff__followup__body">{t("ec.callback.sla")}</div>
+                </div>
+                <svg className="ec-handoff__followup__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </button>
+            </div>
+
+            {/* Primary CTA — start setup. Sits at the bottom of the
+                options view so the secondary tiles are visible above
+                it without competing visually. */}
             <div className="ec-handoff__actions">
               <Button
                 variant="primary"
@@ -833,94 +862,78 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                 {t("ec.handoff.continueAnyway")}
               </Button>
             </div>
+          </div>
+        )}
 
-            {/* Two collapsible secondary actions. Both closed by default
-                so they don't compete with the Start-setup CTA above.
-                Title + 1-line description visible at all times so the
-                user knows the option exists; click expands the form
-                inline. Replaces the previous numbered "do these 3
-                things" checklist + always-visible side form. */}
-            <div className="ec-handoff__followups">
-              {/* — Share with team / forward to CFO ——————————————— */}
-              <div className={"ec-handoff__followup" + (colleagueOpen || colleagueSent ? " is-open" : "")}>
-                <button type="button"
-                        className="ec-handoff__followup__head"
-                        onClick={() => setColleagueOpen((o) => !o)}
-                        aria-expanded={colleagueOpen || colleagueSent}>
-                  <div>
-                    <div className="ec-handoff__followup__title">{t("ec.handoff.sent.step2.title")}</div>
-                    <div className="ec-handoff__followup__body">{t("ec.handoff.sent.step2.body")}</div>
-                  </div>
-                  <svg className="ec-handoff__followup__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                {(colleagueOpen || colleagueSent) && (
-                  <div className="ec-handoff__followup__panel">
-                    {!colleagueSent ? (
-                      <>
-                        <div className="ec-handoff__colleague__row">
-                          <input
-                            type="email"
-                            inputMode="email"
-                            autoComplete="off"
-                            className={"ec-handoff__colleague__input" + (showColleagueError ? " is-error" : "")}
-                            placeholder={t("ec.handoff.sent.colleague.placeholder")}
-                            value={colleagueEmail}
-                            onChange={(e) => setColleagueEmail(e.target.value)}
-                            onBlur={() => setColleagueTouched(true)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter" && isColleagueValid && !colleagueSubmitting) sendColleagueCopy();
-                            }}
-                            disabled={colleagueSubmitting}
-                          />
-                          <button
-                            type="button"
-                            className="ec-handoff__colleague__btn"
-                            onClick={sendColleagueCopy}
-                            disabled={colleagueSubmitting || !isColleagueValid}
-                          >
-                            {colleagueSubmitting ? t("ec.handoff.submitting") : t("ec.handoff.sent.colleague.send")}
-                          </button>
-                        </div>
-                        {showColleagueError && (
-                          <div className="ec-handoff__error" role="alert">{t("ec.handoff.email.error")}</div>
-                        )}
-                        {colleagueError && (
-                          <div className="ec-handoff__error" role="alert">{colleagueError}</div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="ec-handoff__colleague__success">
-                        ✓ {t("ec.handoff.sent.colleague.success", { email: colleagueEmail })}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+        {stage === "sent" && sentView === "forward" && (
+          <div key="forward" className="ec-handoff__subView">
+            <button type="button"
+                    className="ec-handoff__back"
+                    onClick={() => setSentView("options")}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              {t("common.back")}
+            </button>
+            <h2 id="ec-handoff-title" className="ec-modal__title">{t("ec.handoff.sent.step2.title")}</h2>
+            <p className="ec-handoff__lead">{t("ec.handoff.sent.step2.body")}</p>
 
-              {/* — Talk to our team / request callback ————————————— */}
-              <div className={"ec-handoff__followup" + (callbackOpen ? " is-open" : "")}>
-                <button type="button"
-                        className="ec-handoff__followup__head"
-                        onClick={() => setCallbackOpen((o) => !o)}
-                        aria-expanded={callbackOpen}>
-                  <div>
-                    <div className="ec-handoff__followup__title">{t("ec.callback.title")}</div>
-                    <div className="ec-handoff__followup__body">{t("ec.callback.sla")}</div>
-                  </div>
-                  <svg className="ec-handoff__followup__chev" width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                    <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </button>
-                {callbackOpen && (
-                  <div className="ec-handoff__followup__panel">
-                    <EcCallbackForm email={email} rec={rec} />
-                  </div>
+            {!colleagueSent ? (
+              <>
+                <div className="ec-handoff__colleague__row">
+                  <input
+                    type="email"
+                    inputMode="email"
+                    autoComplete="off"
+                    className={"ec-handoff__colleague__input" + (showColleagueError ? " is-error" : "")}
+                    placeholder={t("ec.handoff.sent.colleague.placeholder")}
+                    value={colleagueEmail}
+                    onChange={(e) => setColleagueEmail(e.target.value)}
+                    onBlur={() => setColleagueTouched(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && isColleagueValid && !colleagueSubmitting) sendColleagueCopy();
+                    }}
+                    disabled={colleagueSubmitting}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    className="ec-handoff__colleague__btn"
+                    onClick={sendColleagueCopy}
+                    disabled={colleagueSubmitting || !isColleagueValid}
+                  >
+                    {colleagueSubmitting ? t("ec.handoff.submitting") : t("ec.handoff.sent.colleague.send")}
+                  </button>
+                </div>
+                {showColleagueError && (
+                  <div className="ec-handoff__error" role="alert">{t("ec.handoff.email.error")}</div>
                 )}
+                {colleagueError && (
+                  <div className="ec-handoff__error" role="alert">{colleagueError}</div>
+                )}
+              </>
+            ) : (
+              <div className="ec-handoff__colleague__success">
+                ✓ {t("ec.handoff.sent.colleague.success", { email: colleagueEmail })}
               </div>
-            </div>
-          </>
+            )}
+          </div>
+        )}
+
+        {stage === "sent" && sentView === "callback" && (
+          <div key="callback" className="ec-handoff__subView">
+            <button type="button"
+                    className="ec-handoff__back"
+                    onClick={() => setSentView("options")}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              {t("common.back")}
+            </button>
+            <h2 id="ec-handoff-title" className="ec-modal__title">{t("ec.callback.title")}</h2>
+            <p className="ec-handoff__lead">{t("ec.callback.sla")}</p>
+            <EcCallbackForm email={email} rec={rec} />
+          </div>
         )}
       </div>
     </div>
