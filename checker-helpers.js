@@ -765,6 +765,190 @@ function ecQualitativeMatrix(rec) {
   };
 }
 
+// ─── Region-aware two-panel comparison (price + capability) ─────
+//
+// Strategy: split the single 6-column "all comparators" view into two
+// focused tables that pick comparators where Altery wins each axis.
+//
+//   Price panel  — Altery + 3 traditional banks for the user's region.
+//                  Altery is 4-7x cheaper on FX and SWIFT, opens
+//                  accounts in days vs weeks, publishes every fee.
+//   Capability panel — Altery + 2-3 neobanks. Altery has crypto rails,
+//                  multi-company management, three regulated entities
+//                  in one product, accepts affiliate/creator; the
+//                  neobanks don't.
+//
+// Picking different comparators per axis avoids the "Wise is cheaper
+// than Altery Pro on FX" honesty problem — Wise simply doesn't appear
+// in the price table where its FX-floor wins. Instead it appears in
+// the capability table where it loses (no crypto, no multi-entity).
+//
+// MENA users get only the price panel: no major neobank operates in
+// MENA with a local regulated presence, so capability comparison is
+// vs. nothing — we surface that uniqueness via a callout instead.
+
+// Internal: pick comparators by region from EC_COMPARATORS.
+function ecComparatorGroups(rec) {
+  const cmp = window.EC_COMPARATORS || {};
+  const entityId = (rec?.entity?.id || "uk").toLowerCase();
+  const altery = cmp.altery;
+  if (entityId === "eu") {
+    return {
+      price: [
+        altery,
+        cmp.eu_traditional, // BNP Paribas (lead)
+        cmp.eu_sg,
+        cmp.eu_deutsche,
+      ].filter(Boolean),
+      capability: [
+        altery,
+        cmp.wise,
+        cmp.revolut,
+        cmp.qonto,
+      ].filter(Boolean),
+    };
+  }
+  if (entityId === "mena") {
+    return {
+      price: [
+        altery,
+        cmp.mena_traditional, // Mashreq (lead)
+        cmp.mena_enbd,
+        cmp.mena_fab,
+      ].filter(Boolean),
+      // No major neobank operates in MENA with a local regulated
+      // presence — show a "unique in this region" callout instead of
+      // an empty capability table. The PDF renderer reads this null.
+      capability: null,
+    };
+  }
+  // UK + ROW default
+  return {
+    price: [
+      altery,
+      cmp.uk_traditional, // Barclays (lead)
+      cmp.uk_hsbc,
+      cmp.uk_lloyds,
+    ].filter(Boolean),
+    capability: [
+      altery,
+      cmp.wise,
+      cmp.revolut,
+      cmp.three_s_money,
+    ].filter(Boolean),
+  };
+}
+
+// Resolve a single cell — kind discriminates how the renderer
+// (PDF / future on-screen / email) draws it.
+function ecCellFor(cmpObj, rowKey, planFees) {
+  const q = cmpObj.qualitative || {};
+  const fees = cmpObj.fees || {};
+  if (rowKey === "onboarding") {
+    return { kind: "i18n", value: q.onboardingKey || "ec.cmp.q.onboarding.weeks" };
+  }
+  if (rowKey === "fxMarkup") {
+    if (cmpObj.id === "altery") return { kind: "text", value: planFees.fxMarkup || "up to 0.7%" };
+    if (q.fxMarkup) return { kind: "text", value: q.fxMarkup };
+    if (typeof fees.fxMarkupBps === "number") {
+      return { kind: "text", value: `${(fees.fxMarkupBps / 100).toFixed(2)}%` };
+    }
+    return { kind: "text", value: "—" };
+  }
+  if (rowKey === "swiftOut") {
+    if (cmpObj.id === "altery") return { kind: "text", value: planFees.swift || "€10 + 0.25%" };
+    if (q.swiftOut) return { kind: "text", value: q.swiftOut };
+    if (typeof fees.swiftOutGbp === "number") {
+      return { kind: "text", value: `£${fees.swiftOutGbp}` };
+    }
+    return { kind: "text", value: "—" };
+  }
+  if (rowKey === "accountOpening") {
+    if (cmpObj.id === "altery") return { kind: "i18n", value: "ec.cmp.v.free" };
+    if (typeof fees.accountOpeningGbp === "number" && fees.accountOpeningGbp > 0) {
+      return { kind: "text", value: `£${fees.accountOpeningGbp}` };
+    }
+    // Most banks: "Free with conditions" (min balance / activity), most
+    // neobanks free, traditional MENA banks usually ~AED 500-1000.
+    return { kind: "i18n", value: cmpObj.type === "traditional" ? "ec.cmp.v.freeStar" : "ec.cmp.v.free" };
+  }
+  if (rowKey === "docFriction") {
+    return { kind: "state", value: q.docFriction || "high" };
+  }
+  if (rowKey === "api") {
+    if (cmpObj.id === "altery") return { kind: "yes" };
+    // Wise has API on paid tier, Revolut limited (Sandbox + Live but
+    // narrow scope), Qonto API on higher plans, 3S Money no, banks no
+    // at SME tier (corporate desk only).
+    if (cmpObj.id === "wise" || cmpObj.id === "revolut" || cmpObj.id === "qonto") {
+      return { kind: "state", value: "limited" };
+    }
+    return { kind: "no" };
+  }
+  if (rowKey === "multiJurisdiction") {
+    // Altery is the only product with UK FCA + EU CBC + DIFC DFSA
+    // under one login. Others have multiple legal entities but each
+    // requires a separate account or partner integration.
+    if (cmpObj.id === "altery") return { kind: "yes" };
+    return { kind: "no" };
+  }
+  // Generic boolean / tri-state row (crypto, affiliate, multiEntity,
+  // digitalNative). Falls through to qualitative[rowKey].
+  const v = q[rowKey];
+  if (v === true) return { kind: "yes" };
+  if (v === false) return { kind: "no" };
+  if (typeof v === "string") return { kind: "state", value: v };
+  return { kind: "text", value: "—" };
+}
+
+// Build the price-focused comparison panel. Rows are picked to
+// emphasise Altery's pricing wins against the traditional bank
+// baseline for the user's region.
+function ecPricePanel(rec) {
+  const groups = ecComparatorGroups(rec);
+  const comparators = groups.price;
+  if (!comparators || comparators.length === 0) return null;
+  const planFees = rec?.plan?.fees || {};
+  const rows = [
+    { key: "onboarding",     labelKey: "ec.cmp.row.onboarding" },
+    { key: "fxMarkup",       labelKey: "ec.cmp.row.fxMarkup" },
+    { key: "swiftOut",       labelKey: "ec.cmp.row.swiftOut" },
+    { key: "accountOpening", labelKey: "ec.cmp.row.accountOpening" },
+    { key: "docFriction",    labelKey: "ec.cmp.row.docFriction" },
+  ];
+  return {
+    comparators,
+    rows: rows.map((r) => ({
+      ...r,
+      cells: comparators.map((c) => ecCellFor(c, r.key, planFees)),
+    })),
+  };
+}
+
+// Build the capability-focused comparison panel. For MENA returns
+// null — the PDF renderer surfaces a "unique in MENA" callout instead.
+function ecCapabilityPanel(rec) {
+  const groups = ecComparatorGroups(rec);
+  const comparators = groups.capability;
+  if (!comparators || comparators.length === 0) return null;
+  const planFees = rec?.plan?.fees || {};
+  const rows = [
+    { key: "cryptoNative",      labelKey: "ec.cmp.row.crypto" },
+    { key: "multiEntity",       labelKey: "ec.cmp.row.multiEntity" },
+    { key: "affiliate",         labelKey: "ec.cmp.row.affiliate" },
+    { key: "api",               labelKey: "ec.cmp.row.api" },
+    { key: "multiJurisdiction", labelKey: "ec.cmp.row.multiJurisdiction" },
+    { key: "onboarding",        labelKey: "ec.cmp.row.onboarding" },
+  ];
+  return {
+    comparators,
+    rows: rows.map((r) => ({
+      ...r,
+      cells: comparators.map((c) => ecCellFor(c, r.key, planFees)),
+    })),
+  };
+}
+
 // Translate an annual-savings number into 1-3 tangible business
 // outcomes the customer can visualize. Engages future-self
 // simulation — the savings number stops being abstract and
@@ -1121,6 +1305,7 @@ Object.assign(window, {
   ecCurrencyFlag, ecCurrencyName, ecRecommend,
   ecEstimateTxCount, ecComputeCostBreakdown, ecOutcomesForSavings,
   ecBaselineFor, ecQualitativeMatrix, ecCapabilityMatrix,
+  ecComparatorGroups, ecPricePanel, ecCapabilityPanel,
   ecConfidenceLevel, ecFxVolumeRatio, ecLocalSwiftSplit, ecAvgTxGbp,
   ecVolumeHintKey, ecFormatVolume, ecEstimateSavings,
   ecCheckerContext, ecBookingUrl, ecContactRequestUrl, ecSubmitHubspotLead, ecGenProposalRef,

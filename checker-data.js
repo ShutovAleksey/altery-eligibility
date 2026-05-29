@@ -1052,7 +1052,7 @@ const EC_COMPARATORS = {
     name: "Wise Business",
     type: "neobank",
     asof: "2026-05-29",
-    sources: ["https://wise.com/help/articles/2978049/where-can-i-use-wise"],
+    sources: ["https://wise.com/gb/pricing/business"],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
       digitalNative: "partial",     // accepts SaaS but not high-risk
@@ -1060,7 +1060,7 @@ const EC_COMPARATORS = {
       cryptoNative:  false,         // explicitly banned
       multiEntity:   false,
       docFriction:   "medium",
-      fxMarkup:      "0.43-0.65%",
+      fxMarkup:      "from 0.33%",  // verified against wise.com/gb/pricing/business 2026-05-29
       swiftOut:      "£5-15",
     },
   },
@@ -1122,7 +1122,7 @@ const EC_COMPARATORS = {
     name: "Payset",
     type: "neobank",
     asof: "2026-05-29",
-    sources: ["https://www.payset.io/multi-currency-account/"],
+    sources: ["https://www.payset.io/pricing"],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
       digitalNative: "partial",
@@ -1130,8 +1130,30 @@ const EC_COMPARATORS = {
       cryptoNative:  false,
       multiEntity:   false,
       docFriction:   "medium",
-      fxMarkup:      "0.5-1.5%",
-      swiftOut:      "£10-20",
+      fxMarkup:      "On request",
+      swiftOut:      "from £8 + 0.3%",
+    },
+  },
+  // EU-strong neobank — France/DE/ES/IT/PT licenses, B2B focused.
+  // Qonto wins on UX vs traditional EU banks but, like every other
+  // neobank in the comparison, can't host crypto businesses, doesn't
+  // offer multi-company management, and doesn't span three regulated
+  // entities the way Altery does. Goes into the EU capability table.
+  qonto: {
+    id: "qonto",
+    name: "Qonto",
+    type: "neobank",
+    asof: "2026-05-29",
+    sources: ["https://qonto.com/en/pricing"],
+    qualitative: {
+      onboardingKey: "ec.cmp.q.onboarding.days",
+      digitalNative: "partial",
+      affiliate:     "caseByCase",
+      cryptoNative:  false,
+      multiEntity:   false,
+      docFriction:   "medium",
+      fxMarkup:      "0.65-1.5%",
+      swiftOut:      "€5-15",
     },
   },
   // ── Altery — the reference row in both panels ───────────────────

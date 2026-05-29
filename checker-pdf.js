@@ -450,15 +450,21 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         </div>`).join("")}
     </div>` : "";
 
-  // Multi-comparator qualitative matrix — the same matrix that used to
-  // live on the result page, moved here. Six columns (Altery + the
-  // entity-matched traditional bank + 4 neobanks), eight rows
-  // (onboarding, digital-native acceptance, affiliate/creator, crypto,
-  // multi-entity, FX margin, SWIFT outgoing, doc friction). Lives in
-  // the PDF because the considered-evaluation context (CFO opens to
-  // study) suits multi-comparator density; the live result page is
-  // optimised for scanning, so it stays clean.
-  const matrix = ecQualitativeMatrix(rec);
+  // Two-panel comparison — replaces the single 6-column "all comparators"
+  // matrix. Strategy: split the same width across two focused tables,
+  // each picking comparators where Altery has a clear win on that axis.
+  //   • Price panel — Altery + 3 traditional banks for the user's region.
+  //     Altery winsruntime on FX margin, SWIFT outgoing, onboarding speed,
+  //     account opening, and pricing transparency.
+  //   • Capability panel — Altery + 2-3 neobanks (Wise / Revolut / 3S
+  //     Money for UK, Qonto added for EU). Altery winsruntime on crypto
+  //     acceptance, multi-company management, affiliate/creator support,
+  //     B2B API, and three-jurisdiction unified product.
+  // For MENA users the capability panel is skipped (no major neobank
+  // operates locally with regulated presence) — surfaced as a callout.
+  const pricePanel = (typeof ecPricePanel === "function") ? ecPricePanel(rec) : null;
+  const capPanel   = (typeof ecCapabilityPanel === "function") ? ecCapabilityPanel(rec) : null;
+
   const renderCell = (cell) => {
     if (cell.kind === "yes")   return `<span style="color:${C.success};font-weight:700;">✓</span>`;
     if (cell.kind === "no")    return `<span style="color:${C.muted};font-weight:500;">—</span>`;
@@ -466,66 +472,57 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
     if (cell.kind === "state") return `<span>${t("ec.cmp.state." + cell.value)}</span>`;
     return `<span>${cell.value || "—"}</span>`;
   };
-  const matrixThStyle = (isUs) =>
+  const panelThStyle = (isUs) =>
     `text-align:center;font-size:10.5px;font-weight:700;padding:10px 8px;border-bottom:1px solid ${C.border};letter-spacing:-0.005em;` +
     (isUs ? `color:${C.primary};` : `color:${C.inkSoft};`);
-  const matrixRowThStyle = `text-align:left;font-size:11.5px;font-weight:500;color:${C.muted};padding:10px 14px;`;
-  const matrixTdStyle = (isUs) =>
+  const panelRowThStyle = `text-align:left;font-size:11.5px;font-weight:500;color:${C.muted};padding:10px 14px;`;
+  const panelTdStyle = (isUs) =>
     `text-align:center;font-size:11.5px;padding:10px 8px;` +
     (isUs ? `background:${C.beige};color:${C.primary};font-weight:600;` : `color:${C.ink};`);
-  const comparisonHTML = `
-    <div style="margin:0 0 30px;">
-      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 14px;">${t("ec.cmp.head")}</div>
+
+  const renderPanel = (panel, eyebrowKey, titleKey) => `
+    <div style="margin:0 0 24px;">
+      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">${t(eyebrowKey)}</div>
+      <h2 style="font-size:17px;font-weight:700;color:${C.ink};margin:0 0 12px;letter-spacing:-0.01em;">${t(titleKey)}</h2>
       <table style="width:100%;border-collapse:collapse;background:${C.surface};border:1px solid ${C.border};border-radius:12px;overflow:hidden;">
         <thead>
           <tr style="background:${C.white};">
-            <th style="${matrixThStyle(false)}text-align:left;padding-left:14px;width:30%;"></th>
-            ${matrix.comparators.map((c) => `
-              <th style="${matrixThStyle(c.id === "altery")}">${c.name}</th>`).join("")}
+            <th style="${panelThStyle(false)}text-align:left;padding-left:14px;width:30%;"></th>
+            ${panel.comparators.map((c) => `
+              <th style="${panelThStyle(c.id === "altery")}">${c.name}</th>`).join("")}
           </tr>
         </thead>
         <tbody>
-          ${matrix.rows.map((row, i) => `
+          ${panel.rows.map((row, i) => `
             <tr ${i > 0 ? `style="border-top:1px solid ${C.border};"` : ""}>
-              <td style="${matrixRowThStyle}">${t(row.labelKey)}</td>
+              <td style="${panelRowThStyle}">${t(row.labelKey)}</td>
               ${row.cells.map((cell, j) => `
-                <td style="${matrixTdStyle(matrix.comparators[j].id === "altery")}">${renderCell(cell)}</td>`).join("")}
+                <td style="${panelTdStyle(panel.comparators[j].id === "altery")}">${renderCell(cell)}</td>`).join("")}
             </tr>`).join("")}
         </tbody>
       </table>
-      <div style="font-size:10px;color:${C.muted};line-height:15px;margin-top:8px;">${t("ec.cmp.note")}</div>
     </div>`;
 
-  // Capability matrix — Altery wins / Roughly equal / Where bank
-  // may still win. Three-section narrative read that lives only in
-  // the PDF and email (too dense for the live result page).
-  //
-  // The bank-wins section is the trust-driver: conceding 3-4 areas
-  // where the bank does something we don't makes the entire
-  // analysis read as honest comparison, not marketing copy.
-  const cap = ecCapabilityMatrix(rec);
-  const capColBg = { wins: C.beige, equal: C.surface, bank: "#FFF4E5" };
-  const capColBorder = { wins: C.beigeBorder, equal: C.border, bank: "#F2D9B8" };
-  const capCol = (kind, head, rows) => `
-    <div style="flex:1 1 200px;background:${capColBg[kind]};border:1px solid ${capColBorder[kind]};border-radius:12px;padding:14px 16px;min-width:0;">
-      <div style="font-size:11px;font-weight:700;color:${C.ink};margin:0 0 10px;letter-spacing:0.005em;">${head}</div>
-      ${rows.map((r) => `
-        <div style="margin:0 0 10px;">
-          <div style="font-size:12px;font-weight:600;color:${C.ink};line-height:17px;">${t(r.titleKey)}</div>
-          <div style="font-size:11px;color:${C.inkSoft};line-height:16px;margin-top:2px;">${t(r.detailKey)}</div>
-        </div>`).join("")}
-    </div>`;
-  const capabilityHTML = `
-    <div style="margin:0 0 30px;page-break-inside:avoid;">
-      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">${t("ec.cap.eyebrow")}</div>
-      <h2 style="font-size:17px;font-weight:700;color:${C.ink};margin:0 0 6px;letter-spacing:-0.01em;">${t("ec.cap.title")}</h2>
-      <div style="font-size:12px;color:${C.inkSoft};line-height:17px;margin:0 0 14px;max-width:560px;">${t("ec.cap.lead")}</div>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        ${capCol("wins",  t("ec.cap.section.wins"),       cap.alteryWins)}
-        ${capCol("equal", t("ec.cap.section.comparable"), cap.comparable)}
-        ${capCol("bank",  t("ec.cap.section.bankWins", { bank: cap.bankName }), cap.bankWins)}
-      </div>
-    </div>`;
+  // MENA-only callout: replaces the capability table when no major
+  // digital-first competitor operates with a local regulated presence
+  // in the region. The angle is uniqueness ("only neobank with DFSA"),
+  // not a row-by-row comparison.
+  const menaCalloutHTML = (rec?.entity?.id === "mena") ? `
+    <div style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;padding:18px 22px;margin:0 0 24px;">
+      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px;">${t("ec.cmp.menaCallout.eyebrow")}</div>
+      <h2 style="font-size:15px;font-weight:700;color:${C.ink};margin:0 0 6px;letter-spacing:-0.01em;">${t("ec.cmp.menaCallout.title")}</h2>
+      <p style="font-size:12.5px;line-height:19px;color:${C.inkSoft};margin:0;">${t("ec.cmp.menaCallout.body")}</p>
+    </div>` : "";
+
+  const comparisonHTML = `
+    ${pricePanel ? renderPanel(pricePanel, "ec.cmp.price.eyebrow", "ec.cmp.price.title") : ""}
+    ${capPanel   ? renderPanel(capPanel,   "ec.cmp.capability.eyebrow", "ec.cmp.capability.title") : menaCalloutHTML}
+    <div style="font-size:10px;color:${C.muted};line-height:15px;margin:-6px 0 30px;">${t("ec.cmp.note")}</div>`;
+
+  // capabilityHTML is unused (the "Where Altery wins / Roughly equal /
+  // Bank wins" 3-column block was retired 2026-05-29 in favour of the
+  // two-panel comparison above). Variable kept absent intentionally.
+  const capabilityHTML = "";
 
   // Onboarding checklist — neutralizes the #1 friction: "what do
   // I need to prepare?" By spelling it out before they ask, we
