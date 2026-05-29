@@ -10,6 +10,11 @@ node_modules/
 # part of the deployable repo.
 claude-code-context.zip
 
+# Local-only working context — drafts, briefs, research artefacts,
+# bug-tracking notes. Lives on disk for the author's reference but
+# isn't part of the deployable repo or commit history.
+context/
+
 # OS / editor junk
 Thumbs.db
 .vscode/

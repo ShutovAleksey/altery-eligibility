@@ -768,7 +768,6 @@
   // terminology that the audience already recognises.
   Object.assign(D.de, {
     "ec.r.plan.compare.title": "Finden Sie den passenden Tarif",
-    "ec.r.plan.compare.recommended": "Für Sie empfohlen",
     "ec.r.plan.compare.wasRecommended": "Ursprünglich empfohlen",
     "ec.r.plan.compare.switch": "Zu diesem Tarif wechseln",
     "ec.r.plan.compare.featuresHead": "Funktionen",
@@ -782,7 +781,6 @@
   });
   Object.assign(D.nl, {
     "ec.r.plan.compare.title": "Vind het juiste plan voor uw behoeften",
-    "ec.r.plan.compare.recommended": "Voor u aanbevolen",
     "ec.r.plan.compare.wasRecommended": "Oorspronkelijk aanbevolen",
     "ec.r.plan.compare.switch": "Overstappen naar dit plan",
     "ec.r.plan.compare.featuresHead": "Functies",
@@ -796,7 +794,6 @@
   });
   Object.assign(D.ru, {
     "ec.r.plan.compare.title": "Подберите план под ваши задачи",
-    "ec.r.plan.compare.recommended": "Рекомендуем вам",
     "ec.r.plan.compare.wasRecommended": "Изначально рекомендовали",
     "ec.r.plan.compare.switch": "Перейти на этот план",
     "ec.r.plan.compare.featuresHead": "Возможности",
@@ -810,7 +807,6 @@
   });
   Object.assign(D.tr, {
     "ec.r.plan.compare.title": "İhtiyacınıza uygun planı bulun",
-    "ec.r.plan.compare.recommended": "Sizin için önerilen",
     "ec.r.plan.compare.wasRecommended": "Başlangıçta önerilmiş",
     "ec.r.plan.compare.switch": "Bu plana geç",
     "ec.r.plan.compare.featuresHead": "Özellikler",
@@ -824,7 +820,6 @@
   });
   Object.assign(D.it, {
     "ec.r.plan.compare.title": "Trova il piano giusto",
-    "ec.r.plan.compare.recommended": "Consigliato per te",
     "ec.r.plan.compare.wasRecommended": "Consigliato all'inizio",
     "ec.r.plan.compare.switch": "Passa a questo piano",
     "ec.r.plan.compare.featuresHead": "Funzionalità",
@@ -838,7 +833,6 @@
   });
   Object.assign(D.es, {
     "ec.r.plan.compare.title": "Encuentra el plan adecuado",
-    "ec.r.plan.compare.recommended": "Recomendado para ti",
     "ec.r.plan.compare.wasRecommended": "Recomendado originalmente",
     "ec.r.plan.compare.switch": "Cambiar a este plan",
     "ec.r.plan.compare.featuresHead": "Funciones",
@@ -852,7 +846,6 @@
   });
   Object.assign(D.pl, {
     "ec.r.plan.compare.title": "Znajdź odpowiedni plan",
-    "ec.r.plan.compare.recommended": "Polecane dla Ciebie",
     "ec.r.plan.compare.wasRecommended": "Pierwotnie polecane",
     "ec.r.plan.compare.switch": "Przejdź na ten plan",
     "ec.r.plan.compare.featuresHead": "Funkcje",
@@ -866,7 +859,6 @@
   });
   Object.assign(D.pt, {
     "ec.r.plan.compare.title": "Encontre o plano certo",
-    "ec.r.plan.compare.recommended": "Recomendado para você",
     "ec.r.plan.compare.wasRecommended": "Originalmente recomendado",
     "ec.r.plan.compare.switch": "Mudar para este plano",
     "ec.r.plan.compare.featuresHead": "Funcionalidades",
@@ -880,7 +872,6 @@
   });
   Object.assign(D.fr, {
     "ec.r.plan.compare.title": "Trouvez le plan qui vous convient",
-    "ec.r.plan.compare.recommended": "Recommandé pour vous",
     "ec.r.plan.compare.wasRecommended": "Recommandé à l'origine",
     "ec.r.plan.compare.switch": "Passer à ce plan",
     "ec.r.plan.compare.featuresHead": "Fonctionnalités",
@@ -1030,10 +1021,6 @@
   // takes a {cap} param substituted from the active plan's perk
   // text at render time.
   Object.assign(D.en, {
-    "ec.r.plan.viewFees": "View all fees",
-    "ec.r.fees.head": "What you'll pay",
-    "ec.r.fees.subscription": "Subscription",
-    "ec.r.fees.seeAll": "See full schedule →",
     "ec.fees.title": "Full fees",
     "ec.fees.section.account": "Account",
     "ec.fees.section.outgoing": "Outgoing transfers",
@@ -1062,10 +1049,6 @@
     "ec.fees.footer.link": "Full schedule at altery.com/fees/business →",
   });
   Object.assign(D.es, {
-    "ec.r.plan.viewFees": "Ver todas las tarifas",
-    "ec.r.fees.head": "Cuánto pagarás",
-    "ec.r.fees.subscription": "Suscripción",
-    "ec.r.fees.seeAll": "Tarifa completa →",
     "ec.fees.title": "Tarifas completas",
     "ec.fees.section.account": "Cuenta",
     "ec.fees.section.outgoing": "Transferencias salientes",
@@ -1094,10 +1077,6 @@
     "ec.fees.footer.link": "Tabla completa en altery.com/fees/business →",
   });
   Object.assign(D.fr, {
-    "ec.r.plan.viewFees": "Voir tous les frais",
-    "ec.r.fees.head": "Ce que vous paierez",
-    "ec.r.fees.subscription": "Abonnement",
-    "ec.r.fees.seeAll": "Tarification complète →",
     "ec.fees.title": "Frais complets",
     "ec.fees.section.account": "Compte",
     "ec.fees.section.outgoing": "Virements sortants",
@@ -1126,10 +1105,6 @@
     "ec.fees.footer.link": "Grille complète sur altery.com/fees/business →",
   });
   Object.assign(D.pt, {
-    "ec.r.plan.viewFees": "Ver todas as tarifas",
-    "ec.r.fees.head": "Quanto irá pagar",
-    "ec.r.fees.subscription": "Subscrição",
-    "ec.r.fees.seeAll": "Tarifário completo →",
     "ec.fees.title": "Tarifas completas",
     "ec.fees.section.account": "Conta",
     "ec.fees.section.outgoing": "Transferências enviadas",
@@ -1158,10 +1133,6 @@
     "ec.fees.footer.link": "Tabela completa em altery.com/fees/business →",
   });
   Object.assign(D.ru, {
-    "ec.r.plan.viewFees": "Все тарифы",
-    "ec.r.fees.head": "Сколько будет стоить",
-    "ec.r.fees.subscription": "Подписка",
-    "ec.r.fees.seeAll": "Полный прайс-лист →",
     "ec.fees.title": "Все тарифы",
     "ec.fees.section.account": "Аккаунт",
     "ec.fees.section.outgoing": "Исходящие платежи",
@@ -1190,10 +1161,6 @@
     "ec.fees.footer.link": "Полная таблица на altery.com/fees/business →",
   });
   Object.assign(D.de, {
-    "ec.r.plan.viewFees": "Alle Gebühren ansehen",
-    "ec.r.fees.head": "Was Sie zahlen werden",
-    "ec.r.fees.subscription": "Abonnement",
-    "ec.r.fees.seeAll": "Vollständige Übersicht →",
     "ec.fees.title": "Alle Gebühren",
     "ec.fees.section.account": "Konto",
     "ec.fees.section.outgoing": "Ausgehende Überweisungen",
@@ -1222,10 +1189,6 @@
     "ec.fees.footer.link": "Vollständige Übersicht auf altery.com/fees/business →",
   });
   Object.assign(D.it, {
-    "ec.r.plan.viewFees": "Vedi tutte le tariffe",
-    "ec.r.fees.head": "Quanto pagherai",
-    "ec.r.fees.subscription": "Abbonamento",
-    "ec.r.fees.seeAll": "Listino completo →",
     "ec.fees.title": "Tariffe complete",
     "ec.fees.section.account": "Conto",
     "ec.fees.section.outgoing": "Trasferimenti in uscita",
@@ -1254,10 +1217,6 @@
     "ec.fees.footer.link": "Tabella completa su altery.com/fees/business →",
   });
   Object.assign(D.tr, {
-    "ec.r.plan.viewFees": "Tüm ücretleri gör",
-    "ec.r.fees.head": "Ne ödeyeceksiniz",
-    "ec.r.fees.subscription": "Abonelik",
-    "ec.r.fees.seeAll": "Tüm ücretler →",
     "ec.fees.title": "Tüm ücretler",
     "ec.fees.section.account": "Hesap",
     "ec.fees.section.outgoing": "Giden transferler",
@@ -1286,10 +1245,6 @@
     "ec.fees.footer.link": "Tam liste altery.com/fees/business adresinde →",
   });
   Object.assign(D.pl, {
-    "ec.r.plan.viewFees": "Zobacz wszystkie opłaty",
-    "ec.r.fees.head": "Ile zapłacisz",
-    "ec.r.fees.subscription": "Subskrypcja",
-    "ec.r.fees.seeAll": "Pełny cennik →",
     "ec.fees.title": "Pełne opłaty",
     "ec.fees.section.account": "Konto",
     "ec.fees.section.outgoing": "Przelewy wychodzące",
@@ -1318,10 +1273,6 @@
     "ec.fees.footer.link": "Pełna tabela na altery.com/fees/business →",
   });
   Object.assign(D.nl, {
-    "ec.r.plan.viewFees": "Bekijk alle tarieven",
-    "ec.r.fees.head": "Wat je betaalt",
-    "ec.r.fees.subscription": "Abonnement",
-    "ec.r.fees.seeAll": "Volledig schema →",
     "ec.fees.title": "Volledige tarieven",
     "ec.fees.section.account": "Account",
     "ec.fees.section.outgoing": "Uitgaande overschrijvingen",
