@@ -231,11 +231,17 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
           </p>
         </td></tr>
 
-        <!-- Footer -->
-        <tr><td class="t-footer-bg t-border" style="background:${C.surface};padding:22px 36px;border-top:1px solid ${C.border};font-size:11px;line-height:16px;color:${C.muted};">
-          <div class="t-ink" style="color:${C.ink};font-weight:600;margin-bottom:4px;">Altery</div>
-          <div class="t-muted" style="color:${C.muted};">${s.footerTagline || "Business finance for digital companies banks struggle to understand."}</div>
-          <div class="t-muted" style="margin-top:8px;color:${C.muted};">${s.footerEntities || "Altery Ltd (UK · FCA-licensed EMI) · Altery EU (CY · Central Bank of Cyprus EMI) · Altery MENA (DIFC · DFSA)"}</div>
+        <!-- Footer — rounded pill floating inside the card with the
+             same 24px padding ring as the header so the email reads
+             symmetrically (rounded pill top, rounded pill bottom). -->
+        <tr><td style="padding:0 24px 24px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="t-footer-bg" style="background:${C.surface};border-radius:16px;">
+            <tr><td style="padding:20px 28px;font-size:11px;line-height:16px;color:${C.muted};">
+              <div class="t-ink" style="color:${C.ink};font-weight:600;margin-bottom:4px;">Altery</div>
+              <div class="t-muted" style="color:${C.muted};">${s.footerTagline || "Business finance for digital companies banks struggle to understand."}</div>
+              <div class="t-muted" style="margin-top:8px;color:${C.muted};">${s.footerEntities || "Altery Ltd (UK · FCA-licensed EMI) · Altery EU (CY · Central Bank of Cyprus EMI) · Altery MENA (DIFC · DFSA)"}</div>
+            </td></tr>
+          </table>
         </td></tr>
 
       </table>
