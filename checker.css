@@ -1797,6 +1797,55 @@
        numbered rows keep momentum past the success state without
        making it feel like another task. First row is pre-completed
        (with a checkmark) to anchor a "you're 1/3 done" feeling. */
+    /* Sent-stage collapsible follow-ups (share-with-team, talk-to-team).
+       Both closed by default; click expands the form inline. Visually
+       calm tile pattern so they don't compete with the primary
+       "Start setup now" CTA above them. */
+    .ec-handoff__followups {
+      display: flex; flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .ec-handoff__followup {
+      border: 1px solid var(--c-border);
+      border-radius: 12px;
+      background: var(--c-surface);
+      text-align: left;
+      overflow: hidden;
+    }
+    .ec-handoff__followup__head {
+      width: 100%;
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+    }
+    .ec-handoff__followup__head > div { flex: 1 1 auto; min-width: 0; }
+    .ec-handoff__followup__title {
+      font-size: 14px; font-weight: 600;
+      color: var(--c-ink);
+      line-height: 20px;
+    }
+    .ec-handoff__followup__body {
+      font-size: 12px; line-height: 17px;
+      color: var(--c-muted);
+      margin-top: 2px;
+    }
+    .ec-handoff__followup__chev {
+      flex: 0 0 14px;
+      color: var(--c-muted);
+      transition: transform 0.18s var(--easing-out);
+    }
+    .ec-handoff__followup.is-open .ec-handoff__followup__chev {
+      transform: rotate(180deg);
+    }
+    .ec-handoff__followup__panel {
+      padding: 4px 16px 16px;
+      border-top: 1px solid var(--c-border-soft);
+    }
     .ec-handoff__nextSteps {
       margin: 18px 0 6px;
       padding: 16px 18px;
