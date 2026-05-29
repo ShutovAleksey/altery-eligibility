@@ -171,6 +171,11 @@
     "ec.plan.pro.users":     "Bis zu 5 Konto-Nutzer",
     "ec.plan.ultra.users":   "Unbegrenzte Konto-Nutzer",
     "ec.plan.ultra.negotiatedFx": "Verhandelte FX- und Transaktionsgebühren",
+    "ec.plan.pro.trial":     "14-tägige kostenlose Testphase",
+    "ec.plan.ultra.trial":   "14-tägige kostenlose Testphase",
+    "ec.plan.pro.am":        "Persönlicher Account Manager",
+    "ec.plan.ultra.am":      "Persönlicher Account Manager",
+    "ec.plan.cap.am":        "Persönlicher Account Manager",
 
     "ec.cav.crypto.tag": "Krypto-erprobt",
     "ec.cav.crypto.text": "Krypto-natives KYB läuft über unser Spezialistenteam, nicht die allgemeine Warteschlange. Synterra Connect — unser Partner-Netzwerk für direkte Exchange-Abwicklung — leitet Mittel zu und von regulierten Plattformen; Fiat-Ein-/-Auszahlungen via SEPA, Faster Payments und SWIFT.",
@@ -620,6 +625,11 @@
     "ec.plan.pro.users":     "До 5 пользователей счёта",
     "ec.plan.ultra.users":   "Без ограничений по пользователям счёта",
     "ec.plan.ultra.negotiatedFx": "Индивидуальные FX- и транзакционные ставки",
+    "ec.plan.pro.trial":     "14 дней бесплатно",
+    "ec.plan.ultra.trial":   "14 дней бесплатно",
+    "ec.plan.pro.am":        "Персональный менеджер",
+    "ec.plan.ultra.am":      "Персональный менеджер",
+    "ec.plan.cap.am":        "Персональный менеджер",
 
     "ec.cav.crypto.tag": "Знаем крипту",
     "ec.cav.crypto.text": "KYB крипто-нативного бизнеса проходит через специализированную команду, не общую очередь. Synterra Connect — наша партнёрская сеть для прямых расчётов с биржами — проводит средства в обе стороны через регулируемые площадки; фиат через SEPA, Faster Payments и SWIFT.",

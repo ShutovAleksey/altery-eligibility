@@ -106,15 +106,17 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     // reasoning bullets as supporting context when the plan is Pro/Ultra.
     corridorsBreadth: corridors.length >= 5,
     txHigh:           monthlyTx >= 300,
-    // Capability gate: bulk & batch transfers and programmatic access
-    // are Pro-only (Starter has neither mass payouts nor API keys).
-    servicesPro:      svcSet.has("mass") || svcSet.has("api"),
-    // Capability gate: Multi-Company Management (one login across
-    // several legal entities, separate balances/IBANs/cards per
-    // company) is Ultra-only — closes the gap where Ultra was
-    // reachable only via raw volume ≥ £1M and a multi-company SMB
-    // group structure would otherwise wrongly land on Pro.
-    servicesUltra:    svcSet.has("multiCompany"),
+    // Capability gate: bulk & batch transfers, programmatic access,
+    // and multi-company management are Pro-only. Canonical pricing
+    // says multi-company is technically available on all plans, but
+    // the operational tooling (separate IBANs / cards / team scopes
+    // per entity) sits in Pro+ — Starter is single-entity in practice.
+    // Volume alone still escalates to Ultra (≥£1M).
+    servicesPro:      svcSet.has("mass") || svcSet.has("api") || svcSet.has("multiCompany"),
+    // No service forces Ultra anymore — only raw volume does. Kept
+    // on the signals object for downstream callers that still read
+    // the field; left false until volume crosses the £1M threshold.
+    servicesUltra:    false,
     industryPro:      industry === "affiliate" || industry === "creator",
   };
   const needsPro = tierSignals.volumePro || tierSignals.servicesPro;
@@ -214,7 +216,7 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
   if (svcSet.has("api") && plan.id !== "starter") {
     reasoning.push({ key: "ec.reasoning.services.api", priority: 7 });
   }
-  if (svcSet.has("multiCompany") && plan.id === "ultra") {
+  if (svcSet.has("multiCompany") && plan.id !== "starter") {
     reasoning.push({ key: "ec.reasoning.services.multiCompany", priority: 9 });
   }
   // Industry-driven

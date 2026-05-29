@@ -109,13 +109,16 @@ test("Volume ≥ 1M → Ultra", () => {
   assert.equal(rec.plan.id, "ultra");
 });
 
-test("Ultra driven by multi-company management capability gate", () => {
+test("Pro driven by multi-company management capability gate", () => {
   // Multi-Company Management (one login across multiple legal entities,
-  // separate balances/IBANs/cards per company) is Ultra-only — picking
-  // it should force Ultra even at small volume.
+  // separate balances/IBANs/cards per company) is technically available
+  // on every plan per the canonical pricing schedule, but the surrounding
+  // tooling sits in Pro+. Picking it forces Pro at small volume; Ultra
+  // is reached only when raw volume crosses £1M.
   const rec = w.ecRecommend(input({ services: ["multiCompany"], monthlyVolume: 50000 }));
-  assert.equal(rec.plan.id, "ultra");
-  assert.equal(rec.tierSignals.servicesUltra, true);
+  assert.equal(rec.plan.id, "pro");
+  assert.equal(rec.tierSignals.servicesPro, true);
+  assert.equal(rec.tierSignals.servicesUltra, false);
 });
 
 test("Ultra-hint caveat fires for Pro at scale with mass + api", () => {

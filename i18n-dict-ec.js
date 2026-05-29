@@ -311,6 +311,11 @@
     "ec.plan.pro.users":     "Up to 5 account users",
     "ec.plan.ultra.users":   "Unlimited account users",
     "ec.plan.ultra.negotiatedFx": "Negotiated FX & transaction fees",
+    "ec.plan.pro.trial":     "14-day free trial",
+    "ec.plan.ultra.trial":   "14-day free trial",
+    "ec.plan.pro.am":        "Dedicated account manager",
+    "ec.plan.ultra.am":      "Dedicated account manager",
+    "ec.plan.cap.am":        "Dedicated account manager",
 
     // Realistic-track savings callout — bank-side hidden costs added
     // on top of the published-rates headline. Hint cites the two

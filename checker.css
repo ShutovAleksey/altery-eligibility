@@ -1693,12 +1693,12 @@
       font-weight: 700;
       letter-spacing: -0.02em;
       text-align: left;
-      margin: 4px 32px 8px 0;
+      margin: 4px 32px 10px 0;
     }
     .ec-handoff__lead {
       font-size: 14px; line-height: 21px;
       color: var(--c-ink-2);
-      margin: 0 0 20px;
+      margin: 0 0 24px;
     }
     .ec-handoff__summary {
       background: var(--c-bg);
@@ -1856,7 +1856,7 @@
     .ec-handoff__back {
       display: inline-flex; align-items: center; gap: 6px;
       background: none; border: 0; padding: 0;
-      margin: 0 0 12px;
+      margin: 0 0 18px;
       font: inherit;
       font-size: 13px; font-weight: 500;
       color: var(--c-muted);
@@ -1946,14 +1946,14 @@
       color: var(--c-ink);
       margin-bottom: 10px;
     }
-    /* Send-to-colleague row — DS Input + DS Button on one baseline.
-       align-items:flex-start so the row stays top-anchored even if
-       Input grows a row to show its inline error message. Mobile
-       collapses to a column stack with full-width children. */
+    /* Forward-to-colleague form — DS Input stacked above a DS Button.
+       Vertical stack gives the button room to be full-width and the
+       form feels less cramped than the old inline row. */
     .ec-handoff__colleague__row {
       display: flex;
-      gap: 8px;
-      align-items: flex-start;
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
     }
     .ec-handoff__colleague__success {
       font-size: 13px;
@@ -1961,18 +1961,13 @@
       font-weight: 500;
       padding: 4px 0;
     }
-    @media (max-width: 640px) {
-      .ec-handoff__colleague__row { flex-direction: column; }
-      .ec-handoff__colleague__row > * { width: 100% !important; }
-    }
 
-    /* Request-a-callback form — first/last name + optional email + submit.
-       Used inline on the handoff sent stage (callback subview) and
-       standalone on the ?contact deep-link entry. Fields are DS Input
-       components; .ec-callback__row aligns first/last name side by side.
-       Mobile collapses to a column stack. */
-    .ec-callback { display: flex; flex-direction: column; gap: 10px; }
-    .ec-callback__row { display: flex; gap: 8px; align-items: flex-start; }
+    /* Request-a-callback form — first/last name side by side, then a
+       full-width submit button below. Used inline on the handoff sent
+       stage (callback subview) and standalone on the ?contact deep
+       link. Mobile collapses the first/last row to a column stack. */
+    .ec-callback { display: flex; flex-direction: column; gap: 16px; }
+    .ec-callback__row { display: flex; gap: 12px; align-items: flex-start; }
     .ec-callback__success {
       font-size: 13px; color: var(--c-success); font-weight: 500; padding: 4px 0;
     }

@@ -540,7 +540,10 @@ const EC_INDUSTRIES = [
 // bottom and the list visually telegraphs tier escalation. Crypto sits
 // in the Starter block because picking it doesn't force a tier (it
 // triggers UK FCA routing instead) — same user-side effect as the other
-// Starter-eligible services. mass/api force Pro, multiCompany forces Ultra.
+// Starter-eligible services. mass/api/multiCompany force Pro (per the
+// canonical pricing doc multi-company is available on all plans but
+// the surrounding tooling — separate IBANs/cards/team-access per
+// entity — sits in Pro+).
 const EC_SERVICES = [
   { value: "local",        titleKey: "ec.svc.local.title",        bodyKey: "ec.svc.local.body",        tier: "starter" },
   { value: "cards",        titleKey: "ec.svc.cards.title",        bodyKey: "ec.svc.cards.body",        tier: "starter" },
@@ -548,7 +551,7 @@ const EC_SERVICES = [
   { value: "crossBorder",  titleKey: "ec.svc.crossBorder.title",  bodyKey: "ec.svc.crossBorder.body",  tier: "starter" },
   { value: "mass",         titleKey: "ec.svc.mass.title",         bodyKey: "ec.svc.mass.body",         tier: "pro" },
   { value: "api",          titleKey: "ec.svc.api.title",          bodyKey: "ec.svc.api.body",          tier: "pro" },
-  { value: "multiCompany", titleKey: "ec.svc.multiCompany.title", bodyKey: "ec.svc.multiCompany.body", tier: "ultra" },
+  { value: "multiCompany", titleKey: "ec.svc.multiCompany.title", bodyKey: "ec.svc.multiCompany.body", tier: "pro" },
 ];
 
 // Single source of truth for the questionnaire length. Used by EcApp
@@ -664,11 +667,11 @@ const EC_PLANS = {
     price: "£100", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.pro.tagline",
     fitKey: "ec.plan.pro.fit",
-    perkKeys: ["ec.plan.pro.p3", "ec.plan.pro.users"],
+    perkKeys: ["ec.plan.pro.trial", "ec.plan.pro.p3", "ec.plan.pro.am", "ec.plan.pro.users"],
     fees: {
       fasterPay: "£1",
-      sepa:      "€1",
-      swift:     "€10 + 0.25%",
+      sepa:      "€1.5",
+      swift:     "€12 + 0.35%",
       fxMarkup:  "up to 0.7%",
     },
   },
@@ -677,12 +680,12 @@ const EC_PLANS = {
     price: "£300", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.ultra.tagline",
     fitKey: "ec.plan.ultra.fit",
-    perkKeys: ["ec.plan.ultra.p5", "ec.plan.ultra.negotiatedFx", "ec.plan.ultra.users"],
+    perkKeys: ["ec.plan.ultra.trial", "ec.plan.ultra.p5", "ec.plan.ultra.am", "ec.plan.ultra.negotiatedFx", "ec.plan.ultra.users"],
     fees: {
       fasterPay: "£0.5",
-      sepa:      "€0.5",
-      swift:     "€10 + 0.15%",
-      fxMarkup:  "up to 0.5%",
+      sepa:      "€1",
+      swift:     "€10 + 0.20%",
+      fxMarkup:  "up to 0.4%",
     },
   },
 };

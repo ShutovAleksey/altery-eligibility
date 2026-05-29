@@ -34,7 +34,9 @@
 // Row labels reuse existing perk i18n strings (no new translations
 // added for the feature names themselves).
 const PLAN_CAPABILITIES = [
+  { labelKey: "ec.plan.starter.p4",         on: { starter: true,  pro: true,  ultra: true  } },
   { labelKey: "ec.plan.pro.p3",             on: { starter: false, pro: true,  ultra: true  } },
+  { labelKey: "ec.plan.cap.am",             on: { starter: false, pro: true,  ultra: true  } },
   { labelKey: "ec.plan.ultra.p5",           on: { starter: false, pro: false, ultra: true  } },
   { labelKey: "ec.plan.ultra.negotiatedFx", on: { starter: false, pro: false, ultra: true  } },
   { labelKey: "ec.plan.ultra.users",        on: { starter: false, pro: false, ultra: true  } },
@@ -56,12 +58,16 @@ function EcFeesModal({ plan, entity, onClose }) {
   // regardless of CSS white-space behaviour. Belt-and-braces with
   // the .ec-fees__value { white-space: nowrap } rule.
   const monthlyFee = `${planPrice}${cycleSuffix}`.replace(/ /g, '\u00A0');
-  // FX cap and SWIFT cap detection — read from plan perkKeys text.
-  // The modal sources its plan-specific values from the same i18n
-  // strings the perks list uses, so changing one updates both.
+  // FX cap and SWIFT cap come straight from the plan's fees object.
+  // Previously parsed out of perkKeys text via regex, but the perks
+  // no longer carry a literal "X%" string (perk copy moved to feature
+  // names like "Dedicated account manager"). plan.fees.fxMarkup is
+  // the canonical string ("up to 0.7%") — title-case it for display.
+  const fxRaw = (plan.fees && plan.fees.fxMarkup) || "";
+  const fxCap = fxRaw ? fxRaw.replace(/^up\s+to\b/i, "Up to") : "On request";
+  // SWIFT cap detection — still parsed from perkKeys text because no
+  // structured field exists; falls back to null when no perk says "cap".
   const allPerkText = plan.perkKeys.map((k) => t(k)).join(" ");
-  const fxMatch = allPerkText.match(/(\d+(?:\.\d+)?)\s*%/);
-  const fxCap = fxMatch ? `Up to ${fxMatch[1]}%` : "On request";
   const swiftCapMatch = allPerkText.match(/(?:cap|capped).*?([€£$]\d+)/i);
   const swiftCapLabel = swiftCapMatch ? swiftCapMatch[1] : null;
 
@@ -570,10 +576,10 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
       )}
       <Button
         variant="primary"
-        size="md"
+        size="lg"
+        full
         onClick={submit}
         disabled={submitting || (touched && !valid)}
-        style={{ alignSelf: "flex-start" }}
       >
         {submitting ? t("ec.handoff.submitting") : t("ec.callback.submit")}
       </Button>
@@ -898,11 +904,11 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                     disabled={colleagueSubmitting}
                     autoFocus
                     error={showColleagueError ? t("ec.handoff.email.error") : undefined}
-                    style={{ flex: "1 1 0", minWidth: 0 }}
                   />
                   <Button
                     variant="primary"
-                    size="md"
+                    size="lg"
+                    full
                     onClick={sendColleagueCopy}
                     disabled={colleagueSubmitting || !isColleagueValid}
                   >
