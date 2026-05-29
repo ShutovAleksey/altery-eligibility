@@ -744,21 +744,13 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
             </h2>
             <p className="ec-handoff__lead">{t("ec.handoff.email.lead")}</p>
 
-            {/* Value-prop list — the conversion driver. Three
-                concrete bullets, the first personalized with
-                the user's savings number. Reads as upgrade, not
-                chore. */}
+            {/* Single concrete value bullet — the prep checklist. The
+                cost-breakdown and bank-comparison bullets used to live
+                here too, but those are content INSIDE the PDF and
+                listing them as features over-sold the artifact. The
+                checklist is genuinely actionable (here's what you'll
+                need before KYB) — that's worth surfacing. */}
             <ul className="ec-handoff__value">
-              <li className="ec-handoff__value__item">
-                <span className="ec-handoff__value__tick" aria-hidden="true">✓</span>
-                <span>{cost && cost.savings.monthly >= 100
-                  ? t("ec.handoff.email.value.costPersonal", { monthly: fmt(cost.savings.monthly) })
-                  : t("ec.handoff.email.value.costGeneric")}</span>
-              </li>
-              <li className="ec-handoff__value__item">
-                <span className="ec-handoff__value__tick" aria-hidden="true">✓</span>
-                <span>{t("ec.handoff.email.value.comparison")}</span>
-              </li>
               <li className="ec-handoff__value__item">
                 <span className="ec-handoff__value__tick" aria-hidden="true">✓</span>
                 <span>{t("ec.handoff.email.value.checklist")}</span>
