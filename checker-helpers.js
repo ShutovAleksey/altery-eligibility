@@ -927,6 +927,18 @@ function ecPricePanel(rec) {
 
 // Build the capability-focused comparison panel. For MENA returns
 // null — the PDF renderer surfaces a "unique in MENA" callout instead.
+//
+// The "multiEntity" row (Multi-company management) used to live here
+// but was removed 2026-05-29: Wise, Revolut and Qonto all support
+// linked-accounts multi-company on the user side (one login, several
+// businesses, account switcher). Altery does the same shape — none
+// of them ships a consolidated group treasury with cross-entity
+// approvals and unified analytics. So the binary ✓ / — claim was
+// dishonest. The "multiJurisdiction" row below carries the real
+// Altery-only advantage: three regulated entities (UK FCA, EU CBC,
+// DIFC DFSA) under one product. The competitors have multiple
+// businesses, but all those businesses live in one of their
+// licensing regions, not three.
 function ecCapabilityPanel(rec) {
   const groups = ecComparatorGroups(rec);
   const comparators = groups.capability;
@@ -934,10 +946,9 @@ function ecCapabilityPanel(rec) {
   const planFees = rec?.plan?.fees || {};
   const rows = [
     { key: "cryptoNative",      labelKey: "ec.cmp.row.crypto" },
-    { key: "multiEntity",       labelKey: "ec.cmp.row.multiEntity" },
+    { key: "multiJurisdiction", labelKey: "ec.cmp.row.multiJurisdiction" },
     { key: "affiliate",         labelKey: "ec.cmp.row.affiliate" },
     { key: "api",               labelKey: "ec.cmp.row.api" },
-    { key: "multiJurisdiction", labelKey: "ec.cmp.row.multiJurisdiction" },
     { key: "onboarding",        labelKey: "ec.cmp.row.onboarding" },
   ];
   return {

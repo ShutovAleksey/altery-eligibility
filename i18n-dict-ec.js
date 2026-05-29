@@ -551,6 +551,7 @@
     "ec.cmp.v.free": "Free",
     "ec.cmp.v.freeStar": "Free*",
     "ec.cmp.state.limited": "Limited",
+    "ec.cmp.state.linkedOnly": "Linked accounts",
     "ec.cmp.price.eyebrow": "Pricing",
     "ec.cmp.price.title": "Lower fees than traditional banks",
     "ec.cmp.capability.eyebrow": "Capabilities",

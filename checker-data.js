@@ -1058,7 +1058,11 @@ const EC_COMPARATORS = {
       digitalNative: "partial",     // accepts SaaS but not high-risk
       affiliate:     "restricted",  // many affiliate niches restricted
       cryptoNative:  false,         // explicitly banned
-      multiEntity:   false,
+      // Wise supports multiple Business accounts under one login,
+      // one account per legal entity, account switcher between them.
+      // Not consolidated treasury — separate data per entity, no
+      // group dashboard. "linkedOnly" is the honest middle state.
+      multiEntity:   "linkedOnly",
       docFriction:   "medium",
       fxMarkup:      "from 0.33%",  // verified against wise.com/gb/pricing/business 2026-05-29
       swiftOut:      "£5-15",
@@ -1075,7 +1079,11 @@ const EC_COMPARATORS = {
       digitalNative: "partial",
       affiliate:     "no",
       cryptoNative:  false,
-      multiEntity:   false,
+      // Revolut publishes a "Link multiple Revolut Business accounts"
+      // feature — accounts can be linked under one login but Revolut
+      // explicitly states the linking does NOT share banking data
+      // between accounts. So same linkedOnly model as Wise / Qonto.
+      multiEntity:   "linkedOnly",
       docFriction:   "medium",
       fxMarkup:      "0-1.0%",     // free up to plan limit
       swiftOut:      "£1-15",
@@ -1150,7 +1158,10 @@ const EC_COMPARATORS = {
       digitalNative: "partial",
       affiliate:     "caseByCase",
       cryptoNative:  false,
-      multiEntity:   false,
+      // Qonto supports multi-organization on the user side — one
+      // login, several orgs accessible via switcher. Same shape as
+      // Wise / Revolut: linked but not consolidated.
+      multiEntity:   "linkedOnly",
       docFriction:   "medium",
       fxMarkup:      "0.65-1.5%",
       swiftOut:      "€5-15",
