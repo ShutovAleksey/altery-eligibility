@@ -26,6 +26,46 @@ import { sendEmail } from "../lib/email.js";
 const MAX_PDF_BYTES = 2_500_000;      // 2.5 MB — generous for our PDFs
 const EMAIL_RE      = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+// Minimal HTML escape — every user-supplied string spliced into the
+// email template MUST flow through this before reaching the HTML body.
+// Email clients render the same tag set as browsers (img, script-tags
+// are usually stripped, but onerror on <img> can survive), so the same
+// XSS rules apply. Inlined to keep the API function dependency-free.
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
+// Allow-list for the post-email CTA's "Continue to setup" link. The
+// client controls sessionLink; without an allow-list an attacker could
+// POST sessionLink="https://phish.example.com/altery-clone" and the
+// email — sent from our verified domain — would point its primary CTA
+// at the attacker's domain. Anchored to our deployment host and the
+// public production host.
+const ALLOWED_SESSION_HOSTS = new Set([
+  "altery-eligibility.vercel.app",
+  "altery.com",
+  "www.altery.com",
+]);
+function safeSessionLink(link) {
+  if (typeof link !== "string") return "https://altery.com";
+  try {
+    const url = new URL(link);
+    if (url.protocol !== "https:") return "https://altery.com";
+    if (ALLOWED_SESSION_HOSTS.has(url.host)) return url.toString();
+    // Accept any Vercel preview deploy of this project — they always
+    // sit under *.vercel.app. Tighten further if needed.
+    if (url.host.endsWith(".vercel.app") && url.host.includes("altery")) return url.toString();
+    return "https://altery.com";
+  } catch (e) {
+    return "https://altery.com";
+  }
+}
+
 // Build a short, inbox-friendly email body. The PDF carries the full
 // detail; this is the wrapper that greets the user before they click
 // the attachment. Inline styles only (every email client renders inline
@@ -99,6 +139,14 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
   // first body row above the hero to give the new reader immediate context
   // about who shared the analysis and why. Uses the soft beige surface so
   // it reads as a system note, not promotional copy.
+  //
+  // SECURITY: `forwardedBy` is user-controlled (the original recipient
+  // types it in EcHandoffModal's send-copy form). It MUST be HTML-
+  // escaped before splicing into the template even though we also
+  // validate it against EMAIL_RE upstream — defence in depth, and the
+  // regex is permissive enough that some HTML chars survive (e.g. a
+  // local-part like `user+"><img>`).
+  const forwardedBySafe = forwardedBy ? escapeHtml(forwardedBy) : "";
   const forwarderBlock = forwardedBy ? `
         <tr><td style="padding:24px 24px 0;">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="t-beige" style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;">
@@ -107,7 +155,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
                 ${s.forwardedByLabel || "Shared with you"}
               </div>
               <div class="t-ink" style="font-size:13px;line-height:19px;color:${C.ink};">
-                ${s.forwardedByBanner || `<strong>${forwardedBy}</strong> shared this Altery Business banking analysis with you — they're exploring an account and thought you should see it too.`}
+                ${s.forwardedByBanner || `<strong>${forwardedBySafe}</strong> shared this Altery Business banking analysis with you — they're exploring an account and thought you should see it too.`}
               </div>
             </td></tr>
           </table>
@@ -291,12 +339,19 @@ export default async function handler(req, res) {
     }
 
     const cleanEmail = email.trim();
-    const safePlan   = String(planName).slice(0, 40);
-    const safeEntity = String(entityName).slice(0, 60);
-    const safeLink   = (typeof sessionLink === "string" && sessionLink.startsWith("https://"))
-      ? sessionLink
-      : "https://altery.com";
-    const safePersona = typeof personaLine === "string" ? String(personaLine).slice(0, 120) : "";
+    // SECURITY: planName / entityName / personaLine flow into the HTML
+    // body of the outbound email at multiple splice points. Length-cap
+    // first (prevent overly large payloads), then HTML-escape so a
+    // malicious client cannot inject markup into the email recipient's
+    // inbox. Same logic for forwardedBy below.
+    const safePlan    = escapeHtml(String(planName).slice(0, 40));
+    const safeEntity  = escapeHtml(String(entityName).slice(0, 60));
+    // SECURITY: previously this was a `startsWith("https://")` check
+    // which is open to phishing — any https URL would pass. Tightened
+    // to allow-list our deployment host so the email-CTA "Continue to
+    // setup" cannot be repurposed to point at attacker domains.
+    const safeLink   = safeSessionLink(sessionLink);
+    const safePersona = typeof personaLine === "string" ? escapeHtml(String(personaLine).slice(0, 120)) : "";
 
     // Only accept booking URLs from trusted scheduling hosts. Defensive —
     // anyone with access to the client could POST a different URL claiming

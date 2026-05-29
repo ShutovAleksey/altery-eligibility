@@ -30,10 +30,18 @@
 <body>
   <div id="root"></div>
 
-  <!-- React + Babel -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js" crossorigin="anonymous"></script>
+  <!-- React + Babel — SRI-pinned so a compromised CDN can't push a
+       malicious build into the page. integrity= attrs computed from
+       the current file contents 2026-05-29 (sha384). -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.development.min.js"
+          integrity="sha384-kVcIFke//pMiDJN03as1hindWUCFzuk/YoOAqYJncf3ttAf6U+/j37y56B+NcoSk"
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.development.min.js"
+          integrity="sha384-a9D0JIXk1O+cyK1W0mGZHZoGxEwOFK/YEQZEbsDc633VdwautneyP4gIZQ4SyOBh"
+          crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"
+          integrity="sha384-AISI5AuDG6E8DeEiFMVB3rGQxhZt24OU0avMp+GMV64+tpnA3+Z6F5MT0f96iPva"
+          crossorigin="anonymous"></script>
   <!-- Stripe.js — canonical URL with trailing slash (Stripe-recommended;
        without it you get a 301 redirect which some script-tag loaders
        handle poorly). Async so it doesn't block render. EcPaymentModal
@@ -49,8 +57,12 @@
        the email path entirely. Pinned to stable versions because the
        canvas/PDF rendering surface is finicky enough that breakage
        on a minor bump is plausible. -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" async></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" async></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"
+          integrity="sha384-ZZ1pncU3bQe8y31yfZdMFdSpttDoPmOZg2wguVK9almUodir1PghgT0eY7Mrty8H"
+          crossorigin="anonymous" async></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"
+          integrity="sha384-JcnsjUPPylna1s1fvi1u12X5qjY5OL56iySh75FdtrwhO/SWXgMjoVqcKyIIWOLk"
+          crossorigin="anonymous" async></script>
 
   <!-- ============================================================================
        i18n — minimal runtime + EN dictionary. Architecturally extensible to the
