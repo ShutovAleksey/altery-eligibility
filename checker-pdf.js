@@ -256,6 +256,25 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <div style="font-size:12px;line-height:17px;color:${C.muted};">${t(s.bodyKey)}</div>
     </div>`).join("");
 
+  // "What's included in your plan" — perks list pulled straight from
+  // rec.plan.perkKeys (the same list shown on the result-page card and
+  // in the compare modal). Renders as a checked list inside a surface
+  // panel — same visual idiom as the onboarding checklist below, so
+  // the document has a consistent "things you get / things to bring"
+  // affordance pair.
+  const includedItemsHTML = (rec.plan.perkKeys || []).map((k) => `
+    <div style="display:flex;gap:12px;align-items:flex-start;padding:6px 0;">
+      <div style="flex-shrink:0;width:18px;height:18px;border-radius:50%;background:${C.primary};color:${C.white};display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;line-height:1;margin-top:1px;">✓</div>
+      <div style="font-size:13px;color:${C.ink};line-height:19px;">${t(k)}</div>
+    </div>`).join("");
+  const includedHTML = `
+    <div style="margin:0 0 30px;">
+      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 14px;">${t("ec.pdf.included.head")}</div>
+      <div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:14px 20px;">
+        ${includedItemsHTML}
+      </div>
+    </div>`;
+
   // Pricing table — same five lines as before; the AT A GLANCE box
   // upstairs already led with the headline price and savings, so
   // this is the detail backup.
@@ -292,6 +311,35 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // the proposal. Per-rail tariff strings inside the plan table can
   // still display in their native rail currency (€ SEPA, £ FP).
   const fmtEUR = (n) => "£" + (n || 0).toLocaleString("en-US");
+
+  // "At a glance" — 3-column TLDR card that sits between the hero and
+  // the reasoning bullets. Plan / Entity / Projected savings, each in
+  // a labelled column. Table-based layout (not flex) for html2canvas
+  // fidelity — flex panels occasionally render at the wrong width on
+  // the off-screen render container we use during PDF assembly.
+  const annualSavings = cost ? fmtEUR(cost.savings.annual) : null;
+  const atGlanceHTML = `
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate;border-spacing:0;background:${C.surface};border:1px solid ${C.border};border-radius:14px;margin:0 0 30px;">
+      <tr>
+        <td style="vertical-align:top;padding:18px 22px;width:33%;">
+          <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.pdf.atGlance.plan")}</div>
+          <div style="font-size:17px;font-weight:700;color:${C.ink};line-height:22px;letter-spacing:-0.01em;">${planName}</div>
+          <div style="font-size:12px;color:${C.muted};margin-top:4px;font-variant-numeric:tabular-nums;">${planPrice}</div>
+        </td>
+        <td style="width:1px;background:${C.border};padding:18px 0;"></td>
+        <td style="vertical-align:top;padding:18px 22px;width:33%;">
+          <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.pdf.atGlance.entity")}</div>
+          <div style="font-size:17px;font-weight:700;color:${C.ink};line-height:22px;letter-spacing:-0.01em;">${entityName}</div>
+          <div style="font-size:12px;color:${C.muted};margin-top:4px;">${entityLicence}</div>
+        </td>
+        <td style="width:1px;background:${C.border};padding:18px 0;"></td>
+        <td style="vertical-align:top;padding:18px 22px;width:33%;">
+          <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.pdf.atGlance.savings")}</div>
+          <div style="font-size:17px;font-weight:700;color:${C.savings};line-height:22px;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${annualSavings || "—"}<span style="font-size:12px;font-weight:500;color:${C.savings};margin-left:2px;">${cost ? ` ${t("ec.pdf.costMath.perYear")}` : ""}</span></div>
+          <div style="font-size:12px;color:${C.muted};margin-top:4px;">${t("ec.pdf.atGlance.savingsVs")}</div>
+        </td>
+      </tr>
+    </table>`;
 
   const costMathHTML = cost ? `
     <div style="margin:0 0 18px;">
@@ -527,38 +575,26 @@ ${personaLine ? `<div style="font-size:13px;font-weight:500;color:${C.primary};m
   <span style="color:${C.primary};">${entityName}</span> ${t("ec.r.title.middle")} <span style="color:${C.primary};">${planName}</span>${t("ec.r.title.after")}
 </h1>
 
-<p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0 0 20px;">${leadText}</p>
-
-<div style="display:inline-block;white-space:nowrap;padding:7px 14px 7px 10px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;font-size:12px;color:${C.ink};margin-bottom:28px;">
-  <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${C.success};margin-right:8px;vertical-align:middle;"></span>
-  ${entityName} · ${entityLicence}
-</div>
+<p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0 0 26px;">${leadText}</p>
 
 ${cryptoRerouteHTML}
 
-${costMathHTML}
+<!-- Section 1: At-a-glance TLDR card -->
+${atGlanceHTML}
 
-${outcomesHTML}
-
-${volumeHintHTML}
-
-<!-- Why we recommend -->
+<!-- Section 2: Why this plan — reasoning bullets citing the user's
+     own answers. Anchored at top because trust is the gate to the
+     rest of the document. -->
 <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
   ${t("ec.r.reasoning.head", { plan: planName })}
 </div>
 <div style="margin-bottom:32px;">${reasoningHTML}</div>
 
-${comparisonHTML}
+<!-- Section 3: What's included on this plan — perk list. Comes
+     before pricing so the reader sees value before cost. -->
+${includedHTML}
 
-${capabilityHTML}
-
-<!-- Selected services — compact card list -->
-<div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
-  ${t("ec.pdf.services.head")}
-</div>
-<div style="margin-bottom:30px;">${servicesHTML}</div>
-
-<!-- Pricing detail -->
+<!-- Section 4: Pricing detail — per-rail tariff table. -->
 <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
   ${t("ec.pdf.pricing.head", { plan: planName })}
 </div>
@@ -566,6 +602,27 @@ ${capabilityHTML}
   <table style="width:100%;border-collapse:collapse;">${feeTableHTML}</table>
 </div>
 
+<!-- Section 5: Cost math — Altery vs typical bank with savings band. -->
+${costMathHTML}
+
+<!-- Section 6: Outcomes — what the annual saving buys. -->
+${outcomesHTML}
+
+<!-- Section 7: Comparison vs other banks — multi-comparator matrix. -->
+${comparisonHTML}
+
+<!-- Section 8: Capability matrix — wins / equal / bank wins. -->
+${capabilityHTML}
+
+<!-- Section 9: Selected services — the rails the user picked, for
+     reference during onboarding. -->
+<div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
+  ${t("ec.pdf.services.head")}
+</div>
+<div style="margin-bottom:30px;">${servicesHTML}</div>
+
+<!-- Section 10: Onboarding checklist — what to prepare before
+     starting setup. -->
 ${checklistHTML}
 
 <!-- Numbered timeline — sells "how easy it is to start" -->
@@ -592,9 +649,6 @@ ${checklistHTML}
   <div style="font-size:12.5px;line-height:18px;color:${C.inkSoft};margin-bottom:12px;">${t("ec.pdf.team.body")}</div>
   <a href="${ecContactRequestUrl(rec, email)}" style="display:inline-block;font-size:12.5px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.team.booking")} →</a>
 </div>
-
-<!-- Validity notice — soft urgency, commercial-proposal convention -->
-<div style="font-size:11px;color:${C.muted};line-height:16px;margin-bottom:8px;text-align:center;font-style:italic;">${t("ec.pdf.validity")}</div>
 
   </div>
 
