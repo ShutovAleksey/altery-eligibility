@@ -1767,20 +1767,24 @@ function EcResultApproved({ rec, onBack, onReset }) {
               <div className="ec-r__compare">
                 <div className="ec-r__compare__col">
                   <div className="ec-r__compare__label">{cost.methodology.baseline}</div>
-                  <div className="ec-r__compare__amount ec-r__compare__amount--strike">
-                    {fmtNarrow(cost.bank.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.bank.totalHigh)}
+                  <div className="ec-r__compare__priceLine">
+                    <span className="ec-r__compare__amount ec-r__compare__amount--strike">
+                      {fmtNarrow(cost.bank.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.bank.totalHigh)}
+                    </span>
+                    <span className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</span>
                   </div>
-                  <div className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</div>
                 </div>
                 <div className="ec-r__compare__arrow" aria-hidden="true">
                   <EcIco.arrowRight style={{ width: 20, height: 20 }} />
                 </div>
                 <div className="ec-r__compare__col ec-r__compare__col--us">
                   <div className="ec-r__compare__label">{t("ec.r.savings.altery")}</div>
-                  <div className="ec-r__compare__amount">
-                    {fmtNarrow(cost.altery.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.altery.totalHigh)}
+                  <div className="ec-r__compare__priceLine">
+                    <span className="ec-r__compare__amount">
+                      {fmtNarrow(cost.altery.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.altery.totalHigh)}
+                    </span>
+                    <span className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</span>
                   </div>
-                  <div className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</div>
                 </div>
               </div>
 

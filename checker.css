@@ -2637,22 +2637,32 @@
       text-transform: uppercase;
       color: var(--c-muted);
     }
-    .ec-r__compare__amount {
-      font-size: 18px; font-weight: 700;
-      color: var(--c-ink);
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.01em;
+    /* Amount + cycle on one baseline — same inline pattern as the plan
+       card price ("£50 / month") for visual consistency across the
+       result page. Wrap allows long ranges to break across two lines
+       on narrow viewports without overflowing the cell. */
+    .ec-r__compare__priceLine {
+      display: inline-flex; align-items: baseline; gap: 4px;
+      flex-wrap: wrap;
       margin-top: 2px;
     }
+    .ec-r__compare__amount {
+      font-size: 22px; font-weight: 700;
+      color: var(--c-ink);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    /* Bank cell — strikethrough framing ("you used to pay this").
+       Color stays ink so both amounts read as the same hierarchy
+       and the comparison is what the eye does, not what the colour
+       tells it to do. */
     .ec-r__compare__amount--strike {
-      color: var(--c-muted-2);
       text-decoration: line-through;
       text-decoration-color: var(--c-muted-2);
       text-decoration-thickness: 1.5px;
     }
-    .ec-r__compare__col--us .ec-r__compare__amount { color: var(--c-primary); }
     .ec-r__compare__cycle {
-      font-size: 11px; color: var(--c-muted);
+      font-size: 12px; font-weight: 500; color: var(--c-muted);
       font-variant-numeric: tabular-nums;
     }
     .ec-r__compare__arrow {
@@ -3090,7 +3100,7 @@
       .ec-r__action__primary { flex-direction: column; align-items: stretch; }
       .ec-r__action__primary > * { width: 100%; flex: none; }
       .ec-r__compare { grid-template-columns: 1fr auto 1fr; gap: 6px; }
-      .ec-r__compare__amount { font-size: 16px; }
+      .ec-r__compare__amount { font-size: 18px; }
       .ec-r__savingsHero__amount { font-size: 26px; }
       .ec-r__planPrice__amount { font-size: 24px; }
       .ec-r__action__secondary { justify-content: center; width: 100%; }
