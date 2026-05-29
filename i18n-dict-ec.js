@@ -459,6 +459,8 @@
     "ec.callback.sla": "We'll get back to you within 2 hours.",
     "ec.callback.firstname": "First name",
     "ec.callback.lastname": "Last name",
+    "ec.callback.company": "Company name",
+    "ec.callback.phone": "Phone number",
     "ec.callback.submit": "Request a callback",
     "ec.callback.success": "Thanks — a specialist will reach out within 2 hours.",
     "ec.callback.error": "Please enter your first name, last name and a valid email.",

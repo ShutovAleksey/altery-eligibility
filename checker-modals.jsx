@@ -504,6 +504,8 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
   const t = useT();
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname]   = useState("");
+  const [company, setCompany]     = useState("");
+  const [phone, setPhone]         = useState("");
   const [email, setEmail]         = useState(emailProp || "");
   const [submitting, setSubmitting] = useState(false);
   const [touched, setTouched]     = useState(false);
@@ -512,7 +514,14 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
 
   const needEmail  = !emailProp;
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
-  const valid      = firstname.trim().length > 0 && lastname.trim().length > 0 && emailValid;
+  // Loose phone validation — at least 7 digits anywhere in the string,
+  // intentionally accepting "+44 7700 900 000" / "+1 (415) 555-0123" /
+  // "07700 900 000" without forcing a single format. Sales calls back,
+  // not an automated SMS dialer.
+  const phoneValid = /\d{7,}/.test(phone.replace(/\D/g, ""));
+  const companyValid = company.trim().length > 0;
+  const valid = firstname.trim().length > 0 && lastname.trim().length > 0
+    && companyValid && phoneValid && emailValid;
 
   const submit = async () => {
     setTouched(true);
@@ -520,9 +529,11 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
     setSubmitting(true);
     setError(null);
     const res = await ecSubmitHubspotLead({
-      email: email.trim(),
+      email:     email.trim(),
       firstname: firstname.trim(),
-      lastname: lastname.trim(),
+      lastname:  lastname.trim(),
+      company:   company.trim(),
+      phone:     phone.trim(),
       rec,
       context,
     });
@@ -559,6 +570,25 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
           style={{ flex: "1 1 0", minWidth: 0 }}
         />
       </div>
+      <Input
+        type="text"
+        size="md"
+        autoComplete="organization"
+        placeholder={t("ec.callback.company")}
+        value={company}
+        onChange={(e) => setCompany(e.target.value)}
+        disabled={submitting}
+      />
+      <Input
+        type="tel"
+        size="md"
+        inputMode="tel"
+        autoComplete="tel"
+        placeholder={t("ec.callback.phone")}
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        disabled={submitting}
+      />
       {needEmail && (
         <Input
           type="email"

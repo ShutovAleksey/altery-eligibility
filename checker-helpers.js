@@ -908,7 +908,7 @@ function ecContactRequestUrl(rec, email) {
 // (creates the contact + fires the workflow, but loses entity/plan/volume/
 // savings). Routing through our backend keeps the token off the client and
 // writes every property reliably.
-async function ecSubmitHubspotLead({ email, firstname, lastname, rec, context }) {
+async function ecSubmitHubspotLead({ email, firstname, lastname, company, phone, rec, context }) {
   if (!email) return { ok: false };
   // `context` lets callers pass the 4 checker values directly (e.g. the
   // PDF/email deep-link, which carries them in the URL and has no full
@@ -916,6 +916,8 @@ async function ecSubmitHubspotLead({ email, firstname, lastname, rec, context })
   const properties = Object.assign({ email: String(email).trim() }, context || ecCheckerContext(rec));
   if (firstname) properties.firstname = String(firstname).trim();
   if (lastname)  properties.lastname  = String(lastname).trim();
+  if (company)   properties.company   = String(company).trim();
+  if (phone)     properties.phone     = String(phone).trim();
   try {
     const res = await fetch("/api/hubspot-lead", {
       method: "POST",

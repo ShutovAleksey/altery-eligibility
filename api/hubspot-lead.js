@@ -20,10 +20,16 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // Only these contact properties may be written through this public,
 // unauthenticated endpoint — prevents arbitrary property injection.
+// `company` and `phone` are HubSpot's built-in Contact properties
+// (no setup needed in the dashboard). The `checker_*` set marks the
+// lead as eligibility-checker origin — sales filters on "checker_entity
+// is known" instead of needing a separate lead_source property.
 const ALLOWED_PROPS = [
   "email",
   "firstname",
   "lastname",
+  "company",
+  "phone",
   "checker_entity",
   "checker_plan",
   "checker_monthly_volume_gbp",
