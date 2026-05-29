@@ -921,30 +921,49 @@ const EC_COMPARATORS = {
   uk_hsbc: {
     id: "uk_hsbc", name: "HSBC Kinetic", type: "traditional", panel: "uk",
     asof: "2026-05-29",
-    sources: ["https://www.business.hsbc.uk/-/media/media/uk/pdfs/regulations/business-price-list.pdf"],
+    sources: [
+      "https://www.business.hsbc.uk/-/media/media/uk/pdfs/regulations/business-price-list.pdf",
+      "https://www.business.hsbc.com/-/media/media/global/pdf/hbeu-terms-and-conditions/business-price-list.pdf",
+    ],
     fees: {
-      subscriptionGbp: 6.50, subscriptionProGbp: 36, subscriptionUltraGbp: 220, localOutGbp: 0.40, sepaOutGbp: 18,
-      swiftOutGbp: 24, transferInGbp: 5, fxMarkupBps: 250,
+      // SWIFT outgoing online: GBP 17 per HSBC business price list
+      // (Business Internet Banking international payment). Telephone/
+      // branch and post tiers are higher (GBP 20 / 30 / 40). SEPA
+      // Credit Transfer charged at GBP 0.24.
+      subscriptionGbp: 6.50, subscriptionProGbp: 36, subscriptionUltraGbp: 220, localOutGbp: 0.40, sepaOutGbp: 0.24,
+      swiftOutGbp: 17, transferInGbp: 5, fxMarkupBps: 250,
       cardMonthlyGbp: 4, cardFxMarkupBps: 250, massBatchGbp: 22,
     },
   },
   uk_lloyds: {
     id: "uk_lloyds", name: "Lloyds Business", type: "traditional", panel: "uk",
     asof: "2026-05-29",
-    sources: ["https://www.lloydsbank.com/business/rates-charges.html"],
+    sources: [
+      "https://www.lloydsbank.com/business/rates-charges.html",
+      "https://www.lloydsbank.com/business/commercial-banking/rates-and-charges/international-services-rates-and-charges.html",
+    ],
     fees: {
-      subscriptionGbp: 7.50, subscriptionProGbp: 38, subscriptionUltraGbp: 230, localOutGbp: 0.35, sepaOutGbp: 22,
-      swiftOutGbp: 25, transferInGbp: 7, fxMarkupBps: 275,
+      // SWIFT outgoing online: GBP 15 (internet banking).
+      // Non-urgent SEPA Credit Transfer: GBP 5.
+      // Correspondent bank fee additional: GBP 12 Zone 1, GBP 20 Zone 2.
+      subscriptionGbp: 7.50, subscriptionProGbp: 38, subscriptionUltraGbp: 230, localOutGbp: 0.35, sepaOutGbp: 5,
+      swiftOutGbp: 15, transferInGbp: 7, fxMarkupBps: 275,
       cardMonthlyGbp: 3, cardFxMarkupBps: 275, massBatchGbp: 25,
     },
   },
   uk_natwest: {
     id: "uk_natwest", name: "NatWest Business", type: "traditional", panel: "uk",
     asof: "2026-05-29",
-    sources: ["https://www.natwest.com/business/support-centre/manage-your-account/manage-your-account-charges.html"],
+    sources: [
+      "https://www.natwest.com/business/support-centre/manage-your-account/manage-your-account-charges.html",
+      "https://www.natwest.com/business/support-centre/making-and-accepting-payments/electronic-payments/international-transfers.html",
+    ],
     fees: {
+      // SWIFT outgoing OUR/DEBT: GBP 15 NatWest fee + GBP 8.50-12.50
+      // recipient agent fee depending on country. Effective ~GBP 23-27.
+      // Conservative effective figure GBP 23.
       subscriptionGbp: 8.00, subscriptionProGbp: 38, subscriptionUltraGbp: 240, localOutGbp: 0.35, sepaOutGbp: 22,
-      swiftOutGbp: 22, transferInGbp: 6, fxMarkupBps: 260,
+      swiftOutGbp: 23, transferInGbp: 6, fxMarkupBps: 260,
       cardMonthlyGbp: 3, cardFxMarkupBps: 260, massBatchGbp: 24,
     },
   },
@@ -957,10 +976,16 @@ const EC_COMPARATORS = {
     type: "traditional", panel: "eu",
     forEntities: ["eu"],   // lead — legacy back-compat
     asof: "2026-05-29",
-    sources: ["https://banqueentreprise.bnpparibas/tarifs"],
+    sources: [
+      "https://banqueentreprise.bnpparibas/tarifs",
+      "https://mabanquepro.bnpparibas/fr/notre-offre-pro/comptes-cartes-et-services/cartes-et-autres-moyens-de-paiement/tout-savoir-sur-le-virement/le-virement-international",
+    ],
     fees: {
+      // BNP Paribas online international transfer: EUR 15 (eligible
+      // routes) ~ £13. EUR 3 to BNP group subsidiaries (preferential).
+      // We use the typical EUR 15 figure for the bank comparison.
       subscriptionGbp: 21, subscriptionProGbp: 50, subscriptionUltraGbp: 240, localOutGbp: 0.43, sepaOutGbp: 0.43,
-      swiftOutGbp: 21, transferInGbp: 0, fxMarkupBps: 275,
+      swiftOutGbp: 13, transferInGbp: 0, fxMarkupBps: 275,
       cardMonthlyGbp: 7, cardFxMarkupBps: 250, massBatchGbp: 30,
     },
     qualitative: {
@@ -1192,6 +1217,63 @@ const EC_COMPARATORS = {
       swiftOut:      "from £8 + 0.3%",
       uaeLicence: null,
       tariffTransparency: "quoted",
+    },
+  },
+  // UAE digital business bank — zero-balance, no monthly fee, ~1-5
+  // day app onboarding, backed by ADQ + FAB. Openly accepts Web3
+  // firms. Sharper MENA threat to Altery than the traditional UAE
+  // incumbents (Mashreq/ENBD/FAB) because Wio is the digital-first
+  // option a MENA-incorporated SME founder will compare us against,
+  // not the branch-network legacy banks. Goes into the MENA
+  // capability table.
+  wio_bank: {
+    id: "wio_bank",
+    name: "Wio Bank",
+    type: "neobank",
+    asof: "2026-05-29",
+    sources: [
+      "https://www.wio.io/business",
+    ],
+    qualitative: {
+      onboardingKey: "ec.cmp.q.onboarding.days",
+      digitalNative: true,            // built digital-first for SMEs / startups
+      affiliate:     "caseByCase",
+      cryptoNative:  "caseByCase",    // accepts Web3 firms with risk review
+      multiEntity:   false,           // single legal entity per account
+      docFriction:   "low",           // app-based KYB
+      fxMarkup:      "On request",
+      swiftOut:      "AED 50",
+      uaeLicence:    "CBUAE full bank licence (backed by ADQ/FAB)",
+      tariffTransparency: "partial",
+    },
+  },
+  // Global API/payments platform — 11+ jurisdictional licences, 0.5%
+  // FX above interbank, free local transfers. Strong B2B API stack
+  // (collections, payouts, card issuing, embedded finance). UAE
+  // announced (not live as of 2026-05-29). Wins on FX vs Altery
+  // Starter/Pro, loses on crypto (restricted) and DFSA presence
+  // (not yet). Future-positioning capability competitor.
+  airwallex: {
+    id: "airwallex",
+    name: "Airwallex",
+    type: "neobank",
+    asof: "2026-05-29",
+    sources: [
+      "https://www.airwallex.com/pricing",
+      "https://help.airwallex.com/hc/en-gb/articles/900001757106-How-is-Airwallex-licensed-and-regulated",
+      "https://help.airwallex.com/hc/en-gb/articles/4410623274905-Unsupported-Industries",
+    ],
+    qualitative: {
+      onboardingKey: "ec.cmp.q.onboarding.days",
+      digitalNative: "partial",
+      affiliate:     "caseByCase",
+      cryptoNative:  false,           // crypto/virtual-asset firms restricted unless expressly approved
+      multiEntity:   "linkedOnly",    // multi-user / global accounts under platform; not consolidated group treasury
+      docFriction:   "medium",
+      fxMarkup:      "from 0.5%",     // verified airwallex.com/pricing 2026-05-29
+      swiftOut:      "£10-20",
+      uaeLicence:    null,            // UAE/Saudi announced, not live as of 2026-05-29
+      tariffTransparency: "partial",   // pricing page publishes FX floor but receive-side 0.3% hidden
     },
   },
   // EU-strong neobank — France/DE/ES/IT/PT licenses, B2B focused.

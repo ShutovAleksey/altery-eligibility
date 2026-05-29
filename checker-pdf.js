@@ -503,20 +503,15 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       </table>
     </div>`;
 
-  // MENA-only callout: replaces the capability table when no major
-  // digital-first competitor operates with a local regulated presence
-  // in the region. The angle is uniqueness ("only neobank with DFSA"),
-  // not a row-by-row comparison.
-  const menaCalloutHTML = (rec?.entity?.id === "mena") ? `
-    <div style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;padding:18px 22px;margin:0 0 24px;">
-      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 6px;">${t("ec.cmp.menaCallout.eyebrow")}</div>
-      <h2 style="font-size:15px;font-weight:700;color:${C.ink};margin:0 0 6px;letter-spacing:-0.01em;">${t("ec.cmp.menaCallout.title")}</h2>
-      <p style="font-size:12.5px;line-height:19px;color:${C.inkSoft};margin:0;">${t("ec.cmp.menaCallout.body")}</p>
-    </div>` : "";
+  // (MENA-only callout was retired here on 2026-05-29 — competitive
+  // research confirmed 3S Money holds its own DIFC/DFSA licence and
+  // Wio Bank is a digital UAE SME competitor, so the "uniqueness"
+  // framing was overclaiming. MENA users now get the full capability
+  // panel against 3S Money / Wio Bank / Airwallex instead.)
 
   const comparisonHTML = `
     ${pricePanel ? renderPanel(pricePanel, "ec.cmp.price.eyebrow", "ec.cmp.price.title") : ""}
-    ${capPanel   ? renderPanel(capPanel,   "ec.cmp.capability.eyebrow", "ec.cmp.capability.title") : menaCalloutHTML}
+    ${capPanel   ? renderPanel(capPanel,   "ec.cmp.capability.eyebrow", "ec.cmp.capability.title") : ""}
     <div style="font-size:10px;color:${C.muted};line-height:15px;margin:-6px 0 30px;">${t("ec.cmp.note")}</div>`;
 
   // capabilityHTML is unused (the "Where Altery wins / Roughly equal /

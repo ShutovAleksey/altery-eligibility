@@ -816,10 +816,25 @@ function ecComparatorGroups(rec) {
         cmp.mena_enbd,
         cmp.mena_fab,
       ].filter(Boolean),
-      // No major neobank operates in MENA with a local regulated
-      // presence — show a "unique in this region" callout instead of
-      // an empty capability table. The PDF renderer reads this null.
-      capability: null,
+      // MENA capability set:
+      //  - 3S Money — DFSA + UK + LU + HK, the direct multi-
+      //    jurisdiction peer
+      //  - Wio Bank — UAE digital SME bank, zero-balance, Web3-
+      //    friendly; the sharper digital threat to Altery MENA
+      //    than the traditional UAE incumbents in the price panel
+      //  - Airwallex — global API/payments platform, 11+ licences,
+      //    UAE announced (not live as of 2026-05-29). Included
+      //    because MENA founders evaluating global SaaS payments
+      //    will compare us to them.
+      // Altery angle: 3S Money's regulatory breadth + Wio's
+      // digital UX + Airwallex's API depth, at Starter £50/mo with
+      // published tariff and accepted crypto.
+      capability: [
+        altery,
+        cmp.three_s_money,
+        cmp.wio_bank,
+        cmp.airwallex,
+      ].filter(Boolean),
     };
   }
   // UK + ROW default
