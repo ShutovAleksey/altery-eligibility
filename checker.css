@@ -3026,12 +3026,12 @@
       display: flex; flex-direction: column; gap: 12px;
     }
     .ec-r__action__primary {
-      display: flex; flex-direction: column; align-items: stretch; gap: 12px;
+      display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
     }
-    /* Both CTAs span the full container width — single column stack on
-       every viewport. The visual hierarchy (filled-primary vs muted
-       secondary) carries the order without needing different widths. */
-    .ec-r__action__primary > * { width: 100%; flex: none; }
+    /* Desktop / tablet: CTAs sit inline at content width (no flex-grow
+       on either child) — the visual hierarchy is carried by filled-vs-
+       muted, not by width. Mobile override below stacks them column-
+       full-width for thumb-friendly hit targets. */
     .ec-r__action__secondary {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 12px 18px;
@@ -3087,6 +3087,8 @@
       /* .ec-r__action stays edge-to-edge on mobile — no horizontal
          padding — so the stacked CTAs span the full card width. */
       .ec-r__action { padding: 18px 0 0; }
+      .ec-r__action__primary { flex-direction: column; align-items: stretch; }
+      .ec-r__action__primary > * { width: 100%; flex: none; }
       .ec-r__compare { grid-template-columns: 1fr auto 1fr; gap: 6px; }
       .ec-r__compare__amount { font-size: 16px; }
       .ec-r__savingsHero__amount { font-size: 26px; }
