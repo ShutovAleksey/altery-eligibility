@@ -1837,12 +1837,23 @@ function EcResultApproved({ rec, onBack, onReset }) {
                     ))}
                   </ul>
                   <div className="ec-r__method__sources">
-                    {t("ec.r.method.asof", { date: cost.methodology.asof })}
+                    {t("ec.r.method.asof", {
+                      date: (() => {
+                        try {
+                          return new Date(cost.methodology.asof).toLocaleDateString(
+                            window.__I18N?.getLang?.() || "en",
+                            { year: "numeric", month: "short", day: "numeric" }
+                          );
+                        } catch { return cost.methodology.asof; }
+                      })(),
+                    })}
                     {cost.methodology.baselineSources.map((url, i) => (
                       <span key={i}>
                         {" · "}
                         <a href={url} target="_blank" rel="noopener noreferrer">
-                          {t("ec.r.method.sourceLink", { bank: cost.methodology.baseline })}
+                          {t("ec.r.method.sourceLink", {
+                            bank: cost.methodology.baselinePanel?.[i] || cost.methodology.baseline,
+                          })}
                         </a>
                       </span>
                     ))}

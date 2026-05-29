@@ -902,8 +902,8 @@ const EC_COMPARATORS = {
     type: "traditional",
     panel: "uk",
     forEntities: ["uk", "row"],   // lead — used for legacy back-compat
-    asof: "2026-05-23",
-    sources: ["https://www.barclays.co.uk/business-banking/accounts/pricing/"],
+    asof: "2026-05-29",
+    sources: ["https://www.barclays.co.uk/business-banking/accounts/rates-and-charges/"],
     fees: {
       subscriptionGbp: 8.50, subscriptionProGbp: 40, subscriptionUltraGbp: 250, localOutGbp: 0.35, sepaOutGbp: 20,
       swiftOutGbp: 25, transferInGbp: 6, fxMarkupBps: 275,
@@ -917,8 +917,8 @@ const EC_COMPARATORS = {
   },
   uk_hsbc: {
     id: "uk_hsbc", name: "HSBC Kinetic", type: "traditional", panel: "uk",
-    asof: "2026-05-23",
-    sources: ["https://www.business.hsbc.uk/-/media/library/business-uk/pdfs/business-banking-price-list.pdf"],
+    asof: "2026-05-29",
+    sources: ["https://www.business.hsbc.uk/-/media/media/uk/pdfs/regulations/business-price-list.pdf"],
     fees: {
       subscriptionGbp: 6.50, subscriptionProGbp: 36, subscriptionUltraGbp: 220, localOutGbp: 0.40, sepaOutGbp: 18,
       swiftOutGbp: 24, transferInGbp: 5, fxMarkupBps: 250,
@@ -927,8 +927,8 @@ const EC_COMPARATORS = {
   },
   uk_lloyds: {
     id: "uk_lloyds", name: "Lloyds Business", type: "traditional", panel: "uk",
-    asof: "2026-05-23",
-    sources: ["https://www.lloydsbank.com/business/business-banking-charges.html"],
+    asof: "2026-05-29",
+    sources: ["https://www.lloydsbank.com/business/rates-charges.html"],
     fees: {
       subscriptionGbp: 7.50, subscriptionProGbp: 38, subscriptionUltraGbp: 230, localOutGbp: 0.35, sepaOutGbp: 22,
       swiftOutGbp: 25, transferInGbp: 7, fxMarkupBps: 275,
@@ -937,7 +937,7 @@ const EC_COMPARATORS = {
   },
   uk_natwest: {
     id: "uk_natwest", name: "NatWest Business", type: "traditional", panel: "uk",
-    asof: "2026-05-23",
+    asof: "2026-05-29",
     sources: ["https://www.natwest.com/business/support-centre/manage-your-account/manage-your-account-charges.html"],
     fees: {
       subscriptionGbp: 8.00, subscriptionProGbp: 38, subscriptionUltraGbp: 240, localOutGbp: 0.35, sepaOutGbp: 22,
@@ -953,7 +953,7 @@ const EC_COMPARATORS = {
     id: "eu_traditional", name: "BNP Paribas Business",
     type: "traditional", panel: "eu",
     forEntities: ["eu"],   // lead — legacy back-compat
-    asof: "2026-05-23",
+    asof: "2026-05-29",
     sources: ["https://banqueentreprise.bnpparibas/tarifs"],
     fees: {
       subscriptionGbp: 21, subscriptionProGbp: 50, subscriptionUltraGbp: 240, localOutGbp: 0.43, sepaOutGbp: 0.43,
@@ -969,8 +969,8 @@ const EC_COMPARATORS = {
   eu_socgen: {
     id: "eu_socgen", name: "Société Générale Business",
     type: "traditional", panel: "eu",
-    asof: "2026-05-23",
-    sources: ["https://entreprises.societegenerale.fr/tarifs-societe-generale-entreprises"],
+    asof: "2026-05-29",
+    sources: ["https://entreprises.sg.fr/tarifs-societe-generale-entreprises"],
     fees: {
       subscriptionGbp: 18, subscriptionProGbp: 45, subscriptionUltraGbp: 220, localOutGbp: 0.50, sepaOutGbp: 0.50,
       swiftOutGbp: 19, transferInGbp: 0, fxMarkupBps: 260,
@@ -980,8 +980,8 @@ const EC_COMPARATORS = {
   eu_creditag: {
     id: "eu_creditag", name: "Crédit Agricole Business",
     type: "traditional", panel: "eu",
-    asof: "2026-05-23",
-    sources: ["https://www.credit-agricole.fr/content/dam/assetsca/cr894/npc/documents/tarifs/tarifs-professionnels-entreprises.pdf"],
+    asof: "2026-05-29",
+    sources: ["https://www.credit-agricole.fr/professionnel/aide-contact/tarifs.html"],
     fees: {
       subscriptionGbp: 17, subscriptionProGbp: 42, subscriptionUltraGbp: 200, localOutGbp: 0.45, sepaOutGbp: 0.45,
       swiftOutGbp: 18, transferInGbp: 0, fxMarkupBps: 250,
@@ -991,8 +991,8 @@ const EC_COMPARATORS = {
   eu_deutsche: {
     id: "eu_deutsche", name: "Deutsche Bank Business",
     type: "traditional", panel: "eu",
-    asof: "2026-05-23",
-    sources: ["https://www.deutsche-bank.de/pk/service-und-kontakt/services/konditionen-und-preise.html"],
+    asof: "2026-05-29",
+    sources: ["https://www.deutsche-bank.de/ms/geschaeftskunden.html"],
     fees: {
       subscriptionGbp: 23, subscriptionProGbp: 55, subscriptionUltraGbp: 260, localOutGbp: 0.40, sepaOutGbp: 0.40,
       swiftOutGbp: 22, transferInGbp: 0, fxMarkupBps: 280,
@@ -1006,8 +1006,8 @@ const EC_COMPARATORS = {
     id: "mena_traditional", name: "Mashreq Business",
     type: "traditional", panel: "mena",
     forEntities: ["mena"],   // lead — legacy back-compat
-    asof: "2026-05-23",
-    sources: ["https://www.mashreqbank.com/en/uae/corporate/service-charges/"],
+    asof: "2026-05-29",
+    sources: ["https://www.mashreq.com/en/uae/corporate/service-charges/"],
     fees: {
       subscriptionGbp: 42, subscriptionProGbp: 95, subscriptionUltraGbp: 280, localOutGbp: 1.05, sepaOutGbp: 21,
       swiftOutGbp: 26, transferInGbp: 4, fxMarkupBps: 300,
@@ -1022,8 +1022,8 @@ const EC_COMPARATORS = {
   mena_enbd: {
     id: "mena_enbd", name: "Emirates NBD Business",
     type: "traditional", panel: "mena",
-    asof: "2026-05-23",
-    sources: ["https://www.emiratesnbd.com/en/assets/File/EmiratesNBD_BB_Schedule_of_charges.pdf"],
+    asof: "2026-05-29",
+    sources: ["https://www.emiratesnbd.com/-/media/files/help-and-support-pdf/emiratesnbd_bb_schedule_of_charges.pdf"],
     fees: {
       subscriptionGbp: 37, subscriptionProGbp: 85, subscriptionUltraGbp: 250, localOutGbp: 0.85, sepaOutGbp: 19,
       swiftOutGbp: 25, transferInGbp: 4, fxMarkupBps: 285,
@@ -1033,8 +1033,8 @@ const EC_COMPARATORS = {
   mena_fab: {
     id: "mena_fab", name: "First Abu Dhabi Bank (FAB) Business",
     type: "traditional", panel: "mena",
-    asof: "2026-05-23",
-    sources: ["https://www.bankfab.com/v1/en-ae/ccib/commercial-banking/fees-and-charges"],
+    asof: "2026-05-29",
+    sources: ["https://www.bankfab.com/en-ae/business-banking/fees-and-charges"],
     fees: {
       subscriptionGbp: 32, subscriptionProGbp: 80, subscriptionUltraGbp: 240, localOutGbp: 1.00, sepaOutGbp: 20,
       swiftOutGbp: 24, transferInGbp: 4, fxMarkupBps: 290,
@@ -1048,7 +1048,7 @@ const EC_COMPARATORS = {
     id: "wise",
     name: "Wise Business",
     type: "neobank",
-    asof: "2026-05-23",
+    asof: "2026-05-29",
     sources: ["https://wise.com/help/articles/2978049/where-can-i-use-wise"],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
@@ -1065,7 +1065,7 @@ const EC_COMPARATORS = {
     id: "revolut",
     name: "Revolut Business",
     type: "neobank",
-    asof: "2026-05-23",
+    asof: "2026-05-29",
     sources: ["https://help.revolut.com/en-US/business/help/setting-up-an-account/is-my-business-eligible/"],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
@@ -1082,7 +1082,7 @@ const EC_COMPARATORS = {
     id: "mercury",
     name: "Mercury",
     type: "neobank",
-    asof: "2026-05-23",
+    asof: "2026-05-29",
     sources: ["https://support.mercury.com/hc/en-us/articles/28770467511060"],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
@@ -1100,7 +1100,7 @@ const EC_COMPARATORS = {
     id: "three_s_money",
     name: "3S Money",
     type: "neobank",
-    asof: "2026-05-23",
+    asof: "2026-05-29",
     sources: ["https://3s.money/help-centre/getting-started/is-my-business-eligible-for-a-3s-money-international-business-account"],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.weeks",  // 2-3 weeks despite digital flow
@@ -1118,7 +1118,7 @@ const EC_COMPARATORS = {
     id: "payset",
     name: "Payset",
     type: "neobank",
-    asof: "2026-05-23",
+    asof: "2026-05-29",
     sources: ["https://www.payset.io/multi-currency-account/"],
     qualitative: {
       onboardingKey: "ec.cmp.q.onboarding.days",
