@@ -1747,10 +1747,29 @@ function EcResultApproved({ rec, onBack, onReset }) {
               <div className="ec-r__cardEyebrow">
                 {t("ec.r.savings.head", { bank: cost.methodology.baseline })}
               </div>
+              {/* Single-track savings narrative — annual range as the
+                  emotional anchor, monthly range as the operational
+                  framing right below, then the Bank-vs-Altery proof row
+                  with each side shown as its own range. The bank's high
+                  end already includes wholesale FX spread + correspondent
+                  SWIFT fees, so the inline footnote below explains the
+                  range rather than competing for headline attention with
+                  a second "realistic savings" number. */}
+              <div className="ec-r__savingsHero">
+                <div className="ec-r__savingsHero__amount">
+                  {t("ec.r.savings.yearRange", { low: fmtNarrow(cost.savings.rangeAnnualLow), high: fmtNarrow(cost.savings.rangeAnnualHigh) })}
+                </div>
+                <div className="ec-r__savingsHero__year">
+                  {t("ec.r.savings.monthlyRange", { low: fmtNarrow(cost.savings.rangeMonthlyLow), high: fmtNarrow(cost.savings.rangeMonthlyHigh) })}
+                </div>
+              </div>
+
               <div className="ec-r__compare">
                 <div className="ec-r__compare__col">
                   <div className="ec-r__compare__label">{cost.methodology.baseline}</div>
-                  <div className="ec-r__compare__amount ec-r__compare__amount--strike">{fmtNarrow(cost.bank.total)}</div>
+                  <div className="ec-r__compare__amount ec-r__compare__amount--strike">
+                    {fmtNarrow(cost.bank.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.bank.totalHigh)}
+                  </div>
                   <div className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</div>
                 </div>
                 <div className="ec-r__compare__arrow" aria-hidden="true">
@@ -1758,42 +1777,20 @@ function EcResultApproved({ rec, onBack, onReset }) {
                 </div>
                 <div className="ec-r__compare__col ec-r__compare__col--us">
                   <div className="ec-r__compare__label">{t("ec.r.savings.altery")}</div>
-                  <div className="ec-r__compare__amount">{fmtNarrow(cost.altery.total)}</div>
+                  <div className="ec-r__compare__amount">
+                    {fmtNarrow(cost.altery.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.altery.totalHigh)}
+                  </div>
                   <div className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</div>
                 </div>
               </div>
-              <div className="ec-r__savingsHero">
-                <div className="ec-r__savingsHero__label">{t("ec.r.savings.heroLabel")}</div>
-                <div className="ec-r__savingsHero__amount">
-                  {fmtNarrow(cost.savings.monthlyLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtNarrow(cost.savings.monthlyHigh)}<span className="ec-r__savingsHero__cycle">{t("ec.r.savings.cycle")}</span>
-                </div>
-                <div className="ec-r__savingsHero__year">
-                  {t("ec.r.savings.yearRange", { low: fmtNarrow(cost.savings.annualLow), high: fmtNarrow(cost.savings.annualHigh) })}
-                </div>
-              </div>
 
-              {/* Realistic-track callout — adds bank-side hidden costs
-                  (wholesale FX spread + correspondent SWIFT fees) that
-                  most banks don't surface on their public pricing page.
-                  Conservative (headline) range stays citation-only; this
-                  line shows what a customer would actually pay incl.
-                  the hidden layer, which is materially higher. Only
-                  renders when the hidden contribution is meaningful. */}
+              {/* Hidden-cost disclosure — explains why the bank-side
+                  range stretches as high as it does. Folded inline as a
+                  small footnote instead of a competing savings figure. */}
               {cost.savings.hiddenTotal > 0 && (
-                <div className="ec-r__savings__realistic">
-                  <div className="ec-r__savings__realisticLine">
-                    {t("ec.r.savings.realistic.label")}{" "}
-                    <strong>
-                      {fmtNarrow(cost.savings.monthlyRealisticLow)}
-                      <span className="ec-r__savingsHero__sep">–</span>
-                      {fmtNarrow(cost.savings.monthlyRealisticHigh)}
-                      {t("ec.r.savings.cycle")}
-                    </strong>
-                  </div>
-                  <div className="ec-r__savings__realisticHint">
-                    {t("ec.r.savings.realistic.hint")}
-                  </div>
-                </div>
+                <p className="ec-r__savings__hiddenNote">
+                  {t("ec.r.savings.realistic.hint")}
+                </p>
               )}
 
               <p className="ec-r__savings__note">

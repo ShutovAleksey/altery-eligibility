@@ -600,6 +600,21 @@ function ecComputeCostBreakdown(rec) {
   // and unnecessarily wide for high-input cases (sandbags the number).
   const conf = ecConfidenceLevel(rec);
   const lo = 1 - conf.band, hi = 1 + conf.band;
+  // Range fields for the consolidated single-track result-card view.
+  // bank low end uses published-only fees; bank high end includes the
+  // wholesale FX spread + correspondent SWIFT costs (so the range
+  // brackets both "what the bank advertises" and "what you'd actually
+  // pay"). altery range is just confidence-band variance — our fee
+  // structure is published with no hidden additions.
+  // Single-number `bank.total` / `altery.total` (above) stay unchanged
+  // for the methodology details, PDF/email proposal, and tests.
+  const r100 = (n) => Math.round(n / 100) * 100;
+  bank.totalLow    = r100(bank.total * lo);
+  bank.totalHigh   = r100(bank.totalRealistic * hi);
+  altery.totalLow  = r100(altery.total * lo);
+  altery.totalHigh = r100(altery.total * hi);
+  const rangeMonthlyLow  = r100(Math.max(bank.totalLow  - altery.totalHigh, 0));
+  const rangeMonthlyHigh = r100(Math.max(bank.totalHigh - altery.totalLow,  0));
   const savings = {
     monthly,
     annual,
@@ -620,6 +635,14 @@ function ecComputeCostBreakdown(rec) {
     hiddenFx:             bank.hiddenFx,
     hiddenSwift:          bank.hiddenSwift,
     hiddenTotal:          bank.hiddenFx + bank.hiddenSwift,
+    // Single-track range fields — wider than monthlyLow/monthlyHigh
+    // because they fold the hidden bank-side costs into the high end.
+    // Used by the result-page savings card (which renders one savings
+    // narrative instead of two competing tracks).
+    rangeMonthlyLow:  rangeMonthlyLow,
+    rangeMonthlyHigh: rangeMonthlyHigh,
+    rangeAnnualLow:   rangeMonthlyLow  * 12,
+    rangeAnnualHigh:  rangeMonthlyHigh * 12,
     confidence:        conf.level,
     confidenceBand:    conf.band,
     confidenceMissing: conf.missing,

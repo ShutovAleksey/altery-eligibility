@@ -315,7 +315,6 @@
     // Realistic-track savings callout — bank-side hidden costs added
     // on top of the published-rates headline. Hint cites the two
     // categories (FX spread + correspondent SWIFT).
-    "ec.r.savings.realistic.label": "Including costs the bank doesn't show:",
     "ec.r.savings.realistic.hint":  "Wholesale FX spread (≈ +0.5% on top of published markup) and correspondent SWIFT fees (≈ £18 per outgoing transfer) — items most banks don't list on their pricing page.",
     "ec.r.method.hiddenFxSpread":   "Estimated +{pct}% wholesale FX spread on top of bank's published markup",
     "ec.r.method.hiddenSwiftCorr":  "Estimated £{gbp} correspondent SWIFT fee per outgoing transfer",
@@ -567,10 +566,10 @@
     "ec.r.method.line.subscription": "Monthly subscription",
     "ec.r.method.summary": "How we calculated this",
     "ec.r.savings.yearRange": "{low}–{high} a year",
+    "ec.r.savings.monthlyRange": "≈ {low}–{high} per month",
     "ec.r.savings.bank": "Traditional bank",
     "ec.r.savings.altery": "With Altery",
     "ec.r.savings.cycle": "/month",
-    "ec.r.savings.heroLabel": "You save up to",
     "ec.r.savings.year": "≈ {amount} per year",
     "ec.r.savings.note": "Estimate based on your ~{volume} monthly volume, blended SEPA + SWIFT mix. Full line-by-line breakdown is in your proposal PDF.",
     "ec.r.iban.caption": "Example of your local {currency} format · allocated after KYB",
