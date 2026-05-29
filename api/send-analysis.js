@@ -119,8 +119,10 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
 
         ${forwarderBlock}
 
-        <!-- Hero — eyebrow + persona + title-with-accents + lead + pill -->
-        <tr><td style="padding:32px 36px 4px;">
+        <!-- Hero — eyebrow + persona + title-with-accents + lead.
+             Status pill and capability matrix removed; the PDF carries
+             those, and the email reads as a clean wrapper. -->
+        <tr><td style="padding:32px 36px 24px;">
 
           ${personaLine ? `<div style="font-size:13px;font-weight:500;line-height:19px;color:${C.primary};margin:0 0 10px;letter-spacing:-0.005em;">${personaLine}</div>` : ""}
 
@@ -132,17 +134,9 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
             <span style="color:${C.primary};">${entityName}</span> ${s.titleMid || "is built for your"} <span style="color:${C.primary};">${planName}</span>${s.titleEnd || " account."}
           </h1>
 
-          <p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0 0 18px;">
+          <p style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0;">
             ${s.lead || "We've put together a full eligibility analysis covering our reasoning, your selected services, fees, and your personal setup link. It's attached as a PDF — open it whenever you're ready."}
           </p>
-
-          <!-- Entity status pill — beige bg, success dot, matches result page -->
-          <div style="margin:0 0 26px;">
-            <span style="display:inline-block;padding:7px 14px 7px 10px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;font-size:12px;color:${C.ink};line-height:1;">
-              <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${C.success};margin-right:8px;vertical-align:middle;"></span>
-              ${entityName} · ${s.pillActive || "Active"}
-            </span>
-          </div>
 
         </td></tr>
 
@@ -154,12 +148,6 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
         </td></tr>
 
         ${bookingBlock}
-
-        <!-- Capability matrix — three-section wins/equal/bank-wins
-             read. Rendered client-side and slotted in here because
-             the matrix data lives in browser-only modules. Empty
-             string when the client didn't send it (older client). -->
-        ${s.capabilityHTML || ""}
 
         <!-- Tail copy -->
         <tr><td style="padding:24px 36px 32px;">

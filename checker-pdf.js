@@ -1003,47 +1003,10 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       ? t("ec.email.forwarded.label")
       : "";
 
-    // Capability matrix — 3 short blocks (Altery wins / Roughly
-    // equal / Where bank may still win). Rendered client-side here
-    // because the matrix data + i18n live in browser-only modules;
-    // the serverless function just slots this HTML into its
-    // template. Inline styles only — Gmail / Outlook strip <style>.
-    const capabilityHTML = (() => {
-      if (typeof ecCapabilityMatrix !== "function") return "";
-      const cap = ecCapabilityMatrix(rec);
-      const COL = {
-        wins:  { bg: "#F0EBE3", bd: "#E5E0D5" },
-        equal: { bg: "#F8F7F4", bd: "#E5E7EE" },
-        bank:  { bg: "#FFF4E5", bd: "#F2D9B8" },
-      };
-      const col = (kind, head, rows) => `
-        <td valign="top" width="33%" style="padding:0 4px;">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
-                 style="background:${COL[kind].bg};border:1px solid ${COL[kind].bd};border-radius:10px;">
-            <tr><td style="padding:12px 14px;">
-              <div style="font-size:11px;font-weight:700;color:#14171F;margin:0 0 8px;letter-spacing:0.01em;">${head}</div>
-              ${rows.map((r) => `
-                <div style="margin:0 0 9px;">
-                  <div style="font-size:12px;font-weight:600;color:#14171F;line-height:16px;">${t(r.titleKey)}</div>
-                  <div style="font-size:11px;color:#4B5063;line-height:15px;margin-top:1px;">${t(r.detailKey)}</div>
-                </div>`).join("")}
-            </td></tr>
-          </table>
-        </td>`;
-      return `
-        <tr><td style="padding:0 36px 24px;">
-          <div style="font-size:11px;font-weight:600;color:#6B6F7B;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">${t("ec.cap.eyebrow")}</div>
-          <h3 style="font-size:16px;font-weight:700;color:#14171F;margin:0 0 6px;letter-spacing:-0.01em;">${t("ec.cap.title")}</h3>
-          <div style="font-size:12px;color:#4B5063;line-height:17px;margin:0 0 12px;">${t("ec.cap.lead")}</div>
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              ${col("wins",  t("ec.cap.section.wins"),       cap.alteryWins)}
-              ${col("equal", t("ec.cap.section.comparable"), cap.comparable)}
-              ${col("bank",  t("ec.cap.section.bankWins", { bank: cap.bankName }), cap.bankWins)}
-            </tr>
-          </table>
-        </td></tr>`;
-    })();
+    // Capability matrix used to be rendered into the email body here
+    // and slotted as ${capabilityHTML}. Removed 2026-05-29 — that
+    // content lives in the PDF, and inboxes scan better when the email
+    // is a short wrapper around the attachment, not a duplicate of it.
 
     const emailStrings = {
       subject:        safeForwarder
@@ -1056,7 +1019,6 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       titleMid:       t("ec.r.title.middle"),
       titleEnd:       t("ec.r.title.after"),
       lead:           t("ec.email.lead"),
-      pillActive:     t("ec.email.pillActive"),
       cta:            t("ec.email.cta"),
       tail1:          t("ec.email.tail1"),
       tail2:          t("ec.email.tail2"),
@@ -1065,7 +1027,6 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       footerEntities: t("ec.pdf.footer.entities"),
       forwardedByBanner,
       forwardedByLabel,
-      capabilityHTML,
     };
 
     const apiRes = await fetch("/api/send-analysis", {

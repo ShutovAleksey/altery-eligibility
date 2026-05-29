@@ -485,7 +485,6 @@
     "ec.email.preheader": "Your {plan} plan recommendation on {entity} — full PDF attached.",
     "ec.email.eyebrow": "Recommended for your business",
     "ec.email.lead": "We've put together a full eligibility analysis covering our reasoning, your selected services, fees, and your personal setup link. It's attached as a PDF — open it whenever you're ready.",
-    "ec.email.pillActive": "Active",
     "ec.email.cta": "Continue to setup",
     "ec.email.tail1": "Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off.",
     "ec.email.tail2": "Questions? Just reply to this email or write to <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a> — we're here to help.",
