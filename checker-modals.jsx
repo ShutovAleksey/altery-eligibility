@@ -511,6 +511,11 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
   const [touched, setTouched]     = useState(false);
   const [error, setError]         = useState(null);
   const [done, setDone]           = useState(false);
+  // Anti-spam: honeypot input + mount-time stamp. See lib/anti-spam.js.
+  // Bots that fill every field set `honeypot` non-empty; instant submits
+  // fail the 3-second form-age check.
+  const [honeypot, setHoneypot]   = useState("");
+  const formLoadedAt = useRef(Date.now());
 
   const needEmail  = !emailProp;
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim());
@@ -536,6 +541,7 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
       phone:     phone.trim(),
       rec,
       context,
+      antiSpam: { website: honeypot, formLoadedAt: formLoadedAt.current },
     });
     setSubmitting(false);
     if (res && res.ok) setDone(true);
@@ -548,6 +554,27 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
 
   return (
     <div className="ec-callback">
+      {/* Honeypot — invisible to humans, irresistible to dumb bots.
+          Positioned off-screen rather than display:none so that
+          headless browsers reading computed styles still "see" it. */}
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        aria-hidden="true"
+        value={honeypot}
+        onChange={(e) => setHoneypot(e.target.value)}
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          top: "auto",
+          width: 1,
+          height: 1,
+          opacity: 0,
+          pointerEvents: "none",
+        }}
+      />
       <div className="ec-callback__row">
         <Input
           type="text"
@@ -648,6 +675,11 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
   // naturally to fit the new view (no fixed height).
   const [sentView, setSentView] = useState("options");
 
+  // Anti-spam: honeypot + mount-time stamp shared by both email-stage
+  // sends (primary recipient and colleague copy). See lib/anti-spam.js.
+  const [honeypot, setHoneypot] = useState("");
+  const formLoadedAt = useRef(Date.now());
+
   // Engagement signal for the next-steps checklist on the sent stage.
   // colleagueSent → step 2 ("Forward to your CFO or co-founder") flips done.
   // Write-once locally — there's no value in toggling back, and refreshing
@@ -678,7 +710,12 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
       // /api/send-analysis, which ships a transactional email (PDF
       // attached) to the address the user entered. See api/send-analysis.js
       // for server-side details (env vars, sender domain).
-      await ecSendAnalysisEmail({ rec, email, t });
+      await ecSendAnalysisEmail({
+        rec,
+        email,
+        t,
+        antiSpam: { website: honeypot, formLoadedAt: formLoadedAt.current },
+      });
       setStage("sent");
     } catch (err) {
       console.error("[EcHandoffModal] email send failed:", err);
@@ -708,6 +745,7 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
         email: colleagueEmail.trim(),
         t,
         forwardedBy: email.trim(),
+        antiSpam: { website: honeypot, formLoadedAt: formLoadedAt.current },
       });
       setColleagueSent(true);
     } catch (err) {
@@ -797,6 +835,26 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                 line above carries the value-prop on its own. */}
 
             <div className="ec-handoff__field">
+              {/* Honeypot — invisible to humans, irresistible to dumb
+                  bots. See lib/anti-spam.js. */}
+              <input
+                type="text"
+                name="website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                style={{
+                  position: "absolute",
+                  left: "-9999px",
+                  top: "auto",
+                  width: 1,
+                  height: 1,
+                  opacity: 0,
+                  pointerEvents: "none",
+                }}
+              />
               <Input
                 id="ec-handoff-email"
                 type="email"

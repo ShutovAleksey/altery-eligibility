@@ -20,6 +20,7 @@
 
 import { sendEmail } from "../lib/email.js";
 import { rateLimitAll, clientIp, send429 } from "../lib/rate-limit.js";
+import { checkAntiSpam, sendAntiSpamReject } from "../lib/anti-spam.js";
 
 // Abuse limits — the endpoint is unauthenticated, so we cap input size
 // and validate format. A determined attacker can still send spam through
@@ -314,6 +315,12 @@ export default async function handler(req, res) {
   // BREVO_API_KEY presence is checked inside sendEmail(); we let the
   // helper surface the no_api_key code rather than duplicating the
   // check here. Lets us swap providers without touching this file.
+
+  // Anti-spam first — honeypot field + Origin header + form-age gate.
+  // Cheap checks, catch most automated submissions before they spend
+  // any rate-limit budget. See lib/anti-spam.js.
+  const spamCheck = checkAntiSpam(req);
+  if (!spamCheck.ok) return sendAntiSpamReject(res, spamCheck);
 
   // Rate-limit BEFORE parsing the body — cheaper to reject early.
   // Per-IP caps catch scripted spammers; per-email-recipient caps

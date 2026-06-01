@@ -17,6 +17,7 @@
 //      HUBSPOT_TOKEN (and redeploy).
 
 import { rateLimitAll, clientIp, send429 } from "../lib/rate-limit.js";
+import { checkAntiSpam, sendAntiSpamReject } from "../lib/anti-spam.js";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
@@ -47,6 +48,12 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
   }
+
+  // Anti-spam first — honeypot field + Origin header + form-age gate.
+  // Cheap checks that catch most automated submissions before they
+  // spend rate-limit budget. See lib/anti-spam.js.
+  const spamCheck = checkAntiSpam(req);
+  if (!spamCheck.ok) return sendAntiSpamReject(res, spamCheck);
 
   // Rate-limit BEFORE talking to HubSpot. An unrestricted endpoint
   // here would let an attacker dump thousands of fake leads into the

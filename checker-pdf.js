@@ -872,7 +872,7 @@ function ecBlobToBase64(blob) {
 // fast, and avoids per-invocation CPU cost on the email path.
 // Trade-off: a few extra MB on the user's browser bundle (the
 // html2pdf script, which we load async).
-async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
+async function ecSendAnalysisEmail({ rec, email, t, forwardedBy, antiSpam }) {
   await ecWaitForPdfLibs();
 
   const langCode = (window.__I18N && typeof window.__I18N.getLang === "function")
@@ -1134,22 +1134,31 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy }) {
       forwardedByLabel,
     };
 
+    // Anti-spam fields (honeypot + form-load timestamp) — server
+    // rejects if honeypot non-empty or form submitted <3 s after
+    // mount. See lib/anti-spam.js. Only sent when caller supplies
+    // them; older clients without these fields still work.
+    const apiPayload = {
+      email,
+      pdfBase64,
+      filename,
+      planName,
+      entityName,
+      personaLine,
+      sessionLink,
+      langCode,
+      bookingURL: ecContactRequestUrl(rec, email),
+      emailStrings,
+      forwardedBy: safeForwarder,
+    };
+    if (antiSpam) {
+      if (typeof antiSpam.website === "string") apiPayload.website = antiSpam.website;
+      if (typeof antiSpam.formLoadedAt === "number") apiPayload.formLoadedAt = antiSpam.formLoadedAt;
+    }
     const apiRes = await fetch("/api/send-analysis", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email,
-        pdfBase64,
-        filename,
-        planName,
-        entityName,
-        personaLine,
-        sessionLink,
-        langCode,
-        bookingURL: ecContactRequestUrl(rec, email),
-        emailStrings,
-        forwardedBy: safeForwarder,
-      }),
+      body: JSON.stringify(apiPayload),
     });
 
     if (!apiRes.ok) {
