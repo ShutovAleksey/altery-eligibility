@@ -288,6 +288,18 @@ function EcApp() {
   // don't need to thread it through component state.
   useEffect(() => { ecCaptureAndStoreUtms(); }, []);
 
+  // Scroll to the top of the page on every step transition. Without
+  // this, a user who scrolled mid-question (e.g. inspected the
+  // services list on Q3, scrolled, then hit Continue) lands at the
+  // same vertical offset on the next question — and has to manually
+  // scroll up to read its header. Same applies to the result screen
+  // and to back-navigation via the sidebar. Use 'auto' (instant) not
+  // 'smooth' — a smooth animation between two question screens reads
+  // as a glitch, and on mobile with an open keyboard it stutters.
+  useEffect(() => {
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "auto" });
+  }, [step]);
+
   // Deep-link entry: the PDF/email "request a callback" button links to
   // /?contact=1 with the visitor's email + checker context as params. When
   // present we skip the quiz entirely and render the standalone callback

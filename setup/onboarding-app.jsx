@@ -567,6 +567,15 @@ function App() {
   // to thread through component state.
   useEffect(() => { obCaptureAndStoreUtms(); }, []);
 
+  // Scroll to the top on every step transition. Onboarding screens
+  // are long (UBO forms, document upload lists, review summaries), so
+  // landing mid-page when stepping forward is disorienting. 'auto'
+  // (instant) not 'smooth' — smooth between two full screens reads
+  // as a glitch and stutters on mobile with the keyboard up.
+  useEffect(() => {
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "auto" });
+  }, [step]);
+
   // formState — single source of truth for user-entered data, persisted to
   // localStorage so a reload mid-flow doesn't lose progress. Initialised below
   // (after checkerParams is computed, since the seed depends on URL params).
