@@ -37,6 +37,16 @@ const ALLOWED_PROPS = [
   "checker_plan",
   "checker_monthly_volume_gbp",
   "checker_est_annual_savings_gbp",
+  // Marketing attribution — populated from sessionStorage on the
+  // client (first-touch capture in ecCaptureAndStoreUtms). These
+  // are stock UTM names; create them as Single-line text contact
+  // properties in HubSpot if they don't exist yet.
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+  "utm_referrer",
 ];
 
 export default async function handler(req, res) {

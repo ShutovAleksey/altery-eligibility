@@ -1144,6 +1144,17 @@ async function ecSubmitHubspotLead({ email, firstname, lastname, company, phone,
   if (lastname)  properties.lastname  = String(lastname).trim();
   if (company)   properties.company   = String(company).trim();
   if (phone)     properties.phone     = String(phone).trim();
+  // Marketing attribution — forward the first-touch UTMs stashed in
+  // sessionStorage to HubSpot so Sales can filter leads by campaign.
+  // ecGetStoredUtms returns null when no utm_* hit the landing URL.
+  // Each property is allowlisted server-side (api/hubspot-lead.js).
+  const utm = ecGetStoredUtms();
+  if (utm) {
+    for (const k of UTM_FIELDS) {
+      if (utm[k]) properties[k] = String(utm[k]).slice(0, 200);
+    }
+    if (utm.referrer) properties.utm_referrer = String(utm.referrer).slice(0, 500);
+  }
   // antiSpam payload — honeypot field + form-load timestamp the
   // form component tracks. Server rejects if honeypot is non-empty
   // (bots fill every field) or if submit happened <3 s after mount.
