@@ -39,14 +39,15 @@ const ALLOWED_PROPS = [
   "checker_est_annual_savings_gbp",
   // Marketing attribution — populated from sessionStorage on the
   // client (first-touch capture in ecCaptureAndStoreUtms). These
-  // are stock UTM names; create them as Single-line text contact
-  // properties in HubSpot if they don't exist yet.
+  // 5 properties exist in the HubSpot account with these exact
+  // internal names. `utm_referrer` is intentionally NOT in the
+  // allowlist — the property is not yet provisioned in HubSpot
+  // and sending an unknown property fails the whole upsert.
   "utm_source",
   "utm_medium",
   "utm_campaign",
   "utm_term",
   "utm_content",
-  "utm_referrer",
 ];
 
 export default async function handler(req, res) {

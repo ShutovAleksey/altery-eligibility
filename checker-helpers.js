@@ -1153,7 +1153,13 @@ async function ecSubmitHubspotLead({ email, firstname, lastname, company, phone,
     for (const k of UTM_FIELDS) {
       if (utm[k]) properties[k] = String(utm[k]).slice(0, 200);
     }
-    if (utm.referrer) properties.utm_referrer = String(utm.referrer).slice(0, 500);
+    // utm.referrer is captured (see ecCaptureUtmsFromURL) but NOT
+    // forwarded — the HubSpot account does not yet have a custom
+    // `utm_referrer` contact property and sending unknown property
+    // names causes the entire batch/upsert to fail with HTTP 400.
+    // Create that property in HubSpot and uncomment the line below
+    // to start writing it.
+    // if (utm.referrer) properties.utm_referrer = String(utm.referrer).slice(0, 500);
   }
   // antiSpam payload — honeypot field + form-load timestamp the
   // form component tracks. Server rejects if honeypot is non-empty
