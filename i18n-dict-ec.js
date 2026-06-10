@@ -215,7 +215,7 @@
 
         // Plan comparison modal — opens from "Compare all plans →" link
         // on the plan card. Side-by-side feature + fees breakdown.
-        "ec.r.plan.compare.title":   "Find the right plan for your needs",
+        "ec.r.plan.compare.title":   "Here's what each plan includes. You decide what fits.",
         "ec.r.plan.compare.wasRecommended": "Originally recommended",
         "ec.r.plan.compare.switch":  "Switch to this plan",
         "ec.r.plan.compare.featuresHead": "Features",
@@ -292,8 +292,8 @@
     "ec.plan.pro.tagline":     "For growing businesses",
     "ec.plan.ultra.tagline":   "For high-volume businesses",
     // Fits (longer — shown in modal's "Suitable for" section)
-    "ec.plan.starter.fit": "Small businesses with monthly transaction volume under £100K.",
-    "ec.plan.pro.fit":     "Growing businesses with volume up to £1M per month.",
+    "ec.plan.starter.fit": "For small businesses sending up to £100k a month.",
+    "ec.plan.pro.fit":     "For growing businesses moving up to £1M a month.",
     "ec.plan.ultra.fit":   "High-volume operations above £1M per month with complex structures.",
     "ec.plan.cycleMo": "/ month",
 
@@ -430,9 +430,9 @@
     "ec.pdf.checklist.volume": "Monthly volume (pre-filled from your answers)",
     "ec.pdf.checklist.note": "Estimated upload time: 5–10 min. Activation: within 48 working hours of complete KYB.",
     "ec.pdf.signature.body": "I'll be your point of contact for setup questions — reply directly to this email or book a 15-min call below.",
-    "ec.handoff.email.title": "Get your full proposal",
-    "ec.handoff.email.lead": "A detailed PDF tailored to your business. Share with your team or take to your CFO.",
-    "ec.handoff.trust": "No spam. No newsletter. Just your proposal PDF — once.",
+    "ec.handoff.email.title": "Your full proposal, ready to share",
+    "ec.handoff.email.lead": "A detailed PDF built around your answers. Share it with your team or CFO.",
+    "ec.handoff.trust": "No spam, just your proposal, once.",
     "ec.handoff.sent.step2.title": "Forward to your CFO or co-founder",
     "ec.handoff.sent.step2.body": "Many founders share before booking the call — it speeds the decision.",
     "ec.callback.title": "Talk to our team",
@@ -497,7 +497,7 @@
     "ec.entity.uk.licence": "FCA-licensed EMI",
     "ec.entity.uk.note": "Local GBP IBAN with Faster Payments and BACS access.",
     "ec.entity.uk.lead": "Get started, and once approved, you'll be set up with an Altery Ltd account, FCA-licensed, with local GBP IBAN and Faster Payments.",
-    "ec.entity.eu.lead": "Get started, and once approved, you'll be set up with an Altery EU account, licensed by the Central Bank of Cyprus, with an EU IBAN and SEPA / SEPA Instant.",
+    "ec.entity.eu.lead": "Get started, and once approved, you could receive an Altery EU account, regulated by the Central Bank of Cyprus, with a real EU IBAN that works with SEPA and SEPA Instant.",
     "ec.entity.mena.lead": "Get started, and once approved, you'll be set up with an Altery MENA account, DFSA-licensed in the DIFC, with USD and AED accounts.",
     "ec.entity.eu.name": "Altery EU",
     "ec.entity.eu.licence": "EMI · Central Bank of Cyprus",

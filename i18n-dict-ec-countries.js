@@ -767,7 +767,7 @@
   // Faster Payments) kept English since they're standard regulatory
   // terminology that the audience already recognises.
   Object.assign(D.de, {
-    "ec.r.plan.compare.title": "Finden Sie den passenden Tarif",
+    "ec.r.plan.compare.title": "Das ist in jedem Tarif enthalten. Du entscheidest, was passt.",
     "ec.r.plan.compare.wasRecommended": "Ursprünglich empfohlen",
     "ec.r.plan.compare.switch": "Zu diesem Tarif wechseln",
     "ec.r.plan.compare.featuresHead": "Funktionen",
@@ -780,7 +780,7 @@
     "ec.r.plan.compare.close": "Schließen",
   });
   Object.assign(D.nl, {
-    "ec.r.plan.compare.title": "Vind het juiste plan voor uw behoeften",
+    "ec.r.plan.compare.title": "Dit zit er in elk plan. Jij bepaalt wat past.",
     "ec.r.plan.compare.wasRecommended": "Oorspronkelijk aanbevolen",
     "ec.r.plan.compare.switch": "Overstappen naar dit plan",
     "ec.r.plan.compare.featuresHead": "Functies",
@@ -793,7 +793,7 @@
     "ec.r.plan.compare.close": "Sluiten",
   });
   Object.assign(D.ru, {
-    "ec.r.plan.compare.title": "Подберите план под ваши задачи",
+    "ec.r.plan.compare.title": "Вот что входит в каждый план. Вы решаете, что подходит.",
     "ec.r.plan.compare.wasRecommended": "Изначально рекомендовали",
     "ec.r.plan.compare.switch": "Перейти на этот план",
     "ec.r.plan.compare.featuresHead": "Возможности",
@@ -806,7 +806,7 @@
     "ec.r.plan.compare.close": "Закрыть",
   });
   Object.assign(D.tr, {
-    "ec.r.plan.compare.title": "İhtiyacınıza uygun planı bulun",
+    "ec.r.plan.compare.title": "Her planda neler var, işte burada. Neyin uygun olduğuna siz karar verin.",
     "ec.r.plan.compare.wasRecommended": "Başlangıçta önerilmiş",
     "ec.r.plan.compare.switch": "Bu plana geç",
     "ec.r.plan.compare.featuresHead": "Özellikler",
@@ -819,7 +819,7 @@
     "ec.r.plan.compare.close": "Kapat",
   });
   Object.assign(D.it, {
-    "ec.r.plan.compare.title": "Trova il piano giusto",
+    "ec.r.plan.compare.title": "Ecco cosa include ogni piano. Decidi tu cosa fa al caso tuo.",
     "ec.r.plan.compare.wasRecommended": "Consigliato all'inizio",
     "ec.r.plan.compare.switch": "Passa a questo piano",
     "ec.r.plan.compare.featuresHead": "Funzionalità",
@@ -832,7 +832,7 @@
     "ec.r.plan.compare.close": "Chiudi",
   });
   Object.assign(D.es, {
-    "ec.r.plan.compare.title": "Encuentra el plan adecuado",
+    "ec.r.plan.compare.title": "Esto es lo que incluye cada plan. Tú decides qué encaja.",
     "ec.r.plan.compare.wasRecommended": "Recomendado originalmente",
     "ec.r.plan.compare.switch": "Cambiar a este plan",
     "ec.r.plan.compare.featuresHead": "Funciones",
@@ -845,7 +845,7 @@
     "ec.r.plan.compare.close": "Cerrar",
   });
   Object.assign(D.pl, {
-    "ec.r.plan.compare.title": "Znajdź odpowiedni plan",
+    "ec.r.plan.compare.title": "Oto co zawiera każdy plan. Ty decydujesz, co pasuje.",
     "ec.r.plan.compare.wasRecommended": "Pierwotnie polecane",
     "ec.r.plan.compare.switch": "Przejdź na ten plan",
     "ec.r.plan.compare.featuresHead": "Funkcje",
@@ -858,7 +858,7 @@
     "ec.r.plan.compare.close": "Zamknij",
   });
   Object.assign(D.pt, {
-    "ec.r.plan.compare.title": "Encontre o plano certo",
+    "ec.r.plan.compare.title": "Eis o que cada plano inclui. Você decide o que se adequa.",
     "ec.r.plan.compare.wasRecommended": "Originalmente recomendado",
     "ec.r.plan.compare.switch": "Mudar para este plano",
     "ec.r.plan.compare.featuresHead": "Funcionalidades",
@@ -871,7 +871,7 @@
     "ec.r.plan.compare.close": "Fechar",
   });
   Object.assign(D.fr, {
-    "ec.r.plan.compare.title": "Trouvez le plan qui vous convient",
+    "ec.r.plan.compare.title": "Voici ce que comprend chaque plan. À vous de décider ce qui convient.",
     "ec.r.plan.compare.wasRecommended": "Recommandé à l'origine",
     "ec.r.plan.compare.switch": "Passer à ce plan",
     "ec.r.plan.compare.featuresHead": "Fonctionnalités",
