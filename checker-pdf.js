@@ -186,6 +186,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
     inkSoft:      "#4B5063",  // Secondary text
     muted:        "#6B6F7B",  // Tertiary / labels
     border:       "#E5E7EE",  // Neutral dividers
+    hairline:     "#ECEDF1",  // Faint internal hairline — subordinate to border
     surface:      "#F8F7F4",  // Off-white panel bg
     beige:        "#F0EBE3",  // Brand beige — body callouts only
     beigeBorder:  "#E5E0D5",
@@ -354,13 +355,13 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
           <div style="font-size:17px;font-weight:700;color:${C.ink};line-height:22px;letter-spacing:-0.01em;">${planName}</div>
           <div style="font-size:12px;color:${C.muted};margin-top:4px;font-variant-numeric:tabular-nums;">${planPrice}</div>
         </td>
-        <td style="width:1px;background:${C.border};padding:18px 0;"></td>
+        <td style="width:1px;background:${C.hairline};padding:26px 0;"></td>
         <td style="vertical-align:top;padding:18px 22px;width:33%;">
           <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.pdf.atGlance.entity")}</div>
           <div style="font-size:17px;font-weight:700;color:${C.ink};line-height:22px;letter-spacing:-0.01em;">${entityName}</div>
           <div style="font-size:12px;color:${C.muted};margin-top:4px;">${entityLicence}</div>
         </td>
-        <td style="width:1px;background:${C.border};padding:18px 0;"></td>
+        <td style="width:1px;background:${C.hairline};padding:26px 0;"></td>
         <td style="vertical-align:top;padding:18px 22px;width:33%;">
           <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.cmp.row.fxMarkup")}</div>
           <div style="font-size:17px;font-weight:700;color:${C.primary};line-height:22px;letter-spacing:-0.01em;">${rec.plan && rec.plan.fees ? rec.plan.fees.fxMarkup : "—"}</div>
