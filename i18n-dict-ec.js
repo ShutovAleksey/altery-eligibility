@@ -69,7 +69,7 @@
     "ec.crypto.blocked.body": "Altery doesn't offer crypto or web3 services for businesses incorporated here. We can still set up the rest of your banking — keep going to see your options.",
     "ec.q1.alert.crypto.body": "We support crypto and web3 businesses regularly, with fiat rails via SEPA, Faster Payments, and SWIFT. Crypto on/off-ramp services are provided through Synterra Connect, our third-party partner.",
     "ec.q1.alert.saas.title": "Digital-native? You're in the right place.",
-    "ec.q1.alert.saas.body": "SaaS, AI-native apps, games, and digital products are a strong fit for Altery. Multi-currency collections, SEPA Direct Debit for EU subscribers, FX corridors, and API-powered payouts built for global revenue flows.",
+    "ec.q1.alert.saas.body": "SaaS, games, apps and digital products are a great fit for Altery. Collect payments in multiple currencies, pay out globally and handle subscriptions, all from one account.",
     "ec.q1.alert.marketplace.title": "Marketplace payouts? We see this every day.",
     "ec.q1.alert.marketplace.body": "Built for platforms managing collections and seller payouts across markets. Multi-currency balances, API-powered payouts, export-ready payments data, and FX support for cross-border flows.",
     "ec.q1.alert.creator.title": "Creator economy? You're in good company.",
