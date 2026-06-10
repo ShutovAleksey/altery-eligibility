@@ -43,8 +43,8 @@
 
     "ec.q2.title": "Waar is je bedrijf gevestigd?",
     "ec.q2.lead": "Selecteer het land dat op je registratiedocumenten staat. Zo bepalen we de juiste opzet voor je bedrijf.",
-    "ec.q2.alert.blocked.title": "Daar zijn we nog niet actief",
-    "ec.q2.alert.blocked.body": "We kunnen momenteel geen rekeningen openen voor bedrijven die zijn geregistreerd in {country}.",
+    "ec.q2.alert.blocked.title": "Daar zijn we niet actief",
+    "ec.q2.alert.blocked.body": "We kunnen geen rekeningen openen voor bedrijven die zijn geregistreerd in {country}.",
     "ec.blocked.cta": "Bekijk je opties",
     "ec.q2.input.label": "Land van vestiging",
     "ec.q2.input.placeholder": "Zoek land",
@@ -463,8 +463,8 @@
 
     "ec.q2.title": "Şirketiniz nerede tescil edilmiş?",
     "ec.q2.lead": "Kayıt belgelerinizde görünen ülkeyi seçin. Bu, işletmeniz için doğru kurulumu belirlememize yardımcı olur.",
-    "ec.q2.alert.blocked.title": "Orada henüz hizmet vermiyoruz",
-    "ec.q2.alert.blocked.body": "Şu anda {country} ülkesinde kayıtlı işletmeler için hesap açamıyoruz.",
+    "ec.q2.alert.blocked.title": "Orada hizmet vermiyoruz",
+    "ec.q2.alert.blocked.body": "{country} ülkesinde kayıtlı işletmeler için hesap açamıyoruz.",
     "ec.blocked.cta": "Seçeneklerinizi görün",
     "ec.q2.input.label": "Tescil ülkesi",
     "ec.q2.input.placeholder": "Ülke ara",
