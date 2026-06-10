@@ -1653,7 +1653,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
               </span>
             </h1>
             <p className="ec-r__heroLead">
-              {t("ec.r.lead", { entity: entityName, licence: entityLicence, note: entityNote })}
+              {t("ec.entity." + entity.id + ".lead")}
             </p>
 
             <div className="ec-r__pills">

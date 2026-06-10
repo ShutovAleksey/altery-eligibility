@@ -226,11 +226,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
     ? t(`ec.r.persona.${rec.ind.value}.line`)
     : null;
 
-  const leadText = t("ec.r.lead", {
-    entity: entityName,
-    licence: entityLicence,
-    note: entityNote,
-  });
+  const leadText = t("ec.entity." + rec.entity.id + ".lead");
 
   // ─── Section blocks ────────────────────────────────────────────
 
