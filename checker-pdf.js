@@ -330,7 +330,10 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // the document's anchor calculation: the number the customer
   // remembers, forwards, and quotes to their CFO.
   const cost = ecComputeCostBreakdown(rec);
-  const outcomes = cost ? ecOutcomesForSavings(cost.savings.annual) : [];
+  // Savings-outcomes block retired with the Jun 2026 comparison reframe —
+  // it monetised a "saving vs bank" we no longer assert. Empty ⇒ outcomesHTML
+  // renders nothing. ecComputeCostBreakdown still returns the altery side.
+  const outcomes = [];
 
   // GBP formatter — page-anchor currency for all monetary lines on
   // the proposal. Per-rail tariff strings inside the plan table can
@@ -359,9 +362,9 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         </td>
         <td style="width:1px;background:${C.border};padding:18px 0;"></td>
         <td style="vertical-align:top;padding:18px 22px;width:33%;">
-          <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.pdf.atGlance.savings")}</div>
-          <div style="font-size:17px;font-weight:700;color:${C.primary};line-height:22px;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${annualSavings || "—"}<span style="font-size:12px;font-weight:500;color:${C.muted};margin-left:2px;">${cost ? ` ${t("ec.pdf.costMath.perYear")}` : ""}</span></div>
-          <div style="font-size:12px;color:${C.muted};margin-top:4px;">${t("ec.pdf.atGlance.savingsVs")}</div>
+          <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.pdf.atGlance.cost")}</div>
+          <div style="font-size:17px;font-weight:700;color:${C.primary};line-height:22px;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${cost ? fmtEUR(cost.altery.total) : "—"}<span style="font-size:12px;font-weight:500;color:${C.muted};margin-left:2px;">${cost ? ` ${t("ec.pdf.costMath.perMonth")}` : ""}</span></div>
+          <div style="font-size:12px;color:${C.muted};margin-top:4px;">${t("ec.pdf.atGlance.costOn", { plan: planName })}</div>
         </td>
       </tr>
     </table>`;
@@ -371,7 +374,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin:0 0 14px;">${t("ec.pdf.costMath.head")}</div>
       <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
         <tr>
-          <td style="width:50%;padding:14px 16px;background:${C.surface};border:1px solid ${C.border};border-radius:12px 0 0 12px;vertical-align:top;">
+          <td style="width:100%;padding:16px 18px;background:${C.surface};border:1px solid ${C.border};border-radius:12px;vertical-align:top;">
             <div style="font-size:11px;color:${C.primary};font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">${t("ec.pdf.costMath.altery")}</div>
             ${cost.altery.subscription > 0 ? `
             <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
@@ -386,43 +389,14 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
             <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
               <span>${t("ec.pdf.costMath.local")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.local)}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:13.5px;color:${C.ink};padding:10px 0 0;margin-top:6px;border-top:1px solid ${C.border};">
-              <span style="font-weight:600;">${t("ec.pdf.costMath.total")}</span><span style="font-weight:700;font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.total)}</span>
-            </div>
-          </td>
-          <td style="width:50%;padding:14px 16px;background:${C.white};border:1px solid ${C.border};border-left:0;border-radius:0 12px 12px 0;vertical-align:top;">
-            <div style="font-size:11px;color:${C.muted};font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">${t("ec.pdf.costMath.bank")}</div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
-              <span>${t("ec.pdf.costMath.fx")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.bank.fx)}</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
-              <span>${t("ec.pdf.costMath.swift")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.bank.swift)}</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
-              <span>${t("ec.pdf.costMath.local")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.bank.local)}</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:13.5px;color:${C.ink};padding:10px 0 0;margin-top:31px;border-top:1px solid ${C.border};">
-              <span style="font-weight:600;">${t("ec.pdf.costMath.total")}</span><span style="font-weight:700;font-variant-numeric:tabular-nums;">${fmtEUR(cost.bank.total)}</span>
+            <div style="display:flex;justify-content:space-between;font-size:14px;color:${C.ink};padding:10px 0 0;margin-top:6px;border-top:1px solid ${C.border};">
+              <span style="font-weight:600;">${t("ec.pdf.costMath.total")}</span><span style="font-weight:700;font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.total)}<span style="font-size:11px;color:${C.muted};font-weight:500;"> ${t("ec.pdf.costMath.perMonth")}</span></span>
             </div>
           </td>
         </tr>
       </table>
 
-      <!-- Savings band — brand-clean: beige bg, 1px navy border, ink + navy
-           text. Replaces the previous warm-orange treatment that read too
-           close to red on print and clashed with the rest of the document
-           which uses the brand navy + beige palette throughout. The number
-           still carries the emphasis via type weight and size, no colour
-           shout needed. -->
-      <div style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;padding:18px 22px;margin-top:14px;">
-        <div style="font-size:11px;color:${C.muted};font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">${t("ec.pdf.costMath.savings.label")}</div>
-        <div style="display:flex;justify-content:space-between;align-items:baseline;">
-          <div style="font-size:24px;font-weight:700;color:${C.primary};font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${fmtEUR(cost.savings.monthly)}<span style="font-size:14px;color:${C.inkSoft};font-weight:500;"> ${t("ec.pdf.costMath.perMonth")}</span></div>
-          <div style="font-size:14px;color:${C.inkSoft};font-weight:600;font-variant-numeric:tabular-nums;">${fmtEUR(cost.savings.annual)} ${t("ec.pdf.costMath.perYear")}</div>
-        </div>
-      </div>
-
-      <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:10px;">${t("ec.pdf.costMath.assumptions", { volume: ecFormatVolume(rec.monthlyVolume), txCount: cost.meta.txCount, fxPct: cost.meta.fxVolumePct })}</div>
+      <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:12px;">${t("ec.pdf.costMath.assumptions", { volume: ecFormatVolume(rec.monthlyVolume), txCount: cost.meta.txCount, fxPct: cost.meta.fxVolumePct })}</div>
     </div>` : "";
 
   // "What €X annual buys you" — future-self visualization. Turns
@@ -450,8 +424,11 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   //     B2B API, and three-jurisdiction unified product.
   // For MENA users the capability panel is skipped (no major neobank
   // operates locally with regulated presence) — surfaced as a callout.
-  const pricePanel = (typeof ecPricePanel === "function") ? ecPricePanel(rec) : null;
-  const capPanel   = (typeof ecCapabilityPanel === "function") ? ecCapabilityPanel(rec) : null;
+  // Named-competitor panels retired (Jun 2026 comparison reframe) — the PDF
+  // no longer renders comparison tables against banks/neobanks. The panel
+  // builders + EC_COMPARATORS stay in the codebase for internal use only.
+  const pricePanel = null;
+  const capPanel   = null;
 
   const renderCell = (cell) => {
     if (cell.kind === "yes")   return `<span style="color:${C.success};font-weight:700;">✓</span>`;
@@ -497,10 +474,22 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // framing was overclaiming. MENA users now get the full capability
   // panel against 3S Money / Wio Bank / Airwallex instead.)
 
+  // Altery-only "what your plan includes" — replaces the retired named-
+  // competitor price/capability tables. No comparison, no competitor column;
+  // reuses the result-page value lines (already in 10 languages). Crypto is
+  // deliberately omitted (jurisdiction-gated).
+  const includedItems = ["transparency", "speed", "reach", "acceptance"];
   const comparisonHTML = `
-    ${pricePanel ? renderPanel(pricePanel, "ec.cmp.price.eyebrow", "ec.cmp.price.title") : ""}
-    ${capPanel   ? renderPanel(capPanel,   "ec.cmp.capability.eyebrow", "ec.cmp.capability.title") : ""}
-    <div style="font-size:10px;color:${C.muted};line-height:15px;margin:-6px 0 30px;">${t("ec.cmp.note")}</div>`;
+    <div style="margin:0 0 28px;">
+      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 12px;">${t("ec.pdf.plus.head")}</div>
+      <div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:16px 20px;">
+        ${includedItems.map((k) => `
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:5px 0;">
+            <div style="flex-shrink:0;width:16px;height:16px;border-radius:50%;background:${C.primary};color:${C.white};display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px;">✓</div>
+            <div style="font-size:12.5px;color:${C.ink};line-height:18px;">${t("ec.r.value." + k)}</div>
+          </div>`).join("")}
+      </div>
+    </div>`;
 
   // capabilityHTML is unused (the "Where Altery wins / Roughly equal /
   // Bank wins" 3-column block was retired 2026-05-29 in favour of the
@@ -696,6 +685,7 @@ ${checklistHTML}
 <div style="margin-bottom:4px;color:${C.ink};font-weight:600;">Altery</div>
 <div>${t("ec.pdf.footer.tagline")}</div>
 <div style="margin-top:8px;">${t("ec.pdf.footer.entities")}</div>
+<div style="margin-top:8px;">${t("ec.pdf.disclaimer")}</div>
   </div>
 
 </div>`;

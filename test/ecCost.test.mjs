@@ -193,16 +193,9 @@ test("Capability matrix: crypto row hidden in a no-crypto jurisdiction (UK), eve
 // Realistic-track savings — bank-side hidden costs (wholesale FX
 // spread + correspondent SWIFT) layered on top of published rates.
 // ────────────────────────────────────────────────────────────────
-test("Realistic savings ≥ conservative when hidden costs > 0", () => {
-  const c = w.ecComputeCostBreakdown(rec({
-    monthlyVolume: 1000000,
-    corridorsIn:  ["uk-eea", "north-america"],
-    corridorsOut: ["uk-eea", "north-america"],
-  }));
-  assert.ok(c.savings.hiddenTotal > 0, "hiddenTotal should be positive for cross-border flow");
-  assert.ok(c.savings.monthlyRealistic >= c.savings.monthly,
-           "realistic monthly should be ≥ headline monthly (hidden costs added to bank)");
-});
+// (Removed Jun 2026 — comparison reframe: EC_BANK_HIDDEN_COSTS was deleted,
+// so the bank-side hidden-cost math (hiddenTotal / realistic ≥ conservative)
+// no longer exists. The bank/savings figures aren't rendered anywhere now.)
 
 test("Realistic range respects same confidence band as headline", () => {
   const c = w.ecComputeCostBreakdown(rec({
@@ -216,16 +209,8 @@ test("Realistic range respects same confidence band as headline", () => {
                Math.round(c.savings.monthlyRealistic * hi / 100) * 100);
 });
 
-test("Hidden cost components break down into FX + SWIFT", () => {
-  const c = w.ecComputeCostBreakdown(rec({
-    monthlyVolume: 1000000,
-    corridorsIn:  ["uk-eea", "apac"],
-    corridorsOut: ["uk-eea", "apac"],
-  }));
-  assert.equal(c.savings.hiddenTotal, c.savings.hiddenFx + c.savings.hiddenSwift);
-  assert.ok(c.bank.totalRealistic > c.bank.total, "bank realistic > bank conservative");
-  assert.equal(c.bank.totalRealistic, c.bank.total + c.bank.hiddenFx + c.bank.hiddenSwift);
-});
+// (Removed Jun 2026 — comparison reframe: hidden FX/SWIFT bank-cost
+// components were deleted with EC_BANK_HIDDEN_COSTS; nothing renders them.)
 
 test("Methodology assumptions are the FX-margin headline comparison", () => {
   // Previously documented hidden FX/SWIFT calibration inline; that's

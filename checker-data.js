@@ -1377,10 +1377,9 @@ const EC_COMPARATORS = {
 // on published rates so each cell remains independently citation-
 // backed (used for the headline savings range). Altery has no
 // hidden costs to add — published markup is the worst case.
-const EC_BANK_HIDDEN_COSTS = {
-  fxAdditionalBps:       50,   // +0.50% on top of published markup
-  swiftCorrespondentGbp: 18,   // typical correspondent fee per SWIFT tx
-};
+// EC_BANK_HIDDEN_COSTS removed (Jun 2026 comparison reframe): the +50bps FX /
+// £18-SWIFT bank inflation was the least-defensible part of the savings claim
+// and no longer ships. ecComputeCostBreakdown falls back to {} if absent.
 
 const EC_CAPABILITY_MATRIX = {
   alteryWins: [
@@ -1410,7 +1409,7 @@ const EC_CAPABILITY_MATRIX = {
 Object.assign(window, {
   EC_COUNTRIES, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER, EC_INDUSTRIES,
   EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,
-  EC_CAPABILITY_MATRIX, EC_BANK_HIDDEN_COSTS,
+  EC_CAPABILITY_MATRIX,
   EC_SERVICES, TOTAL_STEPS,
   EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
   EC_COMPARATORS, ecHeroIdentifier, maskTailDots, ecFeeRegion,
