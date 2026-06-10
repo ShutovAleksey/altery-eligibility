@@ -431,7 +431,7 @@ function EcApp() {
         {step === 0 && <EcIntro onStart={next} />}
         {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}
         {step === 2 && <EcIndustry country={country} industry={industry} setIndustry={setIndustry} onBack={back} onNext={next} onBlocked={jumpToResult} />}
-        {step === 3 && <EcServices services={services} setServices={setServices} onBack={back} onNext={next} />}
+        {step === 3 && <EcServices country={country} services={services} setServices={setServices} onBack={back} onNext={next} />}
         {step === 4 && <EcVolume
           volumeInIdx={volumeInIdx} setVolumeInIdx={setVolumeInIdx}
           volumeOutIdx={volumeOutIdx} setVolumeOutIdx={setVolumeOutIdx}
@@ -849,6 +849,12 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
 function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked }) {
   const t = useT();
   const ind = EC_INDUSTRIES.find((i) => i.value === industry);
+  // Crypto is jurisdiction-gated (see crypto-jurisdictions): no-crypto markets
+  // (UK/US/JP/NL) get a soft warning but can continue; EEA-except-NL is served
+  // quietly (no banner); MENA + the rest of RoW get the open welcome.
+  const cc = EC_COUNTRIES.find((x) => x.code === country);
+  const cryptoNoGo   = !!(ind?.crypto && cc?.noCrypto);
+  const cryptoOpenCC = !!(ind?.crypto && cc && !cc.noCrypto && cc.region !== "eu");
   // UAE incorporations frequently arrive worried that free-zone (DMCC,
   // ADGM, JAFZA…) vs onshore status will be a blocker. It isn't — DIFC-
   // licensed Altery MENA serves both. Banner only fires once the user
@@ -882,9 +888,15 @@ function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked 
         </Alert>
       )}
 
-      {/* Crypto-native welcome — crypto businesses are a core target
-          segment, not an exception we tolerate. */}
-      {!isBlocked && ind?.crypto && (
+      {/* Crypto industry — jurisdiction-aware. No-crypto markets (UK/US/JP/NL)
+          get a soft warning but can still continue; open markets (MENA + RoW)
+          get the welcome; EEA-except-NL is served quietly, so no banner. */}
+      {!isBlocked && cryptoNoGo && (
+        <Alert tone="warning" title={t("ec.crypto.blocked.title")}>
+          {t("ec.crypto.blocked.body")}
+        </Alert>
+      )}
+      {!isBlocked && cryptoOpenCC && (
         <Alert tone="info" title={t("ec.q1.alert.crypto.title")}>
           {t("ec.q1.alert.crypto.body")}
         </Alert>
@@ -940,7 +952,7 @@ function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked 
 // UX pattern matches the reference screenshot: large clickable rows
 // with title + body, custom checkbox left-anchored. Whole row is
 // clickable, keyboard-navigable, ARIA-tagged as role="checkbox".
-function EcServices({ services, setServices, onBack, onNext }) {
+function EcServices({ country, services, setServices, onBack, onNext }) {
   const t = useT();
   const toggle = (value) => {
     setServices((prev) => {
@@ -951,6 +963,10 @@ function EcServices({ services, setServices, onBack, onNext }) {
     });
   };
   const count = services.size;
+  // Crypto rail is jurisdiction-gated — not offered in UK/US/JP/NL (see
+  // crypto-jurisdictions). Warn when ticked there; the user can still continue.
+  const cc = EC_COUNTRIES.find((x) => x.code === country);
+  const cryptoNoGo = services.has("crypto") && cc?.noCrypto;
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -989,6 +1005,12 @@ function EcServices({ services, setServices, onBack, onNext }) {
           );
         })}
       </div>
+
+      {cryptoNoGo && (
+        <Alert tone="warning" title={t("ec.crypto.blocked.title")}>
+          {t("ec.crypto.blocked.body")}
+        </Alert>
+      )}
 
       <WhyWeAsk>{t("ec.q3.why")}</WhyWeAsk>
 
@@ -1652,7 +1674,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
                   <Icon name="external" size={12} style={{ marginLeft: 4 }} aria-hidden="true" />
                 </a>
               )}
-              {rec.cryptoActive && (
+              {rec.cryptoOpen && (
                 <span className="ec-r__pill">
                   <EcIco.token style={{ width: 14, height: 14 }} aria-hidden="true" />
                   {t("ec.r.crypto.fluent")}

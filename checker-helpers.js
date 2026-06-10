@@ -75,8 +75,15 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
   const svcs = services || [];
   const cryptoFromServices = svcs.includes("crypto");
   const cryptoActive = ind?.crypto || cryptoFromServices;
-  const cryptoReroute = cryptoActive && country?.region === "eu";
-  if (cryptoReroute) entity = EC_ENTITIES.uk;
+  // Crypto risk appetite is per-jurisdiction, not per-region: NOT offered to
+  // UK/US/JP/NL (country.noCrypto); served in the EEA except NL but not
+  // advertised; offered openly across MENA + the rest of RoW. So it can't key
+  // off `region` alone — US/JP are "row" like crypto-OK Seychelles/Caribbean.
+  // No entity reroute: EEA crypto stays on the EU entity (the previous EU→UK
+  // reroute was backwards — UK is exactly where crypto isn't offered).
+  const cryptoBlocked = cryptoActive && !!country?.noCrypto;            // UK/US/JP/NL — asked, not offered
+  const cryptoServed  = cryptoActive && !country?.noCrypto;             // EEA-ex-NL + MENA + RoW(−US/JP)
+  const cryptoOpen    = cryptoServed && country?.region !== "eu";       // openly advertised (EEA stays quiet)
 
   // We track WHICH signals fired in `tierSignals` so the reasoning
   // block can cite them by name ("Your €375k/mo volume crosses
@@ -190,7 +197,7 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     .sort((a, b) => b.priority - a.priority)
     .slice(0, 3);
 
-  return { kind: "approved", entity, plan, country, ind, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoReroute, cryptoActive, services: svcs, tierSignals, reasoning: reasoningTop };
+  return { kind: "approved", entity, plan, country, ind, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoActive, cryptoServed, cryptoOpen, cryptoBlocked, services: svcs, tierSignals, reasoning: reasoningTop };
 }
 
 // Derive a transaction-count assumption from the monthly volume
@@ -1249,7 +1256,7 @@ function ecBuildHandoffPayload(rec, plan, opts) {
     cra:          rec?.ind?.craKey || null,
     services:     Array.isArray(rec?.services) ? rec.services : [],
     corridors:    Array.isArray(rec?.corridors) ? rec.corridors : [],
-    cryptoActive: !!rec?.cryptoActive,
+    cryptoActive: !!rec?.cryptoServed,
     email:        (opts && typeof opts.email === "string" && opts.email.includes("@")) ? opts.email : null,
     utm,          // null when no UTMs captured; object {utm_source, ...} otherwise
     ts:           Date.now(),

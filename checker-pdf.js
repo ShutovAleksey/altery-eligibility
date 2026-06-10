@@ -274,7 +274,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <div style="margin-bottom:${heroIban ? "14px" : "0"};">
         <span style="${pillStyle}">${entityLicence}</span>
         ${regulatory ? `<span style="${pillStyle}">${regulatory.refLabel}</span>` : ""}
-        ${rec.cryptoActive ? `<span style="${pillStyle}">${t("ec.r.crypto.fluent")}</span>` : ""}
+        ${rec.cryptoOpen ? `<span style="${pillStyle}">${t("ec.r.crypto.fluent")}</span>` : ""}
       </div>
       ${heroIban ? `
         <div style="display:inline-block;padding:10px 18px 10px 12px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;line-height:1;font-size:13.5px;color:${C.ink};">
