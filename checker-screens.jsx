@@ -1802,77 +1802,67 @@ function EcResultApproved({ rec, onBack, onReset }) {
             </div>
           </section>
 
-          {cost && cost.savings && cost.savings.monthly >= 100 && (
+          {/* Cost block — re-pointed (Jun 2026) from "savings vs a typical
+              bank" to Altery's OWN estimated all-in cost. The money hero +
+              personalisation stay; the persuasion is now radical fee
+              transparency (every line shown, sanity-check it yourself)
+              rather than a savings delta against a named/synthesised
+              competitor we can't substantiate. The bank/savings figures are
+              still computed in ecComputeCostBreakdown — just not rendered —
+              so this is fully reversible. See the savings-comparison memory. */}
+          {cost && cost.altery && (
             <section className="ec-r__card ec-r__savings">
               <div className="ec-r__cardEyebrow">
-                {t("ec.r.savings.head", { bank: cost.methodology.baseline })}
+                {t("ec.r.cost.head")}
               </div>
-              {/* Single-track savings narrative — annual range as the
-                  emotional anchor, monthly range as the operational
-                  framing right below, then the Bank-vs-Altery proof row
-                  with each side shown as its own range. The bank's high
-                  end already includes wholesale FX spread + correspondent
-                  SWIFT fees, so the inline footnote below explains the
-                  range rather than competing for headline attention with
-                  a second "realistic savings" number. */}
-              {/* When the low-end of the range is 0, the range "£0–£X"
-                  reads as "savings might be zero" — true but bad pitch.
-                  Switch to "Up to £X" framing, which preserves the
-                  upper-bound honesty without anchoring on the floor. */}
               <div className="ec-r__savingsHero">
                 <div className="ec-r__savingsHero__amount">
-                  {cost.savings.rangeAnnualLow === 0
-                    ? t("ec.r.savings.yearUpTo", { high: fmtCompact(cost.savings.rangeAnnualHigh) })
-                    : t("ec.r.savings.yearRange", { low: fmtCompact(cost.savings.rangeAnnualLow), high: fmtCompact(cost.savings.rangeAnnualHigh) })}
+                  {t("ec.r.cost.hero", { low: fmtCompact(cost.altery.totalLow), high: fmtCompact(cost.altery.totalHigh) })}
                 </div>
                 <div className="ec-r__savingsHero__year">
-                  {cost.savings.rangeMonthlyLow === 0
-                    ? t("ec.r.savings.monthlyUpTo", { high: fmtCompact(cost.savings.rangeMonthlyHigh) })
-                    : t("ec.r.savings.monthlyRange", { low: fmtCompact(cost.savings.rangeMonthlyLow), high: fmtCompact(cost.savings.rangeMonthlyHigh) })}
+                  {t("ec.r.cost.year", { low: fmtCompact(cost.altery.totalLow * 12), high: fmtCompact(cost.altery.totalHigh * 12), plan: planName })}
                 </div>
               </div>
 
-              <div className="ec-r__compare">
-                <div className="ec-r__compare__col">
-                  <div className="ec-r__compare__label">{cost.methodology.baseline}</div>
-                  <div className="ec-r__compare__priceLine">
-                    <span className="ec-r__compare__amount ec-r__compare__amount--strike">
-                      {fmtCompact(cost.bank.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtCompact(cost.bank.totalHigh)}
-                    </span>
-                    <span className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</span>
-                  </div>
+              {/* Line-by-line Altery breakdown — promoted to the headline
+                  proof of transparency. Reuses the methodology row labels
+                  (already in 10 langs); inline-styled to avoid new CSS. */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 7, margin: "16px 0 4px" }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--c-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 2 }}>
+                  {t("ec.r.cost.breakdown.head")}
                 </div>
-                <div className="ec-r__compare__arrow" aria-hidden="true">
-                  <EcIco.arrowRight style={{ width: 20, height: 20 }} />
-                </div>
-                <div className="ec-r__compare__col ec-r__compare__col--us">
-                  <div className="ec-r__compare__label">{t("ec.r.savings.altery")}</div>
-                  <div className="ec-r__compare__priceLine">
-                    <span className="ec-r__compare__amount">
-                      {fmtCompact(cost.altery.totalLow)}<span className="ec-r__savingsHero__sep">–</span>{fmtCompact(cost.altery.totalHigh)}
-                    </span>
-                    <span className="ec-r__compare__cycle">{t("ec.r.savings.cycle")}</span>
+                {[["subscription", cost.altery.subscription], ["fx", cost.altery.fx], ["swift", cost.altery.swift], ["local", cost.altery.local]].map((row) => (
+                  <div key={row[0]} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>
+                    <span>{t("ec.r.method.line." + row[0])}</span><span>{fmtNarrow(row[1])}</span>
                   </div>
+                ))}
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 600, color: "var(--c-ink)", borderTop: "1px solid var(--c-border)", paddingTop: 8, marginTop: 2 }}>
+                  <span>{t("ec.r.method.line.total")}</span><span>{fmtNarrow(cost.altery.total)}</span>
                 </div>
               </div>
-
-              {/* Hidden-cost disclosure — explains why the bank-side
-                  range stretches as high as it does. Folded inline as a
-                  small footnote instead of a competing savings figure. */}
-              {cost.savings.hiddenTotal > 0 && (
-                <p className="ec-r__savings__hiddenNote">
-                  {t("ec.r.savings.realistic.hint")}
-                </p>
-              )}
 
               <p className="ec-r__savings__note">
-                {t("ec.r.savings.note", { volume: fmtCompact(rec.monthlyVolume) })}
+                {t("ec.r.cost.caption", { plan: planName })}
               </p>
-              {/* "How we calculated this" used to be an inline <details>
-                  expander. Promoted to a modal trigger (same visual
-                  pattern as "Compare all plans →") so the dense line-
-                  by-line table + assumptions + bank tariff sources
-                  don't extend the result page itself. */}
+              <p className="ec-r__savings__note">
+                {t("ec.r.cost.note", { volume: fmtCompact(rec.monthlyVolume) })}
+              </p>
+              <p className="ec-r__savings__hiddenNote">
+                {t("ec.r.cost.compareSelf")}
+              </p>
+
+              {/* Altery-owned value lines (no competitor comparison) —
+                  founder-confirmed as substantiable today. Crypto is
+                  deliberately omitted (jurisdiction-gated). */}
+              <ul style={{ listStyle: "none", margin: "14px 0 2px", padding: 0, display: "flex", flexDirection: "column", gap: 8 }}>
+                {["transparency", "speed", "reach", "acceptance"].map((k) => (
+                  <li key={k} style={{ display: "flex", gap: 8, fontSize: 13, lineHeight: "18px", color: "var(--c-ink-2)" }}>
+                    <EcIco.check style={{ width: 15, height: 15, flex: "0 0 auto", marginTop: 1, color: "var(--c-success)" }} />
+                    <span>{t("ec.r.value." + k)}</span>
+                  </li>
+                ))}
+              </ul>
+
               <div className="ec-r__method">
                 <button type="button" className="ec-r__planFoot__link"
                         onClick={() => setMethodOpen(true)}>

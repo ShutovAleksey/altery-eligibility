@@ -307,58 +307,27 @@ function EcMethodologyModal({ cost, fmtNarrow, onClose }) {
         </h2>
 
         <div className="ec-r__method__body">
-          <div className="ec-r__method__lines">
-            <div className="ec-r__method__lineRow ec-r__method__lineRow--head">
-              <span></span>
-              <span>{t("ec.r.savings.altery")}</span>
-              <span>{cost.methodology.baseline}</span>
-            </div>
-            <div className="ec-r__method__lineRow">
-              <span>{t("ec.r.method.line.subscription")}</span>
-              <span>{fmtNarrow(cost.altery.subscription)}</span>
-              <span>{fmtNarrow(cost.bank.subscription || 0)}</span>
-            </div>
-            <div className="ec-r__method__lineRow">
-              <span>{t("ec.r.method.line.fx")}</span>
-              <span>{fmtNarrow(cost.altery.fx)}</span>
-              <span>{fmtNarrow(cost.bank.fx)}</span>
-            </div>
-            <div className="ec-r__method__lineRow">
-              <span>{t("ec.r.method.line.swift")}</span>
-              <span>{fmtNarrow(cost.altery.swift)}</span>
-              <span>{fmtNarrow(cost.bank.swift)}</span>
-            </div>
-            <div className="ec-r__method__lineRow">
-              <span>{t("ec.r.method.line.local")}</span>
-              <span>{fmtNarrow(cost.altery.local)}</span>
-              <span>{fmtNarrow(cost.bank.local)}</span>
-            </div>
-            <div className="ec-r__method__lineRow ec-r__method__lineRow--total">
-              <span>{t("ec.r.method.line.total")}</span>
-              <span>{fmtNarrow(cost.altery.total)}</span>
-              <span>{fmtNarrow(cost.bank.total)}</span>
+          {/* Altery-only breakdown (Jun 2026): the bank comparison column,
+              the bank-FX assumption line and the named-bank tariff source
+              links were removed — this modal now shows only how Altery's own
+              estimate is built from its published tariff + the user's inputs.
+              Inline-styled to drop the old 3-column grid. */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+            {[["subscription", cost.altery.subscription], ["fx", cost.altery.fx], ["swift", cost.altery.swift], ["local", cost.altery.local]].map((row) => (
+              <div key={row[0]} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>
+                <span>{t("ec.r.method.line." + row[0])}</span><span>{fmtNarrow(row[1])}</span>
+              </div>
+            ))}
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 600, color: "var(--c-ink)", borderTop: "1px solid var(--c-border)", paddingTop: 9 }}>
+              <span>{t("ec.r.method.line.total")}</span><span>{fmtNarrow(cost.altery.total)}</span>
             </div>
           </div>
 
           <ul className="ec-r__method__assumptions">
-            {cost.methodology.assumptions.map((a, i) => (
+            {cost.methodology.assumptions.filter((a) => a.key !== "ec.r.method.bankFx").map((a, i) => (
               <li key={i}>{t(a.key, a.vars)}</li>
             ))}
           </ul>
-
-          <div className="ec-r__method__sources">
-            {t("ec.r.method.asof", { date: asofDisplay })}
-            {cost.methodology.baselineSources.map((url, i) => (
-              <span key={i}>
-                {" · "}
-                <a href={url} target="_blank" rel="noopener noreferrer">
-                  {t("ec.r.method.sourceLink", {
-                    bank: cost.methodology.baselinePanel?.[i] || cost.methodology.baseline,
-                  })}
-                </a>
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </div>
