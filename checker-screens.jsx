@@ -875,7 +875,7 @@ function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked 
       {/* Inline soft-decline — fires the instant a blocked industry is
           picked, so the user gets the answer before pressing Continue. */}
       {isBlocked && (
-        <Alert tone="danger" title={t("ec.q1.alert.blocked.title")}>
+        <Alert tone="warning" title={t("ec.q1.alert.blocked.title")}>
           {t("ec.q1.alert.blocked.body", { industry: t(ind.labelKey).toLowerCase() })}
         </Alert>
       )}

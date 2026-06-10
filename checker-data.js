@@ -488,6 +488,17 @@ const EC_INDUSTRIES = [
   // payouts, often multi-currency, often cross-border.
   { value: "freelance",  labelKey: "ec.ind.freelance",  risk: "ok", craKey: "ec.cra.freelance" },
   { value: "prof",       labelKey: "ec.ind.prof",       risk: "ok", craKey: "ec.cra.professional" },
+  // ── Trade & physical-goods segments — self-serve review path ──────
+  // Added to the customer-facing list (Jun 2026). Cross-border trade,
+  // wholesale, logistics and manufacturing are core multi-currency /
+  // SWIFT-corridor profiles that previously had no home in the digital-
+  // native list and fell into "Other". All map onto existing back-office
+  // CRA buckets (import-export is the one net-new craKey). risk:"ok" —
+  // mainstream B2B, self-serve review, not specialist.
+  { value: "trade",        labelKey: "ec.ind.trade",        risk: "ok", craKey: "ec.cra.import-export" },
+  { value: "wholesale",    labelKey: "ec.ind.wholesale",    risk: "ok", craKey: "ec.cra.retail-wholesale" },
+  { value: "logistics",    labelKey: "ec.ind.logistics",    risk: "ok", craKey: "ec.cra.courier-logistics" },
+  { value: "manufacturing",labelKey: "ec.ind.manufacturing",risk: "ok", craKey: "ec.cra.manufacturing" },
   // ── Specialist review path ────────────────────────────────────────
   // Creator platforms map to the e-commerce-marketplace CRA bucket:
   // operationally they're multi-payee split-flow platforms (platform
