@@ -85,7 +85,7 @@
     "ob.prep.s3.title": "Choose your plan",
     "ob.prep.s3.t": "1 min",
     "ob.prep.s3.i1": "Starter, Growth or Scale — switch any time later",
-    "ob.prep.s3.i2": "14-day trial; we authorise your card for 0.00 today",
+    "ob.prep.s3.i2": "We authorise your card for 0.00 today",
     "ob.prep.s4.title": "Company documents",
     "ob.prep.s4.t": "5 min",
     "ob.prep.s4.i1": "Certificate of Incorporation",
