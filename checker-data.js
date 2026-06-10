@@ -679,7 +679,7 @@ const EC_PLANS = {
     price: "£100", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.pro.tagline",
     fitKey: "ec.plan.pro.fit",
-    perkKeys: ["ec.plan.pro.p3", "ec.plan.pro.am", "ec.plan.pro.users"],
+    perkKeys: ["ec.plan.pro.am", "ec.plan.pro.users"],
     fees: {
       fasterPay: "£1",
       sepa:      "€1.5",

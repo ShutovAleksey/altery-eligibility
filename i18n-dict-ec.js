@@ -300,9 +300,7 @@
 
     // Plan perks — anchored to real differentiators from the comparison page
     "ec.plan.starter.p4": "14-day free trial",
-    "ec.plan.pro.p1":     "Everything in Starter",
-    "ec.plan.pro.p3":     "Recurring & scheduled payments",
-    "ec.plan.ultra.p1":   "Everything in Pro",
+    "ec.plan.pro.p1":     "Everything in Starter",    "ec.plan.ultra.p1":   "Everything in Pro",
     "ec.plan.ultra.p5":   "Priority operations support",
     "ec.plan.starter.users": "Up to 2 account users",
     "ec.plan.pro.users":     "Up to 5 account users",
@@ -568,9 +566,7 @@
     "ec.r.cost.year": "≈ {low}–{high} a year on the {plan} plan",
     "ec.r.cost.breakdown.head": "What's in that number",
     "ec.r.cost.caption": "An estimate built from our published {plan} tariff and the volume you gave us. It's not a quote — your exact costs are confirmed at activation.",
-    "ec.r.cost.note": "Based on your ~{volume}/month and the regions you selected. Every fee is shown above — nothing is buried in the exchange rate.",
-    "ec.r.cost.compareSelf": "Want to sanity-check it? Compare this against a recent statement from your current provider.",
-    "ec.r.value.transparency": "Every fee published up front — FX, cross-border and local pricing on one page, no surprise charges later.",
+    "ec.r.cost.note": "Based on your ~{volume}/month and the regions you selected. Every fee is shown above — nothing is buried in the exchange rate.",    "ec.r.value.transparency": "Every fee published up front — FX, cross-border and local pricing on one page, no surprise charges later.",
     "ec.r.value.speed": "Digital KYB built for online businesses — most accounts reviewed in 1–2 working days.",
     "ec.r.value.reach": "One account across the UK, EU and MENA on a single published tariff.",
     "ec.r.value.acceptance": "Built for digital, SaaS, marketplace and creator businesses — reviewed by a team that understands them.",

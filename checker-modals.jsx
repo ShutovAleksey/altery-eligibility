@@ -34,7 +34,6 @@
 // Row labels reuse existing perk i18n strings (no new translations
 // added for the feature names themselves).
 const PLAN_CAPABILITIES = [
-  { labelKey: "ec.plan.pro.p3",             on: { starter: false, pro: true,  ultra: true  } },
   { labelKey: "ec.plan.cap.am",             on: { starter: false, pro: true,  ultra: true  } },
   { labelKey: "ec.plan.ultra.p5",           on: { starter: false, pro: false, ultra: true  } },
   { labelKey: "ec.plan.ultra.negotiatedFx", on: { starter: false, pro: false, ultra: true  } },

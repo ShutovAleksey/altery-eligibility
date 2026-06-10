@@ -1810,9 +1810,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
               <p className="ec-r__savings__note">
                 {t("ec.r.rates.caption", { plan: planName })}
               </p>
-              <p className="ec-r__savings__hiddenNote">
-                {t("ec.r.cost.compareSelf")}
-              </p>
 
               {/* Altery-owned value lines (no competitor comparison). Crypto
                   deliberately omitted (jurisdiction-gated). */}
