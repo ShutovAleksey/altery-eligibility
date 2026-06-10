@@ -532,14 +532,16 @@ const Toggle = ({ checked, onChange, disabled, loading, size = "md", label, styl
 
 };
 
-const Checkbox = ({ checked, onChange, label, disabled, indeterminate, error, style, "aria-label": ariaLabel }) => {
+const Checkbox = ({ checked, onChange, label, disabled, indeterminate, error, style, tone, "aria-label": ariaLabel }) => {
   const filled = checked || indeterminate;
+  // tone="primary" renders the checked fill in brand navy; default is accent blue.
+  const fillColor = tone === "primary" ? "var(--c-primary)" : "var(--c-accent)";
   const borderColor = disabled ? "var(--c-disabled-border)" :
   error ? "var(--c-danger)" :
-  filled ? "var(--c-accent)" :
+  filled ? fillColor :
   "var(--c-border-strong)";
   const bgColor = disabled ? "var(--c-disabled-bg)" :
-  filled ? "var(--c-accent)" :
+  filled ? fillColor :
   "var(--c-surface)";
   return (
     <div style={{ display: "inline-flex", flexDirection: "column", gap: 4 }}>
