@@ -563,7 +563,7 @@ const EC_SERVICES = [
   { value: "crossBorder",  titleKey: "ec.svc.crossBorder.title",  bodyKey: "ec.svc.crossBorder.body",  tier: "starter" },
   { value: "mass",         titleKey: "ec.svc.mass.title",         bodyKey: "ec.svc.mass.body",         tier: "pro" },
   { value: "api",          titleKey: "ec.svc.api.title",          bodyKey: "ec.svc.api.body",          tier: "pro" },
-  { value: "multiCompany", titleKey: "ec.svc.multiCompany.title", bodyKey: "ec.svc.multiCompany.body", tier: "pro" },
+  { value: "multiCompany", titleKey: "ec.svc.multiCompany.title", bodyKey: "ec.svc.multiCompany.body", tier: "pro", soon: true },
 ];
 
 // Single source of truth for the questionnaire length. Used by EcApp

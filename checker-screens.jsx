@@ -981,12 +981,14 @@ function EcServices({ country, services, setServices, onBack, onNext }) {
             <div
               key={s.value}
               className={"ec-service" + (on ? " is-on" : "")}
-              onClick={() => toggle(s.value)}
+              onClick={() => { if (!s.soon) toggle(s.value); }}
               role="checkbox"
-              aria-checked={on}
-              tabIndex={0}
+              aria-checked={s.soon ? undefined : on}
+              aria-disabled={s.soon || undefined}
+              tabIndex={s.soon ? -1 : 0}
+              style={s.soon ? { opacity: 0.62, cursor: "default" } : undefined}
               onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
+                if (!s.soon && (e.key === "Enter" || e.key === " ")) {
                   e.preventDefault();
                   toggle(s.value);
                 }
@@ -998,7 +1000,14 @@ function EcServices({ country, services, setServices, onBack, onNext }) {
                 </svg>
               </span>
               <div className="ec-service__text">
-                <div className="ec-service__title">{t(s.titleKey)}</div>
+                <div className="ec-service__title">
+                  {t(s.titleKey)}
+                  {s.soon && (
+                    <span style={{ marginLeft: 8, verticalAlign: "middle" }}>
+                      <Tag tone="blue" size="sm">{t("ec.svc.soon")}</Tag>
+                    </span>
+                  )}
+                </div>
                 <div className="ec-service__body">{t(s.bodyKey)}</div>
               </div>
             </div>

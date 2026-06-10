@@ -149,6 +149,7 @@
     "ec.svc.api.body": "Programmatic payments, webhooks, and account data for your product or finance operations",
     "ec.svc.multiCompany.title": "Multi-company management",
     "ec.svc.multiCompany.body": "Manage multiple entities with separate balances, IBANs, cards, and team access.",
+    "ec.svc.soon": "Soon",
     "ec.svc.crypto.title": "Crypto-related payment flows",
     "ec.svc.crypto.body": "Access crypto on-ramp and off-ramp services through Synterra Connect where available.",
 

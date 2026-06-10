@@ -86,6 +86,7 @@
     "ec.svc.api.body": "Programowe płatności, webhooki i dane konta dla Twojego produktu lub operacji finansowych",
     "ec.svc.multiCompany.title": "Multi-company management",
     "ec.svc.multiCompany.body": "Zarządzaj wieloma podmiotami z oddzielnymi saldami, IBAN-ami, kartami i dostępem dla zespołu.",
+    "ec.svc.soon": "Wkrótce",
     "ec.svc.crypto.title": "Przepływy płatności związane z crypto",
     "ec.svc.crypto.body": "Korzystaj z usług crypto on-ramp i off-ramp przez Synterra Connect, tam gdzie są dostępne.",
 
@@ -522,6 +523,7 @@
     "ec.svc.api.body": "Pagamentos programáticos, webhooks e dados da conta para o seu produto ou operações financeiras",
     "ec.svc.multiCompany.title": "Multi-company management",
     "ec.svc.multiCompany.body": "Gira várias entidades com saldos, IBANs, cartões e acesso da equipa separados.",
+    "ec.svc.soon": "Em breve",
     "ec.svc.crypto.title": "Fluxos de pagamento relacionados com crypto",
     "ec.svc.crypto.body": "Aceda aos serviços de crypto on-ramp e off-ramp através da Synterra Connect, onde disponíveis.",
 
@@ -956,6 +958,7 @@
     "ec.svc.api.body": "Paiements programmatiques, webhooks et données de compte pour votre produit ou vos opérations finance",
     "ec.svc.multiCompany.title": "Multi-company management",
     "ec.svc.multiCompany.body": "Gérez plusieurs entités avec des soldes, IBAN, cartes et accès d'équipe séparés.",
+    "ec.svc.soon": "Bientôt",
     "ec.svc.crypto.title": "Flux de paiement liés aux crypto",
     "ec.svc.crypto.body": "Accédez aux services crypto on-ramp et off-ramp via Synterra Connect, là où ils sont disponibles.",
 

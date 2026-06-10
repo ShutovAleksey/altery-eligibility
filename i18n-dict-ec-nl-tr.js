@@ -85,6 +85,7 @@
     "ec.svc.api.body": "Programmatische betalingen, webhooks en accountdata voor je product of finance-operaties",
     "ec.svc.multiCompany.title": "Multi-company management",
     "ec.svc.multiCompany.body": "Beheer meerdere entiteiten met aparte saldi, IBANs, kaarten en teamtoegang.",
+    "ec.svc.soon": "Binnenkort",
     "ec.svc.crypto.title": "Crypto-gerelateerde betaalstromen",
     "ec.svc.crypto.body": "Maak gebruik van crypto on-ramp en off-ramp via Synterra Connect, waar beschikbaar.",
 
@@ -521,6 +522,7 @@
     "ec.svc.api.body": "Ürününüz veya finans operasyonlarınız için programatik ödemeler, webhook'lar ve hesap verisi",
     "ec.svc.multiCompany.title": "Multi-company management",
     "ec.svc.multiCompany.body": "Birden fazla tüzel kişiliği ayrı bakiyeler, IBAN'lar, kartlar ve ekip erişimi ile yönetin.",
+    "ec.svc.soon": "Yakında",
     "ec.svc.crypto.title": "Crypto ile ilgili ödeme akışları",
     "ec.svc.crypto.body": "Crypto on-ramp ve off-ramp hizmetlerine, mevcut olduğu yerlerde Synterra Connect üzerinden erişin.",
 

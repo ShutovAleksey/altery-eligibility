@@ -85,6 +85,7 @@
     "ec.svc.api.body": "Pagamenti programmatici, webhook e dati del conto per il tuo prodotto o per le operazioni finance",
     "ec.svc.multiCompany.title": "Multi-company management",
     "ec.svc.multiCompany.body": "Gestisci più entità con saldi, IBAN, carte e accesso del team separati.",
+    "ec.svc.soon": "Presto",
     "ec.svc.crypto.title": "Flussi di pagamento legati alle crypto",
     "ec.svc.crypto.body": "Accedi ai servizi crypto on-ramp e off-ramp tramite Synterra Connect, dove disponibili.",
 
@@ -521,6 +522,7 @@
     "ec.svc.api.body": "Pagos programáticos, webhooks y datos de la cuenta para tu producto o tus operaciones financieras",
     "ec.svc.multiCompany.title": "Multi-company management",
     "ec.svc.multiCompany.body": "Gestiona varias entidades con saldos, IBANs, tarjetas y acceso del equipo separados.",
+    "ec.svc.soon": "Pronto",
     "ec.svc.crypto.title": "Flujos de pago relacionados con crypto",
     "ec.svc.crypto.body": "Accede a servicios crypto on-ramp y off-ramp a través de Synterra Connect, donde estén disponibles.",
 
