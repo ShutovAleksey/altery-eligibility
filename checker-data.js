@@ -518,13 +518,14 @@ const EC_INDUSTRIES = [
   // Folding crypto under "IT Support / Development" would lose that
   // signal at back-office routing time.
   { value: "crypto",     labelKey: "ec.ind.crypto",     risk: "specialist", crypto: true, craKey: "ec.cra.crypto" },
-  // ── Fallback ──────────────────────────────────────────────────────
-  { value: "other",      labelKey: "ec.ind.other",      risk: "ok", craKey: null },
   // ── Blocked (Fast no's, not slow no's — intro screen card 3) ──────
   { value: "gambling",   labelKey: "ec.ind.gambling",   risk: "blocked", craKey: null },
   { value: "adult",      labelKey: "ec.ind.adult",      risk: "blocked", craKey: null },
   { value: "weapons",    labelKey: "ec.ind.weapons",    risk: "blocked", craKey: null },
   { value: "lending",    labelKey: "ec.ind.lending",    risk: "blocked", craKey: null },
+  // ── Fallback — kept LAST so "my industry isn't listed" sits at the very
+  // bottom of the picker, below every named option (incl. the blocked set). ─
+  { value: "other",      labelKey: "ec.ind.other",      risk: "ok", craKey: null },
 ];
 
 // ── Services multi-select (Q3) ────────────────────────────────────
