@@ -1,4 +1,4 @@
-/* global React, useT, Button, Tag, Alert, Input, Modal, Card, Spinner,
+/* global React, useT, Button, Checkbox, Tag, Alert, Input, Modal, Card, Spinner,
           Icon, Flag, Field, WhyWeAsk,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, EC_SERVICES,
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,
@@ -500,6 +500,34 @@ function EcPlanCompareCard({ plan, onSelect }) {
 // `email` prefills + hides the email field when known. `rec` supplies the
 // checker context on-screen; `context` carries it directly for the
 // deep-link entry (which has no full rec to rebuild).
+// Privacy-policy consent — a REQUIRED checkbox on every form that collects
+// an email or requests a sales callback (GDPR lawful-basis capture at the
+// point of collection). Submit is blocked until it's ticked. The link text
+// lives inside the i18n string as <a>…</a> (same pattern as onboarding's
+// ob.welcome.tos) so its position adapts per language; we splice in the
+// real Privacy Policy URL here. stopPropagation on the anchor so clicking
+// the link opens the policy without toggling the surrounding checkbox label.
+const EC_PRIVACY_URL = "https://altery.com/legal/privacy-policy/";
+function EcPrivacyConsent({ checked, onChange, error }) {
+  const t = useT();
+  const raw = t("ec.consent.privacy");
+  const m = raw.match(/^([\s\S]*)<a>([\s\S]*?)<\/a>([\s\S]*)$/);
+  const label = m ? (
+    <span>
+      {m[1]}
+      <a href={EC_PRIVACY_URL} target="_blank" rel="noopener noreferrer"
+         onClick={(e) => e.stopPropagation()}
+         style={{ color: "var(--c-accent)", textDecoration: "underline" }}>{m[2]}</a>
+      {m[3]}
+    </span>
+  ) : raw;
+  return (
+    <div className="ec-handoff__consent" style={{ margin: "2px 0" }}>
+      <Checkbox checked={checked} onChange={onChange} label={label} error={error} />
+    </div>
+  );
+}
+
 function EcCallbackForm({ email: emailProp, rec, context }) {
   const t = useT();
   const [firstname, setFirstname] = useState("");
@@ -511,6 +539,7 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
   const [touched, setTouched]     = useState(false);
   const [error, setError]         = useState(null);
   const [done, setDone]           = useState(false);
+  const [consent, setConsent]     = useState(false);
   // Anti-spam: honeypot input + mount-time stamp. See lib/anti-spam.js.
   // Bots that fill every field set `honeypot` non-empty; instant submits
   // fail the 3-second form-age check.
@@ -526,7 +555,7 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
   const phoneValid = /\d{7,}/.test(phone.replace(/\D/g, ""));
   const companyValid = company.trim().length > 0;
   const valid = firstname.trim().length > 0 && lastname.trim().length > 0
-    && companyValid && phoneValid && emailValid;
+    && companyValid && phoneValid && emailValid && consent;
 
   const submit = async () => {
     setTouched(true);
@@ -628,6 +657,7 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
           disabled={submitting}
         />
       )}
+      <EcPrivacyConsent checked={consent} onChange={setConsent} />
       {((touched && !valid) || error) && (
         <div className="ec-handoff__error" role="alert">{error || t("ec.callback.error")}</div>
       )}
@@ -636,7 +666,7 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
         size="lg"
         full
         onClick={submit}
-        disabled={submitting || (touched && !valid)}
+        disabled={submitting || !consent || (touched && !valid)}
         style={{ height: 44 }}
       >
         {submitting ? t("ec.handoff.submitting") : t("ec.callback.submit")}
@@ -654,6 +684,7 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
   // that want to jump straight to email capture pass initialStage="email".
   const [stage, setStage] = useState(initialStage || "commit");
   const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
   const [touched, setTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
@@ -702,7 +733,7 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
 
   const sendEmail = async () => {
     setTouched(true);
-    if (!isValid) return;
+    if (!isValid || !consent) return;
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -879,13 +910,15 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
               <div className="ec-handoff__error" role="alert">{submitError}</div>
             )}
 
+            <EcPrivacyConsent checked={consent} onChange={setConsent} />
+
             <div className="ec-handoff__actions">
               <Button
                 variant="primary"
                 size="xl"
                 full
                 onClick={sendEmail}
-                disabled={submitting || !isValid}
+                disabled={submitting || !isValid || !consent}
               >
                 {submitting ? t("ec.handoff.submitting") : t("ec.handoff.email.send")}
               </Button>

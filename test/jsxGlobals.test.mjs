@@ -28,7 +28,7 @@ const RUNTIME_PROVIDED = new Set([
   // /checker-atoms.jsx and /checker-flag-lang.jsx — these are loaded as
   // separate script tags in index.html before checker-screens / modals.
   // Our sandbox only loads data + helpers, so these are stubs.
-  "Button", "Tag", "Alert", "SelectableListItem", "Input", "Select",
+  "Button", "Tag", "Alert", "SelectableListItem", "Input", "Select", "Checkbox",
   "Icon", "Flag", "Title", "Field", "WhyWeAsk", "Card", "Spinner", "Modal",
   "useT",
   // Loaded later by other modal/screen files at runtime:

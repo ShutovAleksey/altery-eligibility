@@ -433,6 +433,7 @@
     "ec.handoff.email.title": "Your full proposal, ready to share",
     "ec.handoff.email.lead": "A detailed PDF built around your answers. Share it with your team or CFO.",
     "ec.handoff.trust": "No spam, just your proposal, once.",
+    "ec.consent.privacy": "I agree to Altery's <a>Privacy Policy</a>.",
     "ec.handoff.sent.step2.title": "Forward to your CFO or co-founder",
     "ec.handoff.sent.step2.body": "Many founders share before booking the call — it speeds the decision.",
     "ec.callback.title": "Talk to our team",
