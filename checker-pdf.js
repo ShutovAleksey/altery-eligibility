@@ -326,14 +326,6 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <td style="padding:9px 0;color:${C.ink};font-weight:${r.bold ? "600" : "500"};text-align:right;font-size:13px;font-variant-numeric:tabular-nums;">${r.value}</td>
     </tr>`).join("");
 
-  // Crypto reroute callout — only when EU-incorporated user had
-  // crypto signal (industry or services) and got routed to UK.
-  const cryptoRerouteHTML = rec.cryptoReroute ? `
-    <div style="background:${C.warn};border:1px solid ${C.warnBorder};border-radius:12px;padding:16px 18px;margin:0 0 28px;">
-      <div style="font-size:13px;font-weight:600;color:${C.ink};margin-bottom:6px;">${t("ec.pdf.cryptoReroute.head")}</div>
-      <div style="font-size:12.5px;line-height:19px;color:${C.inkSoft};">${t("ec.pdf.cryptoReroute.body")}</div>
-    </div>` : "";
-
   // Cost breakdown — Altery vs typical business bank. This is
   // the document's anchor calculation: the number the customer
   // remembers, forwards, and quotes to their CFO.
