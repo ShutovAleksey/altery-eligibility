@@ -34,7 +34,7 @@
     "ob.section.documents": "Company documents",
     "ob.section.ubo": "UBO & director's details",
     "ob.section.minLeft": "≈ {n} min",
-    "ob.section.done": "{label} — done",
+    "ob.section.done": "{label} done",
 
     // Step labels (used in tweaks dropdown + screen-label)
     "ob.step.welcome": "Welcome",
@@ -53,7 +53,7 @@
     "ob.step.applications-list": "All applications",
 
     // ── Resume modal ──
-    "ob.resume.title": "Take a break — your progress is safe",
+    "ob.resume.title": "Take a break. Your progress is safe",
     "ob.resume.body": "Everything you've entered is already saved on your account. We'll send a link to pick up exactly where you left off.",
     "ob.resume.label": "Send the resume link to",
     "ob.resume.placeholder": "you@yourcompany.com",
@@ -64,15 +64,15 @@
     "ob.resume.justNow": "just now",
     "ob.resume.savedAt": "Saved automatically · {time}",
     "ob.resume.sentTitle": "Link sent to {email}",
-    "ob.resume.sentBody": "The link works for 14 days. You can also log back in any time — your application will be waiting on the dashboard.",
+    "ob.resume.sentBody": "The link works for 14 days. You can also log back in any time, and your application will be waiting on the dashboard.",
     "ob.resume.err.email": "Please enter a valid email address.",
     "ob.resume.err.tooLarge": "Your progress is too big to send by link right now. Try saving a few screens earlier, or finish this application in one session.",
-    "ob.resume.err.network": "Network error — please try again in a moment.",
+    "ob.resume.err.network": "Network error. Please try again in a moment.",
     "ob.resume.err.generic": "We couldn't send the link. Please try again.",
 
     // ── Prep ──
     "ob.prep.title": "Let's open your business account",
-    "ob.prep.lead": "Four short steps. Around 17 minutes if you have everything to hand — or pause anytime and continue from another device.",
+    "ob.prep.lead": "Four short steps. Around 17 minutes if you have everything to hand, or pause anytime and continue from another device.",
     "ob.prep.s1.title": "About you",
     "ob.prep.s1.t": "2 min",
     "ob.prep.s1.i1": "Your name and work email",
@@ -84,7 +84,7 @@
     "ob.prep.s2.i3": "Industry and expected payment volumes",
     "ob.prep.s3.title": "Choose your plan",
     "ob.prep.s3.t": "1 min",
-    "ob.prep.s3.i1": "Starter, Growth or Scale — switch any time later",
+    "ob.prep.s3.i1": "Starter, Growth or Scale, and you can switch any time later",
     "ob.prep.s3.i2": "We authorise your card for 0.00 today",
     "ob.prep.s4.title": "Company documents",
     "ob.prep.s4.t": "5 min",
@@ -103,7 +103,7 @@
 
     // ── Welcome ──
     "ob.welcome.title": "Tell us who's opening this account",
-    "ob.welcome.lead": "Use your work email — we'll send the verification code there.",
+    "ob.welcome.lead": "Use your work email, since we'll send the verification code there.",
     "ob.welcome.firstName": "First name",
     "ob.welcome.lastName": "Last name",
     "ob.welcome.email": "Work email",
@@ -112,7 +112,7 @@
 
     // ── Password ──
     "ob.password.title": "Set a password",
-    "ob.password.lead": "Make it strong. This account will hold company funds and team access — the password is your first line of defence.",
+    "ob.password.lead": "Make it strong. This account will hold company funds and team access, so the password is your first line of defence.",
     "ob.password.label": "Password",
     "ob.password.placeholder": "Enter password",
     "ob.password.hint": "8+ characters with letters, numbers and a symbol",
@@ -135,7 +135,7 @@
     "ob.verify.sending": "Sending code…",
     "ob.verify.verifying": "Verifying…",
     "ob.verify.err.send": "Could not send the code. Try again in a moment.",
-    "ob.verify.err.network": "Network error — check your connection and try again.",
+    "ob.verify.err.network": "Network error. Check your connection and try again.",
     "ob.verify.err.expired": "This code has expired. Tap Resend to get a new one.",
     "ob.verify.err.mismatch": "That code doesn't match. Double-check and try again.",
     "ob.verify.err.generic": "We couldn't verify that code. Try again or resend.",
@@ -145,13 +145,13 @@
     "ob.phone.lead": "We use it for 2-step verification and to reach you if a payment needs your sign-off.",
     "ob.phone.label": "Mobile number",
     "ob.phone.send": "Send verification code",
-    "ob.phone.why": "Your number stays private. We never share it with third parties and only send codes when you sign in or approve sensitive actions — large transfers, new recipients, team-permission changes.",
-    "ob.phone.err.length": "Enter the full number — {n} digits expected for the selected country.",
+    "ob.phone.why": "Your number stays private. We never share it with third parties and only send codes when you sign in or approve sensitive actions like large transfers, new recipients, and team-permission changes.",
+    "ob.phone.err.length": "Enter the full number. The selected country expects {n} digits.",
 
     // ── Country ──
     "ob.country.eyebrow": "Your company",
     "ob.country.title": "Where is your company incorporated?",
-    "ob.country.lead": "This determines which Altery entity will issue your account — UK, EEA or DIFC — and which documents we'll need.",
+    "ob.country.lead": "This determines which Altery entity will issue your account (UK, EEA or DIFC) and which documents we'll need.",
     "ob.country.label": "Country of incorporation",
     "ob.country.search": "Search country",
 
@@ -183,7 +183,7 @@
     "ob.bi.website": "Company website (optional)",
     "ob.bi.websitePh": "example.com",
     "ob.bi.alertTitle": "Industries we can't currently serve",
-    "ob.bi.alertBody": "Adult content, gambling, weapons manufacture, unregulated lending, and crypto-only services aren't supported by any Altery entity right now. If you're unsure, talk to us before you finish — we'd rather flag it now than at review.",
+    "ob.bi.alertBody": "Adult content, gambling, weapons manufacture, unregulated lending, and crypto-only services aren't supported by any Altery entity right now. If you're unsure, talk to us before you finish, because we'd rather flag it now than at review.",
 
     // ── Activity ──
     "ob.act.title": "How will you use the account?",
@@ -197,21 +197,21 @@
     "ob.act.range": "Select range",
     "ob.act.channels": "Channels used",
     "ob.act.r.under10k": "Under €10,000",
-    "ob.act.r.10-100k": "€10,000 – €100,000",
-    "ob.act.r.100-250k": "€100,000 – €250,000",
-    "ob.act.r.250k-1m": "€250,000 – €1,000,000",
+    "ob.act.r.10-100k": "€10,000 to €100,000",
+    "ob.act.r.100-250k": "€100,000 to €250,000",
+    "ob.act.r.250k-1m": "€250,000 to €1,000,000",
     "ob.act.r.over1m": "Over €1,000,000",
-    "ob.act.r.10-80k": "€10,000 – €80,000",
-    "ob.act.r.80-200k": "€80,000 – €200,000",
-    "ob.act.r.200k-1m": "€200,000 – €1,000,000",
+    "ob.act.r.10-80k": "€10,000 to €80,000",
+    "ob.act.r.80-200k": "€80,000 to €200,000",
+    "ob.act.r.200k-1m": "€200,000 to €1,000,000",
     "ob.act.tx.under10": "Under 10",
-    "ob.act.tx.10-20": "10 – 20",
-    "ob.act.tx.20-50": "20 – 50",
-    "ob.act.tx.50-100": "50 – 100",
+    "ob.act.tx.10-20": "10 to 20",
+    "ob.act.tx.20-50": "20 to 50",
+    "ob.act.tx.50-100": "50 to 100",
     "ob.act.tx.over100": "Over 100",
-    "ob.act.tx.10-30": "10 – 30",
-    "ob.act.tx.30-80": "30 – 80",
-    "ob.act.tx.80-200": "80 – 200",
+    "ob.act.tx.10-30": "10 to 30",
+    "ob.act.tx.30-80": "30 to 80",
+    "ob.act.tx.80-200": "80 to 200",
     "ob.act.tx.over200": "Over 200",
     "ob.act.ch.sepa": "SEPA / SEPA Instant",
     "ob.act.ch.swift": "SWIFT international",
@@ -223,9 +223,9 @@
 
     // ── Documents ──
     "ob.doc.title": "Company documents",
-    "ob.doc.lead": "Upload the official paperwork that confirms your company exists and who runs it. Names of these documents vary by country — if yours has a different name but covers the same ground, that's fine.",
+    "ob.doc.lead": "Upload the official paperwork that confirms your company exists and who runs it. Names of these documents vary by country, so if yours has a different name but covers the same ground, that's fine.",
     "ob.doc.alert": "PDFs only, up to 10 MB each. Documents must be dated within the last 12 months unless they're constitutional (e.g. Memorandum & Articles).",
-    "ob.doc.fileError": "File too large — max 10 MB",
+    "ob.doc.fileError": "File too large. The maximum is 10 MB.",
     "ob.doc.incorp": "Certificate of Incorporation",
     "ob.doc.incorp.h": "Issued by your company registrar",
     "ob.doc.memo": "Memorandum and Articles of Association",
@@ -241,14 +241,14 @@
 
     // ── UBO list ──
     "ob.ubo.title": "Directors and beneficial owners",
-    "ob.ubo.lead": "List every director and anyone holding 25% or more of the company. We'll handle their identity checks — you don't have to chase passport scans yourself.",
+    "ob.ubo.lead": "List every director and anyone holding 25% or more of the company. We'll handle their identity checks, so you don't have to chase passport scans yourself.",
     "ob.ubo.pending": "Verification pending",
     "ob.ubo.add": "Add another director or owner",
-    "ob.ubo.why": "Compliance rules require us to verify every director and anyone with 25%+ of the company. By sending each person their own secure link, we keep their personal documents off your inbox — and out of your responsibility.",
+    "ob.ubo.why": "Compliance rules require us to verify every director and anyone with 25%+ of the company. By sending each person their own secure link, we keep their personal documents off your inbox and out of your responsibility.",
 
     // ── UBO form ──
     "ob.uboForm.title": "Add a director or owner",
-    "ob.uboForm.lead": "They'll get a secure link to complete their part — ID document, selfie, proof of address. Takes them about 5 minutes.",
+    "ob.uboForm.lead": "They'll get a secure link to complete their part: ID document, selfie, and proof of address. Takes them about 5 minutes.",
     "ob.uboForm.role": "Role",
     "ob.uboForm.role.dir": "Director only",
     "ob.uboForm.role.both": "Director & UBO",
@@ -326,7 +326,7 @@
     "ob.pay.success.step2.title": "Verification started",
     "ob.pay.success.step2.sub": "We're reviewing your company details and shareholder documents",
     "ob.pay.success.step3.title": "Decision within 48 working hours",
-    "ob.pay.success.step3.sub": "We'll email you the outcome — approved, or with any follow-up questions",
+    "ob.pay.success.step3.sub": "We'll email you the outcome, whether approved or with any follow-up questions",
     "ob.pay.success.cta": "View application status",
 
     // ── Submit / status ──
@@ -339,7 +339,7 @@
     "ob.sub.s2.title": "Shareholder verification pending",
     "ob.sub.s2.intro": "We've sent verification requests to the following email addresses with instructions to complete their personal verification:",
     "ob.sub.s3.title": "Documents under review",
-    "ob.sub.s3.bodyPre": "Our team will verify your submitted documents within 3–5 working days. We may contact you at ",
+    "ob.sub.s3.bodyPre": "Our team will verify your submitted documents within three to five working days. We may contact you at ",
     "ob.sub.s3.bodyPost": " if we need any additional information about your company.",
     "ob.sub.s4.title": "Business account open",
     "ob.sub.s4.body": "After successful verification, your business account will be opened and ready to use. You will receive email notification about it.",
@@ -356,7 +356,7 @@
     "ob.rej.reasonBody": "Your business activity falls outside the categories we currently support in your jurisdiction.",
     "ob.rej.what": "What you can do",
     "ob.rej.l1": "Reply to the rejection email if you believe this was a mistake",
-    "ob.rej.l2": "Talk to our team — they can advise on alternative entities or structures",
+    "ob.rej.l2": "Talk to our team, who can advise on alternative entities or structures",
     "ob.rej.l3": "Reapply once your business model or jurisdiction changes",
     "ob.rej.toApps": "Back to applications",
 
@@ -365,7 +365,7 @@
     "ob.apps.lead": "Continue where you left off, track open submissions, or start a new application.",
     "ob.apps.new": "Open new application",
     "ob.apps.newMeta": "Open a new business account in just a few minutes",
-    "ob.apps.lastActivity": "Last activity – an hour ago",
+    "ob.apps.lastActivity": "Last activity an hour ago",
   });
 
   // German, Russian, Dutch, Turkish, Italian, Spanish, Polish, Portuguese, French
