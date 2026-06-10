@@ -169,14 +169,24 @@ test("Capability matrix: crypto row hidden for non-crypto biz", () => {
   assert.equal(hasCryptoRow, false);
 });
 
-test("Capability matrix: crypto row visible for crypto biz", () => {
+test("Capability matrix: crypto row visible for crypto biz in an open jurisdiction (MENA)", () => {
+  const r = w.ecRecommend({
+    countryCode: "AE", industry: "crypto", monthlyVolume: 500000,
+    corridorsIn: [], corridorsOut: [], services: [],
+  });
+  const cap = w.ecCapabilityMatrix(r);
+  const hasCryptoRow = cap.alteryWins.some((x) => x.titleKey === "ec.cap.win.crypto");
+  assert.equal(hasCryptoRow, true);
+});
+
+test("Capability matrix: crypto row hidden in a no-crypto jurisdiction (UK), even for a crypto biz", () => {
   const r = w.ecRecommend({
     countryCode: "GB", industry: "crypto", monthlyVolume: 500000,
     corridorsIn: [], corridorsOut: [], services: [],
   });
   const cap = w.ecCapabilityMatrix(r);
   const hasCryptoRow = cap.alteryWins.some((x) => x.titleKey === "ec.cap.win.crypto");
-  assert.equal(hasCryptoRow, true);
+  assert.equal(hasCryptoRow, false, "UK is a no-crypto jurisdiction → no crypto advantage row");
 });
 
 // ────────────────────────────────────────────────────────────────

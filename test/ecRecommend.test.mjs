@@ -139,29 +139,58 @@ test("tierSignals expose which signals fired", () => {
 });
 
 // ────────────────────────────────────────────────────────────────
-// Crypto re-route: EU + crypto → UK entity
+// Crypto eligibility by jurisdiction (NO entity re-route).
+// Not offered to UK/US/JP/NL; served quietly in the EEA (served but
+// not advertised → cryptoOpen false); offered openly across MENA + the
+// rest of RoW. The old EU→UK "Cyprus EMI doesn't cover crypto" reroute
+// was removed — it was backwards (UK is exactly where crypto isn't
+// offered). See the crypto-jurisdictions note.
 // ────────────────────────────────────────────────────────────────
-test("EU country + crypto industry re-routes to UK (Cyprus EMI doesn't cover crypto)", () => {
-  // After the category→subindustry rebuild, "crypto" is no longer a
-  // top-level industry — `blockchain-dev` is the crypto-native leaf
-  // (with crypto: true). Same routing logic applies.
+test("EU (DE) + crypto industry: served on the EU entity, quietly (no reroute)", () => {
   const rec = w.ecRecommend(input({ countryCode: "DE", industry: "crypto" }));
-  assert.equal(rec.entity.id, "uk", "EU crypto should land on UK FCA");
-  assert.equal(rec.cryptoReroute, true);
+  assert.equal(rec.entity.id, "eu", "EEA crypto stays on the EU entity");
   assert.equal(rec.cryptoActive, true);
+  assert.equal(rec.cryptoServed, true);
+  assert.equal(rec.cryptoOpen, false, "EEA crypto is served but not advertised");
+  assert.equal(rec.cryptoBlocked, false);
 });
 
-test("EU country + crypto SERVICE (not industry) also triggers re-route", () => {
+test("EU (FR) + crypto SERVICE (not industry): same quiet EEA handling", () => {
   const rec = w.ecRecommend(input({ countryCode: "FR", services: ["crypto"] }));
-  assert.equal(rec.entity.id, "uk");
-  assert.equal(rec.cryptoReroute, true);
+  assert.equal(rec.entity.id, "eu");
+  assert.equal(rec.cryptoServed, true);
+  assert.equal(rec.cryptoOpen, false);
 });
 
-test("UK + crypto: no re-route flag (already on UK)", () => {
+test("UK + crypto: not offered (blocked), no reroute, stays on UK entity", () => {
   const rec = w.ecRecommend(input({ countryCode: "GB", industry: "crypto" }));
   assert.equal(rec.entity.id, "uk");
-  assert.equal(rec.cryptoReroute, false);
   assert.equal(rec.cryptoActive, true);
+  assert.equal(rec.cryptoBlocked, true, "UK is a no-crypto jurisdiction");
+  assert.equal(rec.cryptoServed, false);
+  assert.equal(rec.cryptoOpen, false);
+});
+
+test("NL + crypto: EEA member but a no-crypto jurisdiction (blocked)", () => {
+  const rec = w.ecRecommend(input({ countryCode: "NL", industry: "crypto" }));
+  assert.equal(rec.cryptoBlocked, true);
+  assert.equal(rec.cryptoServed, false);
+});
+
+test("MENA (AE) + crypto: served and advertised openly", () => {
+  const rec = w.ecRecommend(input({ countryCode: "AE", industry: "crypto" }));
+  assert.equal(rec.entity.id, "mena");
+  assert.equal(rec.cryptoServed, true);
+  assert.equal(rec.cryptoOpen, true, "MENA crypto is offered openly");
+  assert.equal(rec.cryptoBlocked, false);
+});
+
+test("RoW Seychelles + crypto is open; US/JP are no-crypto jurisdictions", () => {
+  const sc = w.ecRecommend(input({ countryCode: "SC", industry: "crypto" }));
+  assert.equal(sc.cryptoOpen, true, "Seychelles (RoW) crypto is open");
+  const us = w.ecRecommend(input({ countryCode: "US", industry: "crypto" }));
+  assert.equal(us.cryptoBlocked, true, "US is a no-crypto jurisdiction");
+  assert.equal(us.cryptoOpen, false);
 });
 
 // ────────────────────────────────────────────────────────────────
