@@ -4,7 +4,7 @@
           EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,
           EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER,
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
-          ecRecommend, ecComputeCostBreakdown, ecOutcomesForSavings, ecVolumeHintKey,
+          ecRecommend, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
           EcFeesModal, EcPlanComparisonModal, EcHandoffModal, EcPaymentModal, EcCallbackForm */
 // checker-screens.jsx — the eligibility-checker question screens, result
@@ -1550,10 +1550,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
   // Plan comparison modal — local state, opens on "Compare all plans →"
   const [comparisonOpen, setComparisonOpen] = useState(false);
   const [feesOpen, setFeesOpen] = useState(false);
-  // Methodology modal — opens on "How we calculated this →", shows the
-  // line-by-line table, assumptions, and tariff source links that
-  // previously lived inside an inline <details> expander.
-  const [methodOpen, setMethodOpen] = useState(false);
 
   // Handoff modal — used now only for the "Email this proposal as PDF"
   // path on the result page (mounts directly at the email stage).
@@ -1614,30 +1610,13 @@ function EcResultApproved({ rec, onBack, onReset }) {
   const heroIban = ecHeroIdentifier(entity);
   const heroIbanFlag = heroIban ? ecCurrencyFlag(heroIban.currency) : null;
 
-  // Cost projection — drives the savings card. Same helper that builds
-  // the PDF, so on-screen numbers match the email proposal exactly.
-  // Returns null when the volume is too small for a meaningful projection;
-  // we hide the whole savings card in that case (grid collapses to plan-only).
-  //
-  // We compute against a virtual rec that swaps in activePlan, so when the
-  // user picks a different plan from the comparison modal the savings card
-  // (and any downstream views built from `cost`) recompute live against the
-  // new subscription. Only `rec.plan` changes inside the override — every
-  // other input (volume, services, corridors) stays the user's actual
-  // answers, so the projection still reflects how they operate.
-  const activeRec = useMemo(
-    () => ({ ...rec, plan: activePlan }),
-    [rec, activePlan]
-  );
-  const cost = useMemo(() => ecComputeCostBreakdown(activeRec), [activeRec]);
-
-  const _displayCurrency = ecDisplayCurrencyFor(rec);
-  const fmtNarrow = (n) => ecFmtFromGbp(n, _displayCurrency);
-  // Compact format used only on the savings card amounts (annual /
-  // monthly headline + Bank / Altery range cells) so 7-figure values
-  // render as "£2.6m" instead of "£2 598 000". Methodology modal +
-  // PDF / email keep the full-precision fmtNarrow.
-  const fmtCompact = (n) => ecFmtFromGbpCompact(n, _displayCurrency);
+  // The result page no longer renders a computed cost projection — the
+  // "Your monthly cost" total scaled with volume into a figure that scared
+  // high-volume users, so it was replaced (Jun 2026) by the published-rate
+  // card, which reads straight off activePlan.fees / .price. The
+  // ecComputeCostBreakdown helper still backs the PDF (it computes its own
+  // figures internally), so on-screen and PDF surfaces are now decoupled by
+  // design. See the savings/rates reframe memory.
   // Top "Edit my answers" back-link removed — "Start over" in the
   // action footer covers the same use-case more visibly. Edit-vs-Start
   // pair was duplicating intent without giving the user a clearer
@@ -1802,57 +1781,40 @@ function EcResultApproved({ rec, onBack, onReset }) {
             </div>
           </section>
 
-          {/* Cost block — re-pointed (Jun 2026) from "savings vs a typical
-              bank" to Altery's OWN estimated all-in cost. The money hero +
-              personalisation stay; the persuasion is now radical fee
-              transparency (every line shown, sanity-check it yourself)
-              rather than a savings delta against a named/synthesised
-              competitor we can't substantiate. The bank/savings figures are
-              still computed in ecComputeCostBreakdown — just not rendered —
-              so this is fully reversible. See the savings-comparison memory. */}
-          {cost && cost.altery && (
+          {/* Rate card (Jun 2026, 3rd pass): show Altery's published unit
+              RATES from the plan tariff — small, attractive numbers — instead
+              of a total monthly bill, which scales with volume and reads as a
+              scary figure (a high-volume Ultra user saw ~€54k/mo). No total,
+              no competitor, no savings claim — just "here's how little each
+              rail costs, sanity-check it yourself". Reads off activePlan so
+              it tracks the user's plan choice in the comparison modal. */}
+          {activePlan && activePlan.fees && (
             <section className="ec-r__card ec-r__savings">
               <div className="ec-r__cardEyebrow">
-                {t("ec.r.cost.head")}
-              </div>
-              <div className="ec-r__savingsHero">
-                <div className="ec-r__savingsHero__amount">
-                  {t("ec.r.cost.hero", { low: fmtCompact(cost.altery.totalLow), high: fmtCompact(cost.altery.totalHigh) })}
-                </div>
-                <div className="ec-r__savingsHero__year">
-                  {t("ec.r.cost.year", { low: fmtCompact(cost.altery.totalLow * 12), high: fmtCompact(cost.altery.totalHigh * 12), plan: planName })}
-                </div>
+                {t("ec.r.rates.head", { plan: planName })}
               </div>
 
-              {/* Line-by-line Altery breakdown — promoted to the headline
-                  proof of transparency. Reuses the methodology row labels
-                  (already in 10 langs); inline-styled to avoid new CSS. */}
-              <div style={{ display: "flex", flexDirection: "column", gap: 7, margin: "16px 0 4px" }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--c-muted)", textTransform: "uppercase", letterSpacing: ".06em", marginBottom: 2 }}>
-                  {t("ec.r.cost.breakdown.head")}
+              <div style={{ display: "flex", flexDirection: "column", gap: 9, margin: "12px 0 4px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>
+                  <span>{t("ec.r.method.line.subscription")}</span>
+                  <span style={{ fontWeight: 600, color: "var(--c-ink)" }}>{activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}<span style={{ color: "var(--c-muted)", fontWeight: 400 }}>{" " + t(activePlan.cycleKey || "ec.plan.cycleMo")}</span></span>
                 </div>
-                {[["subscription", cost.altery.subscription], ["fx", cost.altery.fx], ["swift", cost.altery.swift], ["local", cost.altery.local]].map((row) => (
+                {[["fxMarkup", activePlan.fees.fxMarkup], ["swift", activePlan.fees.swift], ["sepa", activePlan.fees.sepa], ["fasterPay", activePlan.fees.fasterPay]].map((row) => (
                   <div key={row[0]} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>
-                    <span>{t("ec.r.method.line." + row[0])}</span><span>{fmtNarrow(row[1])}</span>
+                    <span>{t("ec.r.plan.compare.fee." + row[0])}</span>
+                    <span style={{ fontWeight: 600, color: "var(--c-ink)" }}>{row[1]}</span>
                   </div>
                 ))}
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, fontWeight: 600, color: "var(--c-ink)", borderTop: "1px solid var(--c-border)", paddingTop: 8, marginTop: 2 }}>
-                  <span>{t("ec.r.method.line.total")}</span><span>{fmtNarrow(cost.altery.total)}</span>
-                </div>
               </div>
 
               <p className="ec-r__savings__note">
-                {t("ec.r.cost.caption", { plan: planName })}
-              </p>
-              <p className="ec-r__savings__note">
-                {t("ec.r.cost.note", { volume: fmtCompact(rec.monthlyVolume) })}
+                {t("ec.r.rates.caption", { plan: planName })}
               </p>
               <p className="ec-r__savings__hiddenNote">
                 {t("ec.r.cost.compareSelf")}
               </p>
 
-              {/* Altery-owned value lines (no competitor comparison) —
-                  founder-confirmed as substantiable today. Crypto is
+              {/* Altery-owned value lines (no competitor comparison). Crypto
                   deliberately omitted (jurisdiction-gated). */}
               <ul style={{ listStyle: "none", margin: "14px 0 2px", padding: 0, display: "flex", flexDirection: "column", gap: 8 }}>
                 {["transparency", "speed", "reach", "acceptance"].map((k) => (
@@ -1862,13 +1824,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
                   </li>
                 ))}
               </ul>
-
-              <div className="ec-r__method">
-                <button type="button" className="ec-r__planFoot__link"
-                        onClick={() => setMethodOpen(true)}>
-                  {t("ec.r.method.summary")} →
-                </button>
-              </div>
             </section>
           )}
 
@@ -1953,14 +1908,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
           plan={activePlan}
           entity={entity}
           onClose={() => setFeesOpen(false)}
-        />
-      )}
-
-      {methodOpen && (
-        <EcMethodologyModal
-          cost={cost}
-          fmtNarrow={fmtNarrow}
-          onClose={() => setMethodOpen(false)}
         />
       )}
 

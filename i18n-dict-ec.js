@@ -562,6 +562,8 @@
     "ec.r.savings.cycle": "/month",
     "ec.r.savings.note": "Estimate based on your ~{volume} monthly volume and the regions you selected. Full line-by-line breakdown is in your proposal PDF.",
     "ec.r.cost.head": "Your estimated monthly cost on Altery",
+    "ec.r.rates.head": "Your {plan} plan — published rates",
+    "ec.r.rates.caption": "These are your published {plan} rates — no hidden FX markup, nothing added at settlement. Final pricing is confirmed at activation.",
     "ec.r.cost.hero": "≈ {low}–{high} a month, all-in",
     "ec.r.cost.year": "≈ {low}–{high} a year on the {plan} plan",
     "ec.r.cost.breakdown.head": "What's in that number",

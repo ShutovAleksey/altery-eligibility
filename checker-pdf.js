@@ -362,41 +362,43 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         </td>
         <td style="width:1px;background:${C.border};padding:18px 0;"></td>
         <td style="vertical-align:top;padding:18px 22px;width:33%;">
-          <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.pdf.atGlance.cost")}</div>
-          <div style="font-size:17px;font-weight:700;color:${C.primary};line-height:22px;font-variant-numeric:tabular-nums;letter-spacing:-0.01em;">${cost ? fmtEUR(cost.altery.total) : "—"}<span style="font-size:12px;font-weight:500;color:${C.muted};margin-left:2px;">${cost ? ` ${t("ec.pdf.costMath.perMonth")}` : ""}</span></div>
+          <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 8px;">${t("ec.cmp.row.fxMarkup")}</div>
+          <div style="font-size:17px;font-weight:700;color:${C.primary};line-height:22px;letter-spacing:-0.01em;">${rec.plan && rec.plan.fees ? rec.plan.fees.fxMarkup : "—"}</div>
           <div style="font-size:12px;color:${C.muted};margin-top:4px;">${t("ec.pdf.atGlance.costOn", { plan: planName })}</div>
         </td>
       </tr>
     </table>`;
 
-  const costMathHTML = cost ? `
+  // Rate card (Jun 2026, 3rd pass): publish the plan's unit RATES, not a
+  // computed monthly total (which scales with volume into a scary number).
+  // No total, no competitor, no savings — just transparent per-rail pricing.
+  const planFees = rec.plan && rec.plan.fees;
+  const costMathHTML = planFees ? `
     <div style="margin:0 0 18px;">
-      <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin:0 0 14px;">${t("ec.pdf.costMath.head")}</div>
+      <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin:0 0 14px;">${t("ec.r.rates.head", { plan: planName })}</div>
       <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
         <tr>
           <td style="width:100%;padding:16px 18px;background:${C.surface};border:1px solid ${C.border};border-radius:12px;vertical-align:top;">
-            <div style="font-size:11px;color:${C.primary};font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">${t("ec.pdf.costMath.altery")}</div>
-            ${cost.altery.subscription > 0 ? `
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
-              <span>${t("ec.pdf.costMath.subscription")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.subscription)}</span>
-            </div>` : ""}
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
-              <span>${t("ec.pdf.costMath.fx")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.fx)}</span>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+              <span>${t("ec.r.method.line.subscription")}</span><span style="font-weight:600;color:${C.ink};">${planPrice}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
-              <span>${t("ec.pdf.costMath.swift")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.swift)}</span>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+              <span>${t("ec.r.plan.compare.fee.fxMarkup")}</span><span style="font-weight:600;color:${C.ink};">${planFees.fxMarkup}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:3px 0;">
-              <span>${t("ec.pdf.costMath.local")}</span><span style="font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.local)}</span>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+              <span>${t("ec.r.plan.compare.fee.swift")}</span><span style="font-weight:600;color:${C.ink};">${planFees.swift}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:14px;color:${C.ink};padding:10px 0 0;margin-top:6px;border-top:1px solid ${C.border};">
-              <span style="font-weight:600;">${t("ec.pdf.costMath.total")}</span><span style="font-weight:700;font-variant-numeric:tabular-nums;">${fmtEUR(cost.altery.total)}<span style="font-size:11px;color:${C.muted};font-weight:500;"> ${t("ec.pdf.costMath.perMonth")}</span></span>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+              <span>${t("ec.r.plan.compare.fee.sepa")}</span><span style="font-weight:600;color:${C.ink};">${planFees.sepa}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+              <span>${t("ec.r.plan.compare.fee.fasterPay")}</span><span style="font-weight:600;color:${C.ink};">${planFees.fasterPay}</span>
             </div>
           </td>
         </tr>
       </table>
 
-      <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:12px;">${t("ec.pdf.costMath.assumptions", { volume: ecFormatVolume(rec.monthlyVolume), txCount: cost.meta.txCount, fxPct: cost.meta.fxVolumePct })}</div>
+      <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:12px;">${t("ec.r.rates.caption", { plan: planName })}</div>
     </div>` : "";
 
   // "What €X annual buys you" — future-self visualization. Turns
