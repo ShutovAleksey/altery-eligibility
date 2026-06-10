@@ -829,6 +829,8 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
         </Alert>
       )}
 
+      <WhyWeAsk>{t("ec.q2.why")}</WhyWeAsk>
+
       <div className="ob-actions">
         <Button
           variant="primary"
@@ -909,6 +911,8 @@ function EcIndustry({ country, industry, setIndustry, onBack, onNext, onBlocked 
         </Alert>
       )}
 
+      <WhyWeAsk>{t("ec.q1.why")}</WhyWeAsk>
+
       <div className="ob-actions">
         <Button
           variant="primary"
@@ -985,6 +989,8 @@ function EcServices({ services, setServices, onBack, onNext }) {
           );
         })}
       </div>
+
+      <WhyWeAsk>{t("ec.q3.why")}</WhyWeAsk>
 
       <div className="ec-actions ec-actions--end">
         <Button variant="primary" size="xl" onClick={onNext} iconRight="arrowRight"
@@ -1487,6 +1493,8 @@ function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOu
           ariaLabel={t("ec.q5.regions.outAria")}
         />
       )}
+
+      <WhyWeAsk>{t("ec.q5.why")}</WhyWeAsk>
 
       <div className="ob-actions">
         <Button variant="primary" size="xl" onClick={onNext} iconRight="arrowRight"
