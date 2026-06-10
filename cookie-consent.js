@@ -103,19 +103,28 @@
   }
 
   function showPill() {
-    if (document.getElementById("altery-cc-pill")) return;
-    var s = t();
-    var pill = document.createElement("button");
-    pill.id = "altery-cc-pill";
-    pill.type = "button";
-    pill.className = "altery-cc__pill";
-    pill.textContent = s.manage;
-    pill.setAttribute("aria-label", s.manage);
-    pill.addEventListener("click", function () {
-      if (pill.parentNode) pill.parentNode.removeChild(pill);
-      showBanner();
-    });
-    document.body.appendChild(pill);
+    // Boot can call this synchronously from <head> (returning visitor with
+    // a stored choice), when document.body doesn't exist yet — defer to
+    // DOM-ready. Also inject styles here: on the prior-consent path the
+    // banner (which normally injects them) never renders.
+    var mount = function () {
+      if (document.getElementById("altery-cc-pill")) return;
+      injectStyles();
+      var s = t();
+      var pill = document.createElement("button");
+      pill.id = "altery-cc-pill";
+      pill.type = "button";
+      pill.className = "altery-cc__pill";
+      pill.textContent = s.manage;
+      pill.setAttribute("aria-label", s.manage);
+      pill.addEventListener("click", function () {
+        if (pill.parentNode) pill.parentNode.removeChild(pill);
+        showBanner();
+      });
+      document.body.appendChild(pill);
+    };
+    if (document.body) mount();
+    else document.addEventListener("DOMContentLoaded", mount);
   }
 
   function decide(value) {           // "all" | "essential"
