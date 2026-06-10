@@ -186,7 +186,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
     inkSoft:      "#4B5063",  // Secondary text
     muted:        "#6B6F7B",  // Tertiary / labels
     border:       "#E5E7EE",  // Neutral dividers
-    hairline:     "#ECEDF1",  // Faint internal hairline — subordinate to border
+    hairline:     "#F0F1F4",  // Faint internal hairline — subordinate to border
     surface:      "#F8F7F4",  // Off-white panel bg
     beige:        "#F0EBE3",  // Brand beige — body callouts only
     beigeBorder:  "#E5E0D5",
@@ -302,7 +302,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <td style="padding:6px 0;vertical-align:top;font-size:13px;color:${C.ink};line-height:19px;">${t(k)}</td>
     </tr>`).join("");
   const includedHTML = `
-    <div style="margin:0 0 30px;">
+    <div data-pdf-break="1" style="margin:0 0 30px;">
       <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 14px;">${t("ec.pdf.included.head")}</div>
       <div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:8px 20px;">
         <table style="width:100%;border-collapse:collapse;">${includedItemsHTML}</table>
@@ -656,11 +656,14 @@ ${comparisonHTML}
      starting setup. -->
 ${checklistHTML}
 
-<!-- Numbered timeline — sells "how easy it is to start" -->
-<div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
-  ${t("ec.pdf.nextSteps.head")}
+<!-- Numbered timeline — sells "how easy it is to start". Forced onto a
+     fresh page (data-pdf-break) per product request. -->
+<div data-pdf-break="1">
+  <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
+    ${t("ec.pdf.nextSteps.head")}
+  </div>
+  <div style="margin-bottom:26px;">${stepsHTML}</div>
 </div>
-<div style="margin-bottom:26px;">${stepsHTML}</div>
 
 <!-- Setup CTA block — navy, prominent. Visible text shows a clean
      altery.com/setup · proposalRef pairing; the underlying <a href>
@@ -910,11 +913,16 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy, antiSpam }) {
     const CANVAS_SCALE = 2;
     const targetRect = target.getBoundingClientRect();
     const breakCandidates = new Set([0]);
+    // Forced page breaks — elements tagged data-pdf-break must start a new
+    // page (the slicer ends the previous page at their top Y). Used to push
+    // "What's included" and "Next steps" onto their own pages.
+    const forcedBreaks = new Set();
     const collectBreaks = (el) => {
       if (!el || el.nodeType !== 1) return;
       const r = el.getBoundingClientRect();
       const localY = Math.round((r.top - targetRect.top) * CANVAS_SCALE);
       if (localY > 0) breakCandidates.add(localY);
+      if (localY > 0 && el.getAttribute && el.getAttribute("data-pdf-break")) forcedBreaks.add(localY);
       for (const child of el.children) collectBreaks(child);
     };
     collectBreaks(target);
@@ -984,14 +992,25 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy, antiSpam }) {
     let pageIdx = 0;
     while (sliceY < canvas.height) {
       const maxEndY = Math.min(sliceY + slicePxHeight, canvas.height);
-      // Largest candidate Y that's strictly > sliceY and ≤ maxEndY
       let sliceEndY = -1;
-      for (const y of breakYs) {
-        if (y > sliceY && y <= maxEndY) sliceEndY = y;
+      // Forced break takes priority: if a data-pdf-break element starts
+      // within this page's reach, end the page just before it (smallest
+      // forced Y in range) so that section begins on a fresh page.
+      let forcedEnd = -1;
+      for (const y of forcedBreaks) {
+        if (y > sliceY && y <= maxEndY && (forcedEnd === -1 || y < forcedEnd)) forcedEnd = y;
       }
-      // Fallback when nothing fits (single element bigger than one page,
-      // or final tail that doesn't reach any candidate)
-      if (sliceEndY === -1) sliceEndY = maxEndY;
+      if (forcedEnd !== -1) {
+        sliceEndY = forcedEnd;
+      } else {
+        // Largest candidate Y that's strictly > sliceY and ≤ maxEndY
+        for (const y of breakYs) {
+          if (y > sliceY && y <= maxEndY) sliceEndY = y;
+        }
+        // Fallback when nothing fits (single element bigger than one page,
+        // or final tail that doesn't reach any candidate)
+        if (sliceEndY === -1) sliceEndY = maxEndY;
+      }
 
       const thisSlicePx = sliceEndY - sliceY;
 
