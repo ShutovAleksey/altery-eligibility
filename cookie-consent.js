@@ -84,9 +84,6 @@
       ".altery-cc__btn--ghost:hover{background:#F0EBE3;}" +
       ".altery-cc__btn--primary{background:#002780;color:#fff;}" +
       ".altery-cc__btn--primary:hover{filter:brightness(1.12);}" +
-      ".altery-cc__pill{position:fixed;left:16px;bottom:16px;z-index:2147482000;pointer-events:auto;background:#fff;border:1px solid #D7DAE0;border-radius:999px;box-shadow:0 4px 16px rgba(0,6,57,.10);padding:8px 14px;font:inherit;font-size:12px;font-weight:500;color:#69707C;cursor:pointer;font-family:'Inter',ui-sans-serif,system-ui,sans-serif;}" +
-      ".altery-cc__pill:hover{color:#11141A;border-color:#69707C;}" +
-      ".altery-cc__pill:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(0,111,255,.30);}" +
       "@media (max-width:560px){.altery-cc__actions{width:100%;}.altery-cc__btn{flex:1 1 auto;}}";
     var el = document.createElement("style");
     el.id = "altery-cc-styles";
@@ -94,7 +91,7 @@
     document.head.appendChild(el);
   }
 
-  // ── banner + reopen pill ───────────────────────────────────────────
+  // ── banner ──────────────────────────────────────────────────────────
   var bannerEl = null;
 
   function removeBanner() {
@@ -102,36 +99,13 @@
     bannerEl = null;
   }
 
-  function showPill() {
-    // Boot can call this synchronously from <head> (returning visitor with
-    // a stored choice), when document.body doesn't exist yet — defer to
-    // DOM-ready. Also inject styles here: on the prior-consent path the
-    // banner (which normally injects them) never renders.
-    var mount = function () {
-      if (document.getElementById("altery-cc-pill")) return;
-      injectStyles();
-      var s = t();
-      var pill = document.createElement("button");
-      pill.id = "altery-cc-pill";
-      pill.type = "button";
-      pill.className = "altery-cc__pill";
-      pill.textContent = s.manage;
-      pill.setAttribute("aria-label", s.manage);
-      pill.addEventListener("click", function () {
-        if (pill.parentNode) pill.parentNode.removeChild(pill);
-        showBanner();
-      });
-      document.body.appendChild(pill);
-    };
-    if (document.body) mount();
-    else document.addEventListener("DOMContentLoaded", mount);
-  }
-
   function decide(value) {           // "all" | "essential"
     setConsent(value);
     removeBanner();
     if (value === "all") loadClarity();
-    showPill();                       // let the user change their mind later
+    // No floating reopener chip — it cluttered the viewport. Consent can be
+    // re-opened via window.alteryOpenCookieSettings() (e.g. a footer link),
+    // or it is re-prompted automatically once the stored choice expires.
   }
 
   function showBanner() {
@@ -192,11 +166,19 @@
   }
 
   // ── boot ────────────────────────────────────────────────────────────
+  // Public hook so a host page (e.g. a footer "Cookie settings" link) can
+  // reopen the banner to change or withdraw consent — replaces the old
+  // always-on floating pill.
+  try { window.alteryOpenCookieSettings = showBanner; } catch (e) { /* no window */ }
+
   var prior = getConsent();
-  if (prior === "all") { loadClarity(); showPill(); }
-  else if (prior === "essential") { showPill(); }
-  else {
+  if (prior === "all") {
+    loadClarity();
+  } else if (!prior) {
+    // No stored choice yet — show the consent banner once.
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", showBanner);
     else showBanner();
   }
+  // prior === "essential": nothing to load — essential cookies are always on,
+  // Clarity stays off, and no chip is shown.
 })();
