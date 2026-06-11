@@ -1797,7 +1797,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 9, margin: "12px 0 4px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>
                   <span>{t("ec.r.method.line.subscription")}</span>
-                  <span style={{ fontWeight: 600, color: "var(--c-ink)" }}>{activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}<span style={{ color: "var(--c-muted)", fontWeight: 400 }}>{" " + t(activePlan.cycleKey || "ec.plan.cycleMo")}</span></span>
+                  <span style={{ fontWeight: 600, color: "var(--c-ink)" }}>{activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}</span>
                 </div>
                 {[["fxMarkup", activePlan.fees.fxMarkup], ["swift", activePlan.fees.swift], ["sepa", activePlan.fees.sepa], ["fasterPay", activePlan.fees.fasterPay]].map((row) => (
                   <div key={row[0]} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>

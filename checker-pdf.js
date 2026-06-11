@@ -229,6 +229,16 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
 
   const leadText = t("ec.entity." + rec.entity.id + ".lead");
 
+  // One consistent check indicator across the whole document: a round navy
+  // disc with a centered white checkmark, drawn as an SVG path. A ✓ text
+  // glyph (and flex/line-height text centering) sits slightly off-centre
+  // under html2canvas; an SVG filling the disc with a viewBox-centered path
+  // is pixel-stable at any size. `mt` nudges the top margin for flex rows.
+  const checkDisc = (px, mt) =>
+    `<div style="flex-shrink:0;width:${px}px;height:${px}px;border-radius:50%;background:${C.primary};${mt ? "margin-top:" + mt + "px;" : ""}">` +
+      `<svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" style="display:block;"><path d="M6 12.5l3.8 3.8L18 7.7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` +
+    `</div>`;
+
   // ─── Section blocks ────────────────────────────────────────────
 
   // Reasoning bullets — same data as the result page, formatted
@@ -237,7 +247,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
     const text = t(r.key, r.vars || {});
     return `
       <div style="display:flex;gap:14px;margin-bottom:14px;align-items:flex-start;">
-        <div style="flex-shrink:0;width:22px;height:22px;border-radius:50%;background:${C.primary};color:${C.white};display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;line-height:1;">✓</div>
+        ${checkDisc(22)}
         <div style="font-size:13.5px;line-height:21px;color:${C.ink};flex:1;">${text}</div>
       </div>`;
   }).join("");
@@ -297,7 +307,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   const includedItemsHTML = (rec.plan.perkKeys || []).map((k) => `
     <tr>
       <td style="width:22px;padding:6px 12px 6px 0;vertical-align:top;">
-        <div style="width:18px;height:18px;border-radius:50%;background:${C.primary};color:${C.white};text-align:center;font-size:11px;font-weight:700;line-height:18px;">✓</div>
+        ${checkDisc(18)}
       </td>
       <td style="padding:6px 0;vertical-align:top;font-size:13px;color:${C.ink};line-height:19px;">${t(k)}</td>
     </tr>`).join("");
@@ -381,7 +391,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         <tr>
           <td style="width:100%;padding:16px 18px;background:${C.surface};border:1px solid ${C.border};border-radius:12px;vertical-align:top;">
             <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
-              <span>${t("ec.r.method.line.subscription")}</span><span style="font-weight:600;color:${C.ink};">${planPrice}</span>
+              <span>${t("ec.r.method.line.subscription")}</span><span style="font-weight:600;color:${C.ink};">${rec.plan.price}</span>
             </div>
             <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
               <span>${t("ec.r.plan.compare.fee.fxMarkup")}</span><span style="font-weight:600;color:${C.ink};">${planFees.fxMarkup}</span>
@@ -488,7 +498,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:16px 20px;">
         ${includedItems.map((k) => `
           <div style="display:flex;gap:10px;align-items:flex-start;padding:5px 0;">
-            <div style="flex-shrink:0;width:16px;height:16px;border-radius:50%;background:${C.primary};color:${C.white};display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;margin-top:1px;">✓</div>
+            ${checkDisc(16, 1)}
             <div style="font-size:12.5px;color:${C.ink};line-height:18px;">${t("ec.r.value." + k)}</div>
           </div>`).join("")}
       </div>
@@ -510,7 +520,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <div style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:14px 18px;">
         ${checklistItems.map((id) => `
           <div style="display:flex;gap:12px;align-items:flex-start;padding:6px 0;">
-            <div style="flex-shrink:0;width:16px;height:16px;border-radius:4px;border:1.5px solid ${C.primary};display:inline-flex;align-items:center;justify-content:center;color:${C.primary};font-size:10px;font-weight:700;margin-top:2px;">✓</div>
+            ${checkDisc(16, 2)}
             <div style="font-size:12.5px;color:${C.ink};line-height:18px;">${t(`ec.pdf.checklist.${id}`)}</div>
           </div>`).join("")}
         <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:10px;padding-top:10px;border-top:1px solid ${C.border};">${t("ec.pdf.checklist.note")}</div>
@@ -534,7 +544,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   const stepsHTML = `<table style="width:100%;border-collapse:collapse;">` + [1, 2, 3, 4].map((n) => `
     <tr>
       <td style="width:42px;padding:0 14px 14px 0;vertical-align:top;">
-        <div style="width:28px;height:28px;border-radius:50%;background:${C.beige};border:1.5px solid ${C.primary};color:${C.primary};text-align:center;font-size:13px;font-weight:700;line-height:25px;font-variant-numeric:tabular-nums;">${n}</div>
+        <div style="width:28px;height:28px;border-radius:50%;background:${C.beige};border:1.5px solid ${C.primary};color:${C.primary};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;">${n}</div>
       </td>
       <td style="padding:0 0 14px;vertical-align:top;">
         <div style="font-size:13.5px;font-weight:600;color:${C.ink};line-height:19px;">${t(`ec.pdf.steps.${n}.title`)}</div>
