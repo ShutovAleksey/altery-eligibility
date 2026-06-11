@@ -1277,14 +1277,27 @@ function ecEncodeHandoffP(payload) {
   return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-// Convenience — full URL string used by goToOnboarding AND by the
-// PDF/email CTA. One call site, one shape, impossible to forget a field.
-// `opts` forwards into the payload builder so callers can embed extras
-// like the recipient email without touching the payload schema directly.
+// External corporate-registration app. The checker no longer hosts an
+// internal /setup onboarding — every "Start setup" CTA (web, PDF, email)
+// redirects here.
+const EC_REGISTRATION_URL = "https://app.altery.com/n/registration-corporate";
+
+// Full handoff URL used by goToOnboarding AND the PDF/email CTA. Carries
+// first-touch UTMs + the plan/entity/currency/volume context so attribution
+// and pre-fill survive the hop to the external app. `origin`/`opts` are kept
+// in the signature for call-site compatibility but no longer used.
 function ecBuildHandoffURL(rec, plan, origin, opts) {
-  const base = origin || (typeof window !== "undefined" ? window.location.origin : "https://altery.com");
-  const p    = ecEncodeHandoffP(ecBuildHandoffPayload(rec, plan, opts));
-  return `${base}/setup?p=${p}`;
+  const url = new URL(EC_REGISTRATION_URL);
+  const activePlan = plan || (rec && rec.plan);
+  if (activePlan && activePlan.id) url.searchParams.set("plan", activePlan.id);
+  if (rec && rec.entity && rec.entity.id) {
+    url.searchParams.set("entity", rec.entity.id);
+    url.searchParams.set("currency", rec.entity.id === "uk" ? "GBP" : "EUR");
+  }
+  if (rec && rec.monthlyVolume) url.searchParams.set("volume", String(rec.monthlyVolume));
+  // ecAppendUtmsToURL reads first-touch UTMs from sessionStorage and appends
+  // them without trampling the params we just set.
+  return ecAppendUtmsToURL(url.toString());
 }
 
 // ── UTM attribution (first-touch, session-scoped) ──────────────────

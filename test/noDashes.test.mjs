@@ -20,10 +20,6 @@ const DICTS = [
   "i18n-dict-ec-it-es.js",
   "i18n-dict-ec-pl-pt-fr.js",
   "i18n-dict-ec-countries.js",
-  "setup/i18n-dict-ob.js",
-  "setup/i18n-dict-ob-de-ru.js",
-  "setup/i18n-dict-ob-nl-tr-it.js",
-  "setup/i18n-dict-ob-es-pl-pt-fr.js",
 ];
 
 const DASH = /[—–]/;

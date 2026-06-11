@@ -6,7 +6,7 @@
           EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
-          EcFeesModal, EcPlanComparisonModal, EcHandoffModal, EcPaymentModal, EcCallbackForm */
+          EcFeesModal, EcPlanComparisonModal, EcHandoffModal, EcCallbackForm */
 // checker-screens.jsx — the eligibility-checker question screens, result
 // screens, and the supporting EcIco decorative-icon set.
 //
@@ -1558,9 +1558,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
   // initialStage prop in EcHandoffModal.
   const [handoffOpen, setHandoffOpen] = useState(false);
 
-  // Payment modal — opens on "Set up this account" CTA. Hosts the Stripe
-  // Payment Element with deferred-flow setup (window.Stripe poll-loaded).
-  const [paymentOpen, setPaymentOpen] = useState(false);
 
   // User can override the algorithm's recommendation via the comparison
   // modal. null = "use recommendation as-is". Selecting the recommended
@@ -1914,13 +1911,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
           initialStage="email"
           onClose={() => setHandoffOpen(false)}
           onContinueToSetup={() => { setHandoffOpen(false); goToOnboarding(); }}
-        />
-      )}
-
-      {paymentOpen && (
-        <EcPaymentModal
-          activePlan={activePlan}
-          onClose={() => setPaymentOpen(false)}
         />
       )}
     </div>

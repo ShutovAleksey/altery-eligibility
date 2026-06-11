@@ -36,12 +36,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.24.7/babel.min.js"
           integrity="sha384-AISI5AuDG6E8DeEiFMVB3rGQxhZt24OU0avMp+GMV64+tpnA3+Z6F5MT0f96iPva"
           crossorigin="anonymous"></script>
-  <!-- Stripe.js — canonical URL with trailing slash (Stripe-recommended;
-       without it you get a 301 redirect which some script-tag loaders
-       handle poorly). Async so it doesn't block render. EcPaymentModal
-       uses ecLoadStripe() to handle this script's lifecycle properly,
-       including load/error events and timeouts. -->
-  <script src="https://js.stripe.com/v3/" async></script>
   <!-- PDF generation libs — used by the handoff modal's "Email me the
        full analysis" path. We load html2canvas and jsPDF as separate
        UMD scripts (rather than the html2pdf.bundle which wraps both

@@ -230,32 +230,10 @@
 
         // Payment modal — Stripe Payment Element opens from "Set up this
         // account". Other languages fall back to EN until translated.
-        "ec.r.payment.title":   "Set up your Altery account",
-        "ec.r.payment.lead":    "Subscribe with card, Apple Pay, Google Pay, SEPA, iDEAL, Bancontact, Klarna and more. Over 20 payment methods are supported.",
-        "ec.r.payment.pay":     "Subscribe for {price}/mo",
-        "ec.r.payment.processing": "Processing…",
-        "ec.r.payment.loading": "Loading payment options…",
-        "ec.r.payment.orPayWith": "or pay with card",
-        "ec.r.payment.success":     "Payment succeeded! 🎉 This is test mode, so no real charge was made. Check Stripe Dashboard → Payments to see the PaymentIntent.",
-        "ec.r.payment.backendError": "Couldn't reach backend: {error}. Make sure /api/create-payment-intent is deployed.",
-        "ec.r.payment.processingState": "Payment in state: {status}. Stripe will finalise asynchronously, so check the Dashboard.",
-        "ec.r.payment.loadError":  "Couldn't load Stripe in this preview environment. See payment methods that would appear below.",
-        "ec.r.payment.testNote":   "This is test mode, so there are no real charges. Use card 4242 4242 4242 4242 with any future expiry, CVC, and ZIP.",
-        "ec.r.payment.currencyNote": "Demo amount shown in EUR for the broadest payment method coverage. Real pricing currency localises by country of incorporation (GBP, EUR, USD).",
 
         // Fallback UI — shown when Stripe.js is blocked by the environment
         // (claude.ai preview sandbox, file:// origin, restrictive CSP).
         // Honest demo state describing what Payment Element would render.
-        "ec.r.payment.fallback.title":      "Preview environment",
-        "ec.r.payment.fallback.lead":       "Stripe's Payment Element couldn't load here, because preview sandboxes typically block external scripts. The methods below are what would render in production for an EUR + EU customer:",
-        "ec.r.payment.fallback.cards":      "Cards",
-        "ec.r.payment.fallback.wallets":    "Wallets",
-        "ec.r.payment.fallback.bankDebit":  "Bank debit",
-        "ec.r.payment.fallback.bnpl":       "Buy now, pay later",
-        "ec.r.payment.fallback.local":      "Local methods",
-        "ec.r.payment.fallback.transfer":   "Transfers",
-        "ec.r.payment.fallback.hint":       "To see the live Payment Element, serve the file via http(s):// (e.g. python3 -m http.server) with a real Stripe publishable key.",
-        "ec.r.payment.fallback.close":      "Got it, continue setup later",
 
         // Result — approved
         "ec.r.eyebrow": "Recommended for your business",

@@ -1,9 +1,8 @@
 // checker-pdf.js — PDF + email infrastructure for the eligibility checker.
 //
-// Loaded as a classic <script> in /index.html. Exports four functions to
+// Loaded as a classic <script> in /index.html. Exports three functions to
 // window so the checker's screens/modals can call them at render time:
 //
-//   ecLoadStripe         — promise-based Stripe.js loader with diagnostic errors
 //   ecWaitForPdfLibs     — polls until window.html2canvas + window.jspdf are ready
 //   ecBuildAnalysisHTML  — builds the proposal HTML string (no JSX, plain template)
 //   ecSendAnalysisEmail  — composes the email body + posts to /api/send-analysis
@@ -13,108 +12,6 @@
 // EC_ALTERY_LOGO_B64, STRIPE_PUBLISHABLE_KEY, …) and helper functions
 // (ecComputeCostBreakdown, ecOutcomesForSavings, ecGenProposalRef, …)
 // via Global Lexical Declarations across classic scripts.
-
-// ─── ecLoadStripe ──────────────────────────────────────────────
-// Loads Stripe.js with proper script-tag lifecycle handling.
-// Returns a Promise resolving to the window.Stripe constructor, or
-// rejecting with a specific Error containing diagnostic info.
-//
-// Distinguishes three failure modes for accurate error messages:
-//   1. Script load failure (network/CSP/firewall/adblocker) → load
-//      event never fires, error event does
-//   2. Script loads but window.Stripe stays undefined (Stripe refused
-//      to initialise on origin, e.g. file://) → load fires but poll
-//      never picks up window.Stripe
-//   3. Overall timeout (15s) for slow networks
-//
-// Handles three DOM states:
-//   a. Stripe already loaded → resolves immediately
-//   b. Script tag in DOM (from <head>) — may have loaded before this
-//      runs, so we poll AND listen for load/error
-//   c. No script tag → inject one + listen
-function ecLoadStripe() {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") {
-      return reject(new Error("No window object available"));
-    }
-    if (window.Stripe) {
-      return resolve(window.Stripe);
-    }
-
-    const STRIPE_SRC = "https://js.stripe.com/v3/";
-    let scriptEl = document.querySelector('script[src^="https://js.stripe.com/v3"]');
-    let scriptWasNew = false;
-
-    if (!scriptEl) {
-      scriptEl = document.createElement("script");
-      scriptEl.src = STRIPE_SRC;
-      scriptEl.async = true;
-      document.head.appendChild(scriptEl);
-      scriptWasNew = true;
-    }
-
-    let settled = false;
-    let pollHandle = null;
-    let timeoutHandle = null;
-
-    const cleanup = () => {
-      if (pollHandle) clearInterval(pollHandle);
-      if (timeoutHandle) clearTimeout(timeoutHandle);
-      scriptEl.removeEventListener("load", onLoad);
-      scriptEl.removeEventListener("error", onError);
-    };
-    const settle = (fn, val) => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      fn(val);
-    };
-
-    function onLoad() {
-      // Script fetched OK — give Stripe up to 2s to set window.Stripe.
-      // If it doesn't, the origin probably isn't accepted (file://,
-      // sandbox, etc.) and Stripe.js refused to init silently.
-      const startedAt = Date.now();
-      pollHandle = setInterval(() => {
-        if (window.Stripe) {
-          settle(resolve, window.Stripe);
-        } else if (Date.now() - startedAt > 2000) {
-          const origin = (window.location && window.location.origin) || "file://";
-          settle(reject, new Error(
-            "Stripe.js loaded but didn't initialise (window.Stripe is undefined). " +
-            "Stripe may have refused to run on origin \"" + origin + "\". " +
-            "Try serving the file via a web server (http(s)://) instead."
-          ));
-        }
-      }, 50);
-    }
-    function onError() {
-      settle(reject, new Error(
-        "Stripe.js script failed to load. Likely cause: blocked by network, " +
-        "firewall, ad-blocker, sandbox iframe, or Content Security Policy. " +
-        "Check the browser console for the exact network error."
-      ));
-    }
-
-    scriptEl.addEventListener("load", onLoad);
-    scriptEl.addEventListener("error", onError);
-
-    // The <head> script may have fired its load event before this
-    // listener was attached. Poll concurrently to catch that race.
-    if (!scriptWasNew) {
-      pollHandle = setInterval(() => {
-        if (window.Stripe) settle(resolve, window.Stripe);
-      }, 50);
-    }
-
-    timeoutHandle = setTimeout(() => {
-      settle(reject, new Error(
-        "Stripe.js load timeout (15s). Check DevTools → Network for the " +
-        "request to js.stripe.com/v3/."
-      ));
-    }, 15000);
-  });
-}
 
 // ── Analysis PDF generation ───────────────────────────────────────
 // When a user clicks "Send analysis" in the handoff modal's email
@@ -555,15 +452,10 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // Self-contained handoff URL — all checker answers travel inside the
   // ?p=<base64url> payload, so this PDF link works for the original
   // recipient, anyone they forward it to, and across device switches.
-  // See ecBuildHandoffURL in checker-helpers.js. Origin defaults to
-  // wherever the app is actually deployed (Vercel preview, production
-  // domain when it lands, etc.) — never to a hardcoded altery.com that
-  // does not host this app today.
-  const handoffOrigin = (typeof window !== "undefined" && window.location && window.location.origin)
-    ? window.location.origin
-    : "https://altery-eligibility.vercel.app";
-  const handoffURL = ecBuildHandoffURL(rec, rec.plan, handoffOrigin);
-  const handoffDisplay = handoffOrigin.replace(/^https?:\/\//, "") + "/setup";
+  // ecBuildHandoffURL points at the external corporate-registration app
+  // (app.altery.com) and carries first-touch UTMs + plan/entity context.
+  const handoffURL = ecBuildHandoffURL(rec, rec.plan);
+  const handoffDisplay = "app.altery.com/registration";
 
   // ─── Full document ───────────────────────────────────────────
   return `
@@ -1182,5 +1074,5 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy, antiSpam }) {
 }
 
 Object.assign(window, {
-  ecLoadStripe, ecWaitForPdfLibs, ecBuildAnalysisHTML, ecSendAnalysisEmail,
+  ecWaitForPdfLibs, ecBuildAnalysisHTML, ecSendAnalysisEmail,
 });

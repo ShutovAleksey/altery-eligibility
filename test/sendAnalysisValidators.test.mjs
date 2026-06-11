@@ -24,6 +24,7 @@ test("escapeHtml neutralizes every HTML-significant char", () => {
 
 test("safeSessionLink allow-lists hosts and falls back to altery.com", () => {
   assert.equal(safeSessionLink("https://altery.com/setup"), "https://altery.com/setup");
+  assert.equal(safeSessionLink("https://app.altery.com/n/registration-corporate?plan=pro"), "https://app.altery.com/n/registration-corporate?plan=pro");
   assert.equal(safeSessionLink("https://altery-eligibility.vercel.app/setup?x=1"), "https://altery-eligibility.vercel.app/setup?x=1");
   assert.equal(safeSessionLink("https://altery-pr-42.vercel.app/setup"), "https://altery-pr-42.vercel.app/setup");
   assert.equal(safeSessionLink("https://phish.example.com/altery"), "https://altery.com");
