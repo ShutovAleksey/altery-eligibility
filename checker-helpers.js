@@ -58,11 +58,15 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     return { kind: "blocked", reason: "industry", reasonKey: ind.labelKey };
   }
 
+  // Defensive: RoW maps to the UK entity, and so does an unknown/missing
+  // country (shouldn't happen via the UI, which only offers EC_COUNTRIES
+  // codes) — never leave `entity` undefined, because downstream
+  // EcResultApproved reads entity.nameKey unconditionally.
   let entity;
   if (country?.region === "uk") entity = EC_ENTITIES.uk;
   else if (country?.region === "eu") entity = EC_ENTITIES.eu;
   else if (country?.region === "mena") entity = EC_ENTITIES.mena;
-  else if (country?.region === "row") entity = EC_ENTITIES.uk;
+  else entity = EC_ENTITIES.uk;
 
   // Crypto detection — two sources, either sufficient:
   //   (1) Industry = "Crypto & Web3" (Q1)

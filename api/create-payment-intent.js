@@ -10,6 +10,7 @@
 // Production: deploys automatically on `vercel --prod`.
 
 import Stripe from "stripe";
+import { resolveActivationAmount } from "../lib/payment-pricing.js";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   // Pin the API version so Stripe behaviour stays stable across
@@ -17,16 +18,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2024-12-18.acacia",
 });
 
-// Plan annual fees, expressed in MAJOR currency units (£ or €) — these
-// mirror the prices the frontend shows on the plan and payment screens
-// (see `PLANS` in setup/onboarding-screens-payment.jsx). The Stripe
-// PaymentIntent wants the smallest unit, so the handler multiplies by
-// 100 below. Whitelist also doubles as currency validation: anything
-// outside {gbp, eur} is rejected before reaching Stripe.
-const PLAN_ANNUAL_MAJOR = {
-  gbp: { starter: 500,  pro: 1000, ultra: 3000 },
-  eur: { starter: 600,  pro: 1200, ultra: 3600 },
-};
+// Plan pricing + the activation-amount resolver live in
+// lib/payment-pricing.js (imported above) so the whitelist + validation are
+// unit-tested without pulling in the Stripe SDK.
 
 export default async function handler(req, res) {
   // CORS — Vercel serves both frontend and API on the same origin so
@@ -57,17 +51,23 @@ export default async function handler(req, res) {
     const cur = String(currency).toLowerCase();
 
     // Resolve amount server-side from the whitelist — never trust the
-    // amount the client sends. Reject unknown currencies up-front so we
-    // don't accidentally pass an unsupported ISO code to Stripe and get
-    // a confusing 4xx back.
-    const table = PLAN_ANNUAL_MAJOR[cur];
-    if (!table) {
+    // client's amount. Reject unknown currency OR plan up-front rather than
+    // silently defaulting (defaulting an unknown planId to 'pro' would
+    // mischarge the customer).
+    const resolved = resolveActivationAmount(currency, planId);
+    if (resolved.error === "unsupported_currency") {
       return res.status(400).json({
         error: `Unsupported currency '${currency}'. Use 'gbp' or 'eur'.`,
+        code: "unsupported_currency",
       });
     }
-    const annualMajor = table[planId] || table.pro;
-    const amount = annualMajor * 100; // major → pence / cents
+    if (resolved.error === "unknown_plan") {
+      return res.status(400).json({
+        error: `Unknown plan '${planId}'. Use 'starter', 'pro' or 'ultra'.`,
+        code: "unknown_plan",
+      });
+    }
+    const amount = resolved.amount; // smallest currency unit (pence / cents)
 
     // Capture method — automatic for BOTH presubmit and live modes.
     // Manual capture (the previous presubmit behaviour) restricted the

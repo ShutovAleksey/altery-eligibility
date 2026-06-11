@@ -21,6 +21,7 @@
 import { sendEmail } from "../lib/email.js";
 import { rateLimitAll, clientIp, send429 } from "../lib/rate-limit.js";
 import { checkAntiSpam, sendAntiSpamReject } from "../lib/anti-spam.js";
+import { escapeHtml, safeSessionLink, isAllowedBookingURL, sanitizeEmailStrings, safeSubject } from "../lib/send-analysis-validators.js";
 
 // Abuse limits — the endpoint is unauthenticated, so we cap input size
 // and validate format. A determined attacker can still send spam through
@@ -28,45 +29,9 @@ import { checkAntiSpam, sendAntiSpamReject } from "../lib/anti-spam.js";
 const MAX_PDF_BYTES = 2_500_000;      // 2.5 MB — generous for our PDFs
 const EMAIL_RE      = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-// Minimal HTML escape — every user-supplied string spliced into the
-// email template MUST flow through this before reaching the HTML body.
-// Email clients render the same tag set as browsers (img, script-tags
-// are usually stripped, but onerror on <img> can survive), so the same
-// XSS rules apply. Inlined to keep the API function dependency-free.
-function escapeHtml(s) {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#x27;");
-}
-
-// Allow-list for the post-email CTA's "Continue to setup" link. The
-// client controls sessionLink; without an allow-list an attacker could
-// POST sessionLink="https://phish.example.com/altery-clone" and the
-// email — sent from our verified domain — would point its primary CTA
-// at the attacker's domain. Anchored to our deployment host and the
-// public production host.
-const ALLOWED_SESSION_HOSTS = new Set([
-  "altery-eligibility.vercel.app",
-  "altery.com",
-  "www.altery.com",
-]);
-function safeSessionLink(link) {
-  if (typeof link !== "string") return "https://altery.com";
-  try {
-    const url = new URL(link);
-    if (url.protocol !== "https:") return "https://altery.com";
-    if (ALLOWED_SESSION_HOSTS.has(url.host)) return url.toString();
-    // Accept any Vercel preview deploy of this project — they always
-    // sit under *.vercel.app. Tighten further if needed.
-    if (url.host.endsWith(".vercel.app") && url.host.includes("altery")) return url.toString();
-    return "https://altery.com";
-  } catch (e) {
-    return "https://altery.com";
-  }
-}
+// HTML escaping, the session/booking URL allow-lists, and the email-string
+// sanitizer live in lib/send-analysis-validators.js (imported above so they
+// can be unit-tested independently — see test/sendAnalysisValidators.test.mjs).
 
 // Build a short, inbox-friendly email body. The PDF carries the full
 // detail; this is the wrapper that greets the user before they click
@@ -255,7 +220,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
           </h1>
 
           <p class="t-ink-soft" style="font-size:14px;line-height:21px;color:${C.inkSoft};margin:0;">
-            ${s.lead || "We've put together a full eligibility analysis covering our reasoning, your selected services, fees, and your personal setup link. It's attached as a PDF — open it whenever you're ready."}
+            ${s.lead || "We've put together a full eligibility analysis covering our reasoning, your selected services, fees, and your personal setup link. It's attached as a PDF, so open it whenever you're ready."}
           </p>
 
         </td></tr>
@@ -277,7 +242,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
             ${s.tail1 || "Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off."}
           </p>
           <p class="t-muted" style="font-size:13px;line-height:20px;color:${C.muted};margin:0;">
-            ${s.tail2 || `Questions? Just reply to this email or write to <a href="mailto:sales@altery.com" class="t-primary-text" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a> — we're here to help.`}
+            ${s.tail2 || `Questions? Just reply to this email or write to <a href="mailto:sales@altery.com" class="t-primary-text" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a>. We're here to help.`}
           </p>
         </td></tr>
 
@@ -380,19 +345,19 @@ export default async function handler(req, res) {
     // to be a booking page, but the allow-list keeps user-clickable links
     // pointing at trusted destinations. Trimmed to the Google Calendar
     // hosts we actually use; add more if/when the provider changes.
-    const safeBooking = (typeof bookingURL === "string"
-      && /^https:\/\/(calendar\.app\.google|calendar\.google\.com)\//.test(bookingURL))
-      ? bookingURL
-      : "";
+    const safeBooking = isAllowedBookingURL(bookingURL);
 
     const safeLang = (typeof langCode === "string" && /^[a-z]{2,5}$/i.test(langCode))
       ? langCode.toLowerCase()
       : "en";
 
-    // emailStrings is the localized copy bundle built client-side. We
-    // pass it through to buildEmailHTML which slot-fills the template;
-    // missing keys fall through to English defaults inside the builder.
-    const safeStrings = (emailStrings && typeof emailStrings === "object") ? emailStrings : {};
+    // emailStrings is the localized copy bundle built client-side. SECURITY:
+    // every value is HTML-escaped + length-capped (sanitizeEmailStrings)
+    // before it slot-fills the template, so a malicious client cannot inject
+    // markup into the recipient's inbox. Missing keys fall through to English
+    // defaults inside buildEmailHTML. `subject` is handled separately below
+    // (it's an email header, not HTML).
+    const safeStrings = sanitizeEmailStrings(emailStrings);
 
     // forwardedBy — the original recipient's email when this send is a
     // colleague forward. Validated as an email (same regex as recipient)
@@ -407,9 +372,10 @@ export default async function handler(req, res) {
     // Subject — localized client-side (already plan-interpolated).
     // Fall back to a constructed English subject if the client didn't
     // send one (older client cached in browser).
-    const subject = (typeof safeStrings.subject === "string" && safeStrings.subject.length > 0)
-      ? safeStrings.subject.slice(0, 120)
-      : `Your ${safePlan} account on Altery — analysis attached`;
+    const subject = safeSubject(
+      emailStrings && emailStrings.subject,
+      `Your ${safePlan} account on Altery, analysis attached`
+    );
 
     // Absolute URL to the brand wordmark PNG. Adapts automatically when
     // the user points a custom domain at this Vercel deployment.
