@@ -10,9 +10,11 @@ automated abuse expensive without a login wall on a top-of-funnel tool.
 > Stripe activation payment were **removed**. Every "Start setup" CTA — on the
 > result page, in the PDF, and in the email — now redirects to the external
 > corporate-registration app `https://app.altery.com/n/registration-corporate`,
-> carrying first-touch UTMs + plan/entity/currency/volume context
+> carrying the full non-PII profile (plan/entity/currency/volume/country/
+> industry/services/corridors/crypto) + first-touch UTMs
 > (`ecBuildHandoffURL` in `checker-helpers.js`). No payment or KYB data is
-> collected or stored by this app anymore.
+> collected or stored by this app anymore. See §8 for the contact-detail (PII)
+> handoff policy.
 
 ---
 
@@ -57,6 +59,7 @@ All in Vercel env vars, never in the repo/client: `BREVO_API_KEY`, `VERIFY_SECRE
 ### 8. Privacy & consent
 - **Cookie consent** (`cookie-consent.js`) — Microsoft Clarity loads only after explicit opt-in; "Reject" keeps it off. First-party consent cookie (~6-month expiry, PECR/ePrivacy).
 - **Privacy-policy consent** — a required checkbox on the contact-our-team form.
+- **Contact details in the handoff URL (PII policy, founder decision 2026-06-15).** To let the external registration pre-fill, `ecBuildHandoffURL` forwards contact details as URL params — but only when a call-site opts in, so each surface carries the minimum it holds: the anonymous **web CTA passes none**; the **PDF/email links carry the user's own email** (which they gave us to receive the proposal); the **Sales-callback flow carries firstname/lastname/phone/email/company** (entered on a consented form). The trade-off is accepted knowingly: GET params surface in server logs, browser history, and the `Referer` header. Email is dropped unless it parses as an address. `test/handoffUrl.test.mjs` pins the gating (no-`opts` call ⇒ zero PII).
 
 ---
 
@@ -71,12 +74,12 @@ All in Vercel env vars, never in the repo/client: `BREVO_API_KEY`, `VERIFY_SECRE
 
 ---
 
-## Tests (`test/`, run with `node --test test/*.test.mjs`) — 142 tests
+## Tests (`test/`, run with `node --test test/*.test.mjs`) — 144 tests
 
 Security / boundary coverage:
 - **`sendAnalysisValidators.test.mjs`** — `escapeHtml` (XSS payloads), `safeSessionLink` / `isAllowedBookingURL` (phishing/allow-list incl. `app.altery.com`), `sanitizeEmailStrings`, `safeSubject` (header injection).
 - **`antiSpam.test.mjs`** — honeypot, origin allow-list, time-gate.
-- **`handoffUrl.test.mjs`** — the "Start setup" redirect targets the external app with plan/entity/currency/volume + first-touch UTMs (no internal `/setup`).
+- **`handoffUrl.test.mjs`** — the "Start setup" redirect targets the external app with the full non-PII profile + first-touch UTMs (no internal `/setup`); crypto flag only when served; PII rides the URL **only** when a call-site opts in (web CTA ⇒ zero PII).
 - **`ecRecommendEdge.test.mjs`** — recommendation never returns an undefined entity / never throws.
 - **`noDashes.test.mjs`** — guards all checker i18n dicts against em/en-dash regressions.
 
