@@ -1282,21 +1282,47 @@ function ecEncodeHandoffP(payload) {
 // redirects here.
 const EC_REGISTRATION_URL = "https://app.altery.com/n/registration-corporate";
 
-// Full handoff URL used by goToOnboarding AND the PDF/email CTA. Carries
-// first-touch UTMs + the plan/entity/currency/volume context so attribution
-// and pre-fill survive the hop to the external app. `origin`/`opts` are kept
-// in the signature for call-site compatibility but no longer used.
+// Full handoff URL used by goToOnboarding AND the PDF/email/callback CTAs.
+// Carries the complete NON-PII profile (so the external registration can
+// pre-fill and our attribution survives the hop) + first-touch UTMs, plus —
+// per the call-site — the contact details collected so far.
+//
+// PII policy (founder decision, 2026-06-15): contact details (email / name /
+// phone / company) ARE forwarded so registration can pre-fill, but ONLY when a
+// call-site explicitly passes them in `opts`. The trade-off is accepted
+// knowingly — GET params surface in server logs, browser history, and the
+// Referer header — so the gating keeps each surface to the minimum it holds:
+//   • web "Start setup" CTA — anonymous quiz, passes NO opts → zero PII.
+//   • PDF + email links     — pass { email } only (the user gave it there).
+//   • Sales-callback flow   — passes { firstname, lastname, phone, email, company }.
 function ecBuildHandoffURL(rec, plan, origin, opts) {
   const url = new URL(EC_REGISTRATION_URL);
+  const set = (k, v) => { if (v != null && v !== "") url.searchParams.set(k, String(v)); };
   const activePlan = plan || (rec && rec.plan);
-  if (activePlan && activePlan.id) url.searchParams.set("plan", activePlan.id);
+
+  if (activePlan && activePlan.id) set("plan", activePlan.id);
   if (rec && rec.entity && rec.entity.id) {
-    url.searchParams.set("entity", rec.entity.id);
-    url.searchParams.set("currency", rec.entity.id === "uk" ? "GBP" : "EUR");
+    set("entity", rec.entity.id);
+    set("currency", rec.entity.id === "uk" ? "GBP" : "EUR");
   }
-  if (rec && rec.monthlyVolume) url.searchParams.set("volume", String(rec.monthlyVolume));
-  // ecAppendUtmsToURL reads first-touch UTMs from sessionStorage and appends
-  // them without trampling the params we just set.
+  if (rec) {
+    set("volume", rec.monthlyVolume);
+    set("country", rec.country && rec.country.code);
+    set("industry", rec.ind && rec.ind.value);
+    if (Array.isArray(rec.services) && rec.services.length) set("services", rec.services.join(","));
+    if (Array.isArray(rec.corridorsIn) && rec.corridorsIn.length) set("corridors_in", rec.corridorsIn.join(","));
+    if (Array.isArray(rec.corridorsOut) && rec.corridorsOut.length) set("corridors_out", rec.corridorsOut.join(","));
+    if (rec.cryptoServed) set("crypto", "1");   // crypto will actually be offered for this jurisdiction
+  }
+  // Contact details — present only when a call-site opted in via `opts`.
+  if (opts) {
+    if (typeof opts.email === "string" && opts.email.includes("@")) set("email", opts.email.trim());
+    set("firstname", opts.firstname);
+    set("lastname",  opts.lastname);
+    set("phone",     opts.phone);
+    set("company",   opts.company);
+  }
+  // ecAppendUtmsToURL appends first-touch UTMs without trampling the above.
   return ecAppendUtmsToURL(url.toString());
 }
 

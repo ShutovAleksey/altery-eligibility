@@ -4,6 +4,7 @@
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,
           ecOutcomesForSavings, ecGenProposalRef,
           ecBuildAnalysisHTML, ecSendAnalysisEmail, ecWaitForPdfLibs,
+          ecBuildHandoffURL,
           EcIco, ecSubmitHubspotLead */
 // checker-modals.jsx — all the modal/handoff/payment overlays the result
 // page can open.
@@ -546,7 +547,29 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
   };
 
   if (done) {
-    return <div className="ec-callback__success">✓ {t("ec.callback.success")}</div>;
+    // Lead is now in HubSpot. Offer the same hop to the external registration
+    // the result page does — pre-filled with everything this form collected
+    // (founder decision 2026-06-15: contact details ride the URL so the
+    // registration form pre-fills). `rec` carries the non-PII profile; the
+    // opts object carries the PII the user just gave us here.
+    const regURL = ecBuildHandoffURL(rec, rec && rec.plan, null, {
+      firstname: firstname.trim(),
+      lastname:  lastname.trim(),
+      company:   company.trim(),
+      phone:     phone.trim(),
+      email:     email.trim(),
+    });
+    return (
+      <div className="ec-callback__success">
+        <div>✓ {t("ec.callback.success")}</div>
+        <div style={{ marginTop: 14 }}>
+          <Button variant="primary" iconRight="arrowRight"
+                  onClick={() => { window.location.href = regURL; }}>
+            {t("ec.r.cta.continue")}
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (

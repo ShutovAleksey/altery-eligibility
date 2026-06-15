@@ -449,12 +449,13 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       </td>
     </tr>`).join("") + `</table>`;
 
-  // Self-contained handoff URL — all checker answers travel inside the
-  // ?p=<base64url> payload, so this PDF link works for the original
-  // recipient, anyone they forward it to, and across device switches.
-  // ecBuildHandoffURL points at the external corporate-registration app
-  // (app.altery.com) and carries first-touch UTMs + plan/entity context.
-  const handoffURL = ecBuildHandoffURL(rec, rec.plan);
+  // Handoff URL → external corporate-registration app (app.altery.com).
+  // Carries the full non-PII profile (plan/entity/currency/volume/country/
+  // industry/services/corridors) + first-touch UTMs, and — because this is a
+  // PDF link the recipient asked us to send them — their own email, so
+  // registration pre-fills it. (Per the PII policy in ecBuildHandoffURL,
+  // only the PDF/email links carry email; the anonymous web CTA does not.)
+  const handoffURL = ecBuildHandoffURL(rec, rec.plan, null, { email });
   const handoffDisplay = "app.altery.com/registration";
 
   // ─── Full document ───────────────────────────────────────────
