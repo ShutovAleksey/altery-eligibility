@@ -57,11 +57,12 @@ test("handoff URL: param shape + PII absent without opts", () => {
   assert.equal(u.searchParams.get("volume_out"), "12");                   // idx 5
   assert.equal(u.searchParams.get("tx_in"), "4");                         // idx 4
   assert.equal(u.searchParams.get("tx_out"), "1");                        // idx 0
-  // Corridors split: region slugs → context param; explicit ISO → country field.
-  assert.equal(u.searchParams.get("corridors_in"), "uk-eea");             // region slug only
-  assert.equal(u.searchParams.get("paymentSendersCountries"), "BR");      // explicit ISO outlier
+  // Corridors travel as context only (regions + any named countries); NO KYB
+  // country-field pre-fill (founder UX call) — so no paymentSenders/Receivers.
+  assert.equal(u.searchParams.get("corridors_in"), "uk-eea,BR");
   assert.equal(u.searchParams.get("corridors_out"), "apac");
-  assert.equal(u.searchParams.get("paymentReceiversCountries"), null);    // no explicit countries out
+  assert.equal(u.searchParams.get("paymentSendersCountries"), null);
+  assert.equal(u.searchParams.get("paymentReceiversCountries"), null);
   assert.equal(u.searchParams.get("crypto"), null, "crypto flag absent when not served");
 
   // INVARIANT: with no `opts` (the anonymous web "Start setup" CTA), NO PII
