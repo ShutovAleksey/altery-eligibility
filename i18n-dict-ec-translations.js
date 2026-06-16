@@ -613,7 +613,7 @@
     "ec.plan.ultra.trial":   "14 дней бесплатно",
     "ec.plan.pro.am":        "Персональный менеджер",
     "ec.plan.ultra.am":      "Персональный менеджер",
-    "ec.plan.perk.humanSupport": "Поддержка реальных людей, без ботов",
+    "ec.plan.perk.humanSupport": "Живая поддержка, без ботов",
     "ec.plan.cap.am":        "Персональный менеджер",
 
 

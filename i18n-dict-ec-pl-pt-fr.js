@@ -164,7 +164,7 @@
     "ec.plan.ultra.trial":   "14-dniowy bezpłatny okres próbny",
     "ec.plan.pro.am":        "Dedykowany account manager",
     "ec.plan.ultra.am":      "Dedykowany account manager",
-    "ec.plan.perk.humanSupport": "Wsparcie prawdziwych ludzi, bez botów",
+    "ec.plan.perk.humanSupport": "Wsparcie od prawdziwych ludzi, bez botów",
     "ec.plan.cap.am":        "Dedykowany account manager",
 
 
