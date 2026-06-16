@@ -1367,11 +1367,24 @@ function ecBuildHandoffURL(rec, plan, origin, opts) {
     if (rec.volumeOutIdx != null && EC_REG_VOL_OUT[rec.volumeOutIdx] != null) set("volume_out", EC_REG_VOL_OUT[rec.volumeOutIdx]);
     if (rec.txInIdx  != null && EC_REG_TX[rec.txInIdx]  != null) set("tx_in",  EC_REG_TX[rec.txInIdx]);
     if (rec.txOutIdx != null && EC_REG_TX[rec.txOutIdx] != null) set("tx_out", EC_REG_TX[rec.txOutIdx]);
-    // Corridors travel as region slugs (uk-eea, apac, …) + any individual ISO
-    // outliers the user added. The registration team maps slugs → ISO country
-    // lists on their side from the EC_CHIP_REGIONS taxonomy (checker-data.js).
-    if (Array.isArray(rec.corridorsIn) && rec.corridorsIn.length) set("corridors_in", rec.corridorsIn.join(","));
-    if (Array.isArray(rec.corridorsOut) && rec.corridorsOut.length) set("corridors_out", rec.corridorsOut.join(","));
+    // Corridors. The checker mixes region slugs (uk-eea, apac, …) and the
+    // individual ISO countries a user adds by hand. We send them in TWO
+    // separate params so registration pre-fills only what's precise (founder
+    // call, 2026-06-16 — no over-claiming 50 EEA countries from one chip):
+    //   • corridors_in/out             → region slugs only, as context/CRM signal.
+    //   • paymentSendersCountries /     → only the explicit ISO countries, straight
+    //     paymentReceiversCountries        into registration's country field.
+    // ISO codes are exactly two uppercase letters; region slugs never are.
+    const splitCorridor = (arr, regions, countries) => {
+      if (Array.isArray(arr)) for (const x of arr) (/^[A-Z]{2}$/.test(String(x)) ? countries : regions).push(x);
+    };
+    const inRegions = [], inCountries = [], outRegions = [], outCountries = [];
+    splitCorridor(rec.corridorsIn,  inRegions,  inCountries);
+    splitCorridor(rec.corridorsOut, outRegions, outCountries);
+    if (inRegions.length)    set("corridors_in",  inRegions.join(","));
+    if (outRegions.length)   set("corridors_out", outRegions.join(","));
+    if (inCountries.length)  set("paymentSendersCountries",   inCountries.join(","));
+    if (outCountries.length) set("paymentReceiversCountries", outCountries.join(","));
     if (rec.cryptoServed) set("crypto", "1");   // crypto will actually be offered for this jurisdiction
   }
   // Contact details — present only when a call-site opted in via `opts`.
