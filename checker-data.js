@@ -697,7 +697,7 @@ const EC_PLANS = {
       fasterPay: "£0.5",
       sepa:      "€1",
       swift:     "€10 + 0.20%",
-      fxMarkup:  "up to 0.4%",
+      fxMarkup:  "up to 0.5%",
     },
   },
 };
