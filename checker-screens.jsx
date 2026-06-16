@@ -1745,7 +1745,7 @@ function EcResultApproved({ rec, onBack, onReset }) {
               </div>
             )}
             <ul className="ec-r__perks">
-              {activePlan.perkKeys.slice(0, 5).map((k, i) => {
+              {activePlan.perkKeys.slice(0, 7).map((k, i) => {
                 // The "Everything in <prev plan>" perk (Pro.p1, Ultra.p1)
                 // referenced a plan the user hadn't seen — read as upsell
                 // trick. Make it a button that opens the comparison modal,
@@ -1796,13 +1796,16 @@ function EcResultApproved({ rec, onBack, onReset }) {
                   <span>{t("ec.r.method.line.subscription")}</span>
                   <span style={{ fontWeight: 600, color: "var(--c-ink)" }}>{activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}</span>
                 </div>
-                {[["fxMarkup", activePlan.fees.fxMarkup], ["swift", activePlan.fees.swift], ["sepa", activePlan.fees.sepa], ["fasterPay", activePlan.fees.fasterPay]].map((row) => (
+                {[["fxMarkup", activePlan.fees.fxMarkup], ["fasterPay", activePlan.fees.fasterPay], ["sepa", activePlan.fees.sepa], ["swift", activePlan.fees.swift], ["swiftCap", activePlan.fees.swiftCap], ["swiftIn", activePlan.fees.swiftIn], ["cardUk", activePlan.fees.cardUk], ["cardEu", activePlan.fees.cardEu], ["cardRow", activePlan.fees.cardRow]].filter((row) => row[1]).map((row) => (
                   <div key={row[0]} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>
                     <span>{t("ec.r.plan.compare.fee." + row[0])}</span>
                     <span style={{ fontWeight: 600, color: "var(--c-ink)" }}>{row[1]}</span>
                   </div>
                 ))}
               </div>
+              <p style={{ fontSize: 12, color: "var(--c-ink-2)", opacity: 0.85, margin: "8px 0 0" }}>
+                {t("ec.r.rates.openingFee")}
+              </p>
 
               <p className="ec-r__savings__note">
                 {t("ec.r.rates.caption", { plan: planName })}

@@ -666,12 +666,17 @@ const EC_PLANS = {
     // Plan-card perks for the result-page recommendation hero (NOT the
     // compare modal — the modal uses the unified PLAN_CAPABILITIES list
     // in checker-modals.jsx for row-by-row scan-comparability).
-    perkKeys: ["ec.plan.starter.users", "ec.plan.perk.humanSupport"],
+    perkKeys: ["ec.plan.starter.accounts", "ec.plan.starter.rails", "ec.plan.starter.cards", "ec.plan.starter.googlePay", "ec.plan.starter.app", "ec.plan.perk.humanSupport"],
     fees: {
       fasterPay: "£1",
       sepa:      "€2",
       swift:     "€15 + 0.5%",
       fxMarkup:  "up to 0.8%",
+      swiftCap:  "No cap",
+      swiftIn:   "€10",
+      cardUk:    "0.7%, min £1",
+      cardEu:    "1.5%, min £1",
+      cardRow:   "£0.5 + 3%",
     },
   },
   pro: {
@@ -679,12 +684,17 @@ const EC_PLANS = {
     price: "£100", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.pro.tagline",
     fitKey: "ec.plan.pro.fit",
-    perkKeys: ["ec.plan.pro.am", "ec.plan.pro.users", "ec.plan.perk.humanSupport"],
+    perkKeys: ["ec.plan.pro.p1", "ec.plan.pro.lowerFees", "ec.plan.pro.prioritySupport", "ec.plan.pro.betterRates", "ec.plan.perk.humanSupport"],
     fees: {
       fasterPay: "£1",
       sepa:      "€1.5",
       swift:     "€12 + 0.35%",
       fxMarkup:  "up to 0.7%",
+      swiftCap:  "No cap",
+      swiftIn:   "€5",
+      cardUk:    "0.7%, min £1",
+      cardEu:    "1.5%, min £1",
+      cardRow:   "£0.5 + 2.5%",
     },
   },
   ultra: {
@@ -692,12 +702,17 @@ const EC_PLANS = {
     price: "£300", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.ultra.tagline",
     fitKey: "ec.plan.ultra.fit",
-    perkKeys: ["ec.plan.ultra.p5", "ec.plan.ultra.am", "ec.plan.ultra.negotiatedFx", "ec.plan.ultra.users", "ec.plan.perk.humanSupport"],
+    perkKeys: ["ec.plan.ultra.p1", "ec.plan.ultra.lowerFees", "ec.plan.ultra.rm", "ec.plan.ultra.costOpt", "ec.plan.ultra.complexFlows", "ec.plan.perk.humanSupport"],
     fees: {
       fasterPay: "£0.5",
       sepa:      "€1",
       swift:     "€10 + 0.20%",
       fxMarkup:  "up to 0.5%",
+      swiftCap:  "Max €500",
+      swiftIn:   "Free",
+      cardUk:    "0.7%, min £0.5",
+      cardEu:    "1.5%, min £0.5",
+      cardRow:   "£0.5 + 2%",
     },
   },
 };

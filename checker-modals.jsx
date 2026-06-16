@@ -34,11 +34,12 @@
 // Row labels reuse existing perk i18n strings (no new translations
 // added for the feature names themselves).
 const PLAN_CAPABILITIES = [
-  { labelKey: "ec.plan.perk.humanSupport",  on: { starter: true,  pro: true,  ultra: true  } },
-  { labelKey: "ec.plan.cap.am",             on: { starter: false, pro: true,  ultra: true  } },
-  { labelKey: "ec.plan.ultra.p5",           on: { starter: false, pro: false, ultra: true  } },
-  { labelKey: "ec.plan.ultra.negotiatedFx", on: { starter: false, pro: false, ultra: true  } },
-  { labelKey: "ec.plan.ultra.users",        on: { starter: false, pro: false, ultra: true  } },
+  { labelKey: "ec.plan.perk.humanSupport",   on: { starter: true,  pro: true,  ultra: true  } },
+  { labelKey: "ec.plan.pro.prioritySupport", on: { starter: false, pro: true,  ultra: true  } },
+  { labelKey: "ec.plan.pro.betterRates",     on: { starter: false, pro: true,  ultra: true  } },
+  { labelKey: "ec.plan.ultra.rm",            on: { starter: false, pro: false, ultra: true  } },
+  { labelKey: "ec.plan.ultra.costOpt",       on: { starter: false, pro: false, ultra: true  } },
+  { labelKey: "ec.plan.ultra.complexFlows",  on: { starter: false, pro: false, ultra: true  } },
 ];
 
 function EcFeesModal({ plan, entity, onClose }) {
