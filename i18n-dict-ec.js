@@ -460,7 +460,7 @@
     "ec.email.lead": "We've put together a full eligibility analysis covering our reasoning, your selected services, fees, and your personal setup link. It's attached as a PDF, so open it whenever you're ready.",
     "ec.email.cta": "Continue to setup",
     "ec.email.tail1": "Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off.",
-    "ec.email.tail2": "Questions? You'll always reach a real person, never a bot. Just reply to this email or write to <a href=\"mailto:sales@altery.com\" style=\"color:#002780;text-decoration:underline;\">sales@altery.com</a>, and our team is happy to help.",
+    "ec.email.tail2": "Questions? You'll always reach a real person, never a bot. Just reply to this email or write to {email}, and our team is happy to help.",
     "ec.email.bookingCta": "Or request a callback and we'll reply as soon as possible",
     "ec.email.forwarded.label": "Shared with you",
     "ec.email.forwarded.banner": "<strong>{forwarder}</strong> shared this Altery Business banking analysis with you. They're exploring the {plan} plan and thought you should see it too.",

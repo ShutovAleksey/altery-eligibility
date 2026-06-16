@@ -114,6 +114,15 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
   // regex is permissive enough that some HTML chars survive (e.g. a
   // local-part like `user+"><img>`).
   const forwardedBySafe = forwardedBy ? escapeHtml(forwardedBy) : "";
+
+  // Footer support line. The localized copy (s.tail2) is HTML-escaped by
+  // sanitizeEmailStrings, so it carries a {email} placeholder instead of raw
+  // markup (otherwise the <a> tag would render as literal text in the inbox).
+  // We splice in our own constant mailto link here: it is server-built, so
+  // it's safe to emit unescaped, while the surrounding localized text stays
+  // escaped.
+  const salesLink = `<a href="mailto:sales@altery.com" class="t-primary-text" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a>`;
+  const tail2Html = (s.tail2 || "Questions? You'll always reach a real person, never a bot. Just reply to this email or write to {email}, and our team is happy to help.").replace("{email}", salesLink);
   const forwarderBlock = forwardedBy ? `
         <tr><td style="padding:24px 24px 0;">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="t-beige" style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;">
@@ -242,7 +251,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
             ${s.tail1 || "Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off."}
           </p>
           <p class="t-muted" style="font-size:13px;line-height:20px;color:${C.muted};margin:0;">
-            ${s.tail2 || `Questions? You'll always reach a real person, never a bot. Just reply to this email or write to <a href="mailto:sales@altery.com" class="t-primary-text" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a>, and our team is happy to help.`}
+            ${tail2Html}
           </p>
         </td></tr>
 
