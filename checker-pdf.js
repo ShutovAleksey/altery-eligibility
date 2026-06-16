@@ -140,14 +140,16 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
 
   // Reasoning bullets — same data as the result page, formatted
   // for print with check-circle markers.
-  const reasoningHTML = (rec.reasoning || []).map((r) => {
+  // Table-row layout (not flex) — html2canvas drifts flex bullets vertically
+  // during raster (same reason includedItemsHTML below uses a table).
+  const reasoningHTML = `<table style="width:100%;border-collapse:collapse;">` + (rec.reasoning || []).map((r) => {
     const text = t(r.key, r.vars || {});
     return `
-      <div style="display:flex;gap:14px;margin-bottom:14px;align-items:flex-start;">
-        ${checkDisc(22)}
-        <div style="font-size:13.5px;line-height:21px;color:${C.ink};flex:1;">${text}</div>
-      </div>`;
-  }).join("");
+      <tr>
+        <td style="width:22px;padding:0 14px 14px 0;vertical-align:top;">${checkDisc(22)}</td>
+        <td style="padding:0 0 14px;vertical-align:top;font-size:13px;line-height:19px;color:${C.ink};">${text}</td>
+      </tr>`;
+  }).join("") + `</table>`;
 
   // Selected services — keep cards compact so they don't blow the
   // page count out.
@@ -181,11 +183,13 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         ${rec.cryptoOpen ? `<span style="${pillStyle}">${t("ec.r.crypto.fluent")}</span>` : ""}
       </div>
       ${heroIban ? `
-        <div style="display:inline-block;padding:10px 18px 10px 12px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;line-height:1;font-size:13.5px;color:${C.ink};">
-          ${heroFlagSrc ? `<img src="${heroFlagSrc}" alt="" width="22" height="22" style="display:inline-block;border-radius:50%;vertical-align:middle;margin-right:10px;border:1px solid ${C.beigeBorder};"/>` : ""}
-          <span style="font-weight:600;vertical-align:middle;letter-spacing:0.005em;">${heroIban.currency}</span>
-          <span style="display:inline-block;width:1px;height:14px;background:${C.beigeBorder};vertical-align:middle;margin:0 12px;"></span>
-          <span style="font-family:${FF_MONO};letter-spacing:0.04em;vertical-align:middle;">${heroIbanMasked}</span>
+        <div style="display:inline-block;padding:8px 18px 8px 12px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-size:13px;color:${C.ink};"><tr>
+            ${heroFlagSrc ? `<td style="vertical-align:middle;padding:0 10px 0 0;"><img src="${heroFlagSrc}" alt="" width="22" height="22" style="display:block;border-radius:50%;border:1px solid ${C.beigeBorder};"/></td>` : ""}
+            <td style="vertical-align:middle;font-weight:600;letter-spacing:0.005em;white-space:nowrap;">${heroIban.currency}</td>
+            <td style="vertical-align:middle;padding:0 12px;"><div style="width:1px;height:14px;background:${C.beigeBorder};"></div></td>
+            <td style="vertical-align:middle;font-family:${FF_MONO};letter-spacing:0.04em;white-space:nowrap;">${heroIbanMasked}</td>
+          </tr></table>
         </div>
         <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:8px;">${t("ec.r.iban.caption", { currency: heroIban.currency })}</div>
       ` : ""}
@@ -287,19 +291,19 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <table style="width:100%;border-collapse:collapse;table-layout:fixed;">
         <tr>
           <td style="width:100%;padding:16px 18px;background:${C.surface};border:1px solid ${C.border};border-radius:12px;vertical-align:top;">
-            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:4px 0;">
               <span>${t("ec.r.method.line.subscription")}</span><span style="font-weight:600;color:${C.ink};">${rec.plan.price}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:4px 0;">
               <span>${t("ec.r.plan.compare.fee.fxMarkup")}</span><span style="font-weight:600;color:${C.ink};">${planFees.fxMarkup}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:4px 0;">
               <span>${t("ec.r.plan.compare.fee.swift")}</span><span style="font-weight:600;color:${C.ink};">${planFees.swift}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:4px 0;">
               <span>${t("ec.r.plan.compare.fee.sepa")}</span><span style="font-weight:600;color:${C.ink};">${planFees.sepa}</span>
             </div>
-            <div style="display:flex;justify-content:space-between;font-size:12.5px;color:${C.inkSoft};padding:4px 0;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:4px 0;">
               <span>${t("ec.r.plan.compare.fee.fasterPay")}</span><span style="font-weight:600;color:${C.ink};">${planFees.fasterPay}</span>
             </div>
           </td>
@@ -348,11 +352,11 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
     return `<span>${cell.value || "—"}</span>`;
   };
   const panelThStyle = (isUs) =>
-    `text-align:center;font-size:10.5px;font-weight:700;padding:10px 8px;border-bottom:1px solid ${C.border};letter-spacing:-0.005em;` +
+    `text-align:center;font-size:10px;font-weight:700;padding:10px 8px;border-bottom:1px solid ${C.border};letter-spacing:-0.005em;` +
     (isUs ? `color:${C.primary};` : `color:${C.inkSoft};`);
-  const panelRowThStyle = `text-align:left;font-size:11.5px;font-weight:500;color:${C.muted};padding:10px 14px;`;
+  const panelRowThStyle = `text-align:left;font-size:11px;font-weight:500;color:${C.muted};padding:10px 14px;`;
   const panelTdStyle = (isUs) =>
-    `text-align:center;font-size:11.5px;padding:10px 8px;` +
+    `text-align:center;font-size:11px;padding:10px 8px;` +
     (isUs ? `background:${C.beige};color:${C.primary};font-weight:600;` : `color:${C.ink};`);
 
   const renderPanel = (panel, eyebrowKey, titleKey) => `
@@ -396,7 +400,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         ${includedItems.map((k) => `
           <div style="display:flex;gap:10px;align-items:flex-start;padding:5px 0;">
             ${checkDisc(16, 1)}
-            <div style="font-size:12.5px;color:${C.ink};line-height:18px;">${t("ec.r.value." + k)}</div>
+            <div style="font-size:12px;color:${C.ink};line-height:18px;">${t("ec.r.value." + k)}</div>
           </div>`).join("")}
       </div>
     </div>`;
@@ -418,7 +422,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         ${checklistItems.map((id) => `
           <div style="display:flex;gap:12px;align-items:flex-start;padding:6px 0;">
             ${checkDisc(16, 2)}
-            <div style="font-size:12.5px;color:${C.ink};line-height:18px;">${t(`ec.pdf.checklist.${id}`)}</div>
+            <div style="font-size:12px;color:${C.ink};line-height:18px;">${t(`ec.pdf.checklist.${id}`)}</div>
           </div>`).join("")}
         <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:10px;padding-top:10px;border-top:1px solid ${C.border};">${t("ec.pdf.checklist.note")}</div>
       </div>
@@ -428,7 +432,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // beige-bordered italic stripe so it visually reads as a side-
   // comment from a real advisor rather than another data block.
   const volumeHintHTML = monthlyVolume ? `
-    <div style="margin:0 0 30px;padding:2px 0 2px 14px;border-left:3px solid ${C.beige};font-size:12.5px;line-height:19px;color:${C.inkSoft};font-style:italic;">
+    <div style="margin:0 0 30px;padding:2px 0 2px 14px;border-left:3px solid ${C.beige};font-size:12px;line-height:19px;color:${C.inkSoft};font-style:italic;">
       ${t(ecVolumeHintKey(monthlyVolume))}
     </div>` : "";
 
@@ -438,16 +442,18 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // anchor and easy scanning.
   // Table-row layout for the same html2canvas alignment reason as the
   // included list above — flex circles drift vertically during raster.
-  const stepsHTML = `<table style="width:100%;border-collapse:collapse;">` + [1, 2, 3, 4].map((n) => `
+  const stepRow = (n) => `
     <tr>
       <td style="width:42px;padding:0 14px 14px 0;vertical-align:top;">
         <div style="width:28px;height:28px;border-radius:50%;background:${C.beige};border:1.5px solid ${C.primary};color:${C.primary};display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;">${n}</div>
       </td>
       <td style="padding:0 0 14px;vertical-align:top;">
-        <div style="font-size:13.5px;font-weight:600;color:${C.ink};line-height:19px;">${t(`ec.pdf.steps.${n}.title`)}</div>
+        <div style="font-size:13px;font-weight:600;color:${C.ink};line-height:19px;">${t(`ec.pdf.steps.${n}.title`)}</div>
         <div style="font-size:12px;color:${C.muted};line-height:18px;margin-top:2px;">${t(`ec.pdf.steps.${n}.body`)}</div>
       </td>
-    </tr>`).join("") + `</table>`;
+    </tr>`;
+  const step1HTML = `<table style="width:100%;border-collapse:collapse;">${stepRow(1)}</table>`;
+  const remainingStepsHTML = `<table style="width:100%;border-collapse:collapse;">` + [2, 3, 4].map(stepRow).join("") + `</table>`;
 
   // Handoff URL → external corporate-registration app (app.altery.com).
   // Carries the full non-PII profile (plan/entity/currency/volume/country/
@@ -514,10 +520,12 @@ ${atGlanceHTML}
 <!-- Section 2: Why this plan — reasoning bullets citing the user's
      own answers. Anchored at top because trust is the gate to the
      rest of the document. -->
-<div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
-  ${t("ec.r.reasoning.head", { plan: planName })}
+<div style="margin-bottom:32px;">
+  <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
+    ${t("ec.r.reasoning.head", { plan: planName })}
+  </div>
+  ${reasoningHTML}
 </div>
-<div style="margin-bottom:32px;">${reasoningHTML}</div>
 
 <!-- Section 3: What's included on this plan — perk list. Comes
      before pricing so the reader sees value before cost. -->
@@ -533,7 +541,7 @@ ${includedHTML}
   <table style="width:100%;border-collapse:collapse;">${feeTableHTML}</table>
 </div>
 <div style="margin:0 0 32px;">
-  <a href="https://altery.com/fees/business/" style="display:inline-block;font-size:12.5px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.allPlans")} →</a>
+  <a href="https://altery.com/fees/business/" style="display:inline-block;font-size:12px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.allPlans")} →</a>
 </div>
 
 <!-- Section 5: Cost math — Altery vs typical bank with savings band. -->
@@ -559,35 +567,37 @@ ${comparisonHTML}
      starting setup. -->
 ${checklistHTML}
 
-<!-- Numbered timeline — sells "how easy it is to start" -->
-<div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
-  ${t("ec.pdf.nextSteps.head")}
+<!-- Numbered timeline. Step 1 + the setup CTA are kept in one block: the
+     CTA fulfils step 1's "via the link below" and sits high enough that it
+     always renders (it used to live at the document tail and could be
+     dropped on long proposals). Steps 2-4 follow. The <a href> points at the
+     external registration handoff; link annotation wired by
+     ecAddLinkAnnotations during PDF assembly. -->
+<div style="margin-bottom:26px;">
+  <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
+    ${t("ec.pdf.nextSteps.head")}
+  </div>
+  <div style="margin-bottom:14px;">${step1HTML}</div>
+  <a href="${handoffURL}" style="display:block;text-decoration:none;background:${C.primary};border-radius:12px;padding:16px 20px;color:${C.white};">
+    <div style="font-size:10px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">${t("ec.pdf.continueSetup")}</div>
+    <div style="font-size:14px;color:${C.white};font-family:${FF_MONO};letter-spacing:-0.005em;">${handoffDisplay} · ${proposalRef}</div>
+  </a>
 </div>
-<div style="margin-bottom:26px;">${stepsHTML}</div>
-
-<!-- Setup CTA block — navy, prominent. Visible text shows a clean
-     altery.com/setup · proposalRef pairing; the underlying <a href>
-     points to the full ?p=<payload> URL so a click pre-fills every
-     onboarding field the checker collected. The link annotation is
-     wired via ecAddLinkAnnotations during PDF assembly. -->
-<a href="${handoffURL}" style="display:block;text-decoration:none;background:${C.primary};border-radius:12px;padding:16px 20px;color:${C.white};margin-bottom:20px;">
-  <div style="font-size:10.5px;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px;">${t("ec.pdf.continueSetup")}</div>
-  <div style="font-size:14px;color:${C.white};font-family:${FF_MONO};letter-spacing:-0.005em;">${handoffDisplay} · ${proposalRef}</div>
-</a>
+<div style="margin-bottom:26px;">${remainingStepsHTML}</div>
 
 <!-- Account team — humanises the proposal. Validity notice gives
      it the legal-document weight of a real commercial proposal. -->
 <div style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;padding:16px 20px;margin-bottom:16px;">
   <div style="font-size:10px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">${t("ec.pdf.team.head")}</div>
   <div style="font-size:13px;line-height:19px;color:${C.ink};margin-bottom:10px;">${t("ec.pdf.signature.body")}</div>
-  <div style="font-size:12.5px;line-height:18px;color:${C.inkSoft};margin-bottom:12px;">${t("ec.pdf.team.body")}</div>
-  <a href="${ecContactRequestUrl(rec, email)}" style="display:inline-block;font-size:12.5px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.team.booking")} →</a>
+  <div style="font-size:12px;line-height:18px;color:${C.inkSoft};margin-bottom:12px;">${t("ec.pdf.team.body")}</div>
+  <a href="${ecContactRequestUrl(rec, email)}" style="display:inline-block;font-size:12px;color:${C.primary};text-decoration:none;font-weight:500;border-bottom:1px solid ${C.primary};line-height:18px;">${t("ec.pdf.team.booking")} →</a>
 </div>
 
   </div>
 
   <!-- Footer — sub-fold legal block -->
-  <div style="background:${C.surface};padding:22px 40px;border-top:1px solid ${C.border};font-size:10.5px;line-height:16px;color:${C.muted};">
+  <div style="background:${C.surface};padding:22px 40px;border-top:1px solid ${C.border};font-size:10px;line-height:16px;color:${C.muted};">
 <div style="margin-bottom:4px;color:${C.ink};font-weight:600;">Altery</div>
 <div>${t("ec.pdf.footer.tagline")}</div>
 <div style="margin-top:8px;">${t("ec.pdf.footer.entities")}</div>
