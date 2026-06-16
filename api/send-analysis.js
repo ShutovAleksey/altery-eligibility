@@ -242,7 +242,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
             ${s.tail1 || "Setup takes about 10 minutes and saves as you go. Your answers from the eligibility check are pre-filled, so onboarding picks up where this analysis left off."}
           </p>
           <p class="t-muted" style="font-size:13px;line-height:20px;color:${C.muted};margin:0;">
-            ${s.tail2 || `Questions? Just reply to this email or write to <a href="mailto:sales@altery.com" class="t-primary-text" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a>. We're here to help.`}
+            ${s.tail2 || `Questions? You'll always reach a real person, never a bot. Just reply to this email or write to <a href="mailto:sales@altery.com" class="t-primary-text" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a>, and our team is happy to help.`}
           </p>
         </td></tr>
 
