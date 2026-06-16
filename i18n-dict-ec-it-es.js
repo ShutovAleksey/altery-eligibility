@@ -163,6 +163,7 @@
     "ec.plan.ultra.trial":   "Prova gratuita di 14 giorni",
     "ec.plan.pro.am":        "Account manager dedicato",
     "ec.plan.ultra.am":      "Account manager dedicato",
+    "ec.plan.perk.humanSupport": "Supporto umano reale, niente bot",
     "ec.plan.cap.am":        "Account manager dedicato",
 
 
@@ -608,6 +609,7 @@
     "ec.plan.ultra.trial":   "Prueba gratuita de 14 días",
     "ec.plan.pro.am":        "Gestor de cuenta dedicado",
     "ec.plan.ultra.am":      "Gestor de cuenta dedicado",
+    "ec.plan.perk.humanSupport": "Soporte de personas reales, sin bots",
     "ec.plan.cap.am":        "Gestor de cuenta dedicado",
 
 

@@ -164,6 +164,7 @@
     "ec.plan.ultra.trial":   "14-dniowy bezpłatny okres próbny",
     "ec.plan.pro.am":        "Dedykowany account manager",
     "ec.plan.ultra.am":      "Dedykowany account manager",
+    "ec.plan.perk.humanSupport": "Wsparcie prawdziwych ludzi, bez botów",
     "ec.plan.cap.am":        "Dedykowany account manager",
 
 
@@ -609,6 +610,7 @@
     "ec.plan.ultra.trial":   "Teste gratuito de 14 dias",
     "ec.plan.pro.am":        "Account manager dedicado",
     "ec.plan.ultra.am":      "Account manager dedicado",
+    "ec.plan.perk.humanSupport": "Apoio de pessoas reais, sem bots",
     "ec.plan.cap.am":        "Account manager dedicado",
 
 
@@ -1052,6 +1054,7 @@
     "ec.plan.ultra.trial":   "Essai gratuit de 14 jours",
     "ec.plan.pro.am":        "Account manager dédié",
     "ec.plan.ultra.am":      "Account manager dédié",
+    "ec.plan.perk.humanSupport": "Un vrai support humain, pas de bots",
     "ec.plan.cap.am":        "Account manager dédié",
 
 

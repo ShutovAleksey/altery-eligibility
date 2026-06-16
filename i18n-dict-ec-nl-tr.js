@@ -163,6 +163,7 @@
     "ec.plan.ultra.trial":   "14 dagen gratis proefperiode",
     "ec.plan.pro.am":        "Toegewezen accountmanager",
     "ec.plan.ultra.am":      "Toegewezen accountmanager",
+    "ec.plan.perk.humanSupport": "Echte menselijke support, geen bots",
     "ec.plan.cap.am":        "Toegewezen accountmanager",
 
 
@@ -608,6 +609,7 @@
     "ec.plan.ultra.trial":   "14 gün ücretsiz deneme",
     "ec.plan.pro.am":        "Özel hesap yöneticisi",
     "ec.plan.ultra.am":      "Özel hesap yöneticisi",
+    "ec.plan.perk.humanSupport": "Gerçek insan desteği, bot yok",
     "ec.plan.cap.am":        "Özel hesap yöneticisi",
 
 

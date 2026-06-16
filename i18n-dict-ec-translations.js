@@ -167,6 +167,7 @@
     "ec.plan.ultra.trial":   "14-tägige kostenlose Testphase",
     "ec.plan.pro.am":        "Persönlicher Account Manager",
     "ec.plan.ultra.am":      "Persönlicher Account Manager",
+    "ec.plan.perk.humanSupport": "Echter Support von Menschen, keine Bots",
     "ec.plan.cap.am":        "Persönlicher Account Manager",
 
 
@@ -612,6 +613,7 @@
     "ec.plan.ultra.trial":   "14 дней бесплатно",
     "ec.plan.pro.am":        "Персональный менеджер",
     "ec.plan.ultra.am":      "Персональный менеджер",
+    "ec.plan.perk.humanSupport": "Поддержка реальных людей, без ботов",
     "ec.plan.cap.am":        "Персональный менеджер",
 
 

@@ -288,6 +288,7 @@
     "ec.plan.ultra.trial":   "14-day free trial",
     "ec.plan.pro.am":        "Dedicated account manager",
     "ec.plan.ultra.am":      "Dedicated account manager",
+    "ec.plan.perk.humanSupport": "Real human support, no bots",
     "ec.plan.cap.am":        "Dedicated account manager",
 
     // Realistic-track savings callout — bank-side hidden costs added

@@ -666,7 +666,7 @@ const EC_PLANS = {
     // Plan-card perks for the result-page recommendation hero (NOT the
     // compare modal — the modal uses the unified PLAN_CAPABILITIES list
     // in checker-modals.jsx for row-by-row scan-comparability).
-    perkKeys: ["ec.plan.starter.users"],
+    perkKeys: ["ec.plan.starter.users", "ec.plan.perk.humanSupport"],
     fees: {
       fasterPay: "£1",
       sepa:      "€2",
@@ -679,7 +679,7 @@ const EC_PLANS = {
     price: "£100", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.pro.tagline",
     fitKey: "ec.plan.pro.fit",
-    perkKeys: ["ec.plan.pro.am", "ec.plan.pro.users"],
+    perkKeys: ["ec.plan.pro.am", "ec.plan.pro.users", "ec.plan.perk.humanSupport"],
     fees: {
       fasterPay: "£1",
       sepa:      "€1.5",
@@ -692,7 +692,7 @@ const EC_PLANS = {
     price: "£300", cycleKey: "ec.plan.cycleMo",
     taglineKey: "ec.plan.ultra.tagline",
     fitKey: "ec.plan.ultra.fit",
-    perkKeys: ["ec.plan.ultra.p5", "ec.plan.ultra.am", "ec.plan.ultra.negotiatedFx", "ec.plan.ultra.users"],
+    perkKeys: ["ec.plan.ultra.p5", "ec.plan.ultra.am", "ec.plan.ultra.negotiatedFx", "ec.plan.ultra.users", "ec.plan.perk.humanSupport"],
     fees: {
       fasterPay: "£0.5",
       sepa:      "€1",
