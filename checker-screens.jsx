@@ -352,8 +352,8 @@ function EcApp() {
   const monthlyVolume = (EC_VOLUME_BANDS[volumeInIdx]?.value || 0) + (EC_VOLUME_BANDS[volumeOutIdx]?.value || 0);
   const monthlyTx     = (EC_TX_BANDS[txInIdx]?.value || 0) + (EC_TX_BANDS[txOutIdx]?.value || 0);
   const recommendation = useMemo(() =>
-    ecRecommend({ countryCode: country, industry, monthlyVolume, corridorsIn: [...corridorsIn], corridorsOut: [...corridorsOut], monthlyTx, services: [...services] }),
-  [country, industry, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services]);
+    ecRecommend({ countryCode: country, industry, monthlyVolume, corridorsIn: [...corridorsIn], corridorsOut: [...corridorsOut], monthlyTx, services: [...services], volumeInIdx, volumeOutIdx, txInIdx, txOutIdx }),
+  [country, industry, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services, volumeInIdx, volumeOutIdx, txInIdx, txOutIdx]);
 
   // Step navigation. Steps:
   //   0 intro · 1 country · 2 industry · 3 services · 4 volume · 5 corridors · 6 result

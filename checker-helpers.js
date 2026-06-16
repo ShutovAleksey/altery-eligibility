@@ -32,7 +32,7 @@ Object.values(EC_ENTITIES).forEach((e) => {
 });
 
 // Pure routing function — answers → recommendation. Easy to test in isolation.
-function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services }) {
+function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services, volumeInIdx, volumeOutIdx, txInIdx, txOutIdx }) {
   // Union of regions hit on either direction = the actual corridor
   // breadth of the business. Keep both directions on rec for the PDF
   // and downstream consumers; expose the merged set as `corridors`.
@@ -201,7 +201,11 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     .sort((a, b) => b.priority - a.priority)
     .slice(0, 3);
 
-  return { kind: "approved", entity, plan, country, ind, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoActive, cryptoServed, cryptoOpen, cryptoBlocked, services: svcs, tierSignals, reasoning: reasoningTop };
+  return { kind: "approved", entity, plan, country, ind, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoActive, cryptoServed, cryptoOpen, cryptoBlocked, services: svcs, tierSignals, reasoning: reasoningTop,
+    // Raw per-direction band indices echoed through so the handoff URL can
+    // translate them to registration band codes (the summed monthlyVolume/
+    // monthlyTx can't be split back). Undefined when not supplied.
+    volumeInIdx, volumeOutIdx, txInIdx, txOutIdx };
 }
 
 // Derive a transaction-count assumption from the monthly volume
@@ -1282,10 +1286,56 @@ function ecEncodeHandoffP(payload) {
 // redirects here.
 const EC_REGISTRATION_URL = "https://app.altery.com/n/registration-corporate";
 
+// ── Handoff value maps: checker taxonomy → external registration catalog ──
+// The registration app keys these fields off its own catalog CODES, not our
+// text slugs, so we translate at the boundary. Built against the registration
+// team's catalog dump (2026-06-16).
+//
+// Industry → registration catalogType-2 code. The checker's industry list is
+// deliberately coarser than registration's two-level catalog, so a few rows
+// are a best-fit pending the team's sign-off (marked CONFIRM).
+const EC_REG_INDUSTRY = {
+  saas: 1115, apps: 1108, games: 2004, edtech: 1801,
+  marketplace: 1403, ecom: 1402, marketing: 1001, freelance: 1201,
+  prof: 1300,            // CONFIRM — parent "Legal & Professional Services" (no single leaf fits)
+  trade: 1405,           // CONFIRM — no import/export leaf; mapped to Wholesale
+  wholesale: 1405, logistics: 1502, manufacturing: 1409,
+  creator: 1702, affiliate: 1005, vpn: 1106,
+  crypto: 2101,          // CONFIRM — generic crypto → "Digital assets trading"
+  other: 600,            // "My category is not listed"
+  // gambling/adult/weapons/lending are hard declines — they never reach a
+  // handoff URL, so they need no mapping.
+};
+
+// Services → registration `businessNeeds` slug. api + multiCompany have no
+// registration equivalent and are intentionally dropped.
+const EC_REG_SERVICE = {
+  local:       "local-payments",
+  cards:       "cards",
+  crypto:      "crypto-transfers",
+  crossBorder: "cross-border-payments",
+  mass:        "mass-payments",
+};
+
+// Volume bands: checker band index → registration band code. Incoming and
+// outgoing use DIFFERENT code sets for the same EUR bands (registration
+// catalogType 11 vs 14). The checker's 6 bands don't line up 1:1 with
+// registration's 9, so each checker band maps to the registration band that
+// contains its midpoint — a couple collapse onto one code (lossy, but it's a
+// pre-fill the applicant adjusts).
+//   checker idx: 0 <50k · 1 50–200k · 2 200–500k · 3 500k–1M · 4 1–5M · 5 5M+
+const EC_REG_VOL_IN  = [11, 211, 212, 212, 213, 12];
+const EC_REG_VOL_OUT = [11, 5,   6,   6,   7,   12];
+
+// Tx-count bands: checker band index → registration activity code (1–4).
+//   checker idx: 0 <20 · 1 20–100 · 2 101–300 · 3 301–1000 · 4 1000+
+//   registration: 1 = 1–50 · 2 = 51–300 · 3 = 301–1000 · 4 = 1001+
+const EC_REG_TX = [1, 2, 2, 3, 4];
+
 // Full handoff URL used by goToOnboarding AND the PDF/email/callback CTAs.
-// Carries the complete NON-PII profile (so the external registration can
-// pre-fill and our attribution survives the hop) + first-touch UTMs, plus —
-// per the call-site — the contact details collected so far.
+// Carries the complete NON-PII profile (translated to the registration's
+// catalog codes, so it can pre-fill) + first-touch UTMs, plus — per the
+// call-site — the contact details collected so far.
 //
 // PII policy (founder decision, 2026-06-15): contact details (email / name /
 // phone / company) ARE forwarded so registration can pre-fill, but ONLY when a
@@ -1301,15 +1351,25 @@ function ecBuildHandoffURL(rec, plan, origin, opts) {
   const activePlan = plan || (rec && rec.plan);
 
   if (activePlan && activePlan.id) set("plan", activePlan.id);
-  if (rec && rec.entity && rec.entity.id) {
-    set("entity", rec.entity.id);
-    set("currency", rec.entity.id === "uk" ? "GBP" : "EUR");
-  }
+  // entity + currency intentionally NOT sent: registration derives the legal
+  // entity from the country of incorporation and the currency from that, and
+  // the team confirmed both params are unused (founder call, 2026-06-16).
   if (rec) {
-    set("volume", rec.monthlyVolume);
-    set("country", rec.country && rec.country.code);
-    set("industry", rec.ind && rec.ind.value);
-    if (Array.isArray(rec.services) && rec.services.length) set("services", rec.services.join(","));
+    set("country", rec.country && rec.country.code);   // ISO 3166-1 alpha-2, as registration expects
+    if (rec.ind && EC_REG_INDUSTRY[rec.ind.value] != null) set("industry", EC_REG_INDUSTRY[rec.ind.value]);
+    if (Array.isArray(rec.services)) {
+      const mapped = rec.services.map((s) => EC_REG_SERVICE[s]).filter(Boolean);
+      if (mapped.length) set("services", mapped.join(","));
+    }
+    // Volume + tx are two-directional in registration; the checker collects
+    // both directions, so we send both with the right per-direction codes.
+    if (rec.volumeInIdx  != null && EC_REG_VOL_IN[rec.volumeInIdx]   != null) set("volume_in",  EC_REG_VOL_IN[rec.volumeInIdx]);
+    if (rec.volumeOutIdx != null && EC_REG_VOL_OUT[rec.volumeOutIdx] != null) set("volume_out", EC_REG_VOL_OUT[rec.volumeOutIdx]);
+    if (rec.txInIdx  != null && EC_REG_TX[rec.txInIdx]  != null) set("tx_in",  EC_REG_TX[rec.txInIdx]);
+    if (rec.txOutIdx != null && EC_REG_TX[rec.txOutIdx] != null) set("tx_out", EC_REG_TX[rec.txOutIdx]);
+    // Corridors travel as region slugs (uk-eea, apac, …) + any individual ISO
+    // outliers the user added. The registration team maps slugs → ISO country
+    // lists on their side from the EC_CHIP_REGIONS taxonomy (checker-data.js).
     if (Array.isArray(rec.corridorsIn) && rec.corridorsIn.length) set("corridors_in", rec.corridorsIn.join(","));
     if (Array.isArray(rec.corridorsOut) && rec.corridorsOut.length) set("corridors_out", rec.corridorsOut.join(","));
     if (rec.cryptoServed) set("crypto", "1");   // crypto will actually be offered for this jurisdiction
