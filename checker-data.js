@@ -595,57 +595,6 @@ const EC_TX_BANDS = [
   { idx: 4, value: 2000, labelKey: "ec.q4.tx.4" }, // 1000+
 ];
 
-// ── Fee schedule (canonical, from altery.com/fees/business) ───────
-// Real Altery business-account fees. Altery's published schedule is
-// region-tiered — same fees regardless of plan tier (Starter/Pro/
-// Ultra), only the monthly subscription and the plan-level perks
-// (FX cap, SWIFT cap) differ across tiers. Region key:
-//   • "ukEu" — businesses registered in UK or any EU member state
-//   • "row"  — Rest of the World (everyone else)
-// Routing derived from entity.id: uk + eu entities → ukEu, mena → row.
-// Values are FORMATTED strings matching altery.com display, kept
-// verbatim so they survive copy review without re-translation. If
-// Altery updates fees, this constant is the single source-of-truth
-// to keep in sync (link: https://altery.com/fees/business).
-const EC_FEE_SCHEDULE = {
-  ukEu: {
-    accountOpening:  "Free",
-    accountClosure:  "Free",
-    inactivity:      "£4.99/mo",
-    internal:        "Free",
-    sepa:            "€/£/$ 0.50",
-    fp:              "£/$/€ 0.50",
-    fedwire:         "$10 / €8.80 / £8",
-    achUsd:          "1%, min $1 (>$100)",
-    swiftGbpOut:     "£20",
-    swiftEurOut:     "€30",
-    swiftUsdOut:     "$30",
-    swiftIn:         "£10 / €15 / $20",
-    exchange:        "On request",
-  },
-  row: {
-    accountOpening:  "£100",
-    accountClosure:  "Free",
-    inactivity:      "£9.99/mo",
-    internal:        "Free",
-    sepa:            "€2 / £2 / $2 + 0.10%, max €30 / £25 / $35",
-    fp:              "£2 / $2.50 / €2.50 + 0.10%, max £25 / €30 / $35",
-    fedwire:         "Currently unavailable",
-    achUsd:          "Currently unavailable",
-    swiftGbpOut:     "£30 + 0.15%, max £150",
-    swiftEurOut:     "€35 + 0.15%, max €180",
-    swiftUsdOut:     "$40 + 0.15%, max $200",
-    swiftIn:         "£10 / €15 / $20",
-    exchange:        "On request",
-  },
-};
-// Region derivation: UK + EU entities route to UK-EU schedule;
-// MENA (and any other non-EU entity) routes to RoW schedule.
-function ecFeeRegion(entity) {
-  if (!entity) return "ukEu";
-  return entity.id === "mena" ? "row" : "ukEu";
-}
-
 // Real Altery plan data, from the public pricing page:
 //   • Starter — £50/mo, SMEs under €100K/mo volume
 //   • Pro     — £100/mo, growing businesses under €1M/mo
@@ -1426,6 +1375,6 @@ Object.assign(window, {
   EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,
   EC_CAPABILITY_MATRIX,
   EC_SERVICES, TOTAL_STEPS,
-  EC_VOLUME_BANDS, EC_TX_BANDS, EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES,
-  EC_COMPARATORS, ecHeroIdentifier, maskTailDots, ecFeeRegion,
+  EC_VOLUME_BANDS, EC_TX_BANDS, EC_PLANS, EC_ENTITIES,
+  EC_COMPARATORS, ecHeroIdentifier, maskTailDots,
 });

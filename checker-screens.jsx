@@ -3,10 +3,10 @@
           EC_COUNTRIES, EC_INDUSTRIES, EC_SERVICES,
           EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,
           EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER,
-          EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
+          EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecOutcomesForSavings, ecVolumeHintKey,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
-          EcFeesModal, EcPlanComparisonModal, EcHandoffModal, EcCallbackForm */
+          EcPlanComparisonModal, EcHandoffModal, EcCallbackForm */
 // checker-screens.jsx — the eligibility-checker question screens, result
 // screens, and the supporting EcIco decorative-icon set.
 //
@@ -1549,7 +1549,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
 
   // Plan comparison modal — local state, opens on "Compare all plans →"
   const [comparisonOpen, setComparisonOpen] = useState(false);
-  const [feesOpen, setFeesOpen] = useState(false);
 
   // Handoff modal — used now only for the "Email this proposal as PDF"
   // path on the result page (mounts directly at the email stage).
@@ -1897,14 +1896,6 @@ function EcResultApproved({ rec, onBack, onReset }) {
             setComparisonOpen(false);
           }}
           onClose={() => setComparisonOpen(false)}
-        />
-      )}
-
-      {feesOpen && (
-        <EcFeesModal
-          plan={activePlan}
-          entity={entity}
-          onClose={() => setFeesOpen(false)}
         />
       )}
 

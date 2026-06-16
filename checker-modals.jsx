@@ -1,6 +1,6 @@
 /* global React, useT, Button, Checkbox, Tag, Alert, Input, Modal, Card, Spinner,
           Icon, Flag, Field, WhyWeAsk,
-          EC_FEE_SCHEDULE, EC_PLANS, EC_ENTITIES, EC_SERVICES,
+          EC_PLANS, EC_ENTITIES, EC_SERVICES,
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,
           ecOutcomesForSavings, ecGenProposalRef,
           ecBuildAnalysisHTML, ecSendAnalysisEmail, ecWaitForPdfLibs,
@@ -12,7 +12,6 @@
 // Loaded as <script type="text/babel" src="/checker-modals.jsx"> in
 // /index.html after /checker-screens.jsx. Exports to window:
 //
-//   EcFeesModal          — full fee schedule popup, opened by the "View all fees" link
 //   EcPlanComparisonModal — "Compare plans" popup with three plan cards
 //   EcPlanIcon           — small helper, renders a tier icon from EcIco
 //   EcPlanCompareCard    — single plan card inside EcPlanComparisonModal
@@ -41,138 +40,6 @@ const PLAN_CAPABILITIES = [
   { labelKey: "ec.plan.ultra.costOpt",       on: { starter: false, pro: false, ultra: true  } },
   { labelKey: "ec.plan.ultra.complexFlows",  on: { starter: false, pro: false, ultra: true  } },
 ];
-
-function EcFeesModal({ plan, entity, onClose }) {
-  const t = useT();
-  const region = ecFeeRegion(entity);
-  const fees = EC_FEE_SCHEDULE[region];
-  // Plan-specific values pulled directly from EC_PLANS (price) and
-  // perks text (FX cap, SWIFT cap if present). Keeps the modal in
-  // sync with whatever copy the plan card shows.
-  const planPrice = plan.price; // e.g. "£100"
-  const cycleSuffix = t(plan.cycleKey); // "/ month" etc.
-  // Concatenate with non-breaking spaces — the cycle suffix usually
-  // contains a regular space (e.g. "/ month") which the browser will
-  // happily wrap at on narrow mobile cells. Replacing all ASCII
-  // spaces with \u00A0 keeps the price-and-cycle unit on one line
-  // regardless of CSS white-space behaviour. Belt-and-braces with
-  // the .ec-fees__value { white-space: nowrap } rule.
-  const monthlyFee = `${planPrice}${cycleSuffix}`.replace(/ /g, '\u00A0');
-  // FX cap and SWIFT cap come straight from the plan's fees object.
-  // Previously parsed out of perkKeys text via regex, but the perks
-  // no longer carry a literal "X%" string (perk copy moved to feature
-  // names like "Dedicated account manager"). plan.fees.fxMarkup is
-  // the canonical string ("up to 0.7%") — title-case it for display.
-  const fxRaw = (plan.fees && plan.fees.fxMarkup) || "";
-  const fxCap = fxRaw ? fxRaw.replace(/^up\s+to\b/i, "Up to") : "On request";
-  // SWIFT cap detection — still parsed from perkKeys text because no
-  // structured field exists; falls back to null when no perk says "cap".
-  const allPerkText = plan.perkKeys.map((k) => t(k)).join(" ");
-  const swiftCapMatch = allPerkText.match(/(?:cap|capped).*?([€£$]\d+)/i);
-  const swiftCapLabel = swiftCapMatch ? swiftCapMatch[1] : null;
-
-  // Modal sections — order matches buyer logic: what does the
-  // account cost → what does it cost to send → what does it cost
-  // to receive → FX. Each section is a small table.
-  const sections = [
-    {
-      headKey: "ec.fees.section.account",
-      rows: [
-        { labelKey: "ec.fees.row.opening",     value: fees.accountOpening },
-        { labelKey: "ec.fees.row.monthly",     value: monthlyFee, highlight: true },
-        { labelKey: "ec.fees.row.closure",     value: fees.accountClosure },
-        { labelKey: "ec.fees.row.inactivity",  value: fees.inactivity },
-      ],
-    },
-    {
-      headKey: "ec.fees.section.outgoing",
-      rows: [
-        { labelKey: "ec.fees.row.internal",    value: fees.internal },
-        { labelKey: "ec.fees.row.sepa",        value: fees.sepa },
-        { labelKey: "ec.fees.row.fp",          value: fees.fp },
-        { labelKey: "ec.fees.row.fedwire",     value: fees.fedwire },
-        { labelKey: "ec.fees.row.achUsd",      value: fees.achUsd },
-        { labelKey: "ec.fees.row.swiftGbp",    value: fees.swiftGbpOut },
-        { labelKey: "ec.fees.row.swiftEur",    value: fees.swiftEurOut },
-        { labelKey: "ec.fees.row.swiftUsd",    value: fees.swiftUsdOut },
-      ],
-    },
-    {
-      headKey: "ec.fees.section.incoming",
-      rows: [
-        { labelKey: "ec.fees.row.internalIn",  value: fees.internal },
-        { labelKey: "ec.fees.row.sepaIn",      value: "Free" },
-        { labelKey: "ec.fees.row.fpIn",        value: "Free" },
-        { labelKey: "ec.fees.row.swiftIn",     value: fees.swiftIn },
-      ],
-    },
-    {
-      headKey: "ec.fees.section.fx",
-      rows: [
-        { labelKey: "ec.fees.row.fxMarkup",    value: fxCap, highlight: true },
-        { labelKey: "ec.fees.row.exchange",    value: fees.exchange },
-      ],
-    },
-  ];
-
-  return ReactDOM.createPortal((
-    <div className="ec-modal__backdrop" role="dialog" aria-modal="true" onClick={onClose}>
-      <div className="ec-modal" onClick={(e) => e.stopPropagation()}>
-        <button
-          type="button"
-          className="ec-modal__close"
-          aria-label={t("ec.r.plan.compare.close")}
-          onClick={onClose}
-        >
-          <EcIco.close style={{ width: 18, height: 18 }} />
-        </button>
-        <h2 className="ec-modal__title">{t("ec.fees.title")}</h2>
-        <div className="ec-fees__subtitle">
-          {t(plan.nameKey)} · {monthlyFee} · {t(entity.nameKey)}
-        </div>
-
-        {sections.map((s) => (
-          <div className="ec-fees__section" key={s.headKey}>
-            <div className="ec-fees__sectionHead">{t(s.headKey)}</div>
-            <div className="ec-fees__table">
-              {s.rows.map((r) => (
-                <div
-                  key={r.labelKey}
-                  className={"ec-fees__row" + (r.highlight ? " ec-fees__row--highlight" : "")}
-                >
-                  <div className="ec-fees__label">{t(r.labelKey)}</div>
-                  <div className={"ec-fees__value" + (r.value === "Currently unavailable" ? " ec-fees__value--muted" : "")}>
-                    {r.value}
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* SWIFT cap note — only render when active plan has the
-                "SWIFT fee cap at X" perk (currently Ultra). Sits
-                visually attached to the Outgoing section since SWIFT
-                rows are in that group. */}
-            {s.headKey === "ec.fees.section.outgoing" && swiftCapLabel && (
-              <div className="ec-fees__planNote">
-                {t("ec.fees.note.swiftCap", { cap: swiftCapLabel })}
-              </div>
-            )}
-          </div>
-        ))}
-
-        <div className="ec-fees__footer">
-          {t("ec.fees.footer.disclaimer")}<br/>
-          <a
-            href="https://altery.com/fees/business"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t("ec.fees.footer.link")}
-          </a>
-        </div>
-      </div>
-    </div>
-  ), document.body);
-}
 
 // ──────────────────── Plan comparison modal ────────────────────
 // Opens from the "Compare all plans →" link. Shows plans that are NOT
@@ -1063,7 +930,6 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
 }
 
 Object.assign(window, {
-  EcFeesModal,
   EcPlanComparisonModal, EcMethodologyModal, EcPlanIcon, EcPlanCompareCard,
   EcHandoffModal, EcCallbackForm,
 });
