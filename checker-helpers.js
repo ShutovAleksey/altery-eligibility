@@ -1210,77 +1210,6 @@ function ecGenProposalRef() {
   return `EL-${year}-${tail.padEnd(4, "0")}`;
 }
 
-// ── Handoff payload ─────────────────────────────────────────────
-// One base64url-encoded JSON blob in the URL carries every checker
-// answer to the onboarding flow. Self-contained → works across device
-// switches, email forwards, and "I'll come back later" without any
-// backend state. No HMAC or expiry — the data is not security-sensitive
-// (the user can still lie during KYB, so signing the URL adds zero
-// defence and lots of friction).
-//
-// Shape (v=1):
-//   { v, ref, plan, entity, currency, volume, industry,
-//     services[], corridors[], cryptoActive, ts }
-//
-// Onboarding's URL parser reads ?p=<base64url>, decodes, and pre-fills
-// formState. If parsing fails the parser silently falls back to the
-// legacy individual params (token/plan/entity/...) — old emails and
-// bookmarks keep working.
-function ecBuildHandoffPayload(rec, plan, opts) {
-  // `plan` lets the caller pin the link to a specific tier (e.g. when
-  // the user switched plans via the comparison modal). Defaults to the
-  // algorithm's recommendation.
-  // `opts.email` lets the caller embed the recipient email — used by
-  // the email-this-proposal flow so the onboarding welcome screen can
-  // prefill the same address the PDF was sent to. Not included on the
-  // result-page CTA path (we don't have an email yet) — that's fine,
-  // the field is optional in the decoder.
-  //
-  // UTMs are read from sessionStorage (first-touch captured on landing)
-  // and embedded so the entire handoff — checker→/setup, PDF/email
-  // magic link, forwarded copies — carries original marketing
-  // attribution all the way to onboarding's meta.utm and onward to
-  // HubSpot leads.
-  const active = plan || rec?.plan || {};
-  const utm    = (typeof ecGetStoredUtms === "function") ? ecGetStoredUtms() : null;
-  return {
-    v:            1,
-    ref:          ecGenProposalRef(),
-    plan:         active.id || "pro",
-    entity:       rec?.entity?.id || "uk",
-    // ISO-3166 alpha-2 country code (e.g. "DE", "GB", "FR"). The
-    // onboarding country screen uses the same vocabulary, so this
-    // pre-fills the selection with no mapping needed. Falls back to
-    // null when the checker didn't capture one (older clients).
-    country:      rec?.country?.code || null,
-    currency:     rec?.entity?.id === "uk" ? "GBP" : "EUR",
-    volume:       rec?.monthlyVolume || null,
-    // `industry` is the customer-facing ICP-aligned label the user
-    // picked. `cra` is the back-office Compliance/Risk Assessment
-    // category (i18n key, e.g. "ec.cra.it-dev") — onboarding/back-
-    // office uses this to route the KYB queue. Mapping lives on the
-    // industry definition in checker-data.js.
-    industry:     rec?.ind?.value || null,
-    cra:          rec?.ind?.craKey || null,
-    services:     Array.isArray(rec?.services) ? rec.services : [],
-    corridors:    Array.isArray(rec?.corridors) ? rec.corridors : [],
-    cryptoActive: !!rec?.cryptoServed,
-    email:        (opts && typeof opts.email === "string" && opts.email.includes("@")) ? opts.email : null,
-    utm,          // null when no UTMs captured; object {utm_source, ...} otherwise
-    ts:           Date.now(),
-  };
-}
-
-function ecEncodeHandoffP(payload) {
-  // JSON → UTF-8 → base64 → base64url. The unescape(encodeURIComponent)
-  // dance preserves Unicode (Cyrillic industry labels, etc.) which raw
-  // btoa() would corrupt. Strip trailing "=" padding because URLs are
-  // happier without it and atob accepts unpadded input fine.
-  const json = JSON.stringify(payload || {});
-  const b64  = btoa(unescape(encodeURIComponent(json)));
-  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
 // External corporate-registration app. The checker no longer hosts an
 // internal /setup onboarding — every "Start setup" CTA (web, PDF, email)
 // redirects here.
@@ -1398,9 +1327,9 @@ function ecBuildHandoffURL(rec, plan, origin, opts) {
 //      under "altery:utm:v1" with FIRST-TOUCH semantics — once a non-empty
 //      payload is stored, subsequent captures inside the same tab can't
 //      overwrite it. Tab close clears the storage.
-//   3. ecBuildHandoffPayload embeds the stored UTMs in ?p=, so the
-//      checker→onboarding handoff (and any forwarded email link) carries
-//      original attribution.
+//   3. ecAppendUtmsToURL appends the stored UTMs to the registration
+//      handoff link (and any forwarded email link), so the
+//      checker→registration handoff carries original attribution.
 //   4. Onboarding hydrateFormState reads utms from the payload, parks them
 //      in formState.meta.utm — available for HubSpot lead-attribution
 //      properties and any future analytics fire-and-forget.
@@ -1484,7 +1413,7 @@ Object.assign(window, {
   ecConfidenceLevel, ecFxVolumeRatio, ecLocalSwiftSplit, ecAvgTxGbp,
   ecVolumeHintKey, ecFormatVolume, ecEstimateSavings,
   ecCheckerContext, ecBookingUrl, ecContactRequestUrl, ecSubmitHubspotLead, ecGenProposalRef,
-  ecBuildHandoffPayload, ecEncodeHandoffP, ecBuildHandoffURL,
+  ecBuildHandoffURL,
   ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,
   ecCaptureAndStoreUtms, ecAppendUtmsToURL,
   ecFmtFromGbp, ecFmtFromGbpCompact, ecDisplayCurrencyFor, EC_FX_FROM_GBP, EC_CURRENCY_SYMBOL,
