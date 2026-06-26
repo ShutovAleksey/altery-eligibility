@@ -1,4 +1,4 @@
-/* global React, useT, Button, Tag, Alert, SelectableListItem, Input, Select,
+/* global React, useT, Button, Tag, Alert, Input, Select,
           Icon, Flag, Title, Field, WhyWeAsk,
           EC_COUNTRIES, EC_INDUSTRIES, EC_SERVICES,
           EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,

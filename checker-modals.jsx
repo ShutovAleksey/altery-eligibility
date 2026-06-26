@@ -1,4 +1,4 @@
-/* global React, useT, Button, Checkbox, Tag, Alert, Input, Modal, Card, Spinner,
+/* global React, useT, Button, Checkbox, Tag, Alert, Input, Modal, Spinner,
           Icon, Flag, Field, WhyWeAsk,
           EC_PLANS, EC_ENTITIES, EC_SERVICES,
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,

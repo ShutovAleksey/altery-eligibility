@@ -2,7 +2,7 @@
   "name": "altery-eligibility-checker",
   "version": "1.0.0",
   "private": true,
-  "description": "Altery pre-onboarding eligibility checker prototype with Stripe Payment Element",
+  "description": "Altery pre-onboarding eligibility checker",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -11,7 +11,7 @@
     "test": "node --test test/*.test.mjs",
     "verify:baselines": "node scripts/verify-baselines.mjs"
   },
-  "dependencies": {
-    "stripe": "^17.5.0"
+  "devDependencies": {
+    "esbuild": "^0.28.1"
   }
 }
