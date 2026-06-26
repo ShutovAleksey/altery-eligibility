@@ -29,9 +29,9 @@ const JSX_FILES = [
 ];
 
 // API endpoints — these are real ESM modules, deploy-on-error if broken.
-const API_FILES = ["api/config.js", "api/create-payment-intent.js", "api/send-analysis.js",
-                   "api/save-progress.js", "api/send-verify-code.js",
-                   "lib/email.js"];
+const API_FILES = ["api/send-analysis.js", "api/hubspot-lead.js",
+                   "lib/email.js", "lib/rate-limit.js", "lib/anti-spam.js",
+                   "lib/send-analysis-validators.js"];
 
 for (const f of [...JS_FILES, ...API_FILES]) {
   test(`node --check ${f}`, () => {

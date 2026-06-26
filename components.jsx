@@ -1299,100 +1299,6 @@ const Stepper = ({ steps, currentIndex, variant = "horizontal", tone = "onLight"
 };
 
 // ════════════════════════════════════════════════════════════════════════════
-// CodeInput (OTP)
-// ════════════════════════════════════════════════════════════════════════════
-const CodeInput = ({ length = 6, value = "", onChange, error, style, ariaLabel = "Verification code" }) => {
-  const refs = React.useRef([]);
-  const chars = value.split("").concat(Array(length).fill("")).slice(0, length);
-  const setAt = (i, ch) => {
-    const next = chars.slice();
-    next[i] = ch;
-    onChange?.(next.join(""));
-  };
-  // Distribute a multi-character string (typically from paste) across the
-  // input cells starting at `start`. Strips non-digits, truncates to fit
-  // remaining slots, fills sequentially, then focuses the cell after the
-  // last filled one (or the final cell if we wrote to the end).
-  const fillFrom = (start, raw) => {
-    const digits = String(raw || "").replace(/\D/g, "").slice(0, length - start);
-    if (!digits.length) return;
-    const next = chars.slice();
-    for (let j = 0; j < digits.length; j++) next[start + j] = digits[j];
-    onChange?.(next.join(""));
-    const lastIdx = Math.min(start + digits.length, length - 1);
-    requestAnimationFrame(() => refs.current[lastIdx]?.focus());
-  };
-  return (
-    <div role="group" aria-label={ariaLabel} style={{ display: "flex", gap: "var(--s-2)", ...style }}>
-      {chars.map((c, i) =>
-      <input
-        key={i}
-        ref={(el) => refs.current[i] = el}
-        value={c}
-        maxLength={1}
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        aria-label={`Digit ${i + 1} of ${length}`}
-        aria-invalid={!!error || undefined}
-        onChange={(e) => {
-          // If the input fired with more than one char (autofill / paste
-          // bypass / mobile keyboard), distribute across the remaining
-          // cells starting at the current index. Otherwise single-digit
-          // path stays identical to the original behaviour.
-          const incoming = e.target.value.replace(/\D/g, "");
-          if (incoming.length > 1) {
-            fillFrom(i, incoming);
-            return;
-          }
-          const v = incoming.slice(-1);
-          setAt(i, v);
-          if (v && refs.current[i + 1]) refs.current[i + 1].focus();
-        }}
-        onPaste={(e) => {
-          // Capture paste explicitly — most browsers fire onChange too,
-          // but preventing default here ensures the input doesn't first
-          // overwrite cell i with the entire pasted string before we
-          // can redistribute it. Reads the clipboard once, strips
-          // non-digits, then writes via fillFrom.
-          const text = (e.clipboardData || window.clipboardData)?.getData("text") || "";
-          const digits = text.replace(/\D/g, "");
-          if (!digits) return;
-          e.preventDefault();
-          fillFrom(i, digits);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === "Backspace" && !c && refs.current[i - 1]) {
-            refs.current[i - 1].focus();
-          } else if (e.key === "ArrowLeft" && refs.current[i - 1]) {
-            refs.current[i - 1].focus();
-          } else if (e.key === "ArrowRight" && refs.current[i + 1]) {
-            refs.current[i + 1].focus();
-          }
-        }}
-        style={{
-          width: 56, height: 64, textAlign: "center",
-          fontSize: 24, fontWeight: "var(--fw-semibold)", letterSpacing: 0,
-          color: "var(--c-ink)",
-          background: error ? "var(--c-danger-soft)" : "var(--c-surface)",
-          border: `1px solid ${error ? "var(--c-danger)" : "var(--c-border)"}`,
-          borderRadius: "var(--r-md)", outline: "none",
-          transition: "border-color var(--motion-base), box-shadow var(--motion-base)"
-        }}
-        onFocus={(e) => {
-          e.target.style.borderColor = error ? "var(--c-danger)" : "var(--c-accent)";
-          e.target.style.boxShadow = error ? "var(--sh-focus-danger)" : "var(--sh-focus)";
-        }}
-        onBlur={(e) => {
-          e.target.style.borderColor = error ? "var(--c-danger)" : "var(--c-border)";
-          e.target.style.boxShadow = "none";
-        }} />
-
-      )}
-    </div>);
-
-};
-
-// ════════════════════════════════════════════════════════════════════════════
 // FileUploadRow
 // ════════════════════════════════════════════════════════════════════════════
 const FileUploadRow = ({
@@ -1687,6 +1593,6 @@ Object.assign(window, {
   Button, IconButton, Spinner, Input, Tag, Badge, Avatar,
   Toggle, Checkbox, Radio, Tabs, Segmented, Card, Alert, Modal,
   Progress, Select, Tooltip, Breadcrumb,
-  Stepper, CodeInput, FileUploadRow, PersonRow, SelectableListItem,
+  Stepper, FileUploadRow, PersonRow, SelectableListItem,
   Timeline, TimelineStep, ApplicationCard, ReviewSection, ReviewRow
 });
