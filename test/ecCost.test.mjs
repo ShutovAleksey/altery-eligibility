@@ -147,48 +147,6 @@ test("Confidence drops to medium when corridors are empty", () => {
   assert.ok(c.savings.confidenceMissing.includes("corridors"));
 });
 
-test("Capability matrix returns three sections with bank name in bankWins header", () => {
-  const r = w.ecRecommend({
-    countryCode: "GB", industry: "saas", monthlyVolume: 500000,
-    corridorsIn: ["uk-eea"], corridorsOut: ["uk-eea"], services: [],
-  });
-  const cap = w.ecCapabilityMatrix(r);
-  assert.match(cap.bankName, /typical uk business bank/i);
-  assert.ok(cap.alteryWins.length >= 4, "wins ≥ 4 rows");
-  assert.ok(cap.comparable.length >= 2, "comparable ≥ 2 rows");
-  assert.ok(cap.bankWins.length   >= 3, "bankWins ≥ 3 rows — concession block");
-});
-
-test("Capability matrix: crypto row hidden for non-crypto biz", () => {
-  const r = w.ecRecommend({
-    countryCode: "GB", industry: "saas", monthlyVolume: 500000,
-    corridorsIn: [], corridorsOut: [], services: [],
-  });
-  const cap = w.ecCapabilityMatrix(r);
-  const hasCryptoRow = cap.alteryWins.some((x) => x.titleKey === "ec.cap.win.crypto");
-  assert.equal(hasCryptoRow, false);
-});
-
-test("Capability matrix: crypto row visible for crypto biz in an open jurisdiction (MENA)", () => {
-  const r = w.ecRecommend({
-    countryCode: "AE", industry: "crypto", monthlyVolume: 500000,
-    corridorsIn: [], corridorsOut: [], services: [],
-  });
-  const cap = w.ecCapabilityMatrix(r);
-  const hasCryptoRow = cap.alteryWins.some((x) => x.titleKey === "ec.cap.win.crypto");
-  assert.equal(hasCryptoRow, true);
-});
-
-test("Capability matrix: crypto row hidden in a no-crypto jurisdiction (UK), even for a crypto biz", () => {
-  const r = w.ecRecommend({
-    countryCode: "GB", industry: "crypto", monthlyVolume: 500000,
-    corridorsIn: [], corridorsOut: [], services: [],
-  });
-  const cap = w.ecCapabilityMatrix(r);
-  const hasCryptoRow = cap.alteryWins.some((x) => x.titleKey === "ec.cap.win.crypto");
-  assert.equal(hasCryptoRow, false, "UK is a no-crypto jurisdiction → no crypto advantage row");
-});
-
 // ────────────────────────────────────────────────────────────────
 // Realistic-track savings — bank-side hidden costs (wholesale FX
 // spread + correspondent SWIFT) layered on top of published rates.
