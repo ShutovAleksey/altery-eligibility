@@ -238,26 +238,11 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <td style="padding:9px 0;color:${C.ink};font-weight:${r.bold ? "600" : "500"};text-align:right;font-size:13px;font-variant-numeric:tabular-nums;">${r.value}</td>
     </tr>`).join("");
 
-  // Cost breakdown — Altery vs typical business bank. This is
-  // the document's anchor calculation: the number the customer
-  // remembers, forwards, and quotes to their CFO.
-  const cost = ecComputeCostBreakdown(rec);
-  // Savings-outcomes block retired with the Jun 2026 comparison reframe —
-  // it monetised a "saving vs bank" we no longer assert. Empty ⇒ outcomesHTML
-  // renders nothing. ecComputeCostBreakdown still returns the altery side.
-  const outcomes = [];
-
-  // GBP formatter — page-anchor currency for all monetary lines on
-  // the proposal. Per-rail tariff strings inside the plan table can
-  // still display in their native rail currency (€ SEPA, £ FP).
-  const fmtEUR = (n) => "£" + (n || 0).toLocaleString("en-US");
-
   // "At a glance" — 3-column TLDR card that sits between the hero and
-  // the reasoning bullets. Plan / Entity / Projected savings, each in
+  // the reasoning bullets. Plan / Entity / FX margin, each in
   // a labelled column. Table-based layout (not flex) for html2canvas
   // fidelity — flex panels occasionally render at the wrong width on
   // the off-screen render container we use during PDF assembly.
-  const annualSavings = cost ? fmtEUR(cost.savings.annual) : null;
   const atGlanceHTML = `
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:separate;border-spacing:0;background:${C.surface};border:1px solid ${C.border};border-radius:14px;margin:0 0 30px;">
       <tr>
@@ -313,81 +298,6 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
       <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:12px;">${t("ec.r.rates.caption", { plan: planName })}</div>
     </div>` : "";
 
-  // "What €X annual buys you" — future-self visualization. Turns
-  // an abstract money number into 2-3 concrete business outcomes
-  // (hire, runway, marketing) the founder can already picture.
-  const outcomesHTML = outcomes.length ? `
-    <div style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;padding:16px 20px;margin:0 0 30px;">
-      <div style="font-size:11px;color:${C.muted};font-weight:600;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 10px;">${t("ec.pdf.outcomes.head", { amount: fmtEUR(cost.savings.annual) })}</div>
-      ${outcomes.map((o) => `
-        <div style="display:flex;align-items:flex-start;gap:10px;padding:4px 0;">
-          <div style="flex-shrink:0;width:6px;height:6px;border-radius:50%;background:${C.primary};margin-top:8px;"></div>
-          <div style="font-size:13px;color:${C.ink};line-height:19px;">${t(o.key, { value: o.value })}</div>
-        </div>`).join("")}
-    </div>` : "";
-
-  // Two-panel comparison — replaces the single 6-column "all comparators"
-  // matrix. Strategy: split the same width across two focused tables,
-  // each picking comparators where Altery has a clear win on that axis.
-  //   • Price panel — Altery + 3 traditional banks for the user's region.
-  //     Altery winsruntime on FX margin, SWIFT outgoing, onboarding speed,
-  //     account opening, and pricing transparency.
-  //   • Capability panel — Altery + 2-3 neobanks (Wise / Revolut / 3S
-  //     Money for UK, Qonto added for EU). Altery winsruntime on crypto
-  //     acceptance, multi-company management, affiliate/creator support,
-  //     B2B API, and three-jurisdiction unified product.
-  // For MENA users the capability panel is skipped (no major neobank
-  // operates locally with regulated presence) — surfaced as a callout.
-  // Named-competitor panels retired (Jun 2026 comparison reframe) — the PDF
-  // no longer renders comparison tables against banks/neobanks. The panel
-  // builders + EC_COMPARATORS stay in the codebase for internal use only.
-  const pricePanel = null;
-  const capPanel   = null;
-
-  const renderCell = (cell) => {
-    if (cell.kind === "yes")   return `<span style="color:${C.success};font-weight:700;">✓</span>`;
-    if (cell.kind === "no")    return `<span style="color:${C.muted};font-weight:500;">—</span>`;
-    if (cell.kind === "i18n")  return `<span>${t(cell.value)}</span>`;
-    if (cell.kind === "state") return `<span>${t("ec.cmp.state." + cell.value)}</span>`;
-    return `<span>${cell.value || "—"}</span>`;
-  };
-  const panelThStyle = (isUs) =>
-    `text-align:center;font-size:10px;font-weight:700;padding:10px 8px;border-bottom:1px solid ${C.border};letter-spacing:-0.005em;` +
-    (isUs ? `color:${C.primary};` : `color:${C.inkSoft};`);
-  const panelRowThStyle = `text-align:left;font-size:11px;font-weight:500;color:${C.muted};padding:10px 14px;`;
-  const panelTdStyle = (isUs) =>
-    `text-align:center;font-size:11px;padding:10px 8px;` +
-    (isUs ? `background:${C.beige};color:${C.primary};font-weight:600;` : `color:${C.ink};`);
-
-  const renderPanel = (panel, eyebrowKey, titleKey) => `
-    <div style="margin:0 0 24px;">
-      <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 4px;">${t(eyebrowKey)}</div>
-      <h2 style="font-size:17px;font-weight:700;color:${C.ink};margin:0 0 12px;letter-spacing:-0.01em;">${t(titleKey)}</h2>
-      <table style="width:100%;border-collapse:collapse;background:${C.surface};border:1px solid ${C.border};border-radius:12px;overflow:hidden;">
-        <thead>
-          <tr style="background:${C.white};">
-            <th style="${panelThStyle(false)}text-align:left;padding-left:14px;width:30%;"></th>
-            ${panel.comparators.map((c) => `
-              <th style="${panelThStyle(c.id === "altery")}">${c.name}</th>`).join("")}
-          </tr>
-        </thead>
-        <tbody>
-          ${panel.rows.map((row, i) => `
-            <tr ${i > 0 ? `style="border-top:1px solid ${C.border};"` : ""}>
-              <td style="${panelRowThStyle}">${t(row.labelKey)}</td>
-              ${row.cells.map((cell, j) => `
-                <td style="${panelTdStyle(panel.comparators[j].id === "altery")}">${renderCell(cell)}</td>`).join("")}
-            </tr>`).join("")}
-        </tbody>
-      </table>
-    </div>`;
-
-  // (MENA-only callout was retired here on 2026-05-29 — competitive
-  // research confirmed 3S Money holds its own DIFC/DFSA licence and
-  // Wio Bank is a digital UAE SME competitor, so the "uniqueness"
-  // framing was overclaiming. MENA users now get the full capability
-  // panel against 3S Money / Wio Bank / Airwallex instead.)
-
   // Altery-only "what your plan includes" — replaces the retired named-
   // competitor price/capability tables. No comparison, no competitor column;
   // reuses the result-page value lines (already in 10 languages). Crypto is
@@ -404,11 +314,6 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
           </div>`).join("")}
       </div>
     </div>`;
-
-  // capabilityHTML is unused (the "Where Altery wins / Roughly equal /
-  // Bank wins" 3-column block was retired 2026-05-29 in favour of the
-  // two-panel comparison above). Variable kept absent intentionally.
-  const capabilityHTML = "";
 
   // Onboarding checklist — neutralizes the #1 friction: "what do
   // I need to prepare?" By spelling it out before they ask, we
@@ -547,8 +452,6 @@ ${includedHTML}
 <!-- Section 5: Cost math — Altery vs typical bank with savings band. -->
 ${costMathHTML}
 
-<!-- Section 6: Outcomes — what the annual saving buys. -->
-${outcomesHTML}
 
 <!-- Section 7: Comparison vs other banks — multi-comparator matrix.
      Capability matrix ("Beyond cost / Where Altery wins") that used
