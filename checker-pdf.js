@@ -183,13 +183,11 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
         ${rec.cryptoOpen ? `<span style="${pillStyle}">${t("ec.r.crypto.fluent")}</span>` : ""}
       </div>
       ${heroIban ? `
-        <div style="display:inline-block;padding:8px 18px 8px 12px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;">
-          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;font-size:13px;color:${C.ink};"><tr>
-            ${heroFlagSrc ? `<td style="vertical-align:middle;padding:0 10px 0 0;"><img src="${heroFlagSrc}" alt="" width="22" height="22" style="display:block;border-radius:50%;border:1px solid ${C.beigeBorder};"/></td>` : ""}
-            <td style="vertical-align:middle;font-weight:600;letter-spacing:0.005em;white-space:nowrap;">${heroIban.currency}</td>
-            <td style="vertical-align:middle;padding:0 12px;"><div style="width:1px;height:14px;background:${C.beigeBorder};"></div></td>
-            <td style="vertical-align:middle;font-family:${FF_MONO};letter-spacing:0.04em;white-space:nowrap;">${heroIbanMasked}</td>
-          </tr></table>
+        <div style="display:inline-block;padding:8px 18px 8px 12px;background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:999px;line-height:22px;font-size:13px;color:${C.ink};white-space:nowrap;">
+          ${heroFlagSrc ? `<img src="${heroFlagSrc}" alt="" width="22" height="22" style="display:inline-block;vertical-align:middle;border-radius:50%;margin-right:10px;border:1px solid ${C.beigeBorder};"/>` : ""}
+          <span style="vertical-align:middle;font-weight:600;letter-spacing:0.005em;">${heroIban.currency}</span>
+          <span style="display:inline-block;vertical-align:middle;width:1px;height:14px;background:${C.beigeBorder};margin:0 12px;"></span>
+          <span style="vertical-align:middle;font-family:${FF_MONO};letter-spacing:0.04em;">${heroIbanMasked}</span>
         </div>
         <div style="font-size:11px;color:${C.muted};line-height:16px;margin-top:8px;">${t("ec.r.iban.caption", { currency: heroIban.currency })}</div>
       ` : ""}
@@ -408,7 +406,7 @@ ${personaLine ? `<div style="font-size:13px;font-weight:500;color:${C.primary};m
      bitmap ("AlteryLtd · UK on theProplan."). Explicit word-spacing
      widens the gap by ~3px at 26px which restores legible separation
      without affecting the on-screen render this template also feeds. -->
-<h1 style="font-size:26px;font-weight:700;letter-spacing:0;word-spacing:0.12em;line-height:32px;color:${C.ink};margin:0 0 14px;">
+<h1 style="font-size:26px;font-weight:700;letter-spacing:0;word-spacing:0.2em;line-height:32px;color:${C.ink};margin:0 0 14px;">
   <span style="color:${C.primary};">${entityName}</span> ${t("ec.r.title.middle")} <span style="color:${C.primary};">${planName}</span>${t("ec.r.title.after")}
 </h1>
 
