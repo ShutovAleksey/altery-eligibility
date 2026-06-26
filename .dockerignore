@@ -1,0 +1,18 @@
+# Keep the runtime image to source only — no dev/test/tooling, no deps.
+node_modules
+package-lock.json
+test
+scripts
+docs
+.git
+.gitignore
+.github
+.gitlab-ci.yml
+*.md
+vercel.json
+.vercel
+.claude
+.DS_Store
+*.pdf
+Dockerfile
+.dockerignore

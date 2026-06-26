@@ -1,0 +1,47 @@
+# Example GitLab CI for the eligibility-checker container.
+# Adjust the registry, runner tags, and deploy stage to your standards — the
+# only opinionated bit is that the app has NO build step (static SPA + Node
+# functions served by server.js), so CI = test → build image → deploy.
+stages:
+  - test
+  - build
+  - deploy
+
+# Unit + integration suite (includes the esbuild JSX parse-check, so devDeps
+# are installed here; the runtime image installs nothing).
+test:
+  stage: test
+  image: node:20-alpine
+  script:
+    - npm install --no-audit --no-fund
+    - npm test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# Build + push the container image. Requires Docker-in-Docker or a configured
+# runner; swap $CI_REGISTRY_IMAGE for your registry path.
+build:
+  stage: build
+  image: docker:27
+  services:
+    - docker:27-dind
+  script:
+    - docker build -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA" -t "$CI_REGISTRY_IMAGE:latest" .
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA"
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# Placeholder — wire to however the service behind Nginx is rolled out
+# (compose pull/up, k8s rollout, Nomad, etc.). Runtime env vars to set on the
+# service: BREVO_API_KEY, FROM_EMAIL, REPLY_TO, HUBSPOT_TOKEN,
+# UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN.
+deploy:
+  stage: deploy
+  script:
+    - echo "TODO: roll out $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA to the service behind Nginx"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
