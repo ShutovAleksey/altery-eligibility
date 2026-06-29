@@ -16,12 +16,20 @@ fs.writeFileSync(file, "  file-secret-value\n"); // surrounding whitespace → m
 delete process.env.BREVO_API_KEY;          // ensure no explicit env shadows the file
 process.env.BREVO_API_KEY_FILE = file;     // point the hydrator at our temp file
 
+// An env-delivered secret that carries the secret manager's trailing newline —
+// this is the real-world bug (Brevo → 401 "Key not found" on "xkeysib-…\n").
+process.env.REPLY_TO = "  ops@altery.com\n";
+
 await import("../server.js");              // hydrateSecretsFromFiles() runs here
 
 test.after(() => { try { fs.rmSync(dir, { recursive: true, force: true }); } catch {} });
 
 test("a *_FILE secret is read from disk into process.env, trimmed", () => {
   assert.equal(process.env.BREVO_API_KEY, "file-secret-value");
+});
+
+test("an env-delivered secret is trimmed in place (kills the trailing-newline 401)", () => {
+  assert.equal(process.env.REPLY_TO, "ops@altery.com");
 });
 
 test("missing secret files don't crash startup (server still imported)", async () => {

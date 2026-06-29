@@ -27,22 +27,30 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 // --- Docker / Swarm secrets ------------------------------------------------
-// Secrets may arrive as FILES (the /run/secrets/<name> convention) rather than
-// as env vars. The rest of the app reads process.env.* everywhere, so at startup
-// we hydrate process.env from those files. Precedence per secret: an explicit
-// non-empty env value wins; else <NAME>_FILE (an explicit path); else the
-// conventional /run/secrets/<name lowercased>. Runs synchronously before
-// anything reads these values; a missing file is simply skipped.
+// Secrets may arrive as env vars OR as FILES (the /run/secrets/<name>
+// convention). The rest of the app reads process.env.* everywhere, so at startup
+// we resolve + NORMALIZE each secret. Per secret, in order: a non-empty env value
+// wins; else <NAME>_FILE (an explicit path); else /run/secrets/<name> (lower- or
+// original-case). Either way the value is trimmed — secret managers (Docker,
+// k8s, Vault, CI) routinely append a trailing newline, and a value like
+// "xkeysib-…\n" then fails upstream (Brevo answers 401 "Key not found"). Runs
+// synchronously before anything reads these; a missing file is simply skipped.
 function hydrateSecretsFromFiles() {
   const VARS = [
     "BREVO_API_KEY", "FROM_EMAIL", "REPLY_TO", "HUBSPOT_TOKEN",
     "ALLOWED_ORIGINS", "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN",
   ];
   for (const v of VARS) {
-    if (process.env[v]) continue; // explicit env always wins
+    // Explicit env wins — but trim it (a secret injected into env still carries
+    // the manager's trailing newline, which we must strip).
+    if (process.env[v] && process.env[v].trim()) {
+      process.env[v] = process.env[v].trim();
+      continue;
+    }
     const candidates = [];
     if (process.env[v + "_FILE"]) candidates.push(process.env[v + "_FILE"]);
-    candidates.push("/run/secrets/" + v.toLowerCase());
+    candidates.push("/run/secrets/" + v.toLowerCase()); // conventional name
+    candidates.push("/run/secrets/" + v);               // tolerate UPPER_CASE secret name
     for (const p of candidates) {
       try {
         const val = fs.readFileSync(p, "utf8").trim();
