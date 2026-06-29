@@ -97,6 +97,44 @@ UPSTASH_REDIS_REST_URL=https://….upstash.io
 UPSTASH_REDIS_REST_TOKEN=…
 ```
 
+### 4.1 Секреты как файлы (Docker / Swarm secrets, `/run/secrets/…`)
+
+Если секреты монтируются файлами (`/run/secrets/<имя>`), а не env-переменными,
+приложение **подхватывает их автоматически**: на старте `server.js` читает файл в
+`process.env`. Никакого entrypoint-обёртки не нужно.
+
+Порядок разрешения для каждого секрета: явная env-переменная (если задана и
+непустая) → `<VAR>_FILE` (путь к файлу) → `/run/secrets/<var в нижнем регистре>`.
+
+**Вариант А — назвать секреты как переменные в нижнем регистре** (самый простой,
+0 доп. конфигурации). Имена файлов-секретов:
+
+```
+brevo_api_key   from_email   reply_to   hubspot_token
+allowed_origins   upstash_redis_rest_url   upstash_redis_rest_token
+```
+
+**Вариант Б — любое имя секрета + указать путь через `<VAR>_FILE`:**
+
+```yaml
+# docker-compose (swarm) — пример
+services:
+  altery-eligibility:
+    image: registry/altery-eligibility:latest
+    environment:
+      BREVO_API_KEY_FILE: /run/secrets/brevo_key   # имя секрета произвольное
+      HUBSPOT_TOKEN_FILE: /run/secrets/hs_token
+      ALLOWED_ORIGINS_FILE: /run/secrets/origins
+    secrets: [brevo_key, hs_token, origins]
+secrets:
+  brevo_key: { external: true }
+  hs_token:  { external: true }
+  origins:   { external: true }
+```
+
+Значение из файла обрезается по краям (trailing newline безопасен). `PORT` —
+не секрет, его проще оставить обычной env-переменной.
+
 ---
 
 ## 5. Сеть и внешние зависимости
