@@ -199,6 +199,11 @@ server {
     listen 443 ssl http2;
     server_name check.altery.com;            # ← ваш итоговый домен
 
+    # Письмо с PDF шлётся как base64 (~3–4 МБ). Дефолтный лимит nginx 1 МБ
+    # режет такой POST → за Cloudflare это всплывает как HTTP 520. Сервис сам
+    # принимает до 6 МБ, поэтому ставим с запасом:
+    client_max_body_size 8m;
+
     # --- security-заголовки (раньше были в vercel.json) ---
     add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://www.clarity.ms https://*.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.hubapi.com https://api.brevo.com https://www.clarity.ms https://*.clarity.ms https://cdnjs.cloudflare.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" always;
     add_header X-Content-Type-Options "nosniff" always;
@@ -213,9 +218,16 @@ server {
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;  # ← rate-limit
         proxy_set_header X-Forwarded-Proto $scheme;                     # ← логотип в письме
         proxy_set_header X-Forwarded-Host  $host;                       # ← логотип в письме
+        proxy_read_timeout 30s;                                         # ← запас на вызов Brevo
     }
 }
 ```
+
+Каждая security-директива (и каждый `add_header`) должна задаваться **один раз**.
+Если `Content-Security-Policy` приходит с дублирующимися директивами (`form-action`,
+`base-uri` и т.п.), браузер пишет `Ignoring duplicate Content-Security-Policy
+directive …` — не фатально, но значит, что заголовок собран дважды (например,
+`add_header` и в `http`, и в `server`/`location`, либо директива вписана два раза).
 
 > **Примечание про раздачу статики Nginx’ом.** Если Nginx отдаёт файлы сам, а не
 > проксирует всё на контейнер, обязательно: (а) `.jsx` отдавать с
@@ -283,6 +295,20 @@ CSP завязан на источники ресурсов (`'self'` + пере
 Для серьёзной защиты при горизонтальном масштабировании задайте
 `UPSTASH_REDIS_REST_URL` + `..._TOKEN` (или подставьте свой Redis-совместимый
 REST-эндпойнт).
+
+### 7.7 Отправка письма падает с HTTP 520 → лимит размера тела в nginx
+
+`POST /api/send-analysis` несёт PDF в base64 (~3–4 МБ). `520` — это ошибка
+Cloudflare «origin вернул непонятный ответ», **приложение такой код не отдаёт**
+(его коды: 200/400/429/502/500). Значит запрос умирает на краю, не в коде.
+Причина почти всегда — дефолтный `client_max_body_size 1m` в nginx: большой POST
+не проходит, и за Cloudflare это всплывает как 520 (а не как чистый 413).
+
+→ Поставить `client_max_body_size 8m;` (см. nginx-конфиг в разделе 6). Проверить:
+в логах контейнера запрос либо вообще не появляется (режет nginx — это наш
+случай), либо появляется и отдаёт 500/502 (тогда дело в env: `BREVO_API_KEY` /
+`FROM_EMAIL`). `mailto`-ошибка «user gesture is required» в той же консоли — не
+про это; она про кнопку «Contact our team», к отправке письма отношения не имеет.
 
 ---
 
