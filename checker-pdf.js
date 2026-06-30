@@ -73,6 +73,20 @@ function ecWaitForPdfLibs(timeoutMs = 10000) {
 // (beige header, navy accents, generous white space) rather than
 // "marketing email" (saturated full-bleed color).
 function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
+  // SECURITY (ALT-SEC-005): `email` is user-supplied and gets spliced into
+  // this HTML, which ecSendAnalysisEmail later mounts via `inner.innerHTML`.
+  // The upstream email-format regex still permits HTML-significant chars in
+  // the local part (e.g. `a"><img src=x>@x.co`), so escape before
+  // interpolation. URL contexts (ecContactRequestUrl / ecBuildHandoffURL)
+  // percent-encode their inputs separately and are unaffected.
+  const ecEscapeHtml = (s) => String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+  const safeEmail = email ? ecEscapeHtml(email) : "";
+
   // Brand palette — duplicated as literals rather than CSS vars so
   // the HTML is fully self-contained for email rendering.
   const C = {
@@ -390,7 +404,7 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
 </div>
 ${email ? `
 <div style="margin-top:18px;font-size:11px;color:${C.muted};">
-  ${t("ec.pdf.preparedFor")} <span style="color:${C.ink};font-weight:500;">${email}</span>
+  ${t("ec.pdf.preparedFor")} <span style="color:${C.ink};font-weight:500;">${safeEmail}</span>
 </div>` : ""}
   </div>
 

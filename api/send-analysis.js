@@ -341,6 +341,20 @@ export default async function handler(req, res) {
     if (approxBytes > MAX_PDF_BYTES) {
       return res.status(413).json({ error: "PDF too large", code: "pdf_too_large" });
     }
+    // SECURITY (ALT-SEC-001 hardening): the endpoint is anonymous and
+    // forwards the client-supplied attachment through our trusted sender
+    // domain. Fully binding the bytes to server-trusted state needs a flow
+    // change, but we can at least require the payload to be a real PDF — our
+    // own client always emits one (jsPDF output begins with "%PDF-", and
+    // ecBlobToBase64 strips the data-URI prefix, so the server receives raw
+    // base64). This blocks delivering arbitrary file types (HTML, scripts,
+    // executables renamed .pdf) from the Altery domain. Decode only the
+    // leading chunk so we read the signature without materialising the whole
+    // (up to 2.5 MB) buffer.
+    const pdfHeader = Buffer.from(pdfBase64.slice(0, 16), "base64").toString("latin1");
+    if (!pdfHeader.startsWith("%PDF-")) {
+      return res.status(400).json({ error: "Invalid PDF payload", code: "bad_pdf" });
+    }
     if (!planName || !entityName) {
       return res.status(400).json({ error: "Missing recommendation context", code: "bad_context" });
     }
@@ -434,16 +448,26 @@ export default async function handler(req, res) {
     });
 
     if (!sendResult.ok) {
-      // Surface upstream details (status, body excerpt, sender used) so
-      // the client can show actionable errors. sender_used in particular
-      // is the most common diagnosis — wrong FROM_EMAIL, unverified
-      // domain, etc.
-      return res.status(sendResult.status || 502).json({
-        error: sendResult.error || "Email service rejected the send",
-        code:  sendResult.code  || "brevo_error",
+      // SECURITY (ALT-SEC-004): keep upstream provider diagnostics
+      // (HTTP status, response-body excerpt, sender address used) in
+      // server logs ONLY. This endpoint is anonymous, so echoing them
+      // back lets a caller probe our mail config — FROM_EMAIL value,
+      // domain-verification state, provider behaviour — which aids
+      // abuse/phishing prep. The client only ever renders a generic
+      // localized error (ec.handoff.error), so nothing user-facing
+      // depends on these fields. `sender_used` is still the fastest
+      // operator diagnosis (wrong FROM_EMAIL / unverified domain), so
+      // it lives in the log line below, not the HTTP response.
+      console.error("[send-analysis] upstream send failure:", {
+        status:          sendResult.status,
+        code:            sendResult.code,
         upstream_status: sendResult.upstream_status,
         upstream_body:   sendResult.upstream_body,
         sender_used:     sendResult.sender_used,
+      });
+      return res.status(502).json({
+        error: "Email delivery failed",
+        code:  "delivery_failed",
       });
     }
     return res.status(200).json({ ok: true, id: sendResult.messageId || null });
