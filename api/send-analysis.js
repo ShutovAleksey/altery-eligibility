@@ -123,6 +123,17 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
   // escaped.
   const salesLink = `<a href="mailto:sales@altery.com" class="t-primary-text" style="color:${C.primary};text-decoration:underline;">sales@altery.com</a>`;
   const tail2Html = (s.tail2 || "Questions? You'll always reach a real person, never a bot. Just reply to this email or write to {email}, and our team is happy to help.").replace("{email}", salesLink);
+  // The localized banner (s.forwardedByBanner) is HTML-escaped by
+  // sanitizeEmailStrings, so it carries the forwarder address as PLAIN text —
+  // a literal <strong> in the string would render as visible "<strong>…</strong>"
+  // in the inbox (the bug this fixes). Apply the bold here, server-side, by
+  // wrapping the (escaped) address within the sanitized sentence. Function
+  // replacement avoids `$`-pattern interpretation in unusual local-parts.
+  const forwardedByBannerSrc = s.forwardedByBanner
+    || `${forwardedBySafe} shared this Altery Business banking analysis with you. They're exploring an account and thought you should see it too.`;
+  const forwardedByBannerHtml = forwardedBySafe
+    ? forwardedByBannerSrc.replace(forwardedBySafe, () => `<strong>${forwardedBySafe}</strong>`)
+    : forwardedByBannerSrc;
   const forwarderBlock = forwardedBy ? `
         <tr><td style="padding:24px 24px 0;">
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" class="t-beige" style="background:${C.beige};border:1px solid ${C.beigeBorder};border-radius:12px;">
@@ -131,7 +142,7 @@ function buildEmailHTML({ planName, entityName, sessionLink, personaLine, logoUR
                 ${s.forwardedByLabel || "Shared with you"}
               </div>
               <div class="t-ink" style="font-size:13px;line-height:19px;color:${C.ink};">
-                ${s.forwardedByBanner || `<strong>${forwardedBySafe}</strong> shared this Altery Business banking analysis with you — they're exploring an account and thought you should see it too.`}
+                ${forwardedByBannerHtml}
               </div>
             </td></tr>
           </table>

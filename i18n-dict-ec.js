@@ -463,7 +463,7 @@
     "ec.email.tail2": "Questions? You'll always reach a real person, never a bot. Just reply to this email or write to {email}, and our team is happy to help.",
     "ec.email.bookingCta": "Or request a callback and we'll reply as soon as possible",
     "ec.email.forwarded.label": "Shared with you",
-    "ec.email.forwarded.banner": "<strong>{forwarder}</strong> shared this Altery Business banking analysis with you. They're exploring the {plan} plan and thought you should see it too.",
+    "ec.email.forwarded.banner": "{forwarder} shared this Altery Business banking analysis with you. They're exploring the {plan} plan and thought you should see it too.",
     "ec.email.forwarded.subject": "{forwarder} shared an Altery {plan} proposal with you",
     "ec.email.forwarded.preheader": "An Altery {plan} proposal {forwarder} thought you should see, with the PDF attached.",
     "ec.pdf.footer.entities": "Altery Ltd (UK · FCA-licensed EMI) · Altery EU (CY · Central Bank of Cyprus EMI) · Altery MENA (DIFC · DFSA)",
