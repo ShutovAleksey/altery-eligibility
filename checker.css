@@ -2318,6 +2318,12 @@
 
     .ec-actions { display: flex; gap: 12px; flex-wrap: wrap; padding-top: 8px; }
 
+    /* Visible contact address on the blocked screen — fallback for when the
+       "Contact our team" mailto button can't open a mail client. */
+    .ec-result__contactAddr { margin: 12px 0 0; font-size: var(--fs-small); color: var(--c-muted); }
+    .ec-result__contactAddr a { color: var(--c-accent); text-decoration: none; }
+    .ec-result__contactAddr a:hover { text-decoration: underline; }
+
     /* Support footer — quiet single-line note under the CTAs. Same muted
        gray as fine-print, link in accent colour for hover affordance.
        Centred to read as a "if you got this far, here's a way out" anchor

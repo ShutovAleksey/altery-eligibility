@@ -1969,13 +1969,19 @@ function EcResultBlocked({ rec, onBack, onReset }) {
           <Button variant="primary" size="xl" onClick={onReset}>{t("common.startOver")}</Button>
           {/* Soft-decline cohort: open the user's mail client to sales@ so
               they can describe their setup. Blocked businesses fall outside
-              the self-serve funnel, so a direct email beats a booking link.
-              Native anchor (href) instead of window.location.href so the
-              mailto handler fires reliably across browsers. */}
-          <Button variant="outline" size="xl" href="mailto:sales@altery.com">
+              the self-serve funnel, so a direct email beats a booking link. */}
+          <Button variant="outline" size="xl" href={"mailto:" + t("ec.support.email")}>
             {t("common.contactTeam")}
           </Button>
         </div>
+        {/* A mailto: link silently no-ops when no mail handler is registered
+            (common on desktop) and Chrome blocks it as "user gesture required"
+            in some embedded/iframe contexts — so the button alone can look dead.
+            Always surface the address itself: visible, selectable and clickable,
+            so contact is possible regardless of the mail-handler situation. */}
+        <p className="ec-result__contactAddr">
+          <a href={"mailto:" + t("ec.support.email")}>{t("ec.support.email")}</a>
+        </p>
       </div>
     </div>
   );
