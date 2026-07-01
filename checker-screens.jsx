@@ -5,6 +5,7 @@
           EC_VOLUME_BANDS, EC_TX_BANDS, EC_DISPLAY_REGIONS, EC_COUNTRY_TO_REGION, EC_REGION_ORDER,
           EC_PLANS, EC_ENTITIES, TOTAL_STEPS,
           ecRecommend, ecOutcomesForSavings, ecVolumeHintKey,
+          ecTrack, ecTrackStep,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
           EcPlanComparisonModal, EcHandoffModal, EcCallbackForm */
 // checker-screens.jsx — the eligibility-checker question screens, result
@@ -373,6 +374,11 @@ function EcApp() {
     setStep((s) => Math.max(0, s - 1));
   };
   const next  = () => {
+    // Analytics (Zaraz): the step the user is leaving was just completed
+    // successfully. `step` is the current (closure) ordinal — one Continue
+    // click = one event. The result screen (step 6) is tracked separately
+    // via the effect below, since arriving there isn't a next() call.
+    ecTrackStep(step, { outcome: "advanced" });
     setDirection("forward");
     setStep((s) => {
       const ns = Math.min(totalSteps + 1, s + 1);
@@ -402,7 +408,15 @@ function EcApp() {
   // the blocked result. On the result screen itself, the sidebar
   // uses the `blockedAt` branch (not maxStep) so the visual still
   // shows the gating question's badge correctly.
-  const jumpToResult = () => { setDirection("forward"); setStep(6); };
+  const jumpToResult = () => {
+    // Soft-decline short-circuit (blocked country on Q1 / blocked industry
+    // on Q2): the gating question WAS answered, so record it as a completed
+    // step with a "blocked" outcome before jumping. The result-reached event
+    // then fires from the effect below.
+    ecTrackStep(step, { outcome: "blocked" });
+    setDirection("forward");
+    setStep(6);
+  };
 
   // Which question caused a soft-decline, if any. Used by EcSidebar to
   // avoid marking all 5 steps as done when the user actually only
@@ -410,6 +424,27 @@ function EcApp() {
   const blockedAt = recommendation.kind === "blocked"
     ? (recommendation.reason === "country" ? 1 : 2)
     : null;
+
+  // ── Analytics: result-reached event (Cloudflare Zaraz) ───────────
+  // Fires once when the user lands on the result screen via a FORWARD
+  // transition — either completing Q5 or a soft-decline short-circuit
+  // from Q1/Q2. Not fired on back-navigation into the result. Re-arms
+  // when the user leaves step 6 so a fresh run of the quiz re-fires it.
+  // Carries the recommendation so Zaraz funnels can split approved vs
+  // soft-declined, and by entity/plan. Per-question events fire from
+  // next() / jumpToResult().
+  const resultTracked = useRef(false);
+  useEffect(() => {
+    if (step !== 6) { resultTracked.current = false; return; }
+    if (direction !== "forward" || resultTracked.current) return;
+    resultTracked.current = true;
+    ecTrackStep(6, {
+      outcome: recommendation.kind,                                 // "approved" | "blocked"
+      entity:  (recommendation.entity && recommendation.entity.id) || null,
+      plan:    (recommendation.plan && recommendation.plan.id) || null,
+      reason:  recommendation.reason || null,                        // block reason, if any
+    });
+  }, [step, direction, recommendation]);
 
   if (contactEntry) {
     return (

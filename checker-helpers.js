@@ -1025,7 +1025,54 @@ function ecAppendUtmsToURL(url, utms) {
   } catch (e) { return url; }
 }
 
+// ── Cloudflare Zaraz analytics ─────────────────────────────────────
+// Unlike Google Tag Manager there is NO snippet to embed in index.html:
+// once Zaraz is enabled for the zone in the Cloudflare dashboard, the edge
+// injects `window.zaraz` automatically, and we just call zaraz.track().
+// See https://developers.cloudflare.com/zaraz/web-api/track/.
+//
+// Event naming: "eligibility_step_{N}_{screen}" — the ordinal makes the
+// funnel self-sorting in Zaraz, and the screen slug says which question it
+// was. Each event also carries { step, screen } as flat props so triggers
+// can key off them via {{ client.step }} / {{ client.screen }}.
+const EC_STEP_EVENTS = {
+  0: { name: "eligibility_step_0_intro",                    screen: "intro" },
+  1: { name: "eligibility_step_1_country_of_incorporation", screen: "country_of_incorporation" },
+  2: { name: "eligibility_step_2_industry",                 screen: "industry" },
+  3: { name: "eligibility_step_3_services",                 screen: "services" },
+  4: { name: "eligibility_step_4_monthly_volume",           screen: "monthly_volume" },
+  5: { name: "eligibility_step_5_transfer_corridors",       screen: "transfer_corridors" },
+  6: { name: "eligibility_step_6_result",                   screen: "result" },
+};
+
+// Low-level Zaraz dispatch. Guarded so the checker still runs locally, on
+// Vercel/preview, or before Zaraz is switched on — a missing `zaraz` object
+// makes this a silent no-op instead of a ReferenceError that would break the
+// funnel. Analytics must never take the app down, so we also swallow throws.
+function ecTrack(eventName, props) {
+  try {
+    const z = (typeof window !== "undefined") ? window.zaraz : undefined;
+    if (z && typeof z.track === "function") {
+      z.track(eventName, props || {});
+      return true;
+    }
+  } catch (e) {
+    if (typeof console !== "undefined") console.debug("[ecTrack] skipped:", e && e.message);
+  }
+  return false;
+}
+
+// Fire the per-step "screen completed" event. `step` is the checker's step
+// ordinal (0 intro … 6 result); `extra` merges in outcome/context props
+// (e.g. { outcome: "advanced" | "blocked" | "approved" }).
+function ecTrackStep(step, extra) {
+  const meta = EC_STEP_EVENTS[step];
+  if (!meta) return false;
+  return ecTrack(meta.name, Object.assign({ step: step, screen: meta.screen }, extra || {}));
+}
+
 Object.assign(window, {
+  ecTrack, ecTrackStep,
   ecCurrencyFlag, ecCurrencyName, ecRecommend,
   ecEstimateTxCount, ecComputeCostBreakdown, ecOutcomesForSavings,
   ecBaselineFor,
