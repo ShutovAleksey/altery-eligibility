@@ -120,9 +120,14 @@ const Button = (props) => {
   };
   const labelFromChildren = typeof children === "string" ? children : undefined;
   const ariaLabelComputed = ariaLabelProp || (!labelFromChildren && (iconLeft || iconRight) ? iconLeft || iconRight : undefined);
+  // The spinner is decoration here: the visible label already says what is
+  // happening (and is translated), while Spinner's own aria-label is a fixed
+  // English "Loading" that screen readers would announce in every language.
   const inner = (
     <>
-      {loading ? <Spinner size={sz.iconSize} /> : iconLeft && <Icon name={iconLeft} size={sz.iconSize} aria-hidden="true" />}
+      {loading
+        ? <span aria-hidden="true" style={{ display: "inline-flex" }}><Spinner size={sz.iconSize} /></span>
+        : iconLeft && <Icon name={iconLeft} size={sz.iconSize} aria-hidden="true" />}
       {children && <span>{children}</span>}
       {iconRight && !loading && <Icon name={iconRight} size={sz.iconSize} aria-hidden="true" />}
     </>

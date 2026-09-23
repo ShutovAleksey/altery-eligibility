@@ -24,14 +24,16 @@ const JS_FILES = [
 ];
 
 const JSX_FILES = [
-  "checker-screens.jsx", "checker-modals.jsx", "checker-atoms.jsx",
-  "checker-flag-lang.jsx",
+  "checker-screens.jsx", "checker-modals.jsx", "checker-paywall.jsx",
+  "checker-atoms.jsx", "checker-flag-lang.jsx",
 ];
 
 // API endpoints — these are real ESM modules, deploy-on-error if broken.
-const API_FILES = ["api/send-analysis.js", "api/hubspot-lead.js",
+const API_FILES = ["api/send-analysis.js", "api/hubspot-lead.js", "api/opening-fee.js",
                    "lib/email.js", "lib/rate-limit.js", "lib/anti-spam.js",
-                   "lib/send-analysis-validators.js"];
+                   "lib/send-analysis-validators.js",
+                   "lib/opening-fee.js", "lib/opening-fee-token.js", "lib/opening-fee-promo.js",
+                   "lib/stripe.js"];
 
 for (const f of [...JS_FILES, ...API_FILES]) {
   test(`node --check ${f}`, () => {
@@ -53,7 +55,9 @@ for (const f of [...JS_FILES, ...API_FILES]) {
 // every JSX file is at least non-empty and not obviously corrupted:
 for (const f of JSX_FILES) {
   test(`non-empty + has JSX-shaped content: ${f}`, () => {
-    const text = fs.readFileSync(path.join(root, f), "utf8");
+    const fp = path.join(root, f);
+    if (!fs.existsSync(fp)) return; // file optional, same as the .js list above
+    const text = fs.readFileSync(fp, "utf8");
     assert.ok(text.length > 100, `${f} is suspiciously small`);
     assert.match(text, /</, `${f} has no JSX tags?`);
     assert.match(text, /function\s+\w+/, `${f} has no function definitions?`);

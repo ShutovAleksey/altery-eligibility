@@ -38,7 +38,7 @@ for (const [slug, codes] of Object.entries(chipRegions)) {
 
 const payload = {
   _comment:
-    "Corridor region slug -> ISO 3166-1 alpha-2 country codes for the Altery eligibility-checker handoff. The checker sends corridors_in / corridors_out as region slugs (+ any individual ISO countries a user added by hand). Expand the slugs to countries with this map. Sanctioned countries are already excluded. Source: EC_CHIP_REGIONS in checker-data.js. Regenerate: node scripts/gen-corridor-countries.mjs",
+    "Corridor region slug -> ISO 3166-1 alpha-2 country codes for the Altery eligibility-checker handoff. The checker sends corridors_in / corridors_out as region slugs (+ any individual ISO countries a user added by hand); since 2026-09-23 it asks for corridors once, incoming and outgoing combined, so both params carry the same list. Expand the slugs to countries with this map. Sanctioned countries are already excluded. Source: EC_CHIP_REGIONS in checker-data.js. Regenerate: node scripts/gen-corridor-countries.mjs",
   sanctioned_excluded: [...SANCTIONED].sort(),
   regions,
 };

@@ -34,6 +34,15 @@ const RUNTIME_PROVIDED = new Set([
   // Loaded later by other modal/screen files at runtime:
   "EcIco", "EcFeesModal", "EcPlanComparisonModal", "EcMethodologyModal",
   "EcHandoffModal", "EcCallbackForm",
+  // /checker-paywall.jsx (loaded after /checker-modals.jsx); the result
+  // page swaps to it when the opening fee is on.
+  "EcPaywall",
+  // /checker-screens.jsx's country combobox and two-cell cost block, reused
+  // by the paywall for the billing country and its summary (window exports;
+  // the sandbox loads no JSX).
+  "EcCountrySelect", "EcCosts",
+  // Stripe.js, injected at runtime from js.stripe.com by the paywall.
+  "Stripe",
   // Booking URL lives in /checker-pdf-assets.js (loaded as a separate
   // <script> classic, exported to window). Sandbox doesn't load it.
   "EC_BOOKING_URL",
@@ -68,10 +77,12 @@ function loadSandbox() {
   return win;
 }
 
+// Optional entries are skipped when absent, so a partially checked-out
+// tree fails on real problems only.
 const JSX_FILES = [
-  "checker-screens.jsx", "checker-modals.jsx", "checker-atoms.jsx",
-  "checker-flag-lang.jsx",
-];
+  "checker-screens.jsx", "checker-modals.jsx", "checker-paywall.jsx",
+  "checker-atoms.jsx", "checker-flag-lang.jsx",
+].filter((f) => fs.existsSync(path.join(root, f)));
 
 const win = loadSandbox();
 

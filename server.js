@@ -6,9 +6,9 @@
 // stdlib + global fetch, so the image is just Node + our source files).
 //
 // Responsibilities:
-//   • Route /api/send-analysis and /api/hubspot-lead to their handlers,
-//     adapting node's req/res to the Vercel convention the handlers expect
-//     (parsed `req.body`; `res.status().json()`).
+//   • Route /api/send-analysis, /api/hubspot-lead and /api/opening-fee to
+//     their handlers, adapting node's req/res to the Vercel convention the
+//     handlers expect (parsed `req.body`; `res.status().json()`).
 //   • Serve the static SPA — correct Content-Type (notably .jsx →
 //     application/javascript, which Babel-standalone requires), with an
 //     index.html fallback for extension-less routes. Nginx can serve the
@@ -39,6 +39,10 @@ function hydrateSecretsFromFiles() {
   const VARS = [
     "BREVO_API_KEY", "FROM_EMAIL", "REPLY_TO", "HUBSPOT_TOKEN",
     "ALLOWED_ORIGINS", "UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN",
+    // Account opening fee (api/opening-fee.js): the paywall switches on only
+    // when all three resolve, so a missed secret file degrades to the old
+    // direct-to-registration CTA instead of a broken payment form.
+    "STRIPE_SECRET_KEY", "STRIPE_PUBLISHABLE_KEY", "OPENING_FEE_TOKEN_SECRET",
   ];
   for (const v of VARS) {
     // Explicit env wins — but trim it (a secret injected into env still carries
@@ -70,6 +74,7 @@ const MAX_BODY = 6 * 1024 * 1024; // 6 MB — fits the ≤2.5 MB base64 PDF payl
 const API_ROUTES = {
   "/api/send-analysis": () => import("./api/send-analysis.js"),
   "/api/hubspot-lead":  () => import("./api/hubspot-lead.js"),
+  "/api/opening-fee":   () => import("./api/opening-fee.js"),
 };
 
 const MIME = {
@@ -98,8 +103,19 @@ const MIME = {
 // served; only these backend paths are blocked.
 const DENY_DIRS = new Set(["api", "lib", "node_modules", "test", "scripts", "docs"]);
 const DENY_FILES = new Set(["server.js", "package.json", "package-lock.json"]);
-function isDenied(urlPath) {
-  const clean = decodeURIComponent(urlPath.split("?")[0]).replace(/^\/+/, "");
+
+// decodeURIComponent throws URIError on malformed percent-encoding ("/%FF").
+// A throw in the request listener is uncaught and exits the process, so one
+// anonymous request would take the payment API down with everything else
+// (and could strand a visitor between a successful charge and the confirm
+// call). null here becomes a 400.
+function safeDecodePath(urlPath) {
+  try { return decodeURIComponent(urlPath.split("?")[0]); } catch { return null; }
+}
+
+// Takes the already-decoded path (safeDecodePath).
+function isDenied(decodedPath) {
+  const clean = decodedPath.replace(/^\/+/, "");
   if (!clean) return false; // root → index.html
   const segs = clean.split("/");
   if (segs[0].startsWith(".")) return true;                        // dotfiles (.git, .env, …)
@@ -155,8 +171,7 @@ async function handleApi(route, req, res) {
   }
 }
 
-function resolveStatic(urlPath) {
-  const clean = decodeURIComponent(urlPath.split("?")[0]);
+function resolveStatic(clean) {
   const resolved = path.normalize(path.join(ROOT, clean));
   // Traversal guard: must stay inside ROOT.
   if (resolved !== ROOT && !resolved.startsWith(ROOT + path.sep)) return null;
@@ -165,8 +180,10 @@ function resolveStatic(urlPath) {
 
 function serveStatic(req, res) {
   const urlPath = req.url.split("?")[0];
-  if (isDenied(urlPath)) { res.statusCode = 404; return res.end("Not found"); }
-  let fp = resolveStatic(urlPath);
+  const clean = safeDecodePath(urlPath);
+  if (clean === null) { res.statusCode = 400; return res.end("Bad request"); }
+  if (isDenied(clean)) { res.statusCode = 404; return res.end("Not found"); }
+  let fp = resolveStatic(clean);
   if (!fp) { res.statusCode = 403; return res.end("Forbidden"); }
 
   let stat = null;
@@ -190,15 +207,29 @@ function serveStatic(req, res) {
     .pipe(res);
 }
 
+// Last line of defence for the same reason as safeDecodePath: nothing a
+// request does may throw out of the listener and exit the process.
+function failRequest(res, e) {
+  console.error("[server] request error", e);
+  try {
+    if (!res.headersSent) { res.statusCode = 500; res.end("Internal error"); }
+    else res.end();
+  } catch { /* socket already gone */ }
+}
+
 export const server = http.createServer((req, res) => {
-  const urlPath = req.url.split("?")[0];
-  if (urlPath === "/healthz") {
-    res.setHeader("Content-Type", "application/json; charset=utf-8");
-    return res.end(JSON.stringify({ ok: true }));
+  try {
+    const urlPath = req.url.split("?")[0];
+    if (urlPath === "/healthz") {
+      res.setHeader("Content-Type", "application/json; charset=utf-8");
+      return res.end(JSON.stringify({ ok: true }));
+    }
+    if (API_ROUTES[urlPath]) return handleApi(urlPath, req, res).catch((e) => failRequest(res, e));
+    if (req.method !== "GET" && req.method !== "HEAD") { res.statusCode = 405; return res.end("Method not allowed"); }
+    return serveStatic(req, res);
+  } catch (e) {
+    return failRequest(res, e);
   }
-  if (API_ROUTES[urlPath]) return handleApi(urlPath, req, res);
-  if (req.method !== "GET" && req.method !== "HEAD") { res.statusCode = 405; return res.end("Method not allowed"); }
-  return serveStatic(req, res);
 });
 
 // Only auto-listen when run directly (`node server.js`); stays importable for tests.

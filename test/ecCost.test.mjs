@@ -15,8 +15,7 @@ function rec(overrides = {}) {
     businessType:  "ltd",
     monthlyVolume: 750000,
     monthlyTx:     200,
-    corridorsIn:   [],
-    corridorsOut:  [],
+    corridors:   [],
     services:      [],
     ...overrides,
   });
@@ -128,7 +127,7 @@ test("Savings is bank.total - altery.total, rounded to nearest £100", () => {
 test("Savings range respects adaptive confidence band", () => {
   // All three drivers present (industry, corridors, volume) → high conf → ±10%.
   const c = w.ecComputeCostBreakdown(rec({
-    corridorsIn: ["uk-eea"], corridorsOut: ["uk-eea"],
+    corridors: ["uk-eea"],
   }));
   assert.equal(c.savings.confidence, "high");
   assert.equal(c.savings.confidenceBand, 0.10);
@@ -141,7 +140,7 @@ test("Savings range respects adaptive confidence band", () => {
 });
 
 test("Confidence drops to medium when corridors are empty", () => {
-  const c = w.ecComputeCostBreakdown(rec({ corridorsIn: [], corridorsOut: [] }));
+  const c = w.ecComputeCostBreakdown(rec({ corridors: [] }));
   assert.equal(c.savings.confidence, "medium");
   assert.equal(c.savings.confidenceBand, 0.20);
   assert.ok(c.savings.confidenceMissing.includes("corridors"));
@@ -157,7 +156,7 @@ test("Confidence drops to medium when corridors are empty", () => {
 
 test("Realistic range respects same confidence band as headline", () => {
   const c = w.ecComputeCostBreakdown(rec({
-    corridorsIn: ["uk-eea"], corridorsOut: ["uk-eea"],
+    corridors: ["uk-eea"],
   }));
   const band = c.savings.confidenceBand;
   const lo = 1 - band, hi = 1 + band;
@@ -257,8 +256,7 @@ test("(B) Home-only corridors → low FX share (≤10%)", () => {
   const c = w.ecComputeCostBreakdown(rec({
     countryCode: "GB",
     monthlyVolume: 750000,
-    corridorsIn:  ["uk-eea"],
-    corridorsOut: ["uk-eea"],
+    corridors:  ["uk-eea"],
   }));
   assert.ok(c.meta.fxVolumePct <= 10, `home-only should be ≤10%, got ${c.meta.fxVolumePct}`);
 });
@@ -266,8 +264,7 @@ test("(B) Multi-region corridors → high FX share (≥50%)", () => {
   const c = w.ecComputeCostBreakdown(rec({
     countryCode: "GB",
     monthlyVolume: 750000,
-    corridorsIn:  ["uk-eea", "north-america", "apac"],
-    corridorsOut: ["uk-eea", "north-america", "apac"],
+    corridors:  ["uk-eea", "north-america", "apac"],
   }));
   assert.ok(c.meta.fxVolumePct >= 50, `multi-region should be ≥50%, got ${c.meta.fxVolumePct}`);
 });
@@ -285,16 +282,14 @@ test("(C) tx count is driven by industry avg-tx-size", () => {
 test("(D) UK entity + UK corridors → mostly local payments (≥80%)", () => {
   const c = w.ecComputeCostBreakdown(rec({
     countryCode: "GB",
-    corridorsIn:  ["uk-eea"],
-    corridorsOut: ["uk-eea"],
+    corridors:  ["uk-eea"],
   }));
   assert.ok(c.meta.localPct >= 80, `UK→UK should be ≥80% local, got ${c.meta.localPct}`);
 });
 test("(D) Cross-region heavy → mostly SWIFT (≥40%)", () => {
   const c = w.ecComputeCostBreakdown(rec({
     countryCode: "GB",
-    corridorsIn:  ["north-america", "apac", "latin-america"],
-    corridorsOut: ["north-america", "apac", "latin-america"],
+    corridors:  ["north-america", "apac", "latin-america"],
   }));
   assert.ok(c.meta.swiftPct >= 40, `cross-region should be ≥40% SWIFT, got ${c.meta.swiftPct}`);
 });
@@ -302,12 +297,11 @@ test("(D) Cross-region heavy → mostly SWIFT (≥40%)", () => {
 test("Calibration drives MORE savings for global vs home-only at same volume", () => {
   const home = w.ecComputeCostBreakdown(rec({
     countryCode: "GB", monthlyVolume: 1000000,
-    corridorsIn: ["uk-eea"], corridorsOut: ["uk-eea"],
+    corridors: ["uk-eea"],
   }));
   const global = w.ecComputeCostBreakdown(rec({
     countryCode: "GB", monthlyVolume: 1000000,
-    corridorsIn:  ["uk-eea", "north-america", "apac", "latin-america"],
-    corridorsOut: ["uk-eea", "north-america", "apac", "latin-america"],
+    corridors:  ["uk-eea", "north-america", "apac", "latin-america"],
   }));
   assert.ok(global.savings.monthly > home.savings.monthly,
            `global FX exposure should produce more savings than home-only`);

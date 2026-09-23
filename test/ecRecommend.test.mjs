@@ -16,8 +16,7 @@ function input(overrides = {}) {
     businessType:  "ltd",
     monthlyVolume: 750000,
     monthlyTx:     200,
-    corridorsIn:   [],
-    corridorsOut:  [],
+    corridors:     [],
     services:      [],
     ...overrides,
   };
@@ -125,8 +124,7 @@ test("tierSignals expose which signals fired", () => {
   const rec = w.ecRecommend(input({
     monthlyVolume: 1500000,
     monthlyTx:     400,        // ≥ 300 → txHigh
-    corridorsIn:   ["US", "DE", "JP", "BR", "IN"],
-    corridorsOut:  [],
+    corridors:     ["US", "DE", "JP", "BR", "IN"],
     services:      ["mass", "cards"],
     industry:      "saas",
   }));
@@ -194,16 +192,40 @@ test("RoW Seychelles + crypto is open; US/JP are no-crypto jurisdictions", () =>
 });
 
 // ────────────────────────────────────────────────────────────────
-// Corridors union → rec.corridors
+// Corridors → rec.corridors (one combined list since 2026-09-23)
 // ────────────────────────────────────────────────────────────────
-test("rec.corridors is the union of corridorsIn and corridorsOut", () => {
-  const rec = w.ecRecommend(input({
-    corridorsIn:  ["US", "GB"],
-    corridorsOut: ["GB", "DE"],
-  }));
-  assert.deepEqual([...rec.corridors].sort(), ["DE", "GB", "US"]);
-  assert.deepEqual(rec.corridorsIn,  ["US", "GB"]);
-  assert.deepEqual(rec.corridorsOut, ["GB", "DE"]);
+test("rec.corridors is the deduplicated corridor list, from an array or a Set", () => {
+  const fromArray = w.ecRecommend(input({ corridors: ["US", "GB", "GB", "DE"] }));
+  assert.deepEqual([...fromArray.corridors].sort(), ["DE", "GB", "US"]);
+  const fromSet = w.ecRecommend(input({ corridors: new Set(["US", "GB", "DE"]) }));
+  assert.deepEqual([...fromSet.corridors].sort(), ["DE", "GB", "US"]);
+  // The per-direction fields are gone for good: nothing downstream may
+  // quietly keep reading them.
+  assert.equal("corridorsIn" in fromArray, false);
+  assert.equal("corridorsOut" in fromArray, false);
+});
+
+test("one combined volume gives the same plan the old in+out split gave for that total", () => {
+  // The engine always summed incoming + outgoing before comparing against
+  // the tier thresholds, so a single combined figure lands on the same tier.
+  assert.equal(w.ecRecommend(input({ monthlyVolume: 400000 })).plan.id, "pro");     // was e.g. 125k in + 275k out
+  assert.equal(w.ecRecommend(input({ monthlyVolume: 1200000 })).plan.id, "ultra");  // was e.g. 750k in + 450k out
+  assert.equal(w.ecRecommend(input({ monthlyVolume: 250000 })).plan.id, "starter"); // at the Pro threshold, not over it
+  // Same for the tx-count signal: 300 combined trips txHigh.
+  assert.equal(w.ecRecommend(input({ monthlyTx: 300 })).tierSignals.txHigh, true);
+  assert.equal(w.ecRecommend(input({ monthlyTx: 299 })).tierSignals.txHigh, false);
+});
+
+test("band indices echo through unchanged, and are undefined when not supplied", () => {
+  const rec = w.ecRecommend(input({ volumeIdx: 3, txIdx: 0 }));
+  assert.equal(rec.volumeIdx, 3);
+  assert.equal(rec.txIdx, 0);
+  const bare = w.ecRecommend(input());
+  assert.equal(bare.volumeIdx, undefined);
+  assert.equal(bare.txIdx, undefined);
+  for (const gone of ["volumeInIdx", "volumeOutIdx", "txInIdx", "txOutIdx"]) {
+    assert.equal(gone in rec, false, `${gone} must no longer be on the rec`);
+  }
 });
 
 // ────────────────────────────────────────────────────────────────
@@ -226,8 +248,7 @@ test("Reasoning bullets are sorted by priority and capped at 3", () => {
   const rec = w.ecRecommend(input({
     monthlyVolume: 1500000,
     services:      ["mass", "cards"],
-    corridorsIn:   ["US", "DE", "JP", "BR"],
-    corridorsOut:  ["IN", "SG"],
+    corridors:     ["US", "DE", "JP", "BR", "IN", "SG"],
   }));
   assert.ok(rec.reasoning.length <= 3, "max 3 reasoning bullets");
   for (let i = 1; i < rec.reasoning.length; i++) {

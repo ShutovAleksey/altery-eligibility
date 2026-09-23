@@ -7,7 +7,9 @@
           ecRecommend, ecOutcomesForSavings, ecVolumeHintKey,
           ecTrack, ecTrackStep,
           ecFormatVolume, ecCurrencyFlag, ecCurrencyName, ecEstimateTxCount,
-          EcPlanComparisonModal, EcHandoffModal, EcCallbackForm */
+          ecBuildHandoffURL, ecParseResumeParam, ecLoadOpeningFeeConfig,
+          ecReadContactEmail, ecStoreContactEmail, ecMailto,
+          EcPlanComparisonModal, EcHandoffModal, EcCallbackForm, EcPaywall */
 // checker-screens.jsx — the eligibility-checker question screens, result
 // screens, and the supporting EcIco decorative-icon set.
 //
@@ -17,17 +19,22 @@
 //   EcIco            — checker-specific decorative SVG icon map
 //   EcIntro          — landing card
 //   EcQuestionHeader — shared header above each question
+//   EcCountrySelect  — searchable country combobox with flags (Q1, the Q5
+//                      outlier picker, the paywall's billing country)
 //   EcCountry        — Q1 country/region picker
 //   EcIndustry       — Q2 industry + business type
 //   EcServices       — Q3 services
 //   EcVolume         — Q4 monthly volume + tx count
 //   EcCorridors      — Q5 payment corridors
 //   EcResult         — dispatcher to EcResultApproved / EcResultBlocked
-//   EcResultApproved — full approved-recommendation page
+//   EcResultApproved — full approved-recommendation page; swaps to the
+//                      opening-fee paywall (EcPaywall, /checker-paywall.jsx)
+//   EcCosts          — "Today · one-time / After activation · monthly"
+//                      two-cell cost block, shared with the paywall
 //   EcResultBlocked  — soft-decline result page
 //
 // All cross-module dependencies (DS components, data constants, helpers,
-// modals) are resolved at render time through the standard scope chain
+// modals, the paywall) are resolved at render time through the standard scope chain
 // (i.e. via the window exports those modules set).
 //
 // We DO NOT redeclare useState/useEffect/etc. here. The inline text/babel
@@ -164,7 +171,14 @@ const EcIco = {
 //   - intro (step 0)            → all 5 dots in "todo" (preview of journey)
 //   - question N (step 1..5)    → dots <N done, dot N current, others todo
 //   - result (step 6)           → all 5 dots done
-function EcSidebar({ step, totalSteps, blockedAt, maxStep, onStepClick }) {
+//
+// With the opening fee on (feeOn) a 6th step, "Account opening", follows
+// the questions with the fee as its status ("£100 · one-time"), so the
+// charge is part of the journey the visitor sees from the first screen
+// rather than a caption they meet at the end. It is "todo" through the quiz
+// and the result page, "current" while the paywall is open (paywallOpen),
+// and never clickable: the only way in is the result page's CTA.
+function EcSidebar({ step, totalSteps, blockedAt, maxStep, onStepClick, feeOn, feeDisplay, paywallOpen }) {
   const t = useT();
   const onResult = step > totalSteps;
   // A blocked result means the user jumped straight from the gating
@@ -250,6 +264,25 @@ function EcSidebar({ step, totalSteps, blockedAt, maxStep, onStepClick }) {
             </li>
           );
         })}
+        {feeOn && (() => {
+          // The fee step keeps its amount in the status slot in both states,
+          // where the question steps show "Completed" / "In progress": the
+          // figure IS the information this step carries.
+          const state = paywallOpen ? "current" : "todo";
+          return (
+            <li key="fee"
+                className={`ec-sidebar__step ec-sidebar__step--fee is-${state}`}
+                aria-current={state === "current" ? "step" : undefined}>
+              <span className="ec-sidebar__step__num" aria-hidden="true">{stepLabels.length + 1}</span>
+              <span className="ec-sidebar__step__body">
+                <span className="ec-sidebar__step__label">{t("ec.sidebar.step6")}</span>
+                {feeDisplay && (
+                  <span className="ec-sidebar__step__status">{t("ec.sidebar.status.fee", { fee: feeDisplay })}</span>
+                )}
+              </span>
+            </li>
+          );
+        })()}
       </ol>
 
       <div className="ec-sidebar__lang">
@@ -274,13 +307,70 @@ function EcSidebar({ step, totalSteps, blockedAt, maxStep, onStepClick }) {
 
 function EcApp() {
   const t = useT();
-  const [step, setStep] = useState(0);
+
+  // Resume deep link — the PDF/email "Start setup" CTAs and the Stripe
+  // 3-D Secure return_url land on /?resume=<answers> (see ecBuildResumeURL).
+  // Parsed once, BEFORE the answer state below, because every answer's
+  // useState reads it as a lazy initial value. When the answers are
+  // complete and still come out approved under today's rules we open
+  // straight on the result page; otherwise the visitor starts from the
+  // intro with the answers pre-filled, so nothing is silently re-judged.
+  // `openingReturnPaymentIntentId` is set only on the Stripe return
+  // (&opening_return=1&payment_intent=pi_…), which hands the paywall the
+  // intent to confirm instead of showing the card form again, together with
+  // Stripe's own `redirect_status`. The params are left in the URL on
+  // purpose: a refresh then retries the confirm rather than asking an
+  // already-charged visitor to pay again.
+  const resumeEntry = useMemo(() => {
+    try {
+      const search = window.location.search;
+      const resume = ecParseResumeParam(search);
+      if (!resume) return null;
+      const p = new URLSearchParams(search);
+      const pi = p.get("payment_intent");
+      const openingReturnPaymentIntentId =
+        (p.get("opening_return") === "1" && pi && /^pi_[A-Za-z0-9]{8,}$/.test(pi)) ? pi : null;
+      const rs = p.get("redirect_status");
+      const openingReturnRedirectStatus =
+        (openingReturnPaymentIntentId && rs && /^[a-z_]{1,32}$/.test(rs)) ? rs : null;
+      const band = (idx) => (idx == null ? 1 : idx);   // same defaults as the useState calls below
+      const volumeIdx = band(resume.volumeIdx), txIdx = band(resume.txIdx);
+      const rec = ecRecommend({
+        countryCode: resume.countryCode, industry: resume.industry,
+        monthlyVolume: EC_VOLUME_BANDS[volumeIdx]?.value || 0,
+        monthlyTx:     EC_TX_BANDS[txIdx]?.value || 0,
+        corridors: resume.corridors,
+        services: resume.services,
+        volumeIdx, txIdx,
+      });
+      // "Complete" mirrors what the questions themselves require before
+      // Continue enables (industry picked, 1+ service, 1+ corridor). A
+      // Stripe return skips that check: the payment already happened on a
+      // result the visitor reached (sidebar jumps can leave, say, no service
+      // ticked), and landing on the intro would drop its confirmation.
+      const complete = !!resume.industry && resume.services.length > 0 && resume.corridors.length > 0;
+      return Object.assign({}, resume, {
+        openingReturnPaymentIntentId,
+        openingReturnRedirectStatus,
+        startsOnResult: rec.kind === "approved" && (complete || !!openingReturnPaymentIntentId),
+      });
+    } catch (e) { return null; }
+  }, []);
+  const resumeOnResult = !!(resumeEntry && resumeEntry.startsOnResult);
+
+  const [step, setStep] = useState(() => (resumeOnResult ? 6 : 0));
   // Highest step ever reached this session. Used by EcSidebar so that
   // back-navigation (whether via the back-arrow or via a sidebar click)
   // doesn't visually downgrade later steps to 'todo' — the user's
   // answers persist, so the sidebar should reflect that.
-  const [maxStep, setMaxStep] = useState(0);
+  const [maxStep, setMaxStep] = useState(() => (resumeOnResult ? 6 : 0));
   const [direction, setDirection] = useState("forward");
+  // The resumed plan choice and Stripe return belong to the result page the
+  // link opened on. Once the visitor leaves it (edits an answer, starts
+  // over) the checker behaves as a fresh run: a later visit to the result
+  // must not re-apply an old plan override or re-confirm an old payment.
+  const [resumeLive, setResumeLive] = useState(resumeOnResult);
+  useEffect(() => { if (step !== 6) setResumeLive(false); }, [step]);
   // First-touch UTM capture — runs once on mount. The helper is a
   // no-op if there's nothing in the URL AND nothing in sessionStorage,
   // so it's safe to call unconditionally. Once stored, every downstream
@@ -288,6 +378,22 @@ function EcApp() {
   // payload. Stored value is read again at email/handoff time so we
   // don't need to thread it through component state.
   useEffect(() => { ecCaptureAndStoreUtms(); }, []);
+  // Opening-fee config (one cached GET, shared with the result page and the
+  // paywall). Loaded here, at the top of the tree, because the sidebar
+  // shows the "Account opening" step from the first screen when the fee is
+  // on; loading it early also means the result page knows whether the
+  // paywall is on by the time it renders. null while loading.
+  const [feeConfig, setFeeConfig] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    ecLoadOpeningFeeConfig().then((cfg) => { if (alive) setFeeConfig(cfg); });
+    return () => { alive = false; };
+  }, []);
+  const feeOn = !!(feeConfig && (feeConfig.enabled || feeConfig.preview));
+  // Whether the approved result page currently shows the paywall view.
+  // Reported by EcResultApproved (onPaywallChange) and read by the sidebar,
+  // which marks its fee step "current" while the visitor is there.
+  const [paywallOpen, setPaywallOpen] = useState(false);
 
   // Scroll to the top of the page on every step transition. Without
   // this, a user who scrolled mid-question (e.g. inspected the
@@ -322,12 +428,14 @@ function EcApp() {
     } catch (e) { return null; }
   }, []);
 
-  const [country, setCountry] = useState(null);
+  // Answer state below reads `resumeEntry` as its initial value (all lazy
+  // initializers, so the parse above runs once, not per render).
+  const [country, setCountry] = useState(() => (resumeEntry ? resumeEntry.countryCode : null));
   // Flat ICP-aligned industry list — see EC_INDUSTRIES. Business type
   // dropped on purpose: KYB captures legal form during onboarding where
   // it actually matters, asking it on a pre-onboarding eligibility
   // check was friction without conversion signal value.
-  const [industry, setIndustry] = useState("");
+  const [industry, setIndustry] = useState(() => (resumeEntry ? resumeEntry.industry : ""));
   // services: multi-select of products/use-cases the user wants.
   // Drives plan tier hint (Pro for mass / api, Ultra for multiCompany,
   // specialist review for crypto rails) and result page perk emphasis
@@ -336,25 +444,23 @@ function EcApp() {
   // paper but biases the recommendation before any input, and leaves
   // a confusing "why are these already checked?" signal for fresh
   // visitors who haven't read the question yet.
-  const [services, setServices] = useState(new Set());
-  // Q4 captures volume + tx count separately for incoming and outgoing —
-  // gives a more accurate picture of total throughput than a single
-  // combined slider. Recommendation engine reads the sum.
-  const [volumeInIdx,  setVolumeInIdx]  = useState(1); // €50k – €200k default
-  const [volumeOutIdx, setVolumeOutIdx] = useState(1);
-  const [txInIdx,      setTxInIdx]      = useState(1); // 20 – 100 default
-  const [txOutIdx,     setTxOutIdx]     = useState(1);
-  // Q5 — two parallel sets: regions where money comes in from, and
-  // regions it flows out to. Recommendation engine reads both and
-  // computes breadth from the union.
-  const [corridorsIn,  setCorridorsIn]  = useState(new Set());
-  const [corridorsOut, setCorridorsOut] = useState(new Set());
+  const [services, setServices] = useState(() => new Set(resumeEntry ? resumeEntry.services : []));
+  // Q4: ONE volume band + ONE tx-count band, each covering incoming and
+  // outgoing together (founder decision, 2026-09-23). Asking the two
+  // directions separately doubled the form for no gain: the engine only
+  // ever read the sum, and KYB collects per-direction figures itself.
+  const resumedBand = (key) => (resumeEntry && resumeEntry[key] != null ? resumeEntry[key] : 1);
+  const [volumeIdx, setVolumeIdx] = useState(() => resumedBand("volumeIdx")); // £50k – £200k default
+  const [txIdx,     setTxIdx]     = useState(() => resumedBand("txIdx"));     // 20 – 100 default
+  // Q5: one set of regions (plus outlier countries) the business moves
+  // money to or from. The engine measures corridor breadth on it.
+  const [corridors, setCorridors] = useState(() => new Set(resumeEntry ? resumeEntry.corridors : []));
   const totalSteps = TOTAL_STEPS;
-  const monthlyVolume = (EC_VOLUME_BANDS[volumeInIdx]?.value || 0) + (EC_VOLUME_BANDS[volumeOutIdx]?.value || 0);
-  const monthlyTx     = (EC_TX_BANDS[txInIdx]?.value || 0) + (EC_TX_BANDS[txOutIdx]?.value || 0);
+  const monthlyVolume = EC_VOLUME_BANDS[volumeIdx]?.value || 0;
+  const monthlyTx     = EC_TX_BANDS[txIdx]?.value || 0;
   const recommendation = useMemo(() =>
-    ecRecommend({ countryCode: country, industry, monthlyVolume, corridorsIn: [...corridorsIn], corridorsOut: [...corridorsOut], monthlyTx, services: [...services], volumeInIdx, volumeOutIdx, txInIdx, txOutIdx }),
-  [country, industry, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services, volumeInIdx, volumeOutIdx, txInIdx, txOutIdx]);
+    ecRecommend({ countryCode: country, industry, monthlyVolume, monthlyTx, corridors: [...corridors], services: [...services], volumeIdx, txIdx }),
+  [country, industry, monthlyVolume, monthlyTx, corridors, services, volumeIdx, txIdx]);
 
   // Step navigation. Steps:
   //   0 intro · 1 country · 2 industry · 3 services · 4 volume · 5 corridors · 6 result
@@ -433,7 +539,19 @@ function EcApp() {
   // Carries the recommendation so Zaraz funnels can split approved vs
   // soft-declined, and by entity/plan. Per-question events fire from
   // next() / jumpToResult().
-  const resultTracked = useRef(false);
+  // A resumed link opens directly on the result without walking steps
+  // 0-5, so it must not count as a fresh "result reached" (that would
+  // inflate step 6 above step 5 in the funnel). It gets its own event
+  // instead, which also measures how often PDF/email links bring people back.
+  const resultTracked = useRef(resumeOnResult);
+  useEffect(() => {
+    if (!resumeOnResult) return;
+    ecTrack("eligibility_result_resumed", {
+      entity: (recommendation.entity && recommendation.entity.id) || null,
+      plan:   (recommendation.plan && recommendation.plan.id) || null,
+      source: resumeEntry.openingReturnPaymentIntentId ? "payment_return" : "link",
+    });
+  }, []);
   useEffect(() => {
     if (step !== 6) { resultTracked.current = false; return; }
     if (direction !== "forward" || resultTracked.current) return;
@@ -452,7 +570,10 @@ function EcApp() {
         <main className="ec-main">
           <div className="ec-content fade-in ec-callback-standalone">
             <Title display title={t("ec.callback.title")} lead={t("ec.callback.standaloneLead")} />
-            <EcCallbackForm email={contactEntry.email} context={contactEntry.context} />
+            {/* The address kept here pre-fills the paywall's work email if
+                the visitor goes on to run the check in this tab. */}
+            <EcCallbackForm email={contactEntry.email} context={contactEntry.context}
+                            onEmailCaptured={ecStoreContactEmail} />
           </div>
         </main>
       </div>
@@ -461,23 +582,27 @@ function EcApp() {
 
   return (
     <div className="ec-app">
-      <EcSidebar step={step} totalSteps={totalSteps} blockedAt={blockedAt} maxStep={maxStep} onStepClick={goToStep} />
+      {/* The fee step disappears on a soft-decline: a blocked country or
+          industry never reaches the paywall, so announcing an "Account
+          opening" step there would promise a payment that can't happen. */}
+      <EcSidebar step={step} totalSteps={totalSteps} blockedAt={blockedAt} maxStep={maxStep} onStepClick={goToStep}
+                 feeOn={feeOn && recommendation.kind !== "blocked"} feeDisplay={feeOn ? feeConfig.display : ""} paywallOpen={paywallOpen} />
       <main className="ec-main" data-direction={direction}>
         {step === 0 && <EcIntro onStart={next} />}
         {step === 1 && <EcCountry value={country} onChange={setCountry} onBack={() => { setDirection("back"); setStep(0); }} onNext={next} onBlocked={jumpToResult} />}
         {step === 2 && <EcIndustry country={country} industry={industry} setIndustry={setIndustry} onBack={back} onNext={next} onBlocked={jumpToResult} />}
         {step === 3 && <EcServices country={country} services={services} setServices={setServices} onBack={back} onNext={next} />}
         {step === 4 && <EcVolume
-          volumeInIdx={volumeInIdx} setVolumeInIdx={setVolumeInIdx}
-          volumeOutIdx={volumeOutIdx} setVolumeOutIdx={setVolumeOutIdx}
-          txInIdx={txInIdx} setTxInIdx={setTxInIdx}
-          txOutIdx={txOutIdx} setTxOutIdx={setTxOutIdx}
+          volumeIdx={volumeIdx} setVolumeIdx={setVolumeIdx}
+          txIdx={txIdx} setTxIdx={setTxIdx}
           onBack={back} onNext={next} />}
-        {step === 5 && <EcCorridors
-          corridorsIn={corridorsIn} setCorridorsIn={setCorridorsIn}
-          corridorsOut={corridorsOut} setCorridorsOut={setCorridorsOut}
-          onBack={back} onNext={next} />}
-        {step === 6 && <EcResult rec={recommendation} onBack={back} onReset={reset} />}
+        {step === 5 && <EcCorridors corridors={corridors} setCorridors={setCorridors} onBack={back} onNext={next} />}
+        {step === 6 && <EcResult rec={recommendation} onBack={back} onReset={reset}
+          initialPlanId={resumeLive ? resumeEntry.planId : null}
+          initialEmail={resumeEntry ? resumeEntry.email : ""}
+          openingReturnPaymentIntentId={resumeLive ? resumeEntry.openingReturnPaymentIntentId : null}
+          openingReturnRedirectStatus={resumeLive ? resumeEntry.openingReturnRedirectStatus : null}
+          onPaywallChange={setPaywallOpen} />}
       </main>
     </div>
   );
@@ -606,18 +731,24 @@ function EcCountrySelect({ value, onChange, options, nameOf, label, placeholder 
   }, [options, query, nameOf]);
 
   // Outside pointer or Escape closes. Touchstart added so iOS Safari
-  // taps on whitespace outside the dropdown reliably close it.
+  // taps on whitespace outside the dropdown reliably close it. A click
+  // into another document (the paywall's Stripe card iframe sits right
+  // under the billing-country picker) sends no mousedown here, only a
+  // window blur, so that closes it too.
   useEffect(() => {
     if (!open) return;
     const onDown = (e) => { if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false); };
     const onKey  = (e) => { if (e.key === "Escape") { setOpen(false); triggerRef.current?.focus(); } };
+    const onBlur = () => setOpen(false);
     document.addEventListener("mousedown", onDown);
     document.addEventListener("touchstart", onDown, { passive: true });
     document.addEventListener("keydown", onKey);
+    window.addEventListener("blur", onBlur);
     return () => {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("touchstart", onDown);
       document.removeEventListener("keydown", onKey);
+      window.removeEventListener("blur", onBlur);
     };
   }, [open]);
 
@@ -829,9 +960,13 @@ function EcCountry({ value, onChange, onBack, onNext, onBlocked }) {
   // Sort once per language switch — the combobox keeps countries in a
   // single A→Z list (region grouping is gone), so the Collator handles
   // diacritics correctly for whatever locale the user has active.
+  // Keyed on the language code: useT() returns the same t function in
+  // every language, so [t] alone kept the previous language's order after
+  // a switch made on this screen.
+  const lang = window.__I18N.getLang();
   const options = useMemo(
     () => EC_COUNTRIES.slice().sort((a, b) => collator.compare(nameOf(a), nameOf(b))),
-    [collator, t], // t identity changes per language → re-sort
+    [collator, lang],
   );
 
   // Picked country object — drives Continue button's routing decision
@@ -1075,10 +1210,11 @@ function EcServices({ country, services, setServices, onBack, onNext }) {
 }
 
 // Volume slider — discrete band picker rendered as a continuous-feeling
-// range input. Reused twice in EcVolume (incoming + outgoing). Keeping
-// it slider-only here because volumes have an intuitive linear-ish
-// monotonic mental model ("low → high"), while tx counts are picked
-// from a small finite set that reads better in a Select.
+// range input. Kept as its own component (rather than inlined in EcVolume)
+// so the slider's ARIA wiring stays in one place. Slider-only here because
+// volumes have an intuitive linear-ish monotonic mental model ("low →
+// high"), while tx counts are picked from a small finite set that reads
+// better in a Select.
 function EcVolumeSlider({ idx, setIdx, labelKey, id }) {
   const t = useT();
   const band = EC_VOLUME_BANDS[idx];
@@ -1110,7 +1246,9 @@ function EcVolumeSlider({ idx, setIdx, labelKey, id }) {
   );
 }
 
-function EcVolume({ volumeInIdx, setVolumeInIdx, volumeOutIdx, setVolumeOutIdx, txInIdx, setTxInIdx, txOutIdx, setTxOutIdx, onBack, onNext }) {
+// Q4 — one volume slider and one tx-count select, both "incoming and
+// outgoing combined" (the labels say so; see EcApp for the decision).
+function EcVolume({ volumeIdx, setVolumeIdx, txIdx, setTxIdx, onBack, onNext }) {
   const t = useT();
   const txOptions = EC_TX_BANDS.map((b) => ({ value: b.idx, label: t(b.labelKey) }));
   return (
@@ -1120,29 +1258,14 @@ function EcVolume({ volumeInIdx, setVolumeInIdx, volumeOutIdx, setVolumeOutIdx, 
       </button>
       <EcQuestionHeader num="4" title={t("ec.q4.title")} lead={t("ec.q4.lead")} />
 
-      <div className="ec-flow-section">
-        <h3 className="ec-flow-section__head">{t("ec.q4.section.in")}</h3>
-        <EcVolumeSlider idx={volumeInIdx} setIdx={setVolumeInIdx}
-          labelKey="ec.q4.vol.in.label" id="ec-q4-vol-in" />
-        <Select
-          label={t("ec.q4.tx.in.label")}
-          value={txInIdx}
-          onChange={(v) => setTxInIdx(v)}
-          options={txOptions}
-        />
-      </div>
-
-      <div className="ec-flow-section">
-        <h3 className="ec-flow-section__head">{t("ec.q4.section.out")}</h3>
-        <EcVolumeSlider idx={volumeOutIdx} setIdx={setVolumeOutIdx}
-          labelKey="ec.q4.vol.out.label" id="ec-q4-vol-out" />
-        <Select
-          label={t("ec.q4.tx.out.label")}
-          value={txOutIdx}
-          onChange={(v) => setTxOutIdx(v)}
-          options={txOptions}
-        />
-      </div>
+      <EcVolumeSlider idx={volumeIdx} setIdx={setVolumeIdx}
+        labelKey="ec.q4.vol.label" id="ec-q4-vol" />
+      <Select
+        label={t("ec.q4.tx.label")}
+        value={txIdx}
+        onChange={(v) => setTxIdx(v)}
+        options={txOptions}
+      />
 
       <WhyWeAsk>{t("ec.q4.why")}</WhyWeAsk>
 
@@ -1155,10 +1278,12 @@ function EcVolume({ volumeInIdx, setVolumeInIdx, volumeOutIdx, setVolumeOutIdx, 
   );
 }
 
-// Country-level multi-select used twice on Q5 (incoming / outgoing).
-// Trigger reads as a Select; opening reveals a search input + countries
-// grouped by the 4-region display taxonomy. Selected countries surface
-// as removable pills under the trigger.
+// Country-level multi-select. Not mounted at the moment: Q5 moved to the
+// region chips below (EcRegionChips), which are faster to answer than a
+// country list. Kept for a country-level corridor picker should one come
+// back. Trigger reads as a Select; opening reveals a search input +
+// countries grouped by the 4-region display taxonomy. Selected countries
+// surface as removable pills under the trigger.
 function EcCountryMultiSelect({ value, onChange, label, placeholder }) {
   const t = useT();
   const [open, setOpen] = useState(false);
@@ -1512,23 +1637,14 @@ function EcRegionChips({ value, onChange, label, ariaLabel }) {
   );
 }
 
-function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOut, onBack, onNext }) {
+// Q5 — one list of regions, incoming and outgoing combined (the lead says
+// so). There used to be a "different mix for incoming vs outgoing?" toggle
+// that revealed a second list; almost nobody needed it, ecRecommend only
+// ever read the union, and the handoff still sends the one list under both
+// corridors_in and corridors_out, so dropping it changed no downstream shape.
+function EcCorridors({ corridors, setCorridors, onBack, onNext }) {
   const t = useT();
-  // Asymmetric in/out mode — off by default. 90% of businesses operate
-  // symmetrically (or the union is what ecRecommend uses anyway), so we
-  // ask one combined question. Power users with crypto-OTC / split-flow
-  // marketplaces flip the toggle to flag asymmetric flows.
-  const [asymmetric, setAsymmetric] = useState(false);
-
-  // Sync corridorsOut to corridorsIn whenever asymmetric is off — this
-  // way the handoff payload always carries both even though the UI
-  // only asked once. ecRecommend's corridor-breadth signal reads union,
-  // so duplication is harmless.
-  useEffect(() => {
-    if (!asymmetric) setCorridorsOut(new Set(corridorsIn));
-  }, [asymmetric, corridorsIn, setCorridorsOut]);
-
-  const canContinue = corridorsIn.size > 0;
+  const canContinue = corridors.size > 0;
 
   return (
     <div className="ec-content fade-in">
@@ -1538,27 +1654,11 @@ function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOu
       <EcQuestionHeader num="5" title={t("ec.q5.title")} lead={t("ec.q5.lead")} />
 
       <EcRegionChips
-        value={corridorsIn}
-        onChange={setCorridorsIn}
-        label={asymmetric ? t("ec.q5.section.in") : null}
+        value={corridors}
+        onChange={setCorridors}
+        label={null}
         ariaLabel={t("ec.q5.regions.aria")}
       />
-
-      <label className="ec-q5-asym">
-        <input type="checkbox"
-               checked={asymmetric}
-               onChange={(e) => setAsymmetric(e.target.checked)} />
-        <span>{t("ec.q5.asymmetric.toggle")}</span>
-      </label>
-
-      {asymmetric && (
-        <EcRegionChips
-          value={corridorsOut}
-          onChange={setCorridorsOut}
-          label={t("ec.q5.section.out")}
-          ariaLabel={t("ec.q5.regions.outAria")}
-        />
-      )}
 
       <WhyWeAsk>{t("ec.q5.why")}</WhyWeAsk>
 
@@ -1572,15 +1672,109 @@ function EcCorridors({ corridorsIn, setCorridorsIn, corridorsOut, setCorridorsOu
   );
 }
 
-function EcResult({ rec, onBack, onReset }) {
+// initialPlanId / initialEmail / openingReturn* come from a resume deep link
+// (see EcApp). Blocked results never reach the paywall, so only the approved
+// page takes them, and only it reports the paywall view (onPaywallChange).
+function EcResult({ rec, onBack, onReset, initialPlanId, initialEmail, openingReturnPaymentIntentId, openingReturnRedirectStatus, onPaywallChange }) {
   if (rec.kind === "blocked") return <EcResultBlocked rec={rec} onBack={onBack} onReset={onReset} />;
-  return <EcResultApproved rec={rec} onBack={onBack} onReset={onReset} />;
+  return <EcResultApproved rec={rec} onBack={onBack} onReset={onReset}
+    initialPlanId={initialPlanId} initialEmail={initialEmail}
+    openingReturnPaymentIntentId={openingReturnPaymentIntentId}
+    openingReturnRedirectStatus={openingReturnRedirectStatus}
+    onPaywallChange={onPaywallChange} />;
 }
 
-function EcResultApproved({ rec, onBack, onReset }) {
+// The two costs a visitor commits to, side by side and labelled by WHEN each
+// is charged: the one-time account opening fee today, the plan subscription
+// monthly once the account is activated. The Pro plan costs £100 a month and
+// the opening fee is also £100, so without the time labels the two figures
+// read as one charge stated twice, or as £200. Rendered on the result page
+// (rates card) and reused by the paywall summary (checker-paywall.jsx), so
+// the visitor meets the same block twice with the same numbers.
+//
+// `fee` is the config's display amount ("£100"), `planPrice` the plan's
+// display price, `planName` the translated plan name. `feeWas` / `feeCaption`
+// are the paywall's, with a promo code applied: the full fee struck through
+// before the discounted figure, and for a free code the line naming the
+// code, so the Today cell states what is actually charged.
+function EcCosts({ fee, planPrice, planName, feeWas, feeCaption }) {
+  const t = useT();
+  return (
+    <div className="ec-costs">
+      <div className="ec-costs__cell">
+        <div className="ec-costs__when">{t("ec.r.costs.today")}</div>
+        <div className="ec-costs__amount">
+          {feeWas && <s className="ec-costs__was">{feeWas}</s>}
+          {fee}
+        </div>
+        <div className="ec-costs__what">{t("ec.r.costs.fee")}</div>
+        {feeCaption && <div className="ec-costs__note">{feeCaption}</div>}
+      </div>
+      <div className="ec-costs__cell">
+        <div className="ec-costs__when">{t("ec.r.costs.after")}</div>
+        <div className="ec-costs__amount">{planPrice}</div>
+        <div className="ec-costs__what">{t("ec.r.plan.eyebrow", { plan: planName })}</div>
+      </div>
+    </div>
+  );
+}
+
+function EcResultApproved({ rec, onBack, onReset, initialPlanId, initialEmail, openingReturnPaymentIntentId, openingReturnRedirectStatus, onPaywallChange }) {
   const t = useT();
   const { entity } = rec;
   const recommendedPlan = rec.plan;
+
+  // Opening-fee config (cached; EcApp already started the request). null
+  // while loading. The paywall and its disclosures show when the fee is
+  // live OR in preview; otherwise this page behaves exactly as it did
+  // before the fee existed, which keeps a deploy without Stripe keys safe.
+  const [feeConfig, setFeeConfig] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    ecLoadOpeningFeeConfig().then((cfg) => { if (alive) setFeeConfig(cfg); });
+    return () => { alive = false; };
+  }, []);
+  const paywallOn = !!(feeConfig && (feeConfig.enabled || feeConfig.preview));
+
+  // "result" | "paywall". The paywall replaces the page in place rather
+  // than opening as a modal: it is a full payment step with its own back
+  // link, and on a phone a modal with a card form is cramped. A Stripe
+  // 3-D Secure return opens straight on it so the paywall can confirm.
+  const [view, setView] = useState(openingReturnPaymentIntentId ? "paywall" : "result");
+  // The sidebar (EcApp) marks its "Account opening" step current while the
+  // paywall is open. Reported on every view change and cleared on unmount
+  // (leaving the result page for a question leaves the paywall too).
+  useEffect(() => {
+    if (typeof onPaywallChange !== "function") return undefined;
+    onPaywallChange(view === "paywall");
+    return () => { onPaywallChange(false); };
+  }, [view]);
+  // The Stripe-return intent is handed to the paywall once. Going back to
+  // the result drops it, so reopening the paywall shows the normal form.
+  const [returnPaymentIntentId, setReturnPaymentIntentId] = useState(openingReturnPaymentIntentId || null);
+  const returnRedirectStatus = returnPaymentIntentId ? (openingReturnRedirectStatus || null) : null;
+  // The email the visitor already gave us in this tab, which pre-fills the
+  // paywall's work-email field: the resume link's address (PDF/email link,
+  // Stripe return), else the last one kept in sessionStorage by the forms
+  // below or by the standalone callback link (see ecStoreContactEmail).
+  const [contactEmail, setContactEmail] = useState(() => {
+    const fromLink = typeof initialEmail === "string" ? initialEmail.trim() : "";
+    return fromLink || ecReadContactEmail();
+  });
+  // What the visitor typed into the paywall's email field (null: nothing),
+  // handed back to the paywall if they step back to the result and return,
+  // so their own input is never replaced by a pre-fill. A newer address
+  // given to the proposal or callback form below takes over again.
+  const [paywallEmailDraft, setPaywallEmailDraft] = useState(null);
+  // Called by EcHandoffModal after a successful send to the visitor's OWN
+  // address (never the colleague-forward one) and by EcCallbackForm after a
+  // successful submit.
+  const captureContactEmail = (email) => {
+    const kept = ecStoreContactEmail(email);
+    if (!kept) return;
+    setContactEmail(kept);
+    setPaywallEmailDraft(null);
+  };
 
   // Plan comparison modal — local state, opens on "Compare all plans →"
   const [comparisonOpen, setComparisonOpen] = useState(false);
@@ -1598,7 +1792,10 @@ function EcResultApproved({ rec, onBack, onReset }) {
   // plan again (it reappears in the modal with "Originally recommended"
   // badge) sets selectedPlanId === recommendedPlan.id, and isOnRecommended
   // flips back to true → eyebrow reverts to "Recommended for your business".
-  const [selectedPlanId, setSelectedPlanId] = useState(null);
+  // A resume link may carry the plan the visitor had switched to; it is
+  // honoured only if it still exists and differs from today's pick.
+  const [selectedPlanId, setSelectedPlanId] = useState(() =>
+    (initialPlanId && EC_PLANS[initialPlanId] && initialPlanId !== recommendedPlan.id) ? initialPlanId : null);
 
   const activePlan = selectedPlanId ? EC_PLANS[selectedPlanId] : recommendedPlan;
   const isOnRecommended = !selectedPlanId || selectedPlanId === recommendedPlan.id;
@@ -1620,14 +1817,44 @@ function EcResultApproved({ rec, onBack, onReset }) {
     ? "up"
     : "down";
 
-  // Onboarding redirect — used by both the primary CTA (direct) and the
-  // handoff modal's email-stage "Send & continue" CTA. One base64url
-  // payload in ?p= carries every checker answer (plan, entity, volume,
-  // industry, services, corridors, cryptoActive, ref). The same URL
-  // shape powers email forwards and device hops — see ecBuildHandoffURL
-  // in checker-helpers.js for the payload schema.
-  const goToOnboarding = () => {
-    window.location.href = ecBuildHandoffURL(rec, activePlan);
+  // "Start setup", shared by the primary CTA, the proposal modal and the
+  // callback form. With the opening fee on it opens the paywall, which
+  // hands off to registration itself once the fee is paid. With it off it
+  // is the original direct redirect (ecBuildHandoffURL has the params).
+  //
+  // `contact` is optional: { handoff }, what the fee-off redirect may put
+  // on the registration URL, i.e. exactly what that call-site forwarded
+  // before the paywall existed (PII policy on ecBuildHandoffURL). The
+  // paywall's email pre-fill doesn't travel here: it is contactEmail above.
+  //
+  // A click that beats the config request waits for it instead of
+  // guessing: guessing "off" would skip the paywall. A config that FAILED
+  // to load is asked for again for the same reason (the helper doesn't
+  // cache failures); only a second failure falls back to the direct link.
+  const goToOnboarding = (contact) => {
+    const c = contact || {};
+    const route = (cfg) => {
+      if (cfg && (cfg.enabled || cfg.preview)) {
+        setView("paywall");
+        window.scrollTo({ top: 0, behavior: "auto" });
+        return;
+      }
+      window.location.href = ecBuildHandoffURL(rec, activePlan, null, c.handoff);
+    };
+    if (feeConfig && !feeConfig.failed) { route(feeConfig); return; }
+    ecLoadOpeningFeeConfig().then((cfg) => { setFeeConfig(cfg); route(cfg); });
+  };
+  // Primary CTA. A wrapper, not goToOnboarding itself, because Button
+  // passes the click event, which must not be read as `contact`. A visitor
+  // who came back through their own PDF/email link keeps that email on the
+  // fee-off redirect, exactly as the link used to carry it to registration.
+  const onPrimaryCta = () => goToOnboarding(initialEmail ? { handoff: { email: initialEmail } } : undefined);
+  // Paywall "Back to your result". Its own analytics event fires inside
+  // EcPaywall; here we only swap the view back and reset the scroll.
+  const closePaywall = () => {
+    setReturnPaymentIntentId(null);
+    setView("result");
+    window.scrollTo({ top: 0, behavior: "auto" });
   };
 
   const entityName = t(entity.nameKey);
@@ -1652,6 +1879,23 @@ function EcResultApproved({ rec, onBack, onReset }) {
   // action footer covers the same use-case more visibly. Edit-vs-Start
   // pair was duplicating intent without giving the user a clearer
   // way out.
+  // Paywall view: EcPaywall (/checker-paywall.jsx) renders its own
+  // .ec-content column. It gets the plan the visitor actually chose, and
+  // the contact email as its pre-fill unless they typed their own there.
+  if (view === "paywall") {
+    return (
+      <EcPaywall
+        rec={rec}
+        plan={activePlan}
+        onBack={closePaywall}
+        initialEmail={paywallEmailDraft != null ? paywallEmailDraft : contactEmail}
+        onEmailChange={setPaywallEmailDraft}
+        returnPaymentIntentId={returnPaymentIntentId}
+        returnRedirectStatus={returnRedirectStatus}
+      />
+    );
+  }
+
   return (
     <div className="ec-content fade-in">
       <div className="ec-r">
@@ -1821,15 +2065,34 @@ function EcResultApproved({ rec, onBack, onReset }) {
               it tracks the user's plan choice in the comparison modal. */}
           {activePlan && activePlan.fees && (
             <section className="ec-r__card ec-r__savings">
-              <div className="ec-r__cardEyebrow">
-                {t("ec.r.rates.head", { plan: planName })}
-              </div>
+              {/* With the opening fee on, the card opens with "Your costs":
+                  the two account-level charges (fee today, subscription
+                  monthly after activation) as the EcCosts block, then the
+                  per-operation rates under their own eyebrow. The fee is
+                  stated here, before anyone reaches the paywall, not
+                  discovered on it. With the fee off the card is the
+                  pre-fee layout: rates eyebrow + subscription row. */}
+              {paywallOn ? (
+                <>
+                  <div className="ec-r__cardEyebrow">{t("ec.r.costs.head")}</div>
+                  <EcCosts fee={feeConfig.display}
+                           planPrice={activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}
+                           planName={planName} />
+                  <div className="ec-r__cardEyebrow">{t("ec.r.rates.head", { plan: planName })}</div>
+                </>
+              ) : (
+                <div className="ec-r__cardEyebrow">
+                  {t("ec.r.rates.head", { plan: planName })}
+                </div>
+              )}
 
               <div style={{ display: "flex", flexDirection: "column", gap: 9, margin: "12px 0 4px" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>
-                  <span>{t("ec.r.method.line.subscription")}</span>
-                  <span style={{ fontWeight: 600, color: "var(--c-ink)" }}>{activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}</span>
-                </div>
+                {!paywallOn && (
+                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>
+                    <span>{t("ec.r.method.line.subscription")}</span>
+                    <span style={{ fontWeight: 600, color: "var(--c-ink)" }}>{activePlan.priceKey ? t(activePlan.priceKey) : activePlan.price}</span>
+                  </div>
+                )}
                 {[["fxMarkup", activePlan.fees.fxMarkup], ["fasterPay", activePlan.fees.fasterPay], ["sepa", activePlan.fees.sepa], ["swift", activePlan.fees.swift], ["swiftCap", activePlan.fees.swiftCap], ["swiftIn", activePlan.fees.swiftIn], ["cardUk", activePlan.fees.cardUk], ["cardEu", activePlan.fees.cardEu], ["cardRow", activePlan.fees.cardRow]].filter((row) => row[1]).map((row) => (
                   <div key={row[0]} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, color: "var(--c-ink-2)" }}>
                     <span>{t("ec.r.plan.compare.fee." + row[0])}</span>
@@ -1837,9 +2100,14 @@ function EcResultApproved({ rec, onBack, onReset }) {
                   </div>
                 ))}
               </div>
-              <p style={{ fontSize: 12, color: "var(--c-ink-2)", opacity: 0.85, margin: "8px 0 0" }}>
-                {t("ec.r.rates.openingFee")}
-              </p>
+              {/* Vague "includes an opening fee" footnote: only while the
+                  fee isn't collected here. Once it is, the cost block
+                  above states the actual amount instead. */}
+              {!paywallOn && (
+                <p style={{ fontSize: 12, color: "var(--c-ink-2)", opacity: 0.85, margin: "8px 0 0" }}>
+                  {t("ec.r.rates.openingFee")}
+                </p>
+              )}
 
               <p className="ec-r__savings__note">
                 {t("ec.r.rates.caption", { plan: planName })}
@@ -1882,19 +2150,22 @@ function EcResultApproved({ rec, onBack, onReset }) {
             for the email render. UI keeps the savings card + plan
             card + caveats only. */}
 
-        {/* ───── Action bar — primary CTA goes DIRECTLY to onboarding
-            (no commit-stage interstitial modal). Secondary button opens
-            EcHandoffModal at the email stage for the "Get your full
-            proposal" PDF capture flow. */}
+        {/* ───── Action bar — primary CTA goes to the opening-fee paywall
+            when the fee is on, else DIRECTLY to onboarding (no commit-
+            stage interstitial modal either way). The label names the
+            destination: "Continue to account opening" leads to the fee
+            step the sidebar and the cost block above have already
+            announced. Secondary button opens EcHandoffModal at the email
+            stage for the "Get your full proposal" PDF capture flow. */}
         <section className="ec-r__action">
           <div className="ec-r__action__primary">
             <Button
               variant="primary"
               size="xl"
               iconRight="arrowRight"
-              onClick={goToOnboarding}
+              onClick={onPrimaryCta}
             >
-              {t("ec.r.cta.continue")}
+              {t(paywallOn ? "ec.r.cta.opening" : "ec.r.cta.continue")}
             </Button>
             <button
               type="button"
@@ -1939,7 +2210,8 @@ function EcResultApproved({ rec, onBack, onReset }) {
           rec={rec}
           initialStage="email"
           onClose={() => setHandoffOpen(false)}
-          onContinueToSetup={() => { setHandoffOpen(false); goToOnboarding(); }}
+          onEmailCaptured={captureContactEmail}
+          onContinueToSetup={(contact) => { setHandoffOpen(false); goToOnboarding(contact); }}
         />
       )}
     </div>
@@ -1956,18 +2228,59 @@ function EcResultBlocked({ rec, onBack, onReset }) {
   // on it. `accent` is the country name (title-case proper noun) or the
   // lowercased industry label (reads naturally mid-sentence;
   // toLocaleLowerCase handles non-Latin scripts incl. the Turkish İ→i case).
+  // The country is known for both reasons (Q1 comes before Q2); the
+  // industry only when it caused the block.
+  const countryName = rec.country
+    ? (t("ec.country." + rec.country.code) === rec.country.code ? rec.country.name : t("ec.country." + rec.country.code))
+    : "";
+  const industryLabel = isCountry ? "" : t(rec.reasonKey);
   let accent, title, lead;
   if (isCountry) {
-    const c = rec.country;
-    const localized = t("ec.country." + c.code);
-    accent = localized === c.code ? c.name : localized;
+    accent = countryName;
     title  = t("ec.b.country.title", { country: accent });
     lead   = t("ec.b.country.lead");
   } else {
-    accent = t(rec.reasonKey).toLocaleLowerCase(lang);
+    accent = industryLabel.toLocaleLowerCase(lang);
     title  = t("ec.b.industry.title", { industry: accent });
     lead   = t("ec.b.lead");
   }
+
+  // "Contact our team" mail: subject names the decline reason, the body
+  // restates the answers and leaves room for the visitor's own description.
+  // Paragraphs are joined here (not in the dictionary) so translators never
+  // touch line breaks.
+  const supportEmail = t("ec.support.email");
+  const subject = isCountry
+    ? t("ec.b.mail.subject.country", { country: countryName })
+    : t("ec.b.mail.subject.industry", { industry: accent, country: countryName });
+  const facts = [
+    countryName   ? t("ec.b.mail.line.country",  { country: countryName })    : null,
+    industryLabel ? t("ec.b.mail.line.industry", { industry: industryLabel }) : null,
+  ].filter(Boolean).join("\n");
+  const body = [t("ec.b.mail.intro"), facts, t("ec.b.mail.prompt"), ""].filter((p) => p !== null).join("\n\n");
+  const mailHref = ecMailto(supportEmail, subject, body);
+
+  // A mailto: with no registered mail handler fails silently: the page just
+  // stays where it is. The only observable signal is that the tab never lost
+  // focus or visibility, so if 1.5s after the click it is still the focused,
+  // visible document we reveal the address as a fallback. A mail app or a
+  // webmail tab opening trips blur/visibilitychange and keeps it hidden.
+  const [mailFallback, setMailFallback] = useState(false);
+  const mailTimer = useRef(null);
+  useEffect(() => () => { if (mailTimer.current) clearTimeout(mailTimer.current); }, []);
+  const onContact = () => {
+    let left = false;
+    const gone = () => { left = true; };
+    window.addEventListener("blur", gone);
+    document.addEventListener("visibilitychange", gone);
+    if (mailTimer.current) clearTimeout(mailTimer.current);
+    mailTimer.current = setTimeout(() => {
+      window.removeEventListener("blur", gone);
+      document.removeEventListener("visibilitychange", gone);
+      if (!left && !document.hidden && document.hasFocus()) setMailFallback(true);
+    }, 1500);
+  };
+
   return (
     <div className="ec-content fade-in">
       <button className="ob-link-back" onClick={onBack} type="button" style={{ alignSelf: "flex-start" }}>
@@ -2002,21 +2315,24 @@ function EcResultBlocked({ rec, onBack, onReset }) {
         </div>
         <div className="ec-actions">
           <Button variant="primary" size="xl" onClick={onReset}>{t("common.startOver")}</Button>
-          {/* Soft-decline cohort: open the user's mail client to sales@ so
-              they can describe their setup. Blocked businesses fall outside
-              the self-serve funnel, so a direct email beats a booking link. */}
-          <Button variant="outline" size="xl" href={"mailto:" + t("ec.support.email")}>
+          {/* Soft-decline cohort: open the visitor's mail app to sales@ with
+              the situation already written (subject + the answers that caused
+              the decline), so sales gets context and the visitor only adds a
+              few lines about their setup. Blocked businesses fall outside the
+              self-serve funnel, so a direct email beats a booking link. */}
+          <Button variant="outline" size="xl" href={mailHref} onClick={onContact}>
             {t("common.contactTeam")}
           </Button>
         </div>
-        {/* A mailto: link silently no-ops when no mail handler is registered
-            (common on desktop) and Chrome blocks it as "user gesture required"
-            in some embedded/iframe contexts — so the button alone can look dead.
-            Always surface the address itself: visible, selectable and clickable,
-            so contact is possible regardless of the mail-handler situation. */}
-        <p className="ec-result__contactAddr">
-          <a href={"mailto:" + t("ec.support.email")}>{t("ec.support.email")}</a>
-        </p>
+        {/* The address stays off the screen unless the mail app failed to
+            open (see onContact): a visible address next to the button read
+            as clutter and made the button look like decoration. */}
+        {mailFallback && (
+          <p className="ec-result__contactAddr" role="status">
+            {t("ec.b.mail.fallback")}{" "}
+            <a href={mailHref}>{t("ec.support.email")}</a>
+          </p>
+        )}
       </div>
     </div>
   );
@@ -2026,7 +2342,9 @@ Object.assign(window, {
   EcApp,
   EcIco,
   EcIntro, EcQuestionHeader,
+  EcCountrySelect,
   EcCountry, EcIndustry, EcServices, EcVolume, EcCorridors,
   EcResult,
   EcResultApproved, EcResultBlocked,
+  EcCosts,
 });

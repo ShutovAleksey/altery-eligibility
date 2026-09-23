@@ -43,6 +43,17 @@ test("missing asset (has extension) → 404, not SPA fallback", async () => {
   assert.equal(r.status, 404);
 });
 
+test("malformed percent-encoding → 400, and the server stays up", async () => {
+  // decodeURIComponent throws on these; uncaught, that used to exit the
+  // process (one anonymous GET took the payment API down with it).
+  for (const p of ["/%FF", "/%E0%A4%A", "/api%", "/checker-%zz.js"]) {
+    const r = await fetch(base + p);
+    assert.equal(r.status, 400, `${p} → ${r.status}`);
+  }
+  const h = await fetch(base + "/healthz");
+  assert.equal(h.status, 200, "still serving after the bad requests");
+});
+
 test("extension-less route → SPA index.html", async () => {
   const r = await fetch(base + "/app/route");
   assert.equal(r.status, 200);
@@ -50,7 +61,8 @@ test("extension-less route → SPA index.html", async () => {
 });
 
 test("backend source is NOT served as static (api/lib/server.js/package.json → 404)", async () => {
-  for (const p of ["/server.js", "/package.json", "/api/send-analysis.js", "/lib/email.js", "/lib/rate-limit.js"]) {
+  for (const p of ["/server.js", "/package.json", "/api/send-analysis.js", "/lib/email.js", "/lib/rate-limit.js",
+                   "/api/opening-fee.js", "/lib/opening-fee.js", "/lib/opening-fee-token.js", "/lib/stripe.js"]) {
     const r = await fetch(base + p);
     assert.equal(r.status, 404, `${p} must not be served as static (got ${r.status})`);
   }
@@ -69,4 +81,33 @@ test("/api/* reaches the handler (routed, JSON response, not 404)", async () => 
 test("GET on a POST-only /api route is handled (405), not 404", async () => {
   const r = await fetch(base + "/api/send-analysis", { method: "GET" });
   assert.notEqual(r.status, 404);
+});
+
+// The paywall reads this on every result page, so it must be routed for GET
+// (the other api routes are POST-only) and must never expose a secret key,
+// whatever env the suite runs under.
+test("GET /api/opening-fee is routed and returns the public fee config", async () => {
+  const r = await fetch(base + "/api/opening-fee");
+  assert.equal(r.status, 200);
+  assert.match(r.headers.get("content-type") || "", /application\/json/);
+  assert.equal(r.headers.get("cache-control"), "no-store");
+  const body = await r.json();
+  assert.equal(typeof body.enabled, "boolean");
+  assert.equal(body.amount, 10000);
+  assert.equal(body.currency, "gbp");
+  assert.equal(body.display, "£100");
+  assert.equal(body.termsVersion, "2026-09-23");
+  if (body.enabled) assert.match(body.publishableKey, /^pk_/);
+  else assert.equal(body.publishableKey, null);
+  assert.ok(!JSON.stringify(body).includes("sk_"), "no secret key in the public config");
+});
+
+test("POST /api/opening-fee reaches the handler (unknown action → 400 JSON)", async () => {
+  const r = await fetch(base + "/api/opening-fee", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: "https://altery.com" },
+    body: JSON.stringify({ action: "nope" }),
+  });
+  assert.equal(r.status, 400);
+  assert.deepEqual(await r.json(), { error: "invalid_action" });
 });

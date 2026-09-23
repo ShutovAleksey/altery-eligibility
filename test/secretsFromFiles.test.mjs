@@ -16,6 +16,17 @@ fs.writeFileSync(file, "  file-secret-value\n"); // surrounding whitespace → m
 delete process.env.BREVO_API_KEY;          // ensure no explicit env shadows the file
 process.env.BREVO_API_KEY_FILE = file;     // point the hydrator at our temp file
 
+// The opening-fee secrets ride the same hydration: a Docker secret file for the
+// token secret, and a newline-carrying env value for the Stripe secret key
+// (Stripe would answer 401 on "sk_…\n", silently breaking every payment).
+const feeFile = path.join(dir, "fee_token_secret");
+fs.writeFileSync(feeFile, "fee-token-secret-from-file\n");
+delete process.env.OPENING_FEE_TOKEN_SECRET;
+process.env.OPENING_FEE_TOKEN_SECRET_FILE = feeFile;
+process.env.STRIPE_SECRET_KEY = "sk_test_from_env\n";
+delete process.env.STRIPE_PUBLISHABLE_KEY;
+process.env.STRIPE_PUBLISHABLE_KEY_FILE = path.join(dir, "does-not-exist");
+
 // An env-delivered secret that carries the secret manager's trailing newline —
 // this is the real-world bug (Brevo → 401 "Key not found" on "xkeysib-…\n").
 process.env.REPLY_TO = "  ops@altery.com\n";
@@ -30,6 +41,13 @@ test("a *_FILE secret is read from disk into process.env, trimmed", () => {
 
 test("an env-delivered secret is trimmed in place (kills the trailing-newline 401)", () => {
   assert.equal(process.env.REPLY_TO, "ops@altery.com");
+});
+
+test("opening-fee secrets are hydrated too (file → env, env trimmed, missing skipped)", () => {
+  assert.equal(process.env.OPENING_FEE_TOKEN_SECRET, "fee-token-secret-from-file");
+  assert.equal(process.env.STRIPE_SECRET_KEY, "sk_test_from_env");
+  // Pointer to a missing file → left unset, so the paywall reports disabled.
+  assert.equal(process.env.STRIPE_PUBLISHABLE_KEY, undefined);
 });
 
 test("missing secret files don't crash startup (server still imported)", async () => {

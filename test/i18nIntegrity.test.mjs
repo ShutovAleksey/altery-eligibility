@@ -19,8 +19,8 @@ const root = path.resolve(here, "..");
 
 const SOURCE_FILES = [
   "checker-data.js", "checker-helpers.js", "checker-pdf.js",
-  "checker-screens.jsx", "checker-modals.jsx", "checker-atoms.jsx",
-  "checker-flag-lang.jsx", "checker-pdf-assets.js",
+  "checker-screens.jsx", "checker-modals.jsx", "checker-paywall.jsx",
+  "checker-atoms.jsx", "checker-flag-lang.jsx", "checker-pdf-assets.js",
 ];
 
 // Order matters — bootstrap.js (or the inline in index.html) creates

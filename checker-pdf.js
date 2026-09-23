@@ -72,12 +72,18 @@ function ecWaitForPdfLibs(timeoutMs = 10000) {
 // account team contact. Visual language is "premium document"
 // (beige header, navy accents, generous white space) rather than
 // "marketing email" (saturated full-bleed color).
-function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
+// `fee` (optional) is the opening-fee config from ecLoadOpeningFeeConfig.
+// When the paywall is on (enabled or preview) the proposal's fee tables
+// carry the one-time "Account opening fee" row right under the subscription,
+// with the same label and "{fee} one-time" value as the plan cards on
+// screen: this is the document forwarded to the CFO, and its CTA leads to
+// that paywall, so the fee must not first appear there.
+function ecBuildAnalysisHTML({ rec, email, t, langCode, fee }) {
   // SECURITY (ALT-SEC-005): `email` is user-supplied and gets spliced into
   // this HTML, which ecSendAnalysisEmail later mounts via `inner.innerHTML`.
   // The upstream email-format regex still permits HTML-significant chars in
   // the local part (e.g. `a"><img src=x>@x.co`), so escape before
-  // interpolation. URL contexts (ecContactRequestUrl / ecBuildHandoffURL)
+  // interpolation. URL contexts (ecContactRequestUrl / ecBuildResumeURL)
   // percent-encode their inputs separately and are unaffected.
   const ecEscapeHtml = (s) => String(s)
     .replace(/&/g, "&amp;")
@@ -86,6 +92,11 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#x27;");
   const safeEmail = email ? ecEscapeHtml(email) : "";
+  // Display amount only (e.g. "£100"); escaped like any other value that
+  // didn't come from our own dictionaries.
+  const openingFee = (fee && (fee.enabled || fee.preview) && typeof fee.display === "string" && fee.display)
+    ? ecEscapeHtml(fee.display)
+    : "";
 
   // Brand palette — duplicated as literals rather than CSS vars so
   // the HTML is fully self-contained for email rendering.
@@ -237,8 +248,11 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   // this is the detail backup.
   const fees = rec.plan.fees || {};
   const cycleSuffix = t(rec.plan.cycleKey || "ec.plan.cycleMo");
+  // The opening fee sits right under the subscription: both are account-
+  // level charges, unlike the per-transfer rails that follow.
   const feeRows = [
     { label: t("ec.pdf.fee.subscription"), value: `${rec.plan.price}${cycleSuffix}`, bold: true },
+    ...(openingFee ? [{ label: t("ec.r.costs.fee"), value: t("ec.r.costs.oneTimeValue", { fee: openingFee }), bold: true }] : []),
     { label: t("ec.pdf.fee.fasterPay"),    value: fees.fasterPay || "—" },
     { label: "SEPA",                        value: fees.sepa || "—" },
     { label: "SWIFT",                       value: fees.swift || "—" },
@@ -291,6 +305,10 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
             <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:4px 0;">
               <span>${t("ec.r.method.line.subscription")}</span><span style="font-weight:600;color:${C.ink};">${rec.plan.price}</span>
             </div>
+            ${openingFee ? `
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:4px 0;">
+              <span>${t("ec.r.costs.fee")}</span><span style="font-weight:600;color:${C.ink};">${t("ec.r.costs.oneTimeValue", { fee: openingFee })}</span>
+            </div>` : ""}
             <div style="display:flex;justify-content:space-between;font-size:12px;color:${C.inkSoft};padding:4px 0;">
               <span>${t("ec.r.plan.compare.fee.fxMarkup")}</span><span style="font-weight:600;color:${C.ink};">${planFees.fxMarkup}</span>
             </div>
@@ -372,14 +390,17 @@ function ecBuildAnalysisHTML({ rec, email, t, langCode }) {
   const step1HTML = `<table style="width:100%;border-collapse:collapse;">${stepRow(1)}</table>`;
   const remainingStepsHTML = `<table style="width:100%;border-collapse:collapse;">` + [2, 3, 4].map(stepRow).join("") + `</table>`;
 
-  // Handoff URL → external corporate-registration app (app.altery.com).
-  // Carries the full non-PII profile (plan/entity/currency/volume/country/
-  // industry/services/corridors) + first-touch UTMs, and — because this is a
-  // PDF link the recipient asked us to send them — their own email, so
-  // registration pre-fills it. (Per the PII policy in ecBuildHandoffURL,
-  // only the PDF/email links carry email; the anonymous web CTA does not.)
-  const handoffURL = ecBuildHandoffURL(rec, rec.plan, null, { email });
-  const handoffDisplay = "app.altery.com/registration";
+  // Setup CTA → back to THIS checker's result page (ecBuildResumeURL), not
+  // straight to registration: registration now sits behind the one-time
+  // opening fee, and a direct link in a PDF would skip it. The resume link
+  // carries the answers + first-touch UTMs and, because the recipient asked
+  // us to send them this PDF, their own email so the paywall pre-fills it.
+  // The display line shows the checker host so the printed text matches
+  // where the link actually goes.
+  const handoffURL = ecBuildResumeURL(rec, rec.plan, null, { email });
+  const handoffDisplay = (() => {
+    try { return new URL(handoffURL).host; } catch (e) { return "altery-eligibility.vercel.app"; }
+  })();
 
   // ─── Full document ───────────────────────────────────────────
   return `
@@ -486,7 +507,7 @@ ${checklistHTML}
      CTA fulfils step 1's "via the link below" and sits high enough that it
      always renders (it used to live at the document tail and could be
      dropped on long proposals). Steps 2-4 follow. The <a href> points at the
-     external registration handoff; link annotation wired by
+     checker resume link (result page, then paywall); link annotation wired by
      ecAddLinkAnnotations during PDF assembly. -->
 <div style="margin-bottom:26px;">
   <div style="font-size:11px;font-weight:600;color:${C.muted};text-transform:uppercase;letter-spacing:0.08em;margin:0 0 16px;">
@@ -687,7 +708,15 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy, antiSpam }) {
   const langCode = (window.__I18N && typeof window.__I18N.getLang === "function")
     ? window.__I18N.getLang() : "en";
 
-  const html = ecBuildAnalysisHTML({ rec, email, t, langCode });
+  // Cached after the result page's first load, so normally instant. A
+  // failure leaves the fee out of the proposal rather than failing the send;
+  // the proposal's CTA leads to the result page, which shows the fee again.
+  let fee = null;
+  try {
+    fee = (typeof ecLoadOpeningFeeConfig === "function") ? await ecLoadOpeningFeeConfig() : null;
+  } catch (e) { fee = null; }
+
+  const html = ecBuildAnalysisHTML({ rec, email, t, langCode, fee });
 
   // ── Mount strategy ────────────────────────────────────────────
   // Past attempts failed because html2pdf's worker chain wraps our
@@ -885,22 +914,20 @@ async function ecSendAnalysisEmail({ rec, email, t, forwardedBy, antiSpam }) {
     const personaLine = rec.ind && personaIndustries.includes(rec.ind.value)
       ? t("ec.r.persona." + rec.ind.value + ".line")
       : "";
-    // Email CTA destination — same self-contained handoff URL the PDF
-    // uses internally. One ?p=<base64url> payload pre-fills the entire
-    // onboarding from the original checker answers, so a colleague who
-    // gets the email forwarded picks up exactly where the original
-    // recipient left off. Origin must point at the actual deployment
-    // (Vercel preview, future altery.com when it routes to this app),
-    // never at a hardcoded altery.com that doesn't host the setup flow.
+    // Email CTA destination: the same resume link the PDF uses. It
+    // reopens this checker's result page from the original answers (and so
+    // leads through the opening-fee paywall), so a colleague who gets the
+    // email forwarded picks up exactly where the original recipient left
+    // off. Origin must point at the actual deployment (Vercel preview, the
+    // self-hosted domain), never at a hardcoded host that doesn't serve the
+    // checker. api/send-analysis re-checks it against ALLOWED_SESSION_HOSTS.
     const emailOrigin = (typeof window !== "undefined" && window.location && window.location.origin)
       ? window.location.origin
       : "https://altery-eligibility.vercel.app";
-    // Embed the recipient email in the payload so when they click the
-    // link from their inbox (or forward it to a colleague), the
-    // onboarding welcome screen pre-fills the same address. Recipient
-    // is the canonical "this is the founder" email; forwards can still
-    // override on the welcome screen.
-    const sessionLink = ecBuildHandoffURL(rec, rec.plan, emailOrigin, { email });
+    // Embed the recipient email so when they click the link from their
+    // inbox (or forward it to a colleague), the paywall's work-email field
+    // pre-fills the same address; they can still change it there.
+    const sessionLink = ecBuildResumeURL(rec, rec.plan, emailOrigin, { email });
 
     // Resolve every localized string the email body needs, on the
     // client where the i18n dictionary already lives. The server

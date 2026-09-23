@@ -32,13 +32,18 @@ Object.values(EC_ENTITIES).forEach((e) => {
 });
 
 // Pure routing function — answers → recommendation. Easy to test in isolation.
-function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corridorsOut, monthlyTx, services, volumeInIdx, volumeOutIdx, txInIdx, txOutIdx }) {
-  // Union of regions hit on either direction = the actual corridor
-  // breadth of the business. Keep both directions on rec for the PDF
-  // and downstream consumers; expose the merged set as `corridors`.
-  const cIn  = Array.isArray(corridorsIn)  ? corridorsIn  : [];
-  const cOut = Array.isArray(corridorsOut) ? corridorsOut : [];
-  const corridors = Array.from(new Set([...cIn, ...cOut]));
+//
+// Volume, tx count and corridors are each ONE answer covering incoming and
+// outgoing together (founder decision, 2026-09-23). The checker used to ask
+// both directions separately, but this function only ever read the summed
+// volume / tx count and the union of the two corridor sets, so a single
+// combined answer yields the same recommendation for the same total.
+function ecRecommend({ countryCode, industry, monthlyVolume, monthlyTx, corridors: corridorsRaw, services, volumeIdx, txIdx }) {
+  // Region ids and/or outlier ISO codes; deduplicated so the breadth signal
+  // counts distinct corridors. Accepts a Set or an array, tolerates neither.
+  const corridors = Array.from(new Set(
+    corridorsRaw instanceof Set ? [...corridorsRaw] : (Array.isArray(corridorsRaw) ? corridorsRaw : [])
+  ));
   const country = EC_COUNTRIES.find((c) => c.code === countryCode);
   const ind = EC_INDUSTRIES.find((i) => i.value === industry);
 
@@ -55,7 +60,9 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     return { kind: "blocked", reason: "country", country };
   }
   if (ind && ind.risk === "blocked") {
-    return { kind: "blocked", reason: "industry", reasonKey: ind.labelKey };
+    // `country` and `ind` ride along so the decline screen can pre-write
+    // the "contact our team" email with both answers, not just the reason.
+    return { kind: "blocked", reason: "industry", reasonKey: ind.labelKey, country, ind };
   }
 
   // Defensive: RoW maps to the UK entity, and so does an unknown/missing
@@ -98,9 +105,9 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
   // Tier decision — VOLUME is the primary driver; only one capability
   // genuinely gates Starter. Earlier this fired Pro on five separate
   // signals (volume, breadth, tx count, mass/cards, industry) summed from
-  // a two-slider in+out model, so almost every configuration landed on Pro
-  // and Starter was effectively unreachable — even at minimum volume a
-  // typical multi-market pick (3 regions in + 3 out) crossed the corridor
+  // the then two-slider in+out model, so almost every configuration landed
+  // on Pro and Starter was effectively unreachable — even at minimum volume
+  // a typical multi-market pick (3 regions in + 3 out) crossed the corridor
   // threshold. We now:
   //   • drive Pro by combined throughput > £250k (the default slider
   //     position is £250k, so a small business defaults to Starter);
@@ -201,11 +208,11 @@ function ecRecommend({ countryCode, industry, monthlyVolume, corridorsIn, corrid
     .sort((a, b) => b.priority - a.priority)
     .slice(0, 3);
 
-  return { kind: "approved", entity, plan, country, ind, monthlyVolume, corridors, corridorsIn: cIn, corridorsOut: cOut, cryptoActive, cryptoServed, cryptoOpen, cryptoBlocked, services: svcs, tierSignals, reasoning: reasoningTop,
-    // Raw per-direction band indices echoed through so the handoff URL can
-    // translate them to registration band codes (the summed monthlyVolume/
-    // monthlyTx can't be split back). Undefined when not supplied.
-    volumeInIdx, volumeOutIdx, txInIdx, txOutIdx };
+  return { kind: "approved", entity, plan, country, ind, monthlyVolume, corridors, cryptoActive, cryptoServed, cryptoOpen, cryptoBlocked, services: svcs, tierSignals, reasoning: reasoningTop,
+    // Raw band indices echoed through so the resume deep link can carry the
+    // ANSWERS (a band midpoint can't be mapped back to its band once summed
+    // with anything). Undefined when not supplied.
+    volumeIdx, txIdx };
 }
 
 // Derive a transaction-count assumption from the monthly volume
@@ -319,16 +326,21 @@ const EUR_TO_GBP = 0.85;
 // EC_CHIP_REGION_ORDER ids from checker-data.js.
 const EC_HOME_REGION_OF = { uk: "uk-eea", eu: "uk-eea", mena: "middle-east" };
 
+// rec.corridors as a Set. ecRecommend always emits an array, but the cost
+// helpers below are also called from tests and modals with hand-built recs,
+// so accept a Set or nothing without throwing.
+function ecCorridorSet(rec) {
+  const c = rec?.corridors;
+  return c instanceof Set ? c : new Set(Array.isArray(c) ? c : []);
+}
+
 // (B) FX share of monthly volume — driven by corridor breadth. A UK
 // business operating only in UK+EEA touches FX rarely (~5%); a global
 // business spans 4+ regions and routinely converts (~80%). Old code
 // used a flat 0.60 — accurate for the global case, badly overstated
 // for home-only businesses.
 function ecFxVolumeRatio(rec) {
-  const corridors = new Set([
-    ...(Array.isArray(rec?.corridorsIn) ? rec.corridorsIn : []),
-    ...(Array.isArray(rec?.corridorsOut) ? rec.corridorsOut : []),
-  ]);
+  const corridors = ecCorridorSet(rec);
   const home = EC_HOME_REGION_OF[rec?.entity?.id] || "uk-eea";
   // Anything that isn't the home region counts as foreign. ISO-code
   // outliers (Set entries that don't match a region id) also count as
@@ -381,11 +393,9 @@ function ecEstimateTxCountCalibrated(rec) {
 // surface (result page, methodology, PDF) reads `savings.confidence`
 // and `savings.confidenceBand` to label the projection accordingly.
 function ecConfidenceLevel(rec) {
-  const corridorsSize = (rec?.corridorsIn?.size ?? rec?.corridorsIn?.length ?? 0)
-                      + (rec?.corridorsOut?.size ?? rec?.corridorsOut?.length ?? 0);
   const have = {
     industry:  !!rec?.ind?.value,
-    corridors: corridorsSize > 0,
+    corridors: ecCorridorSet(rec).size > 0,
     volume:    (rec?.monthlyVolume || 0) >= 1000,
   };
   const filled = Object.values(have).filter(Boolean).length;
@@ -402,10 +412,7 @@ function ecConfidenceLevel(rec) {
 // with NA as a smaller cross-border slice. Weight: home = ~95% at 0
 // foreign; each foreign region peels off ~20% (capped at 30% local).
 function ecLocalSwiftSplit(rec) {
-  const corridors = new Set([
-    ...(Array.isArray(rec?.corridorsIn) ? rec.corridorsIn : []),
-    ...(Array.isArray(rec?.corridorsOut) ? rec.corridorsOut : []),
-  ]);
+  const corridors = ecCorridorSet(rec);
   if (corridors.size === 0) return { local: 0.90, swift: 0.10 };
   const home = EC_HOME_REGION_OF[rec?.entity?.id] || "uk-eea";
   const hasHome = corridors.has(home);
@@ -830,6 +837,19 @@ function ecGenProposalRef() {
   return `EL-${year}-${tail.padEnd(4, "0")}`;
 }
 
+// mailto: URL with a pre-written subject and body (RFC 6068). Both parts
+// go through encodeURIComponent and line breaks become CRLF: Outlook and
+// Apple Mail drop bare LF, so the paragraphs would otherwise collapse.
+// Used by the decline screen so the visitor's mail app opens with the
+// situation already described and only their own details left to type.
+function ecMailto(to, subject, body) {
+  const enc = (s) => encodeURIComponent(String(s == null ? "" : s).replace(/\r?\n/g, "\r\n"));
+  const parts = [];
+  if (subject) parts.push("subject=" + enc(subject));
+  if (body) parts.push("body=" + enc(body));
+  return "mailto:" + String(to || "").trim() + (parts.length ? "?" + parts.join("&") : "");
+}
+
 // External corporate-registration app. The checker no longer hosts an
 // internal /setup onboarding — every "Start setup" CTA (web, PDF, email)
 // redirects here.
@@ -866,20 +886,9 @@ const EC_REG_SERVICE = {
   mass:        "mass-payments",
 };
 
-// Volume bands: checker band index → registration band code. Incoming and
-// outgoing use DIFFERENT code sets for the same EUR bands (registration
-// catalogType 11 vs 14). The checker's 6 bands don't line up 1:1 with
-// registration's 9, so each checker band maps to the registration band that
-// contains its midpoint — a couple collapse onto one code (lossy, but it's a
-// pre-fill the applicant adjusts).
-//   checker idx: 0 <50k · 1 50–200k · 2 200–500k · 3 500k–1M · 4 1–5M · 5 5M+
-const EC_REG_VOL_IN  = [11, 211, 212, 212, 213, 12];
-const EC_REG_VOL_OUT = [11, 5,   6,   6,   7,   12];
-
-// Tx-count bands: checker band index → registration activity code (1–4).
-//   checker idx: 0 <20 · 1 20–100 · 2 101–300 · 3 301–1000 · 4 1000+
-//   registration: 1 = 1–50 · 2 = 51–300 · 3 = 301–1000 · 4 = 1001+
-const EC_REG_TX = [1, 2, 2, 3, 4];
+// Opening-fee token shape, "v1.<payloadB64url>.<sigB64url>" — see
+// lib/opening-fee-token.js for how it is signed.
+const EC_OPENING_TOKEN_RE = /^v1\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/;
 
 // Full handoff URL used by goToOnboarding AND the PDF/email/callback CTAs.
 // Carries the complete NON-PII profile (translated to the registration's
@@ -891,9 +900,19 @@ const EC_REG_TX = [1, 2, 2, 3, 4];
 // call-site explicitly passes them in `opts`. The trade-off is accepted
 // knowingly — GET params surface in server logs, browser history, and the
 // Referer header — so the gating keeps each surface to the minimum it holds:
-//   • web "Start setup" CTA — anonymous quiz, passes NO opts → zero PII.
-//   • PDF + email links     — pass { email } only (the user gave it there).
-//   • Sales-callback flow   — passes { firstname, lastname, phone, email, company }.
+//   • web "Start setup" CTA — anonymous quiz, passes NO opts → zero PII. The
+//     one exception is a visitor who came back through their own PDF/email
+//     link: that link already carried their email, so the CTA passes { email }.
+//   • PDF + email links     — no longer call this at all: they point back at
+//     the checker (ecBuildResumeURL) so the opening-fee paywall can't be
+//     skipped. The resume payload carries { email } only.
+//   • Sales-callback flow   — passes { firstname, lastname, phone, email, company }
+//     (only when the opening fee is off; otherwise it routes to the paywall).
+//   • Paywall, after payment — passes { email, openingToken }: the work email
+//     the fee was paid with plus the signed proof of payment registration
+//     verifies server-side. No company details: the paywall collects none,
+//     and registration binds the company to the payment when the token is
+//     first used (founder decision, 2026-09-23).
 function ecBuildHandoffURL(rec, plan, origin, opts) {
   const url = new URL(EC_REGISTRATION_URL);
   const set = (k, v) => { if (v != null && v !== "") url.searchParams.set(k, String(v)); };
@@ -910,12 +929,11 @@ function ecBuildHandoffURL(rec, plan, origin, opts) {
       const mapped = rec.services.map((s) => EC_REG_SERVICE[s]).filter(Boolean);
       if (mapped.length) set("services", mapped.join(","));
     }
-    // Volume + tx are two-directional in registration; the checker collects
-    // both directions, so we send both with the right per-direction codes.
-    if (rec.volumeInIdx  != null && EC_REG_VOL_IN[rec.volumeInIdx]   != null) set("volume_in",  EC_REG_VOL_IN[rec.volumeInIdx]);
-    if (rec.volumeOutIdx != null && EC_REG_VOL_OUT[rec.volumeOutIdx] != null) set("volume_out", EC_REG_VOL_OUT[rec.volumeOutIdx]);
-    if (rec.txInIdx  != null && EC_REG_TX[rec.txInIdx]  != null) set("tx_in",  EC_REG_TX[rec.txInIdx]);
-    if (rec.txOutIdx != null && EC_REG_TX[rec.txOutIdx] != null) set("tx_out", EC_REG_TX[rec.txOutIdx]);
+    // Volume and tx count are NOT sent (volume_in/volume_out/tx_in/tx_out
+    // were dropped 2026-09-23): the checker now asks one combined figure for
+    // each, while registration's KYB asks incoming and outgoing separately
+    // and cannot split a combined band, so it collects both itself.
+    //
     // Corridors travel as CONTEXT ONLY — region slugs (uk-eea, apac, …) plus
     // any individual ISO countries the user named. We deliberately do NOT
     // pre-fill registration's KYB sender/receiver country selectors from this
@@ -924,8 +942,16 @@ function ecBuildHandoffURL(rec, plan, origin, opts) {
     // "Europe" but the field shows only the one outlier they typed), and KYB
     // country declaration should be a deliberate, attested step. Registration
     // treats these as a CRM / risk-routing hint, not form input.
-    if (Array.isArray(rec.corridorsIn) && rec.corridorsIn.length) set("corridors_in", rec.corridorsIn.join(","));
-    if (Array.isArray(rec.corridorsOut) && rec.corridorsOut.length) set("corridors_out", rec.corridorsOut.join(","));
+    //
+    // The single combined list goes out as BOTH corridors_in and
+    // corridors_out. That is exactly what the old Q5 produced with its
+    // "different mix for incoming vs outgoing" toggle off (the default, which
+    // mirrored one list into both), so registration sees no change in shape.
+    if (Array.isArray(rec.corridors) && rec.corridors.length) {
+      const corridors = rec.corridors.join(",");
+      set("corridors_in",  corridors);
+      set("corridors_out", corridors);
+    }
     if (rec.cryptoServed) set("crypto", "1");   // crypto will actually be offered for this jurisdiction
   }
   // Contact details — present only when a call-site opted in via `opts`.
@@ -935,10 +961,17 @@ function ecBuildHandoffURL(rec, plan, origin, opts) {
     set("lastname",  opts.lastname);
     set("phone",     opts.phone);
     set("company",   opts.company);
+    // Opening-fee token from /api/opening-fee confirm. Shape-checked only
+    // (registration verifies the HMAC); anything malformed is dropped rather
+    // than forwarded, so a bad value never looks like proof of payment.
+    if (typeof opts.openingToken === "string" && EC_OPENING_TOKEN_RE.test(opts.openingToken)) {
+      set("opening", opts.openingToken);
+    }
   }
   // ecAppendUtmsToURL appends first-touch UTMs without trampling the above.
   return ecAppendUtmsToURL(url.toString());
 }
+
 
 // ── UTM attribution (first-touch, session-scoped) ──────────────────
 // Marketing attribution flow:
@@ -1025,6 +1058,228 @@ function ecAppendUtmsToURL(url, utms) {
   } catch (e) { return url; }
 }
 
+// ── Resume deep link (PDF / email / Stripe return) ─────────────────
+// The PDF and email "Start setup" CTAs used to jump straight to the
+// external registration. With the opening-fee paywall in front of
+// registration that would be a bypass, so they now point back HERE with
+// the visitor's answers packed into ?resume=<base64url JSON>. EcApp
+// rebuilds the same recommendation from them and opens the result page,
+// whose CTA leads through the paywall. The same link is the Stripe
+// return_url after a 3-D Secure redirect (plus &opening_return=1).
+//
+// Payload v1 uses short keys to keep URLs (and PDF link annotations)
+// compact: c country, i industry, s services, m volume band index, n tx
+// band index, r corridors (region ids + outlier countries), p plan, e email.
+// `v` is the payload version, which is why the volume band is `m`
+// (monthly). Volume, tx count and corridors are each one combined
+// incoming-plus-outgoing answer, like the questions that produce them.
+// Answers only, never derived values, so a link minted before a data or
+// pricing change still resolves against today's rules.
+const EC_RESUME_VERSION = 1;
+const EC_RESUME_MAX_LEN = 4096;       // generous for 7 regions + outliers + email; anything longer is not ours
+const EC_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+// UTF-8 safe base64url. btoa only takes Latin-1, and an email may carry
+// non-ASCII, so go through percent-encoding bytes first. TextEncoder would
+// be tidier but the node test sandbox doesn't provide it.
+function ecB64urlEncode(str) {
+  const bin = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, h) => String.fromCharCode(parseInt(h, 16)));
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+function ecB64urlDecode(s) {
+  const b64 = s.replace(/-/g, "+").replace(/_/g, "/");
+  const bin = atob(b64 + "===".slice((b64.length + 3) % 4));
+  let pct = "";
+  for (let i = 0; i < bin.length; i++) pct += "%" + bin.charCodeAt(i).toString(16).padStart(2, "0");
+  return decodeURIComponent(pct);
+}
+
+function ecBuildResumeURL(rec, plan, origin, opts) {
+  const activePlan = plan || (rec && rec.plan);
+  const payload = { v: EC_RESUME_VERSION };
+  if (rec) {
+    if (rec.country && rec.country.code) payload.c = rec.country.code;
+    if (rec.ind && rec.ind.value) payload.i = rec.ind.value;
+    if (Array.isArray(rec.services)) payload.s = rec.services.slice();
+    if (rec.volumeIdx != null) payload.m = rec.volumeIdx;
+    if (rec.txIdx != null) payload.n = rec.txIdx;
+    if (Array.isArray(rec.corridors)) payload.r = rec.corridors.slice();
+  }
+  if (activePlan && activePlan.id) payload.p = activePlan.id;
+  // Same PII gate as ecBuildHandoffURL: the email rides along only when the
+  // call-site passes it (the PDF/email the visitor asked us to send them).
+  if (opts && typeof opts.email === "string" && EC_EMAIL_RE.test(opts.email.trim())) {
+    payload.e = opts.email.trim();
+  }
+  const base = String(
+    origin
+      || (typeof window !== "undefined" && window.location && window.location.origin)
+      || "https://altery-eligibility.vercel.app"
+  ).replace(/\/+$/, "");
+  return ecAppendUtmsToURL(base + "/?resume=" + ecB64urlEncode(JSON.stringify(payload)));
+}
+
+// Parse ?resume= back into checker answers. Input is untrusted (anyone can
+// hand-craft a link), so every field is checked against today's data
+// tables and anything unknown or out of range is DROPPED rather than
+// clamped: EcApp then falls back to its normal defaults for that field.
+// Returns null when there is nothing usable (no param, undecodable, wrong
+// version, or no valid country, which every recommendation hangs off).
+// Never throws.
+function ecParseResumeParam(search) {
+  try {
+    const params = (search && typeof search === "object" && typeof search.get === "function")
+      ? search
+      : new URLSearchParams(typeof search === "string" ? search : "");
+    const raw = params.get("resume");
+    if (!raw || raw.length > EC_RESUME_MAX_LEN || !/^[A-Za-z0-9_-]+$/.test(raw)) return null;
+    const data = JSON.parse(ecB64urlDecode(raw));
+    if (!data || typeof data !== "object" || Array.isArray(data) || data.v !== EC_RESUME_VERSION) return null;
+
+    const country = typeof data.c === "string" ? EC_COUNTRIES.find((c) => c.code === data.c) : null;
+    if (!country) return null;
+
+    const inRange = (n, len) => (Number.isInteger(n) && n >= 0 && n < len) ? n : undefined;
+    const uniqueFrom = (arr, ok) => Array.isArray(arr)
+      ? Array.from(new Set(arr.filter((x) => typeof x === "string" && ok(x))))
+      : [];
+    // Hidden services can't be un-ticked in the UI, so a link carrying one
+    // (old or hand-made) would pin the visitor to it; drop them like
+    // unknown values.
+    const serviceOk = (v) => EC_SERVICES.some((s) => s.value === v && !s.hidden);
+    // Corridors are region ids or individual outlier countries; the Q5
+    // picker never offers blocked countries as outliers, so neither do we.
+    const corridorOk = (v) =>
+      Object.prototype.hasOwnProperty.call(EC_CHIP_REGIONS, v) ||
+      EC_COUNTRIES.some((c) => c.code === v && c.risk !== "blocked");
+
+    const email = (typeof data.e === "string" && data.e.length <= 254 && EC_EMAIL_RE.test(data.e)) ? data.e : "";
+    return {
+      countryCode:  country.code,
+      industry:     (typeof data.i === "string" && EC_INDUSTRIES.some((x) => x.value === data.i)) ? data.i : "",
+      services:     uniqueFrom(data.s, serviceOk),
+      volumeIdx:    inRange(data.m, EC_VOLUME_BANDS.length),
+      txIdx:        inRange(data.n, EC_TX_BANDS.length),
+      corridors:    uniqueFrom(data.r, corridorOk),
+      planId:       (typeof data.p === "string" && Object.prototype.hasOwnProperty.call(EC_PLANS, data.p)) ? data.p : null,
+      email,
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+// ── Opening-fee config (client) ────────────────────────────────────
+// GET /api/opening-fee says whether the paywall is live on this server and
+// hands over the Stripe publishable key. Fetched once per page load and
+// shared (EcApp warms it on mount so the result page rarely waits).
+//
+// Fail-safe by design: any network, HTTP or parse problem resolves to
+// "disabled", and a disabled checker behaves exactly as it did before the
+// paywall existed (result CTA → registration). That is what makes it safe
+// to deploy this code before the Stripe keys are configured. It also means
+// the checker is NOT the enforcement point: registration must verify the
+// `opening` token server-side.
+//
+// A failed load is marked `failed: true` and NOT cached: the next call asks
+// again. Otherwise one blip at page load would switch the paywall off for
+// the whole visit, and every later "Start setup" would reach registration
+// with no way to pay. Callers that are about to route the visitor retry a
+// failed result once before trusting it (EcResultApproved.goToOnboarding).
+//
+// `preview` lets the team see the paywall UI without Stripe keys: on
+// localhost, or anywhere with ?paywall=preview. It never charges anything;
+// EcPaywall renders a placeholder instead of the card form.
+const EC_OPENING_FEE_CONFIG_TIMEOUT_MS = 8000;
+let ecOpeningFeeConfigPromise = null;
+
+function ecOpeningFeePreviewAllowed() {
+  try {
+    const loc = (typeof window !== "undefined" && window.location) || {};
+    if (loc.hostname === "localhost" || loc.hostname === "127.0.0.1") return true;
+    return new URLSearchParams(loc.search || "").get("paywall") === "preview";
+  } catch (e) { return false; }
+}
+
+function ecLoadOpeningFeeConfig() {
+  if (ecOpeningFeeConfigPromise) return ecOpeningFeeConfigPromise;
+  const fallback = () => Object.assign(
+    { enabled: false, preview: ecOpeningFeePreviewAllowed(), publishableKey: null, failed: true },
+    EC_OPENING_FEE,
+  );
+  const pending = (async () => {
+    try {
+      // window.fetch rather than bare fetch so the node test sandbox can
+      // stub it on the window bag it exposes.
+      const request = window.fetch("/api/opening-fee", {
+        method: "GET",
+        headers: { "Accept": "application/json" },
+        credentials: "same-origin",
+      });
+      // A hung request must not freeze the result CTA, which waits on this.
+      const timeout = (typeof setTimeout === "function")
+        ? new Promise((resolve) => setTimeout(() => resolve(null), EC_OPENING_FEE_CONFIG_TIMEOUT_MS))
+        : null;
+      const res = await (timeout ? Promise.race([request, timeout]) : request);
+      if (!res || !res.ok) return fallback();
+      const j = await res.json();
+      const enabled = !!(j && j.enabled === true && typeof j.publishableKey === "string" && j.publishableKey);
+      // The server is authoritative for the amount, so prefer its values
+      // when they are well-formed; the local mirror only fills gaps.
+      const pick = (key, ok) => (j && ok(j[key])) ? j[key] : EC_OPENING_FEE[key];
+      return {
+        enabled,
+        preview: !enabled && ecOpeningFeePreviewAllowed(),
+        publishableKey: enabled ? j.publishableKey : null,
+        amount:       pick("amount", (v) => Number.isInteger(v) && v > 0),
+        currency:     pick("currency", (v) => typeof v === "string" && /^[a-z]{3}$/.test(v)),
+        display:      pick("display", (v) => typeof v === "string" && v.length > 0 && v.length <= 16),
+        termsVersion: pick("termsVersion", (v) => typeof v === "string" && v.length > 0),
+      };
+    } catch (e) {
+      return fallback();
+    }
+  })();
+  ecOpeningFeeConfigPromise = pending;
+  // Callers already waiting share this answer; the next caller asks again.
+  pending.then((cfg) => {
+    if (cfg && cfg.failed && ecOpeningFeeConfigPromise === pending) ecOpeningFeeConfigPromise = null;
+  });
+  return pending;
+}
+
+// ── Contact email (tab-scoped paywall pre-fill) ────────────────────
+// The address the visitor already gave us in this tab (the proposal they
+// emailed to themselves, or the callback form) pre-fills the opening-fee
+// paywall's work-email field, also after a reload or a detour through the
+// standalone callback link. EcResultApproved holds it in state; this key
+// only carries it across page loads. sessionStorage, so it dies with the
+// tab and never leaves the browser. Storage can be refused (private mode,
+// blocked site data): both helpers are best-effort and never throw.
+const EC_CONTACT_EMAIL_KEY = "altery:ec:contact-email:v1";
+
+function ecCleanContactEmail(raw) {
+  const v = typeof raw === "string" ? raw.trim() : "";
+  return (v.length <= 254 && EC_EMAIL_RE.test(v)) ? v : "";
+}
+
+// The kept address, or "" (none, unreadable, or not an email).
+function ecReadContactEmail() {
+  try {
+    return ecCleanContactEmail(window.sessionStorage.getItem(EC_CONTACT_EMAIL_KEY));
+  } catch (e) { return ""; }
+}
+
+// Keeps `raw` if it is an email and returns it trimmed; returns "" (and
+// keeps nothing) otherwise. The return value is usable even when storage
+// refused the write.
+function ecStoreContactEmail(raw) {
+  const email = ecCleanContactEmail(raw);
+  if (!email) return "";
+  try { window.sessionStorage.setItem(EC_CONTACT_EMAIL_KEY, email); } catch (e) { /* private mode */ }
+  return email;
+}
+
 // ── Cloudflare Zaraz analytics ─────────────────────────────────────
 // Unlike Google Tag Manager there is NO snippet to embed in index.html:
 // once Zaraz is enabled for the zone in the Cloudflare dashboard, the edge
@@ -1078,8 +1333,9 @@ Object.assign(window, {
   ecBaselineFor,
   ecConfidenceLevel, ecFxVolumeRatio, ecLocalSwiftSplit, ecAvgTxGbp,
   ecVolumeHintKey, ecFormatVolume, ecEstimateSavings,
-  ecCheckerContext, ecBookingUrl, ecContactRequestUrl, ecSubmitHubspotLead, ecGenProposalRef,
-  ecBuildHandoffURL,
+  ecCheckerContext, ecBookingUrl, ecContactRequestUrl, ecSubmitHubspotLead, ecGenProposalRef, ecMailto,
+  ecBuildHandoffURL, ecBuildResumeURL, ecParseResumeParam, ecLoadOpeningFeeConfig,
+  ecReadContactEmail, ecStoreContactEmail,
   ecCaptureUtmsFromURL, ecGetStoredUtms, ecStoreUtmsFirstTouch,
   ecCaptureAndStoreUtms, ecAppendUtmsToURL,
 });

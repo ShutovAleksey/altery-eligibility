@@ -11,8 +11,11 @@
 
 Одностраничное веб-приложение («чекер пригодности» для бизнес-банкинга Altery):
 анонимный опрос из 5 вопросов → страница с рекомендацией → опциональная отправка
-PDF-проспекта на e-mail и заявка на обратный звонок. Кнопка «Start setup» уводит
-пользователя на внешнюю регистрацию `app.altery.com`.
+PDF-проспекта на e-mail и заявка на обратный звонок. Если бизнес подходит, кнопка
+«Start setup» ведёт на **пейвол**: разовый сбор за открытие счёта £100 через
+Stripe (карта, Apple Pay или Google Pay; клиент вводит только рабочий e-mail).
+После оплаты пользователь уходит на внешнюю регистрацию `app.altery.com`
+с подписанным токеном оплаты в URL (подробно: [`docs/OPENING-FEE.md`](OPENING-FEE.md)).
 
 Ключевое для инфраструктуры:
 
@@ -24,10 +27,17 @@ PDF-проспекта на e-mail и заявка на обратный зво�
   `devDependencies` — нужен тестам в CI, в образ не попадает.)
 - **Сервис без состояния (stateless).** Нет базы данных, нет файловых томов, нет
   сессий на диске. Единственное состояние — счётчики rate-limit, и те либо в
-  памяти процесса (эфемерные), либо во внешнем Redis (Upstash). Значит: можно
-  свободно масштабировать горизонтально и перезапускать без потерь.
-- **Без Stripe / без платежей.** Платёжный модуль и маршрут `/setup` удалены
-  (июнь 2026). В коде остались только устаревшие комментарии-упоминания.
+  памяти процесса (эфемерные), либо во внешнем Redis (Upstash). Записи об оплате
+  живут в Stripe (PaymentIntent + metadata), токен оплаты проверяется по HMAC без
+  БД. Значит: можно свободно масштабировать горизонтально и перезапускать без потерь.
+- **Stripe вернулся (сентябрь 2026) — только для сбора за открытие счёта.** Старый
+  онбординг `/setup` по-прежнему удалён; платёж теперь один: £100 разово, картой
+  (или Apple Pay / Google Pay поверх карты), списание сразу, без возврата. Stripe вызывается через REST (`lib/stripe.js`),
+  без npm-SDK, так что «ноль runtime-зависимостей» остаётся в силе.
+- **Без ключей Stripe всё работает как раньше.** Пока не заданы все три
+  переменные из раздела 4 (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`,
+  `OPENING_FEE_TOKEN_SECRET`), пейвол выключен, и «Start setup» ведёт прямо на
+  регистрацию. Выкатывать код можно до того, как готовы ключи.
 
 ---
 
@@ -38,7 +48,8 @@ PDF-проспекта на e-mail и заявка на обратный зво�
 | Фронтенд | React 18.3.1 + ReactDOM (UMD), Babel-standalone 7.24.7 — всё с CDN, компиляция JSX в браузере |
 | PDF | html2canvas 1.4.1 + jsPDF 2.5.1 (с CDN, генерация PDF на стороне клиента) |
 | HTTP-сервер | `server.js` — нативный `node:http`, без фреймворка |
-| Бэкенд-функции | `api/send-analysis.js` (письмо с PDF через Brevo), `api/hubspot-lead.js` (лид в HubSpot) |
+| Бэкенд-функции | `api/send-analysis.js` (письмо с PDF через Brevo), `api/hubspot-lead.js` (лид в HubSpot), `api/opening-fee.js` (сбор за открытие счёта через Stripe) |
+| Платежи | Stripe.js v3 + Payment Element (грузится с `js.stripe.com` только на пейволе): карта, Apple Pay, Google Pay; Link выключен. Сервер ходит в Stripe REST API напрямую, без SDK |
 | Аналитика | Microsoft Clarity — грузится **только после согласия** на cookie |
 | Среда выполнения | Node.js 20 (alpine в Dockerfile) |
 
@@ -83,6 +94,9 @@ CI устроен как `test → build → deploy` (стадия `deploy` — 
 | `ALLOWED_ORIGINS` | **да при новом домене** | пусто | Список разрешённых Origin для POST на `/api/*`, через запятую, со схемой (`https://check.altery.com`). См. раздел 7.1 — **без этого формы на новом домене получают 403**. |
 | `UPSTASH_REDIS_REST_URL` | рекоменд. | — | Общий счётчик rate-limit (Upstash Redis REST). Без него — fallback в память процесса. |
 | `UPSTASH_REDIS_REST_TOKEN` | рекоменд. | — | Токен к Upstash; работает в паре с URL выше. |
+| `STRIPE_SECRET_KEY` | **да для пейвола** | — | Секретный ключ Stripe (`sk_live_…` / `sk_test_…`, можно restricted `rk_…` с правом на PaymentIntents). Создаёт и проверяет платёж. В браузер не попадает никогда. |
+| `STRIPE_PUBLISHABLE_KEY` | **да для пейвола** | — | Публичный ключ Stripe (`pk_live_…` / `pk_test_…`), отдаётся браузеру через `GET /api/opening-fee`. Должен начинаться с `pk_`: иначе пейвол считается выключенным (защита от случайно вставленного сюда секретного ключа). Режим (test/live) должен совпадать с `STRIPE_SECRET_KEY`. |
+| `OPENING_FEE_TOKEN_SECRET` | **да для пейвола** | — | Общий секрет HMAC для токена оплаты (`opening` в URL регистрации). **Тот же самый** секрет должен быть у команды регистрации для проверки. Генерировать: `openssl rand -hex 32` (64 символа). **Минимум 32 символа**: короче — пейвол считается выключенным (в логе `[opening-fee] not configured: … shorter than 32 characters`). **Свой секрет на каждое окружение**: продовый секрет никогда не задавать на staging, Vercel Preview или локально (см. 7.8). Смена секрета делает недействительными выданные, но ещё не использованные токены. |
 | `PORT` | нет | `3000` | Порт прослушивания. |
 
 Пример `altery.env`:
@@ -95,7 +109,14 @@ HUBSPOT_TOKEN=pat-…
 ALLOWED_ORIGINS=https://check.altery.com
 UPSTASH_REDIS_REST_URL=https://….upstash.io
 UPSTASH_REDIS_REST_TOKEN=…
+STRIPE_SECRET_KEY=sk_live_…
+STRIPE_PUBLISHABLE_KEY=pk_live_…
+OPENING_FEE_TOKEN_SECRET=…   # openssl rand -hex 32, тот же у регистрации
 ```
+
+Пейвол включается, только когда заданы **все три** Stripe-переменные. Если хоть
+одной нет, `GET /api/opening-fee` отвечает `{"enabled":false,…}`, а чекер ведёт
+«Start setup» прямо на регистрацию, как до пейвола.
 
 ### 4.1 Секреты как файлы (Docker / Swarm secrets, `/run/secrets/…`)
 
@@ -120,6 +141,7 @@ UPSTASH_REDIS_REST_TOKEN=…
 ```
 brevo_api_key   from_email   reply_to   hubspot_token
 allowed_origins   upstash_redis_rest_url   upstash_redis_rest_token
+stripe_secret_key   stripe_publishable_key   opening_fee_token_secret
 ```
 
 **Вариант Б — любое имя секрета + указать путь через `<VAR>_FILE`:**
@@ -157,6 +179,10 @@ secrets:
 |------|-----|
 | `cdnjs.cloudflare.com` | React, ReactDOM, Babel-standalone, html2canvas, jsPDF (с SRI-хешами) |
 | `www.clarity.ms`, `*.clarity.ms` | Microsoft Clarity — **только после согласия на cookie** (ID `ww9jtvpbv1` зашит в `cookie-consent.js`) |
+| `js.stripe.com`, `*.js.stripe.com` | Stripe.js и iframe платёжной формы (Payment Element) — только на пейволе |
+| `api.stripe.com` | запросы Stripe.js из браузера (подтверждение оплаты) |
+| `hooks.stripe.com` | iframe 3-D Secure (подтверждение карты в банке) |
+| `fonts.googleapis.com` | CSS шрифта Inter для полей карты: Stripe.js запрашивает его со страницы (`connect-src`), сами файлы шрифта грузит iframe Stripe — только на пейволе |
 
 ### 5.2 Исходящие соединения СЕРВИСА (важно для egress-фаервола)
 
@@ -166,6 +192,7 @@ secrets:
 |------|-------|
 | `api.brevo.com` | отправка письма с PDF (`POST /v3/smtp/email`) |
 | `api.hubapi.com` | запись лида в HubSpot (`POST /crm/v3/objects/contacts/batch/upsert`) |
+| `api.stripe.com` | создание и проверка платежа (`POST /v1/payment_intents`, `GET /v1/payment_intents/:id`) |
 | ваш `*.upstash.io` | rate-limit (только если используете Upstash) |
 
 ### 5.3 Внешний переход пользователя
@@ -174,13 +201,27 @@ secrets:
 
 ```
 https://app.altery.com/n/registration-corporate?plan=…&country=…&industry=…&services=…
-  &volume_in=…&volume_out=…&tx_in=…&tx_out=…&corridors_in=…&corridors_out=…&crypto=…
+  &corridors_in=…&corridors_out=…&crypto=…
   &utm_source=…&utm_medium=…&utm_campaign=…&utm_term=…&utm_content=…
 ```
+
+Объёмы и число транзакций (`volume_in/volume_out/tx_in/tx_out`) с 2026-09-23
+не передаются: чекер спрашивает одну общую цифру (входящие и исходящие вместе),
+а KYB собирает их по направлениям сам. `corridors_in` и `corridors_out` несут
+один и тот же список регионов: чекер спрашивает коридоры один раз, вместе для
+входящих и исходящих.
 
 (PII — `email/firstname/lastname/phone/company` — добавляются только в потоках
 PDF/письма и обратного звонка, в веб-CTA их нет.) Это просто редирект — никакой
 интеграции на стороне сервиса не требуется.
+
+**При включённом пейволе** переход на регистрацию происходит только после оплаты,
+и к параметрам выше добавляются `opening` (подписанный токен оплаты) и `email`.
+Название и номер компании пейвол не спрашивает: регистрация привязывает оплату
+к первой заявке, пришедшей с этим токеном. Кнопки «Start setup» в PDF и письме
+теперь ведут не на регистрацию, а обратно на чекер (`/?resume=…`), чтобы пейвол
+нельзя было обойти. Что регистрация должна сделать с этими параметрами — в
+[`docs/OPENING-FEE.md`](OPENING-FEE.md).
 
 ---
 
@@ -195,9 +236,20 @@ security-заголовки и проксирует на контейнер. **�
 1. **Проксировать на контейнер `:3000`.** Проще всего — весь трафик (контейнер сам
    отдаёт и статику, и `/api/*`). Если хотите, чтобы статику отдавал Nginx, а на
    контейнер шёл только `/api/*` — см. примечание ниже.
-2. **Пробросить реальный IP и заголовки Forwarded** — критично (см. 7.3):
-   `X-Forwarded-For`, `X-Forwarded-Proto`, `X-Forwarded-Host`, `Host`.
+2. **Пробросить реальный IP клиента и заголовки Forwarded** — критично (см. 7.3):
+   `X-Forwarded-For` **перезаписать** реальным IP (не дописывать), плюс
+   `X-Forwarded-Proto`, `X-Forwarded-Host`, `Host`.
 3. **Выставить security-заголовки + CSP** (точные значения — в 7.2).
+
+Реальный IP за Cloudflare берётся из `CF-Connecting-IP`, и доверять ему можно
+только от адресов самого Cloudflare. Список диапазонов меняется, поэтому его
+лучше генерировать, а не копировать руками:
+
+```bash
+# /etc/nginx/cloudflare-real-ip.conf — перегенерировать при изменении списка
+{ curl -fsS https://www.cloudflare.com/ips-v4; echo; curl -fsS https://www.cloudflare.com/ips-v6; } \
+  | sed '/^$/d; s/.*/set_real_ip_from &;/' > /etc/nginx/cloudflare-real-ip.conf
+```
 
 Референс-конфиг:
 
@@ -206,13 +258,18 @@ server {
     listen 443 ssl http2;
     server_name check.altery.com;            # ← ваш итоговый домен
 
+    # Реальный IP клиента: из CF-Connecting-IP, и только от адресов Cloudflare.
+    # После этого $remote_addr = IP клиента (см. 7.3).
+    include /etc/nginx/cloudflare-real-ip.conf;
+    real_ip_header CF-Connecting-IP;
+
     # Письмо с PDF шлётся как base64 (~3–4 МБ). Дефолтный лимит nginx 1 МБ
     # режет такой POST → за Cloudflare это всплывает как HTTP 520. Сервис сам
     # принимает до 6 МБ, поэтому ставим с запасом:
     client_max_body_size 8m;
 
     # --- security-заголовки (раньше были в vercel.json) ---
-    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://www.clarity.ms https://*.clarity.ms; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.hubapi.com https://api.brevo.com https://www.clarity.ms https://*.clarity.ms https://cdnjs.cloudflare.com; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'self';" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://www.clarity.ms https://*.clarity.ms https://js.stripe.com https://*.js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://api.hubapi.com https://api.brevo.com https://www.clarity.ms https://*.clarity.ms https://cdnjs.cloudflare.com https://api.stripe.com https://fonts.googleapis.com; frame-src https://js.stripe.com https://*.js.stripe.com https://hooks.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self';" always;
     add_header X-Content-Type-Options "nosniff" always;
     add_header X-Frame-Options "SAMEORIGIN" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
@@ -222,7 +279,7 @@ server {
     location / {
         proxy_pass http://altery_eligibility:3000;
         proxy_set_header Host              $host;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;  # ← rate-limit
+        proxy_set_header X-Forwarded-For   $remote_addr;                # ← rate-limit: ПЕРЕЗАПИСАТЬ, не $proxy_add_x_forwarded_for
         proxy_set_header X-Forwarded-Proto $scheme;                     # ← логотип в письме
         proxy_set_header X-Forwarded-Host  $host;                       # ← логотип в письме
         proxy_read_timeout 30s;                                         # ← запас на вызов Brevo
@@ -250,9 +307,13 @@ directive …` — не фатально, но значит, что заголо
 
 ### 7.1 `ALLOWED_ORIGINS` — иначе формы молча отдают 403
 
-`/api/*` (отправка PDF и заявка-лид) проверяет заголовок `Origin` по allow-list.
-В коде зашиты только `altery.com`, `www.altery.com` и старый `*.vercel.app`. POST
-с любого другого Origin → **403** (`{"error":"Request rejected.","code":"spam_check_failed"}`).
+`/api/*` (отправка PDF, заявка-лид и оплата на пейволе) проверяет заголовок `Origin` по allow-list.
+В коде зашиты только `altery.com`, `www.altery.com` и `altery-eligibility.vercel.app`
+(плюс собственные хосты текущего Vercel-деплоя из `VERCEL_URL` / `VERCEL_BRANCH_URL`;
+шаблона «любой `*.vercel.app` с altery в имени» больше нет: такой хост может
+зарегистрировать кто угодно). POST с любого другого Origin → **403**
+(`{"error":"Request rejected.","code":"spam_check_failed"}`). Тот же список
+определяет, куда может вести кнопка в письме с PDF.
 При этом статика и сам опрос работают как ни в чём не бывало — поэтому поломку
 легко не заметить.
 
@@ -274,9 +335,15 @@ CSP завязан на источники ресурсов (`'self'` + пере
 
 ### 7.3 `X-Forwarded-*` — от них зависят rate-limit и логотип в письме
 
-- **Rate-limit** берёт IP из `X-Forwarded-For` → `X-Real-IP` → иначе `"unknown"`.
-  Если Nginx/Cloudflare не пробросят реальный IP, **весь трафик схлопнется в один
-  бакет `unknown`** и легитимные пользователи начнут лимитировать друг друга.
+- **Rate-limit** берёт IP из **первого (левого)** значения `X-Forwarded-For` →
+  `X-Real-IP` → иначе `"unknown"`. Поэтому Nginx должен **перезаписывать**
+  `X-Forwarded-For` реальным IP клиента (`$remote_addr` после `real_ip` из
+  `CF-Connecting-IP`, конфиг в разделе 6). С `$proxy_add_x_forwarded_for`
+  первым остаётся то, что прислал сам клиент: подставляя каждый раз новый
+  адрес, можно обойти все лимиты по IP, включая лимит на создание платежей
+  (раздолье для перебора украденных карт).
+- Если Nginx/Cloudflare не пробросят реальный IP вовсе, **весь трафик схлопнется в
+  один бакет `unknown`** и легитимные пользователи начнут лимитировать друг друга.
 - **Логотип в письме** строится из `X-Forwarded-Proto` / `X-Forwarded-Host` / `Host`
   (`${proto}://${host}/images/altery-logo.png`). Если их не пробросить — картинка
   в письме не загрузится (текст-фолбэк останется).
@@ -317,6 +384,43 @@ Cloudflare «origin вернул непонятный ответ», **прило
 `FROM_EMAIL`). `mailto`-ошибка «user gesture is required» в той же консоли — не
 про это; она про кнопку «Contact our team», к отправке письма отношения не имеет.
 
+### 7.8 Stripe: ключи, режим, кошельки и CSP
+
+- **Все три переменные или ничего.** Пейвол включается только при
+  `STRIPE_SECRET_KEY` + `STRIPE_PUBLISHABLE_KEY` + `OPENING_FEE_TOKEN_SECRET`.
+  Проверка: `curl -s https://<домен>/api/opening-fee` → `"enabled":true`.
+- **Test и live не смешивать.** `sk_test_…` с `pk_live_…` (и наоборот) дают
+  рабочую на вид форму, но платёж не подтверждается. Меняйте пару целиком.
+- **Секрет токена — свой в каждом окружении.** Тестовая оплата бесплатна
+  (карта `4242…`). Если staging, Vercel Preview или локальный запуск с test-ключами
+  получит продовый `OPENING_FEE_TOKEN_SECRET`, он сможет выпускать токены, которые
+  подпись продовой регистрации примет. Токен несёт `lm` (live mode) внутри подписи,
+  и продовая регистрация отклоняет `lm:false` (см. `docs/OPENING-FEE.md`, раздел 4),
+  но это вторая линия защиты: первая — продовый секрет только на проде. На Vercel
+  задавать его только для окружения Production, не для Preview/Development.
+- **CSP.** Без `js.stripe.com` в `script-src`/`frame-src`, `hooks.stripe.com` в
+  `frame-src` и `api.stripe.com` в `connect-src` форма карты не появится (в консоли
+  будет ошибка CSP). `fonts.googleapis.com` в `connect-src` нужен шрифту полей
+  карты (без него форма работает, но в консоли ошибки CSP и шрифт системный).
+  Готовая строка — в разделе 6.
+- **Apple Pay / Google Pay — только на зарегистрированном домене.** Кошельки
+  идут поверх типа `card` (сервер создаёт платёж с `payment_method_types: ["card"]`),
+  но Stripe показывает их кнопки только на домене, зарегистрированном в Stripe:
+  Dashboard → Settings → Payment methods → Payment method domains, или API
+  `POST /v1/payment_method_domains` с `domain_name=<домен>` (подробнее —
+  `docs/OPENING-FEE.md`, раздел 7). Только по HTTPS; на `localhost` кошельков не
+  будет никогда, там только поле карты. Итоговый домен чекера ещё не выбран,
+  поэтому регистрация домена — шаг выката (раздел 9). Без неё пейвол работает,
+  но только картой.
+- **`Permissions-Policy` не должен запрещать `payment`.** Текущее значение
+  (раздел 6) его не трогает. Если добавить `payment=()`, браузер запретит
+  Payment Request / Apple Pay во фрейме Stripe и кошельки пропадут.
+- **Stripe Link выключен** в интерфейсе пейвола сознательно; его отсутствие в
+  форме — не поломка.
+- **Stripe Dashboard.** Включить письма-квитанции об успешной оплате (Settings →
+  Customer emails → Successful payments), иначе `receipt_email` не отправляется.
+  Подробнее — в `docs/OPENING-FEE.md`.
+
 ---
 
 ## 8. Приёмочный smoke-тест (после выката)
@@ -327,9 +431,21 @@ Cloudflare «origin вернул непонятный ответ», **прило
    письме виден — это проверяет проброс `X-Forwarded-*`).
 4. **Заявка на обратный звонок** → в HubSpot появляется контакт с заполненными
    `checker_*` свойствами (это проверяет `HUBSPOT_TOKEN` + кастомные свойства).
-5. **«Start setup»** → редирект на `app.altery.com/n/registration-corporate` с
-   параметрами в URL.
-6. В консоли браузера нет ошибок CSP (это проверяет корректность п. 7.2).
+5. **«Start setup»** → при выключенном пейволе: редирект на
+   `app.altery.com/n/registration-corporate` с параметрами в URL. При включённом:
+   открывается пейвол: поле рабочего e-mail и форма оплаты (полей названия и
+   номера компании нет). В test-режиме оплатить картой
+   `4242 4242 4242 4242` (любая будущая дата, любой CVC) → редирект на регистрацию,
+   в URL есть `opening=v1.…` и `email` (без `company` / `company_number`). В Stripe
+   Dashboard платёж £100 виден с `metadata.kind = account_opening_fee` и
+   `metadata.email`. (Токен тестовой оплаты помечен `lm:false`: продовая
+   регистрация его отклонит, так и задумано.)
+6. **Кошельки** (на итоговом домене, по HTTPS, после регистрации домена в Stripe,
+   см. 7.8): в форме оплаты видна кнопка Apple Pay (Safari на устройстве Apple с
+   картой в Wallet) и Google Pay (Chrome с картой в аккаунте Google); открыть
+   каждую и закрыть, не платя. Кнопок нет → домен не зарегистрирован в Stripe
+   или статус кошелька для домена не активен. На `localhost` кнопок нет всегда.
+7. В консоли браузера нет ошибок CSP (это проверяет корректность п. 7.2).
 
 Если п. 3 или 4 отдают 403 — почти наверняка не задан `ALLOWED_ORIGINS` (см. 7.1).
 
@@ -338,14 +454,21 @@ Cloudflare «origin вернул непонятный ответ», **прило
 ## 9. Порядок выката
 
 1. Зафиксировать итоговый домен (например `check.altery.com`).
-2. Завести секреты/env на сервисе (раздел 4), включая `ALLOWED_ORIGINS` с этим доменом.
-3. Проверить готовность внешних систем: Brevo verified sender (7.5), кастомные
-   свойства в HubSpot (7.4), egress к `api.brevo.com` / `api.hubapi.com` (5.2).
-4. Собрать образ из репозитория, поднять за Nginx, дождаться зелёного `/healthz`.
-5. Настроить Nginx: проксирование + `X-Forwarded-*` + заголовки/CSP (раздел 6).
-6. Завести DNS поддомена в Cloudflare на Nginx.
-7. Прогнать smoke-тест (раздел 8).
-8. Только после подтверждения — выключить проект на Vercel.
+2. Зарегистрировать этот домен в Stripe для Apple Pay / Google Pay (Payment
+   method domains, см. 7.8). Без этого пейвол примет только карту.
+3. Завести секреты/env на сервисе (раздел 4), включая `ALLOWED_ORIGINS` с этим доменом.
+4. Проверить готовность внешних систем: Brevo verified sender (7.5), кастомные
+   свойства в HubSpot (7.4), egress к `api.brevo.com` / `api.hubapi.com` /
+   `api.stripe.com` (5.2). Для пейвола: регистрация уже проверяет `opening` и
+   хранит `pi` из токена с UNIQUE-ограничением (одна оплата = одна заявка, см.
+   `docs/OPENING-FEE.md`, раздел 5), у неё тот же `OPENING_FEE_TOKEN_SECRET`, в
+   Stripe включены квитанции (7.8). Пока это не готово, Stripe-переменные можно
+   не задавать: пейвол просто выключен.
+5. Собрать образ из репозитория, поднять за Nginx, дождаться зелёного `/healthz`.
+6. Настроить Nginx: проксирование + `X-Forwarded-*` + заголовки/CSP (раздел 6).
+7. Завести DNS поддомена в Cloudflare на Nginx.
+8. Прогнать smoke-тест (раздел 8).
+9. Только после подтверждения — выключить проект на Vercel.
 
 ## 10. Откат
 

@@ -13,7 +13,7 @@ function input(o = {}) {
   return {
     countryCode: "GB", industry: "saas", businessType: "ltd",
     monthlyVolume: 750000, monthlyTx: 200,
-    corridorsIn: [], corridorsOut: [], services: [],
+    corridors: [], services: [],
     ...o,
   };
 }
@@ -33,7 +33,8 @@ test("approved rec always carries a usable entity + plan, even for unknown count
 });
 
 test("ecRecommend does not throw on missing / degenerate inputs", () => {
-  assert.doesNotThrow(() => w.ecRecommend(input({ services: null, corridorsIn: null, corridorsOut: null })));
+  assert.doesNotThrow(() => w.ecRecommend(input({ services: null, corridors: null })));
+  assert.doesNotThrow(() => w.ecRecommend(input({ corridors: "uk-eea" })), "a bare string is not a corridor list");
   assert.doesNotThrow(() => w.ecRecommend(input({ monthlyVolume: 0 })));
   assert.doesNotThrow(() => w.ecRecommend(input({ industry: null })));
   assert.doesNotThrow(() => w.ecRecommend({}));

@@ -21,14 +21,14 @@ const read = (f) => fs.readFileSync(path.join(root, f), "utf8");
 // Source files that EXPORT window globals (loaded as <script> in index.html).
 const PROVIDERS = [
   "components.jsx", "icons.jsx", "checker-atoms.jsx", "checker-flag-lang.jsx",
-  "checker-screens.jsx", "checker-modals.jsx",
+  "checker-screens.jsx", "checker-modals.jsx", "checker-paywall.jsx",
   "checker-data.js", "checker-helpers.js", "checker-pdf.js", "checker-pdf-assets.js",
   "inline-flags.js", "cookie-consent.js",
 ];
 // Browser scripts that CONSUME globals via /* global ... */.
 const CONSUMERS = [
   "components.jsx", "icons.jsx", "checker-atoms.jsx", "checker-flag-lang.jsx",
-  "checker-screens.jsx", "checker-modals.jsx",
+  "checker-screens.jsx", "checker-modals.jsx", "checker-paywall.jsx",
 ];
 // React / browser / lexically-scoped runtime names — provided by the runtime
 // (or the single React-hook destructure in checker-flag-lang.jsx), not via window.

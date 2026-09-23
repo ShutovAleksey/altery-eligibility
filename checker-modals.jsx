@@ -4,7 +4,7 @@
           ecCurrencyFlag, ecCurrencyName, ecComputeCostBreakdown,
           ecOutcomesForSavings, ecGenProposalRef,
           ecBuildAnalysisHTML, ecSendAnalysisEmail, ecWaitForPdfLibs,
-          ecBuildHandoffURL,
+          ecBuildHandoffURL, ecLoadOpeningFeeConfig, ecAppendUtmsToURL,
           EcIco, ecSubmitHubspotLead */
 // checker-modals.jsx — all the modal/handoff/payment overlays the result
 // page can open.
@@ -54,6 +54,19 @@ const PLAN_CAPABILITIES = [
 // creates a containing block for position:fixed descendants).
 function EcPlanComparisonModal({ activePlanId, recommendedPlanId, onSelect, onClose }) {
   const t = useT();
+
+  // Opening-fee config (cached after the result page's load). With the fee
+  // on, every card states it under its price: the fee is the same on all
+  // three plans, and a comparison that showed only the monthly prices would
+  // leave the one-time charge out of the very screen people use to weigh
+  // costs.
+  const [feeCfg, setFeeCfg] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    ecLoadOpeningFeeConfig().then((cfg) => { if (alive) setFeeCfg(cfg); });
+    return () => { alive = false; };
+  }, []);
+  const fee = feeCfg && (feeCfg.enabled || feeCfg.preview) ? feeCfg.display : "";
 
   // ESC key closes — keyboard a11y baseline
   useEffect(() => {
@@ -107,6 +120,7 @@ function EcPlanComparisonModal({ activePlanId, recommendedPlanId, onSelect, onCl
             <EcPlanCompareCard
               key={plan.id}
               plan={plan}
+              fee={fee}
               onSelect={() => onSelect(plan.id)}
             />
           ))}
@@ -211,7 +225,9 @@ function EcPlanIcon({ iconKey, size = 22 }) {
   return <Icon style={{ width: size, height: size }} />;
 }
 
-function EcPlanCompareCard({ plan, onSelect }) {
+// `fee` (optional) is the opening fee's display amount; empty when the fee
+// is off, and then no row renders.
+function EcPlanCompareCard({ plan, fee, onSelect }) {
   const t = useT();
   const priceValue = plan.priceKey ? t(plan.priceKey) : plan.price;
   const cycleText = t(plan.cycleKey);
@@ -250,6 +266,14 @@ function EcPlanCompareCard({ plan, onSelect }) {
           <span className="ec-plan-compare__priceValue">{priceValue}</span>
           <span className="ec-plan-compare__priceCycle">/ {cycleText.replace(/^\/\s*/, "")}</span>
         </div>
+        {/* One-time opening fee right under the monthly price, identical on
+            every card, so the two figures are never mistaken for one. */}
+        {fee && (
+          <div className="ec-plan-compare__opening">
+            <span className="ec-plan-compare__feeLabel">{t("ec.r.costs.fee")}</span>
+            <span className="ec-plan-compare__feeValue">{t("ec.r.costs.oneTimeValue", { fee: fee })}</span>
+          </div>
+        )}
       </div>
 
       <div className="ec-plan-compare__divider" />
@@ -366,8 +390,27 @@ function EcPrivacyConsent({ checked, onChange, error }) {
   );
 }
 
-function EcCallbackForm({ email: emailProp, rec, context }) {
+// `onContinue` (optional) is supplied when the form sits inside the result
+// page (via EcHandoffModal): its success button then hands back to the
+// result page's "Start setup", which goes through the opening-fee paywall.
+// Without it (the standalone ?contact=1 deep link) there is no result to
+// pay against, so see the success branch below.
+//
+// `onEmailCaptured(email)` (optional) runs once the lead is in, with the
+// address the visitor gave here; the opening-fee paywall pre-fills its work
+// email from it (kept by the approved result page, or by
+// ecStoreContactEmail on the standalone link).
+function EcCallbackForm({ email: emailProp, rec, context, onContinue, onEmailCaptured }) {
   const t = useT();
+  // Opening-fee config (cached after the first success): decides the success
+  // button's label, which names where the click goes.
+  const [feeCfg, setFeeCfg] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    ecLoadOpeningFeeConfig().then((cfg) => { if (alive) setFeeCfg(cfg); });
+    return () => { alive = false; };
+  }, []);
+  const feeOn = !!(feeCfg && (feeCfg.enabled || feeCfg.preview));
   const [firstname, setFirstname] = useState("");
   const [lastname, setLastname]   = useState("");
   const [company, setCompany]     = useState("");
@@ -411,30 +454,55 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
       antiSpam: { website: honeypot, formLoadedAt: formLoadedAt.current },
     });
     setSubmitting(false);
-    if (res && res.ok) setDone(true);
-    else setError(t("ec.handoff.error"));
+    if (res && res.ok) {
+      setDone(true);
+      if (typeof onEmailCaptured === "function") onEmailCaptured(email.trim());
+    } else {
+      setError(t("ec.handoff.error"));
+    }
   };
 
   if (done) {
-    // Lead is now in HubSpot. Offer the same hop to the external registration
-    // the result page does — pre-filled with everything this form collected
+    // Lead is now in HubSpot. Offer the same next step the result page does.
+    // The contact set is what registration used to get pre-filled with
     // (founder decision 2026-06-15: contact details ride the URL so the
     // registration form pre-fills). `rec` carries the non-PII profile; the
     // opts object carries the PII the user just gave us here.
-    const regURL = ecBuildHandoffURL(rec, rec && rec.plan, null, {
+    const contact = {
       firstname: firstname.trim(),
       lastname:  lastname.trim(),
       company:   company.trim(),
       phone:     phone.trim(),
       email:     email.trim(),
-    });
+    };
+    const continueToSetup = () => {
+      // Inside the result page: its "Start setup" decides between the
+      // paywall (its email already pre-filled through onEmailCaptured) and
+      // the fee-off redirect, which still carries this full contact set.
+      if (onContinue) { onContinue({ handoff: contact }); return; }
+      // Standalone deep link: with the fee on, registration is only reached
+      // through the paywall, which needs a result, so run the check first.
+      // With it off, keep the direct pre-filled registration link. Asked
+      // afresh: a config that failed at mount isn't cached.
+      ecLoadOpeningFeeConfig().then((cfg) => {
+        window.location.href = (cfg.enabled || cfg.preview)
+          ? ecAppendUtmsToURL("/")
+          : ecBuildHandoffURL(rec, rec && rec.plan, null, contact);
+      });
+    };
+    // The label says where the click goes. Standalone with the fee on, it
+    // starts the eligibility check ("Build my plan"), not account setup;
+    // inside the result page with the fee on, it leads to the paywall
+    // ("Continue to account opening").
+    const toCheck = !onContinue && feeOn;
+    const ctaKey = toCheck ? "ec.intro.cta" : feeOn ? "ec.r.cta.opening" : "ec.r.cta.continue";
     return (
       <div className="ec-callback__success">
         <div>✓ {t("ec.callback.success")}</div>
-        <div style={{ marginTop: 14 }}>
+        <div style={{ marginTop: 14, display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 10 }}>
           <Button variant="primary" iconRight="arrowRight"
-                  onClick={() => { window.location.href = regURL; }}>
-            {t("ec.r.cta.continue")}
+                  onClick={continueToSetup}>
+            {t(ctaKey)}
           </Button>
         </div>
       </div>
@@ -535,7 +603,12 @@ function EcCallbackForm({ email: emailProp, rec, context }) {
   );
 }
 
-function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
+// `onEmailCaptured(email)` (optional) runs after a successful send to the
+// visitor's own address, so the opening-fee paywall can pre-fill its work
+// email. Only the primary recipient: the colleague-forward address is
+// someone else's and is never reported. The nested callback form reports
+// through the same hook.
+function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage, onEmailCaptured }) {
   const t = useT();
   // Three-state machine, not a boolean — keeps the JSX readable and
   // makes adding future states (e.g. "loading", "error-retry") trivial.
@@ -569,6 +642,17 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
   // sends (primary recipient and colleague copy). See lib/anti-spam.js.
   const [honeypot, setHoneypot] = useState("");
   const formLoadedAt = useRef(Date.now());
+
+  // Both "Start setup" buttons in here open the opening-fee paywall when
+  // the fee is on, so they take the result page's "Continue to account
+  // opening" label instead of their setup wording.
+  const [feeCfg, setFeeCfg] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    ecLoadOpeningFeeConfig().then((cfg) => { if (alive) setFeeCfg(cfg); });
+    return () => { alive = false; };
+  }, []);
+  const feeOn = !!(feeCfg && (feeCfg.enabled || feeCfg.preview));
 
   // Engagement signal for the next-steps checklist on the sent stage.
   // colleagueSent → step 2 ("Forward to your CFO or co-founder") flips done.
@@ -607,6 +691,7 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
         antiSpam: { website: honeypot, formLoadedAt: formLoadedAt.current },
       });
       setStage("sent");
+      if (typeof onEmailCaptured === "function") onEmailCaptured(email.trim());
     } catch (err) {
       console.error("[EcHandoffModal] email send failed:", err);
       setSubmitError(t("ec.handoff.error"));
@@ -683,10 +768,10 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                 variant="primary"
                 size="xl"
                 full
-                onClick={onContinueToSetup}
+                onClick={() => onContinueToSetup()}
                 iconRight="arrowRight"
               >
-                {t("ec.handoff.continue")}
+                {t(feeOn ? "ec.r.cta.opening" : "ec.handoff.continue")}
               </Button>
               <Button
                 variant="ghost"
@@ -840,13 +925,17 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
                 options view so the secondary tiles are visible above
                 it without competing visually. */}
             <div className="ec-handoff__actions">
+              {/* The paywall's work email is already pre-filled with the
+                  address the proposal just went to (onEmailCaptured). No
+                  contact goes along: without the fee the redirect stays
+                  PII-free, as it always was from here. */}
               <Button
                 variant="primary"
                 size="xl"
-                onClick={onContinueToSetup}
+                onClick={() => onContinueToSetup()}
                 iconRight="arrowRight"
               >
-                {t("ec.handoff.continueAnyway")}
+                {t(feeOn ? "ec.r.cta.opening" : "ec.handoff.continueAnyway")}
               </Button>
             </div>
           </div>
@@ -919,7 +1008,8 @@ function EcHandoffModal({ rec, onClose, onContinueToSetup, initialStage }) {
             </button>
             <h2 id="ec-handoff-title" className="ec-modal__title">{t("ec.callback.title")}</h2>
             <p className="ec-handoff__lead">{t("ec.callback.sla")}</p>
-            <EcCallbackForm email={email} rec={rec} />
+            <EcCallbackForm email={email} rec={rec} onContinue={onContinueToSetup}
+                            onEmailCaptured={onEmailCaptured} />
           </div>
         )}
       </div>

@@ -546,6 +546,14 @@
         color: rgba(255,255,255,.45);
         white-space: nowrap;
       }
+      /* The "Account opening" step's status is the fee ("£100 · one-time"),
+         longer than "Completed", and a translated label can run long too:
+         let the pair wrap onto two lines on a 320px sidebar rather than
+         push past the column. The question steps keep the one-line rule. */
+      .ec-sidebar__step--fee .ec-sidebar__step__body {
+        flex-wrap: wrap;
+        row-gap: 2px;
+      }
       /* Clickable done-step — bare <button> wraps the num + body so the
          entire row reads as one tap target. Background remains transparent
          in default state (the sidebar is brand-dark, no chrome needed)
@@ -654,18 +662,6 @@
       font-size: 11px;
       line-height: 16px;
       color: var(--c-muted);
-    }
-
-    /* Q4 grouping — Incoming / Outgoing payment-flow sections. Volume
-       slider + tx-count Select sit inside each section under a small
-       bold heading. */
-    .ec-flow-section {
-      display: flex; flex-direction: column; gap: 16px;
-    }
-    .ec-flow-section__head {
-      font-size: 16px; font-weight: 600;
-      color: var(--c-ink);
-      margin: 0;
     }
 
     /* ── Q5 region chips ─────────────────────────────────────────────
@@ -824,17 +820,6 @@
       cursor: pointer;
     }
     .ec-region-chips__addCancel:hover { color: var(--c-ink); }
-
-    /* "Different mix for in vs out?" toggle row. */
-    .ec-q5-asym {
-      display: inline-flex; align-items: center; gap: 8px;
-      align-self: flex-start;
-      font-size: 13px;
-      color: var(--c-ink-2);
-      cursor: pointer;
-      padding: 4px 0;
-    }
-    .ec-q5-asym input { margin: 0; }
 
     .ec-slider { display: flex; flex-direction: column; gap: 10px; }
     .ec-slider__head {
@@ -1544,6 +1529,17 @@
     }
     .ec-plan-compare__priceCycle {
       font-size: 13px; color: var(--c-muted);
+    }
+    /* One-time opening fee under the monthly price (fee on only). Same
+       label/value pair as the fee rows further down, set off from the
+       price by a dashed rule so it reads as a second, separate charge. */
+    .ec-plan-compare__opening {
+      display: flex; align-items: baseline; justify-content: space-between;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--c-border-soft);
+      font-size: 13px;
     }
     .ec-plan-compare__divider {
       height: 1px;
@@ -2402,8 +2398,9 @@
          collides with the price on the same row. Stack name/fit vertically;
          price stays right-top aligned. */
       /* ── Slider head ──
-         "Combined incoming + outgoing volume" runs ~32 chars in German/NL.
-         Allow value to wrap below the label rather than colliding. */
+         "Average monthly volume, incoming and outgoing combined (in GBP)"
+         runs ~75 chars in German/Polish/French. Allow the value to wrap
+         below the label rather than colliding. */
       .ec-slider__head { flex-wrap: wrap; }
 
       /* ── Plan switch ──
@@ -2639,6 +2636,72 @@
 
     /* ── Savings card ─────────────────────────────────────────────── */
     .ec-r__savings { gap: 0; }
+
+    /* ── Cost block (EcCosts) ──────────────────────────────────────────
+       Two cells, one per charge, labelled by WHEN each is paid:
+         TODAY · ONE-TIME            AFTER ACTIVATION · MONTHLY
+         £100                        £100
+         Account opening fee         Pro plan
+       Shared by the result page's rates card and the paywall summary, so
+       both screens show the same figures in the same arrangement. The
+       Pro subscription and the opening fee are both £100, so the time
+       eyebrow is what keeps them from reading as one charge or as £200.
+       Amounts in IBM Plex Mono like the other money figures in the
+       product; ink rather than navy so neither cell outranks the other. */
+    .ec-costs {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      border: 1px solid var(--c-border);
+      border-radius: var(--r-lg);
+      background: var(--c-surface);
+      overflow: hidden;
+    }
+    .ec-costs__cell {
+      display: flex; flex-direction: column; gap: 4px;
+      min-width: 0;
+      padding: 16px 18px;
+    }
+    .ec-costs__cell + .ec-costs__cell { border-left: 1px solid var(--c-border); }
+    .ec-costs__when {
+      font-size: 11px; line-height: 16px; font-weight: 600;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--c-muted);
+    }
+    .ec-costs__amount {
+      font-family: var(--ff-mono);
+      font-size: 26px; line-height: 32px; font-weight: 600;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      color: var(--c-ink);
+    }
+    .ec-costs__what {
+      font-size: 14px; line-height: 20px;
+      color: var(--c-ink-2);
+    }
+    /* Paywall only, with a promo code applied: the full fee struck through
+       before the discounted figure, and the line naming a free code. */
+    .ec-costs__was {
+      margin-right: 8px;
+      font-size: 16px; line-height: 20px; font-weight: 500;
+      letter-spacing: 0;
+      color: var(--c-muted);
+      text-decoration: line-through;
+    }
+    .ec-costs__note {
+      font-size: 12px; line-height: 16px; font-weight: 600;
+      color: var(--c-success);
+    }
+    /* Inside the rates card the block sits between the "Your costs"
+       eyebrow (own margin below) and the rates eyebrow that follows. */
+    .ec-r__savings > .ec-costs { margin-bottom: 20px; }
+    @media (max-width: 560px) {
+      .ec-costs { grid-template-columns: minmax(0, 1fr); }
+      .ec-costs__cell + .ec-costs__cell {
+        border-left: 0;
+        border-top: 1px solid var(--c-border);
+      }
+      .ec-costs__amount { font-size: 24px; line-height: 30px; }
+    }
     .ec-r__compare {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -3102,4 +3165,205 @@
       .ec-r__savingsHero__amount { font-size: 26px; }
       .ec-r__planPrice__amount { font-size: 24px; }
       .ec-r__action__secondary { justify-content: center; width: 100%; }
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       OPENING-FEE PAYWALL — EcPaywall (/checker-paywall.jsx)
+       One-time account opening fee between the approved result and the
+       external registration app. Built to read as the next page of the
+       result, not a checkout bolted on: the same 20px white cards with a
+       hairline border as .ec-r__card, the same uppercase micro-labels, the
+       beige outcome panel (#F0EBE3) for "what the fee covers", and the
+       result page's own two-cell cost block (.ec-costs, above) repeated in
+       the summary. Single column inside .ec-content (600px max), so mobile
+       only needs tighter padding. Values mirror the .ec-r__ rules on
+       purpose instead of reusing those classes (the cost block excepted:
+       it must look identical on both screens), so a result-page redesign
+       can't silently restyle the payment step.
+       ════════════════════════════════════════════════════════════════════════ */
+    .ec-pw { display: flex; flex-direction: column; gap: 20px; }
+    .ec-pw__back:disabled { opacity: .5; cursor: default; }
+
+    /* ── Heading ──────────────────────────────────────────────────── */
+    .ec-pw__head { display: flex; flex-direction: column; gap: 8px; }
+    .ec-pw__title {
+      margin: 0;
+      font-size: 28px; line-height: 36px; font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--c-ink);
+      text-wrap: balance;
+    }
+    .ec-pw__lead {
+      margin: 0; max-width: 520px;
+      font-size: 14px; line-height: 20px;
+      color: var(--c-muted);
+    }
+
+    /* ── Summary card: "Eligible" + entity on top, the cost block below ── */
+    .ec-pw__summary {
+      display: flex; flex-direction: column;
+      gap: 16px;
+      padding: 20px 24px;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 20px;
+      box-shadow: 0 2px 4px rgba(17, 20, 26, .02);
+    }
+    .ec-pw__summaryMain {
+      display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px;
+      min-width: 0;
+    }
+    .ec-pw__entity {
+      font-size: 16px; line-height: 22px; font-weight: 600;
+      color: var(--c-ink);
+    }
+    /* The block sits on the card's own white, so it keeps its border and
+       drops the card-in-card shadow it would otherwise inherit. */
+    .ec-pw__summary > .ec-costs { background: var(--c-bg); }
+
+    /* ── What the fee covers — beige outcome panel ─────────────────── */
+    .ec-pw__includes {
+      padding: 20px 24px;
+      background: #F0EBE3;
+      border-radius: 20px;
+    }
+    .ec-pw__includesHead {
+      margin: 0 0 14px;
+      font-size: 14px; line-height: 20px; font-weight: 600;
+      color: var(--c-ink);
+    }
+    .ec-pw__list {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .ec-pw__item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; line-height: 20px;
+      color: var(--c-ink-2);
+    }
+    .ec-pw__tick {
+      flex: 0 0 20px; width: 20px; height: 20px;
+      border-radius: 999px;
+      background: var(--c-surface);
+      color: var(--c-primary);
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+
+    /* ── Payment details card: work email, billing country, card ─────
+       One column of full-width fields with the same 16px rhythm, so our
+       DS Input, the country picker and Stripe's fields share left and right
+       edges at every width. The Stripe side is set in EC_PW_APPEARANCE
+       (checker-paywall.jsx) to the DS Input's measurements: 13px label on a
+       20px line, 4px gap, 44px input, 12px radius, 16px between rows. */
+    .ec-pw__form { display: flex; flex-direction: column; gap: 20px; }
+    /* The wrapper stays mounted while the status panel shows, so the Stripe
+       iframe survives; [hidden] must beat the display:flex above. */
+    .ec-pw__form[hidden] { display: none; }
+    .ec-pw__card {
+      display: flex; flex-direction: column; gap: 16px;
+      padding: 24px;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 20px;
+      box-shadow: 0 2px 4px rgba(17, 20, 26, .02);
+    }
+    .ec-pw__sectionHead {
+      margin: 0;
+      font-size: 16px; line-height: 24px; font-weight: 600;
+      color: var(--c-ink);
+    }
+    /* Billing-country picker (EcCountrySelect). Its menu is absolutely
+       positioned (z-index 40 inside the picker) and opens downwards over the
+       Stripe iframe right below it. Nothing on the way clips it (the card
+       sets no overflow), and this stacking context lifts the whole picker
+       above the card fields and the consent block that follow. */
+    .ec-pw__country { position: relative; z-index: 2; min-width: 0; }
+    /* inert while a payment is in flight: looks as unavailable as the
+       disabled email Input next to it. */
+    .ec-pw__country[inert] { opacity: .55; }
+    /* ── Promo code row: Input + Apply side by side, the button aligned to
+       the input box (below the Input's 20px label line and 4px gap), stacked
+       on the narrowest phones. Once applied, the button gives way to the
+       green line under the field. ── */
+    .ec-pw__promo { display: flex; flex-direction: column; gap: 8px; }
+    .ec-pw__promoRow { display: flex; align-items: flex-start; gap: 8px; }
+    .ec-pw__promoField { flex: 1 1 auto; min-width: 0; }
+    .ec-pw__promoAction { flex: 0 0 auto; padding-top: 24px; }
+    /* Inline flow on purpose (see the JSX comment): the sentence wraps like
+       a paragraph on narrow phones and the Remove link trails its last word. */
+    .ec-pw__promoApplied {
+      margin: 0;
+      font-size: 13px; line-height: 18px; font-weight: 500;
+      color: var(--c-success);
+    }
+    .ec-pw__promoTick {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 18px; height: 18px;
+      margin-right: 6px;
+      border-radius: 999px;
+      background: var(--c-success-soft);
+      color: var(--c-success);
+      vertical-align: -4px;
+    }
+    .ec-pw__promoApplied button { margin-left: 8px; }
+    @media (max-width: 400px) {
+      .ec-pw__promoRow { flex-direction: column; align-items: stretch; }
+      .ec-pw__promoAction { padding-top: 0; }
+      .ec-pw__promoAction button { width: 100%; }
+    }
+    .ec-pw__element[hidden] { display: none; }
+    .ec-pw__loading {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 0;
+      font-size: 13px; line-height: 18px;
+      color: var(--c-muted);
+    }
+    /* Preview stand-in for the card form: same footprint, clearly not live. */
+    .ec-pw__placeholder {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px;
+      min-height: 148px;
+      padding: 20px;
+      border: 1.5px dashed var(--c-border-strong);
+      border-radius: var(--r-md);
+      background: var(--c-bg);
+      font-size: 13px; line-height: 18px;
+      color: var(--c-muted);
+      text-align: center;
+    }
+
+    /* ── Decision point: consent, pay ──────────────────────────────────
+       The consent sentence is the single legal statement on the page, so
+       it stands on its own above the Pay button, without a notice box. */
+    .ec-pw__decision { display: flex; flex-direction: column; gap: 16px; }
+    .ec-pw__consent { padding: 0 2px; }
+    .ec-pw__secure {
+      display: flex; align-items: flex-start; justify-content: center; gap: 6px;
+      margin: 0;
+      font-size: 12px; line-height: 17px;
+      color: var(--c-muted);
+      text-align: center;
+    }
+    .ec-pw__secure svg { margin-top: 1px; }
+    .ec-pw__mail { color: inherit; font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+    .ec-pw__mail:hover { color: inherit; }
+
+    /* ── Status panel (confirming / processing / paid-but-no-token) ── */
+    .ec-pw__statusRow {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; line-height: 20px; font-weight: 500;
+      color: var(--c-ink-2);
+    }
+
+    /* ── Success ───────────────────────────────────────────────────── */
+    .ec-pw--success { align-items: flex-start; gap: 16px; }
+    .ec-pw--success .ec-doodle--block { margin-bottom: 4px; }
+
+    @media (max-width: 640px) {
+      .ec-pw { gap: 16px; }
+      .ec-pw__form { gap: 16px; }
+      .ec-pw__title { font-size: 24px; line-height: 30px; }
+      .ec-pw__card { padding: 20px; border-radius: 18px; }
+      .ec-pw__includes { padding: 18px 20px; border-radius: 18px; }
+      .ec-pw__summary { padding: 18px 20px; border-radius: 18px; }
     }

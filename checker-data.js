@@ -575,9 +575,9 @@ const EC_SERVICES = [
 // removing a question = bump this number; no string edits needed.
 const TOTAL_STEPS = 5;
 
-// Volume bands — used twice on Q4 (incoming + outgoing). `value` is the
-// band midpoint in EUR; the recommendation engine reads (volIn + volOut)
-// as monthly throughput. Threshold spacing follows KYB-industry norms.
+// Volume bands — the Q4 slider, one answer for incoming and outgoing
+// combined. `value` is the band midpoint, which the recommendation engine
+// reads as monthly throughput. Threshold spacing follows KYB-industry norms.
 const EC_VOLUME_BANDS = [
   { idx: 0, value: 25000,   labelKey: "ec.q4.vol.0" }, // Under £50k
   { idx: 1, value: 125000,  labelKey: "ec.q4.vol.1" }, // £50k – £200k
@@ -587,9 +587,10 @@ const EC_VOLUME_BANDS = [
   { idx: 5, value: 7000000, labelKey: "ec.q4.vol.5" }, // £5M+
 ];
 
-// Tx-count bands — same shape as volume. `value` is the band midpoint
-// transaction count; recommendation uses (txIn + txOut) total against
-// the txHigh threshold (≥300 monthly).
+// Tx-count bands — same shape as volume, and likewise one combined
+// incoming-plus-outgoing answer. `value` is the band midpoint transaction
+// count, which the recommendation compares against the txHigh threshold
+// (≥300 monthly).
 const EC_TX_BANDS = [
   { idx: 0, value: 10,   labelKey: "ec.q4.tx.0" }, // Under 20
   { idx: 1, value: 60,   labelKey: "ec.q4.tx.1" }, // 20 – 100
@@ -668,6 +669,20 @@ const EC_PLANS = {
     },
   },
 };
+
+// One-time account opening fee (founder decision, 2026-09-23): charged per
+// application attempt, captured immediately, non-refundable in every case,
+// GBP for every entity. This is a DISPLAY MIRROR of lib/opening-fee.js —
+// the server is authoritative (it sets the PaymentIntent amount and checks
+// it again on confirm), so nothing here is ever trusted for charging.
+// GET /api/opening-fee returns the live values; this copy is the fallback
+// when that call fails. test/openingFeeClient.test.mjs fails if they drift.
+const EC_OPENING_FEE = Object.freeze({
+  amount: 10000,              // minor units (pence)
+  currency: "gbp",
+  display: "£100",
+  termsVersion: "2026-09-23",
+});
 
 const EC_ENTITIES = {
   uk: {
@@ -1383,6 +1398,6 @@ Object.assign(window, {
   EC_CHIP_REGIONS, EC_CHIP_REGION_ORDER, EC_CHIP_REGION_FLAG,
   EC_CAPABILITY_MATRIX,
   EC_SERVICES, TOTAL_STEPS,
-  EC_VOLUME_BANDS, EC_TX_BANDS, EC_PLANS, EC_ENTITIES,
+  EC_VOLUME_BANDS, EC_TX_BANDS, EC_PLANS, EC_ENTITIES, EC_OPENING_FEE,
   EC_COMPARATORS, ecHeroIdentifier, maskTailDots,
 });

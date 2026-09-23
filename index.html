@@ -131,13 +131,22 @@
         return "en";
       }
 
+      // <html lang> follows the UI language, so screen readers pronounce the
+      // copy (the paywall's fee terms and consent line included) in the
+      // language it is written in rather than as English.
+      function syncDocLang(code) {
+        try { document.documentElement.lang = code; } catch (e) {}
+      }
+
       let currentLang = detectInitial();
+      syncDocLang(currentLang);
       const listeners = new Set();
 
       function getLang() { return currentLang; }
       function setLang(code) {
         if (!DICT[code]) return;
         currentLang = code;
+        syncDocLang(code);
         try { localStorage.setItem(STORAGE_KEY, code); } catch (e) {}
         listeners.forEach((fn) => fn(code));
       }
@@ -215,6 +224,11 @@
   <!-- Checker modals — Fees, BankHistory, Perks, PlanComparison, Handoff,
        Payment. Resolves dependencies via window at render time. -->
   <script type="text/babel" data-presets="react" src="/checker-modals.jsx"></script>
+  <!-- Opening-fee paywall — EcPaywall, the one-time account opening fee step
+       between the approved result and registration. Loads Stripe.js on
+       demand; resolves DS, EcIco and the fee helpers via window at render
+       time. -->
+  <script type="text/babel" data-presets="react" src="/checker-paywall.jsx"></script>
   <!-- EC data constants — pure data, no JSX, loaded as a classic script so
        Babel never touches it. Exports EC_COUNTRIES, EC_PLANS, EC_ENTITIES …
        to window for the inline block below to reference unqualified. -->

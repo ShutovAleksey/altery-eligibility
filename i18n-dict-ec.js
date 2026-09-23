@@ -40,8 +40,10 @@
     "ec.sidebar.step3": "Services",
     "ec.sidebar.step4": "Volume",
     "ec.sidebar.step5": "Corridors",
+    "ec.sidebar.step6": "Account opening",
     "ec.sidebar.status.current": "In progress",
     "ec.sidebar.status.done": "Completed",
+    "ec.sidebar.status.fee": "{fee} · one-time",
     "ec.sidebar.editStep": "Edit {label}",
 
     // Question header
@@ -161,12 +163,8 @@
     "ec.q4.tx.2": "101 to 300",
     "ec.q4.tx.1": "20 to 100",
     "ec.q4.tx.0": "Under 20",
-    "ec.q4.tx.out.label": "Number of outgoing transactions per month (approx.)",
-    "ec.q4.tx.in.label": "Number of incoming transactions per month (approx.)",
-    "ec.q4.vol.out.label": "Average monthly outgoing volume (in GBP)",
-    "ec.q4.vol.in.label": "Average monthly incoming volume (in GBP)",
-    "ec.q4.section.out": "Outgoing payments",
-    "ec.q4.section.in": "Incoming payments",
+    "ec.q4.tx.label": "Number of transactions per month, incoming and outgoing combined (approx.)",
+    "ec.q4.vol.label": "Average monthly volume, incoming and outgoing combined (in GBP)",
     "ec.q4.why": "These estimates don't need to be exact. We use them to tailor your setup and starting limits, and they can be adjusted as your business grows.",
     "ec.q1.why": "Your industry helps us tailor the right products and review path, and confirm Altery can support your business. It doesn't affect your pricing.",
     "ec.q2.why": "Where your company is registered determines whether we can open an account for your business. We only work with companies from supported countries, so this is the first thing we check.",
@@ -182,11 +180,7 @@
     // Q4 corridors
     "ec.q5.title": "Which regions do you work with?",
     "ec.q5.lead": "Tap every region you operate with, incoming and outgoing combined. We'll match you to the entity with the best corridor coverage.",
-    "ec.q5.section.in": "Where funds come from",
-    "ec.q5.section.out": "Where funds go",
-    "ec.q5.asymmetric.toggle": "Different mix for incoming vs outgoing?",
     "ec.q5.regions.aria": "Regions you operate with",
-    "ec.q5.regions.outAria": "Outgoing destinations",
     "ec.q5.addCountry": "Add specific country",
     "ec.q5.addCountry.placeholder": "Search and pick a country",
     "ec.q5.outliers.aria": "Specific countries added beyond regions",
@@ -261,6 +255,65 @@
         "ec.r.plan.notRecommended.down.body": "{selected} has a lower subscription, but its higher per-transaction fees and lower volume cap can leave services you selected (mass payouts, FX corridors, business cards) outside the plan, so those become paid extras the projection above doesn't account for.",
         "ec.r.plan.notRecommended.switchBack": "Switch back to {recommended}",
         "ec.r.cta.continue": "Set up your account",
+
+    // Paywall: one-time account opening fee between the approved result
+    // and registration (checker-paywall.jsx). The fee is stated through
+    // structure, not small print: a sidebar step, the two-cell cost block
+    // (ec.r.costs.*, shared by the result page and the paywall), a plan-
+    // card row and the CTA label. "Today · one-time" and "After activation
+    // · monthly" keep the {fee} apart from the Pro plan's identical monthly
+    // price. The consent line is the single legal statement at the decision
+    // point. {fee} is the server-provided display amount, {email} is
+    // ec.support.email.
+    "ec.r.costs.head": "Your costs",
+    "ec.r.costs.today": "Today · one-time",
+    "ec.r.costs.after": "After activation · monthly",
+    "ec.r.costs.fee": "Account opening fee",
+    "ec.r.costs.oneTimeValue": "{fee} one-time",
+    "ec.r.cta.opening": "Continue to account opening",
+    "ec.pw.back": "Back to your result",
+    "ec.pw.eyebrow": "Last step before your application",
+    "ec.pw.title": "Open your account with {entity}",
+    "ec.pw.summary.eligible": "Eligible",
+    "ec.pw.includes.head": "What the fee covers",
+    "ec.pw.includes.review": "Full compliance review of your company, its owners and directors",
+    "ec.pw.includes.team": "Handled by specialists in digital and cross-border businesses",
+    "ec.pw.includes.prefill": "An application pre-filled with your answers from this check",
+    "ec.pw.includes.noDeadline": "No deadline: once paid, finish your application whenever suits you",
+    "ec.pw.field.email.label": "Work email",
+    "ec.pw.field.email.placeholder": "you@company.com",
+    "ec.pw.field.email.hint": "We'll send your payment receipt here.",
+    "ec.pw.field.country.label": "Billing country",
+    "ec.pw.error.email": "Enter a valid work email",
+    "ec.pw.pay.head": "Payment details",
+    "ec.pw.consent": "I understand the {fee} account opening fee is charged once per application and is non-refundable, including if my application is not approved.",
+    "ec.pw.consent.error": "Please tick the box to continue",
+    "ec.pw.cta.pay": "Pay {fee} and continue",
+    "ec.pw.cta.processing": "Processing payment…",
+    "ec.pw.secure": "Payments are processed securely by Stripe. Altery never sees your card details.",
+    "ec.pw.loading": "Loading secure payment form…",
+    "ec.pw.error.load": "We couldn't load the payment form. Check your connection and try again.",
+    "ec.pw.error.retry": "Try again",
+    "ec.pw.error.declined": "The payment didn't go through and you haven't been charged. Please try again or use another card.",
+    "ec.pw.error.unavailable": "Payments are temporarily unavailable. Please try again later or write to {email}.",
+    "ec.pw.error.confirm": "Your payment went through, but we couldn't open your application automatically. Please don't pay again. Write to {email} and we'll help you continue.",
+    "ec.pw.processing": "Your bank is still processing the payment. Please don't pay again. If this takes more than a few minutes, write to {email}.",
+    "ec.pw.success.title": "Payment received",
+    "ec.pw.success.body": "Next: your application, about 10 minutes.",
+    "ec.pw.success.cta": "Continue to application",
+    "ec.pw.preview": "Preview mode: payments aren't configured on this server, so no payment form is shown and nothing is charged.",
+    "ec.pw.paymentPlaceholder": "The secure card form appears here",
+    "ec.pw.promo.label": "Promo code (optional)",
+    "ec.pw.promo.placeholder": "Enter code",
+    "ec.pw.promo.apply": "Apply",
+    "ec.pw.promo.remove": "Remove code",
+    "ec.pw.promo.checking": "Checking…",
+    "ec.pw.promo.applied": "{code} applied: account opening fee {amount}",
+    "ec.pw.promo.freeLabel": "Free with code {code}",
+    "ec.pw.promo.invalid": "This code isn't valid",
+    "ec.pw.promo.expired": "This code has expired",
+    "ec.pw.promo.used": "This code has already been used with this email",
+    "ec.pw.success.freeTitle": "Fee waived with code {code}",
 
     // Plan names
     "ec.plan.starter": "Starter",
@@ -491,6 +544,15 @@
     "ec.b.head": "If your business setup is more complex",
     "ec.b.row1.tag": "Talk to us",
     "ec.b.row1.text": "Some business models require additional review. If you think we may still be able to support your business, contact our team with a short description of your setup.",
+    // Decline screen: the pre-written "contact our team" email (subject +
+    // body) and the address fallback shown only if no mail app opened.
+    "ec.b.mail.subject.country": "Altery eligibility check: business incorporated in {country}",
+    "ec.b.mail.subject.industry": "Altery eligibility check: {industry} business incorporated in {country}",
+    "ec.b.mail.intro": "Hello Altery team, I ran your eligibility checker and it said you can't currently support my business. I think our setup may still fit, so here are the details.",
+    "ec.b.mail.line.country": "Country of incorporation: {country}",
+    "ec.b.mail.line.industry": "Industry: {industry}",
+    "ec.b.mail.prompt": "A short description of our business and what we need:",
+    "ec.b.mail.fallback": "If your mail app didn't open, write to us directly:",
 
     // Country regions/notes (for entity card)
     "ec.r.entity.regHint": "Open the regulator's public register in a new tab",
