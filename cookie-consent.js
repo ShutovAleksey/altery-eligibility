@@ -93,10 +93,12 @@
 
   // ── banner ──────────────────────────────────────────────────────────
   var bannerEl = null;
+  var unsubLang = null;
 
   function removeBanner() {
     if (bannerEl && bannerEl.parentNode) bannerEl.parentNode.removeChild(bannerEl);
     bannerEl = null;
+    if (unsubLang) { unsubLang(); unsubLang = null; }
   }
 
   function decide(value) {           // "all" | "essential"
@@ -110,13 +112,11 @@
 
   function showBanner() {
     injectStyles();
-    var s = t();
     removeBanner();
 
     var wrap = document.createElement("div");
     wrap.className = "altery-cc";
     wrap.setAttribute("role", "dialog");
-    wrap.setAttribute("aria-label", s.title);
     wrap.setAttribute("aria-live", "polite");
 
     var card = document.createElement("div");
@@ -126,15 +126,14 @@
     text.className = "altery-cc__text";
     var h = document.createElement("div");
     h.className = "altery-cc__title";
-    h.textContent = s.title;
     var p = document.createElement("p");
     p.className = "altery-cc__body";
-    p.textContent = s.body + " ";
+    var bodyText = document.createTextNode("");
     var a = document.createElement("a");
     a.href = POLICY_URL;
     a.target = "_blank";
     a.rel = "noopener noreferrer";
-    a.textContent = s.policy;
+    p.appendChild(bodyText);
     p.appendChild(a);
     text.appendChild(h);
     text.appendChild(p);
@@ -144,12 +143,10 @@
     var reject = document.createElement("button");
     reject.type = "button";
     reject.className = "altery-cc__btn altery-cc__btn--ghost";
-    reject.textContent = s.reject;
     reject.addEventListener("click", function () { decide("essential"); });
     var allow = document.createElement("button");
     allow.type = "button";
     allow.className = "altery-cc__btn altery-cc__btn--primary";
-    allow.textContent = s.allow;
     allow.addEventListener("click", function () { decide("all"); });
     // Reject is listed first and styled with equal visual weight to Allow,
     // so rejecting is no harder than accepting (PECR/ePrivacy requirement).
@@ -160,7 +157,28 @@
     card.appendChild(actions);
     wrap.appendChild(card);
 
-    var mount = function () { document.body.appendChild(wrap); bannerEl = wrap; };
+    // Text is applied in place (not by rebuilding the banner) so a language
+    // switch while the banner is open doesn't drop keyboard focus.
+    function applyText() {
+      var s = t();
+      wrap.setAttribute("aria-label", s.title);
+      h.textContent = s.title;
+      bodyText.nodeValue = s.body + " ";
+      a.textContent = s.policy;
+      reject.textContent = s.reject;
+      allow.textContent = s.allow;
+    }
+    applyText();
+
+    var mount = function () {
+      document.body.appendChild(wrap);
+      bannerEl = wrap;
+      // This script loads before the i18n bootstrap, so subscribe at mount
+      // time (DOMContentLoaded or later), when window.__I18N exists.
+      try {
+        if (window.__I18N && window.__I18N.onChange) unsubLang = window.__I18N.onChange(applyText);
+      } catch (e) { /* no i18n on this surface — banner stays in its initial language */ }
+    };
     if (document.body) mount();
     else document.addEventListener("DOMContentLoaded", mount);
   }
