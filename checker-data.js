@@ -722,13 +722,18 @@ const EC_ENTITIES = {
     noteKey: "ec.entity.eu.note",
     currencyPerkKey: "ec.entity.eu.currencyPerk",
     countries: ["DE", "FR", "NL", "IT", "ES", "IE"],
-    // Central Bank of Cyprus EMI authorisation number — public on
-    // CBC's e-money institutions register. Direct firm-detail deep
-    // link isn't exposed by CBC, so we link to the EMI list page where
-    // the number 115.1.3.61 appears against Altery EU Ltd.
+    // Central Bank of Cyprus EMI authorisation number 115.1.3.61. CBC
+    // has no per-firm page (its register is a dated .xlsx that changes
+    // name on every update, and the old /electronic-money-institutions
+    // path now lands on a soft 404, Sep 2026), so we deep-link Altery EU
+    // Limited's entry in the EBA's EUCLID register, which mirrors CBC's
+    // data and shows 115.1.3.61 with its "Authorised (Current)" status.
+    // The entity id is CBC's code plus the Cyprus company number
+    // (HE415141). First-time visitors pass one EBA disclaimer click, then
+    // land on the entry itself (returnUrl is preserved).
     regulatory: {
       refLabel: "EMI 115.1.3.61",
-      registerUrl: "https://www.centralbank.cy/en/licensing-supervision/electronic-money-institutions",
+      registerUrl: "https://euclid.eba.europa.eu/register/pir/view/PSD_EMI/PSD_EMICY_CBC!415141",
     },
     accounts: [
       {
