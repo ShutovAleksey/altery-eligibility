@@ -169,7 +169,7 @@
     "ec.q4.section.in": "Incoming payments",
     "ec.q4.why": "These estimates don't need to be exact. We use them to tailor your setup and starting limits, and they can be adjusted as your business grows.",
     "ec.q1.why": "Your industry helps us tailor the right products and review path, and confirm Altery can support your business. It doesn't affect your pricing.",
-    "ec.q2.why": "Where your company is registered decides which Altery entity opens your account (UK, EU, or MENA) and which regulations and onboarding documents apply.",
+    "ec.q2.why": "Where your company is registered determines whether we can open an account for your business. We only work with companies from supported countries, so this is the first thing we check.",
     "ec.q3.why": "What you want to do with Altery shapes the plan we recommend. Options like mass payouts, cards, or API access point to the right tier for you.",
     "ec.q5.why": "Your payment routes let us estimate your FX and transfer costs and confirm we support the currencies and corridors your business uses.",
     "ec.q4.vol.0": "Under £50k",
