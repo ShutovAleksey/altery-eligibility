@@ -1010,7 +1010,7 @@ function EcServices({ country, services, setServices, onBack, onNext }) {
       <EcQuestionHeader num="3" title={t("ec.q3.title")} lead={t("ec.q3.lead")} />
 
       <div className="ec-services" role="group" aria-label={t("ec.q3.title")}>
-        {EC_SERVICES.map((s) => {
+        {EC_SERVICES.filter((s) => !s.hidden).map((s) => {
           const on = services.has(s.value);
           return (
             <div

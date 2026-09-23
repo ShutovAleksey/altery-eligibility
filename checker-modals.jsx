@@ -286,7 +286,7 @@ function EcPlanCompareCard({ plan, onSelect }) {
       <div className="ec-plan-compare__section">
         <div className="ec-plan-compare__sectionHead">{t("ec.r.plan.compare.productsHead")}</div>
         <div className="ec-plan-compare__perks">
-          {EC_SERVICES.map((svc, i) => {
+          {EC_SERVICES.filter((svc) => !svc.hidden).map((svc, i) => {
             const tier = svc.tier;
             const included =
               (tier === "starter" || tier === "specialist") ||
